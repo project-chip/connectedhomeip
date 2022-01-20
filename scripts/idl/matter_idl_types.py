@@ -9,9 +9,10 @@ class FieldAttribute(enum.Enum):
     NULLABLE = enum.auto()
 
 
-class AttributeAccess(enum.Enum):
-    READONLY = enum.auto()
-    READWRITE = enum.auto()
+class AttributeTag(enum.Enum):
+    READABLE = enum.auto()
+    WRITABLE = enum.auto()
+    GLOBAL = enum.auto()
 
 
 class EventPriority(enum.Enum):
@@ -46,8 +47,20 @@ class Field:
 
 @dataclass
 class Attribute:
-    access: AttributeAccess
     definition: Field
+    tags: Set[AttributeTag] = field(default_factory=set())
+
+    @property
+    def is_readable(self):
+        return AttributeTag.READABLE in self.tags
+
+    @property
+    def is_writable(self):
+        return AttributeTag.WRITABLE in self.tags
+
+    @property
+    def is_global(self):
+        return AttributeTag.GLOBAL in self.tags
 
 
 @dataclass

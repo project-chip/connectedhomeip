@@ -67,11 +67,11 @@ class MatterIdlTransformer(Transformer):
     def nullable(self, _):
         return FieldAttribute.NULLABLE
 
-    def readonly(self, _):
-        return AttributeAccess.READONLY
+    def attr_readonly(self, _):
+        return AttributeTag.READABLE
 
-    def writable(self, _):
-        return AttributeAccess.READWRITE
+    def attr_global(self, _):
+        return AttributeTag.GLOBAL
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL
@@ -113,11 +113,15 @@ class MatterIdlTransformer(Transformer):
         return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
 
     def attribute(self, args):
-        access = AttributeAccess.READWRITE  # default
-        if len(args) > 1:
-            access = args[0]
+        tags = set(args[:-1])
+        # until we support write only (and need a bit of a reshuffle)
+        # if the 'attr_readonly == READABLE' is not in the list, we make things
+        # read/write
+        if AttributeTag.READABLE not in tags:
+            tags.add(AttributeTag.READABLE)
+            tags.add(AttributeTag.WRITABLE)
 
-        return Attribute(access=access, definition=args[-1])
+        return Attribute(definition=args[-1], tags=tags)
 
     @v_args(inline=True)
     def struct(self, id, *fields):

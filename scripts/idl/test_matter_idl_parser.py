@@ -91,6 +91,8 @@ class TestParser(unittest.TestCase):
             server cluster MyCluster = 0x321 {
                 readonly attribute int8u roAttr = 1;
                 attribute int32u rwAttr[] = 123;
+                global attribute int32u grwAttr[] = 124;
+                readonly global attribute int32u groAttr[] = 125;
             }
         """)
 
@@ -99,10 +101,14 @@ class TestParser(unittest.TestCase):
                     name="MyCluster",
                     code=0x321,
                     attributes=[
-                        Attribute(access=AttributeAccess.READONLY, definition=Field(
+                        Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
                             data_type="int8u", code=1, name="roAttr")),
-                        Attribute(access=AttributeAccess.READWRITE, definition=Field(
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type="int32u", code=123, name="rwAttr", is_list=True)),
+                        Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type="int32u", code=124, name="grwAttr", is_list=True)),
+                        Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE]), definition=Field(
+                            data_type="int32u", code=125, name="groAttr", is_list=True)),
                     ]
                     )])
         self.assertEqual(actual, expected)
