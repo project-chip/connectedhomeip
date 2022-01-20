@@ -223,7 +223,7 @@ public:
     // If this function is successful, it will invoke the OnDone callback before returning to indicate
     // to the application that it can destroy and free this object.
     //
-    CHIP_ERROR SendGroupCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendGroupCommandRequest(const SessionHandle & session);
 
 private:
     friend class TestCommandInteraction;

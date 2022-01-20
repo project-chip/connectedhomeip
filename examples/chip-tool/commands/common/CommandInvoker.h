@@ -125,9 +125,12 @@ public:
             return CHIP_ERROR_NO_MEMORY;
         }
 
+        // this (invoker) and commandSender will be deleted by the onDone call before the return of SendGroupCommandRequest
+        // this (invoker) should not be used after the SendGroupCommandRequest call
         ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
-        commandSender.release();
 
+        // this (invoker) and commandSender are already deleted and are not to be used
+        commandSender.release();
         exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
 
         return CHIP_NO_ERROR;
@@ -228,7 +231,12 @@ CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
 {
     auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback, aDoneCallback);
     VerifyOrReturnError(invoker != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // invoker will be deleted by the onDone call before the return of InvokeGroupCommand
+    // invoker should not be used after the InvokeGroupCommand call
     ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice->GetExchangeManager(), groupId, aRequestData));
+
+    //  invoker is already deleted and is not to be used
     invoker.release();
     return CHIP_NO_ERROR;
 }
