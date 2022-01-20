@@ -25,16 +25,16 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     Access::SubjectDescriptor subjectDescriptor;
     if (IsOperationalNodeId(mPeerNodeId))
     {
-        subjectDescriptor.authMode    = Access::AuthMode::kCase;
-        subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.cats        = mPeerCATs;
+        subjectDescriptor.authMode = Access::AuthMode::kCase;
+        subjectDescriptor.subject  = mPeerNodeId;
+        subjectDescriptor.cats     = mPeerCATs;
         VerifyOrDie(mEffectiveFabric == kUndefinedFabricIndex);
         subjectDescriptor.fabricIndex = mEffectiveFabric;
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
-        subjectDescriptor.authMode    = Access::AuthMode::kPase;
-        subjectDescriptor.subject     = mPeerNodeId;
+        subjectDescriptor.authMode = Access::AuthMode::kPase;
+        subjectDescriptor.subject  = mPeerNodeId;
         if (mEffectiveFabric == kUndefinedFabricIndex)
         {
             subjectDescriptor.fabricIndex = mFabric;
