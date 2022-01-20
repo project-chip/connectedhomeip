@@ -15,14 +15,14 @@
 # limitations under the License.
 
 try:
-    from .parser import CreateParser
+    from .matter_idl_parser import CreateParser
     from .matter_idl_types import *
 except:
     import os
     import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-    from parser import CreateParser
+    from matter_idl_parser import CreateParser
     from matter_idl_types import *
 
 import unittest
