@@ -2767,6 +2767,34 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedOperationalCredentialsClusterNOCsAttributeCallback
+      implements ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipClusters.OperationalCredentialsCluster.NOCsAttribute> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipClusters.OperationalCredentialsCluster.NOCsAttribute>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedOperationalCredentialsClusterFabricsListAttributeCallback
       implements ChipClusters.OperationalCredentialsCluster.FabricsListAttributeCallback,
           DelegatedClusterCallback {

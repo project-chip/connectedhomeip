@@ -4147,6 +4147,21 @@ public class ClusterReadMapping {
         readOnOffSwitchConfigurationClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("onOffSwitchConfiguration", readOnOffSwitchConfigurationInteractionInfo);
     Map<String, InteractionInfo> readOperationalCredentialsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readOperationalCredentialsNOCsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalCredentialsNOCsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalCredentialsCluster) cluster)
+                  .readNOCsAttribute(
+                      (ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalCredentialsClusterNOCsAttributeCallback(),
+            readOperationalCredentialsNOCsCommandParams);
+    readOperationalCredentialsInteractionInfo.put(
+        "readNOCsAttribute", readOperationalCredentialsNOCsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOperationalCredentialsFabricsListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOperationalCredentialsFabricsListAttributeInteractionInfo =

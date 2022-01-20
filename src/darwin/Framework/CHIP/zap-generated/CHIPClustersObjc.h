@@ -3103,6 +3103,8 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:(void (^)(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeNOCsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFabricsListWithMinInterval:(uint16_t)minInterval
