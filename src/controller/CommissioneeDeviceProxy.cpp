@@ -162,6 +162,8 @@ void CommissioneeDeviceProxy::Reset()
 
     ReleaseDAC();
     ReleasePAI();
+    ClearIpk();
+    ClearAdminSubject();
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
@@ -272,6 +274,23 @@ CHIP_ERROR CommissioneeDeviceProxy::SetPAI(const chip::ByteSpan & pai)
     memcpy(mPAI, pai.data(), mPAILen);
 
     return CHIP_NO_ERROR;
+}
+
+void CommissioneeDeviceProxy::ClearIpk()
+{
+    mIpk.ClearValue(); // AesCcm128Key destructor will clear secret data.
+}
+
+void CommissioneeDeviceProxy::SetIpk(Optional<AesCcm128KeySpan> ipk)
+{
+    if (!ipk.HasValue())
+    {
+        ClearIpk();
+    }
+    else
+    {
+        mIpk.Emplace(ipk.Value());
+    }
 }
 
 CommissioneeDeviceProxy::~CommissioneeDeviceProxy()

@@ -257,6 +257,15 @@ public:
     CHIP_ERROR SetDAC(const ByteSpan & dac);
     CHIP_ERROR SetPAI(const ByteSpan & pai);
 
+    Optional<AesCcm128KeySpan> GetIpk() const
+    {
+        return mIpk.HasValue() ? Optional<AesCcm128KeySpan>((mIpk.Value().Span())) : Optional<AesCcm128KeySpan>();
+    }
+    void SetIpk(Optional<AesCcm128KeySpan> ipk);
+
+    Optional<NodeId> GetAdminSubject() const { return mAdminSubject; }
+    void SetAdminSubject(Optional<NodeId> adminSubject) { mAdminSubject = adminSubject; }
+
     MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
     CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
@@ -332,6 +341,8 @@ private:
 
     void ReleaseDAC();
     void ReleasePAI();
+    void ClearIpk();
+    void ClearAdminSubject() { mAdminSubject = Optional<NodeId>(); }
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
@@ -349,6 +360,10 @@ private:
 
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
     size_t mICACertBufferSize = 0;
+
+    Optional<Crypto::AesCcm128Key> mIpk;
+
+    Optional<NodeId> mAdminSubject;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 };
