@@ -119,7 +119,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     LogQueryImageResponse(response);
 
     uint32_t currentSoftwareVersion;
-    VerifyOrReturn(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &currentSoftwareVersion) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrDie(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &currentSoftwareVersion) == EMBER_ZCL_STATUS_SUCCESS);
 
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
@@ -136,35 +136,25 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        if (response.softwareVersion.HasValue())
+        if (update.softwareVersion > currentSoftwareVersion)
         {
+            ChipLogDetail(SoftwareUpdate, "Updating to newer version");
+            MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
+            CopySpanToMutableSpan(update.updateToken, updateToken);
+            requestorCore->mUpdateVersion = update.softwareVersion;
+            requestorCore->mUpdateToken   = updateToken;
 
-            if (update.softwareVersion > currentSoftwareVersion)
-            {
-                ChipLogDetail(SoftwareUpdate, "Updating to newer version");
-                MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-                CopySpanToMutableSpan(update.updateToken, updateToken);
-                requestorCore->mUpdateVersion = update.softwareVersion;
-                requestorCore->mUpdateToken   = updateToken;
-
-                requestorCore->mOtaRequestorDriver->UpdateAvailable(
+            requestorCore->mOtaRequestorDriver->UpdateAvailable(
                     update, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-            }
-            else
-            {
-                ChipLogDetail(SoftwareUpdate, "Already up to date");
-
-                requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
-                                                                   System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-            }
         }
         else
         {
-            ChipLogDetail(SoftwareUpdate, "Update Not Found!!");
-            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
-                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-        }
+            ChipLogDetail(SoftwareUpdate, "Already up to date");
 
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
+                                                                   System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+        
         break;
     }
     case OTAQueryStatus::kBusy:
