@@ -14410,7 +14410,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan rootPublicKey;
     uint16_t vendorId       = static_cast<uint16_t>(0);
     chip::FabricId fabricId = static_cast<chip::FabricId>(0);
@@ -14419,6 +14419,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14429,16 +14430,19 @@ enum class Fields
 {
     kFabricIndex = 0,
     kNoc         = 1,
+    kIcac        = 2,
 };
 
 struct Type
 {
 public:
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
+    chip::ByteSpan icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14964,6 +14968,20 @@ public:
 
 namespace Attributes {
 
+namespace NOCs {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NOCs::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NOCs
 namespace FabricsList {
 struct TypeInfo
 {
@@ -15071,6 +15089,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::NOCs::TypeInfo::DecodableType NOCs;
         Attributes::FabricsList::TypeInfo::DecodableType fabricsList;
         Attributes::SupportedFabrics::TypeInfo::DecodableType supportedFabrics       = static_cast<uint8_t>(0);
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);

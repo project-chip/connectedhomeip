@@ -1021,8 +1021,14 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  struct NOCStruct {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING noc = 1;
+    OCTET_STRING icac = 2;
+  }
+
   struct FabricDescriptor {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
     OCTET_STRING rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
@@ -1030,6 +1036,7 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING label = 5;
   }
 
+  readonly attribute NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptor fabricsList[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;

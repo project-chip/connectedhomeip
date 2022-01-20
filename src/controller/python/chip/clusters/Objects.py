@@ -12419,6 +12419,7 @@ class OperationalCredentials(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="NOCs", Tag=0x00000000, Type=typing.List[OperationalCredentials.Structs.NOCStruct]),
                 ClusterObjectFieldDescriptor(Label="fabricsList", Tag=0x00000001, Type=typing.List[OperationalCredentials.Structs.FabricDescriptor]),
                 ClusterObjectFieldDescriptor(Label="supportedFabrics", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
@@ -12429,6 +12430,7 @@ class OperationalCredentials(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    NOCs: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = None
     fabricsList: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = None
     supportedFabrics: 'uint' = None
     commissionedFabrics: 'uint' = None
@@ -12482,10 +12484,12 @@ class OperationalCredentials(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="noc", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="icac", Tag=2, Type=bytes),
                     ])
 
             fabricIndex: 'uint' = 0
             noc: 'bytes' = b""
+            icac: 'bytes' = b""
 
 
 
@@ -12705,6 +12709,22 @@ class OperationalCredentials(Cluster):
 
 
     class Attributes:
+        @dataclass
+        class NOCs(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[OperationalCredentials.Structs.NOCStruct])
+
+            value: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = field(default_factory=lambda: [])
+
         @dataclass
         class FabricsList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
