@@ -4977,6 +4977,35 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::OperationalCredentials::Id: {
         using namespace Clusters::OperationalCredentials;
         switch (aPath.mAttributeId) {
+        case Attributes::NOCs::Id: {
+            using TypeInfo = Attributes::NOCs::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPOperationalCredentialsClusterNOCStruct * newElement_0;
+                newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
+                newElement_0.icac = [NSData dataWithBytes:entry_0.icac.data() length:entry_0.icac.size()];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
+            return value;
+        }
         case Attributes::FabricsList::Id: {
             using TypeInfo = Attributes::FabricsList::TypeInfo;
             TypeInfo::DecodableType cppValue;

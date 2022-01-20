@@ -71,6 +71,13 @@ typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
         data);
+void OperationalCredentialsClusterNOCsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                          chip::Callback::Cancelable * onSuccessCallback,
+                                                          chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+        data);
 void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);

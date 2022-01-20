@@ -4356,6 +4356,21 @@
           ],
           "attributes": [
             {
+              "name": "NOCs",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "fabrics list",
               "code": 1,
               "mfgCode": null,
@@ -7204,9 +7219,9 @@
       ]
     },
     {
-      "name": "MA-rootdevice",
-      "deviceTypeName": "MA-rootdevice",
-      "deviceTypeCode": 22,
+      "name": "MA-onofflight",
+      "deviceTypeName": "MA-onofflight",
+      "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -17119,9 +17134,9 @@
       ]
     },
     {
-      "name": "MA-rootdevice",
-      "deviceTypeName": "MA-rootdevice",
-      "deviceTypeCode": 22,
+      "name": "MA-onofflight",
+      "deviceTypeName": "MA-onofflight",
+      "deviceTypeCode": 256,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -20121,22 +20136,22 @@
       "deviceIdentifier": 22
     },
     {
-      "endpointTypeName": "MA-rootdevice",
+      "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "deviceIdentifier": 256
     },
     {
-      "endpointTypeName": "MA-rootdevice",
+      "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "deviceIdentifier": 256
     }
   ]
 }

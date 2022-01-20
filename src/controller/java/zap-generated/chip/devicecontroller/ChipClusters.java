@@ -9838,6 +9838,44 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public static class NOCsAttribute {
+      public Integer fabricIndex;
+      public byte[] noc;
+      public byte[] icac;
+
+      public NOCsAttribute(Integer fabricIndex, byte[] noc, byte[] icac) {
+        this.fabricIndex = fabricIndex;
+        this.noc = noc;
+        this.icac = icac;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("byte[] ");
+        output.append(Arrays.toString(noc));
+        output.append("\n");
+
+        output.append("byte[] ");
+        output.append(Arrays.toString(icac));
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface NOCsAttributeCallback {
+      void onSuccess(List<NOCsAttribute> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public static class FabricsListAttribute {
       public Integer fabricIndex;
       public byte[] rootPublicKey;
@@ -9924,6 +9962,10 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public void readNOCsAttribute(NOCsAttributeCallback callback) {
+      readNOCsAttribute(chipClusterPtr, callback);
+    }
+
     public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
       readFabricsListAttribute(chipClusterPtr, callback);
     }
@@ -9972,6 +10014,8 @@ public class ChipClusters {
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
+
+    private native void readNOCsAttribute(long chipClusterPtr, NOCsAttributeCallback callback);
 
     private native void readFabricsListAttribute(
         long chipClusterPtr, FabricsListAttributeCallback callback);
