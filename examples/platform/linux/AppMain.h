@@ -22,6 +22,7 @@
 #include <thread>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissionerDiscoveryController.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -39,6 +40,7 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, chip::Tran
 CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
 
 DeviceCommissioner * GetDeviceCommissioner();
+CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

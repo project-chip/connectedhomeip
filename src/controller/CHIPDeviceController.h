@@ -447,7 +447,6 @@ private:
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
-                                      public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
 #endif
                                       public SessionEstablishmentDelegate
 {
@@ -634,17 +633,6 @@ public:
      *
      */
     void FindCommissionableNode(char * instanceName) override;
-
-    /**
-     * @brief
-     *   Called when a UDC message has been received and corresponding nodeData has been found.
-     * It is expected that the implementer will prompt the user to confirm their intention to
-     * commission the given node, and provide the setup code to allow commissioning to proceed.
-     *
-     * @param nodeData DNS-SD node information for the client requesting commissioning
-     *
-     */
-    void OnUserDirectedCommissioningRequest(UDCClientState state) override;
 
     /**
      * @brief

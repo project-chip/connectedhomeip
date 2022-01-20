@@ -209,7 +209,17 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
     }
 };
 
+class MyCommissionerCallback : public CommissionerCallback
+{
+    void ReadyForCommissioning(uint32_t pincode, uint16_t longDiscriminator, PeerAddress peerAddress) override
+    {
+        CommissionerPairOnNetwork(pincode, longDiscriminator, peerAddress);
+    }
+};
+
 DeviceCommissioner gCommissioner;
+CommissionerDiscoveryController gCommissionerDiscoveryController;
+MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 chip::SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
@@ -265,12 +275,20 @@ CHIP_ERROR InitCommissioner()
     auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
+    gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
+    gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ShutdownCommissioner()
 {
+    UserDirectedCommissioningServer * udcServer = gCommissioner.GetUserDirectedCommissioningServer();
+    if (udcServer != nullptr)
+    {
+        udcServer->SetUserConfirmationProvider(nullptr);
+    }
+
     gCommissioner.Shutdown();
     return CHIP_NO_ERROR;
 }
@@ -422,6 +440,11 @@ CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index)
 DeviceCommissioner * GetDeviceCommissioner()
 {
     return &gCommissioner;
+}
+
+CommissionerDiscoveryController * GetCommissionerDiscoveryController()
+{
+    return &gCommissionerDiscoveryController;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

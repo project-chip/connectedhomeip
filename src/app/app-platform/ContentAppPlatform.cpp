@@ -348,6 +348,29 @@ void AppPlatform::UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId)
     }
 }
 
+uint32_t AppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
+{
+    ContentApp * app = GetLoadContentAppByVendorId(vendorId);
+    if (app == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no app found for vendor id=%d \r\n", vendorId);
+        return 0;
+    }
+
+    if (app->GetAccountLoginDelegate() == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d \r\n", vendorId);
+        return 0;
+    }
+
+    chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type responseType =
+        app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingId);
+    std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
+
+    char * eptr;
+    return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+}
+
 } // namespace AppPlatform
 } // namespace chip
 

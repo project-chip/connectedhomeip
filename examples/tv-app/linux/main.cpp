@@ -77,6 +77,28 @@ static WakeOnLanManager wakeOnLanManager;
 
 void ApplicationInit() {}
 
+class MyUserPrompter : public UserPrompter
+{
+    // TODO: tv should override this with a dialog prompt
+    void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override {}
+
+    // TODO: tv should override this with a dialog prompt
+    void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override {}
+};
+
+MyUserPrompter gMyUserPrompter;
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+class MyPincodeService : public PincodeService
+{
+    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return chip::AppPlatform::AppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+    }
+};
+MyPincodeService gMyPincodeService;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 int main(int argc, char * argv[])
 {
 
@@ -89,6 +111,7 @@ int main(int argc, char * argv[])
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     chip::AppPlatform::AppPlatform::GetInstance().SetupAppPlatform();
     chip::AppPlatform::AppPlatform::GetInstance().SetContentAppFactory(&factory);
+    GetCommissionerDiscoveryController()->SetPincodeService(&gMyPincodeService);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -96,6 +119,7 @@ int main(int argc, char * argv[])
     chip::Shell::RegisterAppPlatformCommands();
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #endif
+    GetCommissionerDiscoveryController()->SetUserPrompter(&gMyUserPrompter);
 
     ChipLinuxAppMainLoop();
 

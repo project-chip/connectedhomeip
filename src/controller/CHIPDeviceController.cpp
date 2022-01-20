@@ -673,7 +673,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcTransportMgr->SetSessionManager(mUdcServer);
 
     mUdcServer->SetInstanceNameResolver(this);
-    mUdcServer->SetUserConfirmationProvider(this);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -697,7 +696,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     if (mUdcServer != nullptr)
     {
         mUdcServer->SetInstanceNameResolver(nullptr);
-        mUdcServer->SetUserConfirmationProvider(nullptr);
         chip::Platform::Delete(mUdcServer);
         mUdcServer = nullptr;
     }
@@ -1592,18 +1590,6 @@ void DeviceCommissioner::FindCommissionableNode(char * instanceName)
     DiscoverCommissionableNodes(filter);
 }
 
-void DeviceCommissioner::OnUserDirectedCommissioningRequest(UDCClientState state)
-{
-    ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s deviceName=%s",
-                  state.GetInstanceName(), state.GetDeviceName());
-
-    if (mUdcServer != nullptr)
-    {
-        mUdcServer->PrintUDCClients();
-    }
-
-    ChipLogDetail(Controller, "------To Accept Enter: discover udc-commission <pincode> <udc-client-index>");
-}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD

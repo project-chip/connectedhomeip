@@ -90,6 +90,10 @@ public:
     // unset this as current app, if it is current app
     void UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId);
 
+    // loads content app identified by vid/pid and calls HandleGetSetupPin.
+    // Returns 0 if pin cannot be obtained.
+    uint32_t GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId);
+
 protected:
     bool mNoCurrentApp = true;
     chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type mCurrentApp;

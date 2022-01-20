@@ -176,6 +176,7 @@ static CHIP_ERROR PrintAllCommands()
         sout, "  udc-print                   Print all pending UDC sessions from this UDC server. Usage: controller udc-print\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    streamer_printf(sout, "  ux ok|cancel [<pincode>]   User input. Usage: controller ux ok 34567890\r\n");
     streamer_printf(sout,
                     "  udc-commission <pincode> <udc-entry>     Commission given udc-entry using given pincode. Usage: controller "
                     "udc-commission 34567890 0\r\n");
@@ -246,6 +247,36 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         uint16_t port = (uint16_t) strtol(argv[4], &eptr, 10);
 
         return error = pairOnNetwork(true, pincode, disc, chip::Transport::PeerAddress::UDP(address, port));
+    }
+    else if (strcmp(argv[0], "ux") == 0)
+    {
+        // ux ok|cancel [pincode]
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+        char * response = argv[1];
+        if (strcmp(response, "cancel") == 0)
+        {
+            GetCommissionerDiscoveryController()->Cancel();
+            return CHIP_NO_ERROR;
+        }
+        else if (strcmp(response, "ok") == 0)
+        {
+            if (argc >= 3)
+            {
+                uint32_t pincode = (uint32_t) strtol(argv[2], &eptr, 10);
+                GetCommissionerDiscoveryController()->CommissionWithPincode(pincode);
+                return CHIP_NO_ERROR;
+            }
+            GetCommissionerDiscoveryController()->Ok();
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            return PrintAllCommands();
+        }
     }
     else if (strcmp(argv[0], "udc-commission") == 0)
     {
