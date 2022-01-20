@@ -1176,7 +1176,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
                                       newUserStatus, newUserType, newCredentialRule, newCredentials, newTotalCredentials))
     {
         emberAfDoorLockClusterPrintln("[createUser] Unable to create user: app error "
-                                      "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus="
+                                      "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus="
                                       "%" PRIu8 ",userType=%" PRIu8 ",credentialRule=%" PRIu8 ",totalCredentials=%zu]",
                                       endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId,
                                       to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
@@ -1185,7 +1185,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
     }
 
     emberAfDoorLockClusterPrintln("[createUser] User created "
-                                  "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%"
+                                  "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%"
                                   "" PRIu8 ",userType=%" PRIu8 ",credentialRule=%" PRIu8 ",totalCredentials=%zu]",
                                   endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId,
                                   to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
@@ -1248,7 +1248,7 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
     {
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
-                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%" PRIu8
+                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%" PRIu8
                      ",userType=%" PRIu8 ",credentialRule=%" PRIu8 "]",
                      endpointId, modifierFabricIndex, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
                      to_underlying(newUserType), to_underlying(newCredentialRule));
@@ -1257,7 +1257,7 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
 
     emberAfDoorLockClusterPrintln(
         "[modifyUser] User modified "
-        "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%" PRIu8 ","
+        "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%" PRIu8 ","
         "userType=%" PRIu8 ",credentialRule=%" PRIu8 "]",
         endpointId, modifierFabricIndex, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
         to_underlying(newUserType), to_underlying(newCredentialRule));
