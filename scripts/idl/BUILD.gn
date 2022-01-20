@@ -27,8 +27,8 @@ pw_python_package("idl") {
 
   sources = [
     "__init__.py",
-    "matter_idl_types.py",
     "matter_idl_parser.py",
+    "matter_idl_types.py",
   ]
 
   tests = [ "test_matter_idl_parser.py" ]
