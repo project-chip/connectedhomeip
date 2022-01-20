@@ -106,6 +106,13 @@ CHIPDevice * GetConnectedDevice(void)
     _expectation = nil;
 }
 
+- (void)onCommissioningComplete:(NSError *)error
+{
+    XCTAssertEqual(error.code, 0);
+    [_expectation fulfill];
+    _expectation = nil;
+}
+
 - (void)onAddressUpdated:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
@@ -20086,6 +20093,18 @@ uint8_t currentTarget;
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 2600);
         }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], 1600);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 2600);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -20213,6 +20232,18 @@ uint8_t currentTarget;
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 2000);
         }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], 700);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 3000);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -20338,6 +20369,18 @@ uint8_t currentTarget;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 700);
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], 700);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 3000);
+            }
         }
 
         [expectation fulfill];
@@ -20465,6 +20508,18 @@ uint8_t currentTarget;
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 3000);
         }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], 700);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 3000);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -20591,6 +20646,18 @@ uint8_t currentTarget;
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 1600);
         }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], 1600);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 3200);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -20716,6 +20783,18 @@ uint8_t currentTarget;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 3200);
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue shortValue], 1600);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue shortValue], 3200);
+            }
         }
 
         [expectation fulfill];
@@ -21041,6 +21120,18 @@ uint8_t currentTarget;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedCharValue], 4);
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 5);
+            }
         }
 
         [expectation fulfill];
@@ -38512,6 +38603,12 @@ NSMutableString * readAttributeCharStringNotDefaultValue;
             XCTAssertTrue([actualValue isEqualToString:@"NotDefault"]);
             readAttributeCharStringNotDefaultValue = [NSMutableString stringWithString:actualValue];
         }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -38536,6 +38633,12 @@ NSMutableString * readAttributeCharStringNotDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqualObjects(actualValue, readAttributeCharStringNotDefaultValue);
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
+            }
         }
 
         [expectation fulfill];
@@ -38706,6 +38809,12 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
             XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"NotDefault" length:10]]);
             readAttributeOctetStringNotDefaultValue = [NSMutableData dataWithData:actualValue];
         }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -38730,6 +38839,12 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqualObjects(actualValue, readAttributeOctetStringNotDefaultValue);
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
+            }
         }
 
         [expectation fulfill];

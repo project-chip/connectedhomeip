@@ -453,6 +453,9 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
+    // Notify the secure session of the new fabric.
+    commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->NewFabric(fabricIndex);
+
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
 

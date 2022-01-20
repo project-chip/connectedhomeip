@@ -18,6 +18,7 @@
 
 #include "BDXDownloader.h"
 
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BytesToHex.h>
@@ -28,6 +29,8 @@
 #include <transport/raw/MessageHeader.h>
 
 using chip::OTADownloader;
+using chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
+using chip::app::DataModel::Nullable;
 using chip::bdx::TransferSession;
 
 namespace chip {
@@ -68,7 +71,7 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
 
-    SetState(State::kPreparing);
+    SetState(State::kPreparing, OTAChangeReasonEnum::kSuccess);
 
     return CHIP_NO_ERROR;
 }
@@ -79,7 +82,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
 
     if (status == CHIP_NO_ERROR)
     {
-        SetState(State::kInProgress);
+        SetState(State::kInProgress, OTAChangeReasonEnum::kSuccess);
 
         // Must call here because StartTransfer() should have prepared a ReceiveInit message, and now we should send it.
         PollTransferSession();
@@ -88,7 +91,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
     {
         ChipLogError(BDX, "failed to prepare download: %" CHIP_ERROR_FORMAT, status.Format());
         mBdxTransfer.Reset();
-        SetState(State::kIdle);
+        SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
     }
 
     return CHIP_NO_ERROR;
@@ -113,7 +116,7 @@ void BDXDownloader::OnDownloadTimeout()
         {
             mImageProcessor->Abort();
         }
-        SetState(State::kIdle);
+        SetState(State::kIdle, OTAChangeReasonEnum::kTimeOut);
     }
     else
     {
@@ -131,7 +134,7 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
         {
             mImageProcessor->Abort();
         }
-        SetState(State::kIdle);
+        SetState(State::kIdle, OTAChangeReasonEnum::kSuccess);
 
         // Because AbortTransfer() will generate a StatusReport to send.
         PollTransferSession();
@@ -174,14 +177,16 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
             // BDX transfer is not complete until BlockAckEOF has been sent
-            SetState(State::kComplete);
+            SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
         }
         break;
     }
     case TransferSession::OutputEventType::kBlockReceived: {
         chip::ByteSpan blockData(outEvent.blockdata.Data, outEvent.blockdata.Length);
         ReturnErrorOnFailure(mImageProcessor->ProcessBlock(blockData));
-        mStateDelegate->OnUpdateProgressChanged(mImageProcessor->GetPercentComplete());
+        Nullable<uint8_t> percent;
+        mImageProcessor->GetPercentComplete(percent);
+        mStateDelegate->OnUpdateProgressChanged(percent);
 
         // TODO: this will cause problems if Finalize() is not guaranteed to do its work after ProcessBlock().
         if (outEvent.blockdata.IsEof)
@@ -219,13 +224,13 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     return CHIP_NO_ERROR;
 }
 
-void BDXDownloader::SetState(State state)
+void BDXDownloader::SetState(State state, OTAChangeReasonEnum reason)
 {
     mState = state;
 
     if (mStateDelegate)
     {
-        mStateDelegate->OnDownloadStateChanged(state);
+        mStateDelegate->OnDownloadStateChanged(state, reason);
     }
 }
 

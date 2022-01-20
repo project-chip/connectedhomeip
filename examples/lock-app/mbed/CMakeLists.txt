@@ -72,6 +72,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
                ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
+               ${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp

@@ -136,6 +136,13 @@ public:
     virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;
 
+    // Gets called when starting BLE/DNS-SD advertisement
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    virtual void NotifyOfAdvertisementStart() {}
+#else
+    void NotifyOfAdvertisementStart() {}
+#endif
+
     virtual void LogDeviceConfig() = 0;
 
     virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
