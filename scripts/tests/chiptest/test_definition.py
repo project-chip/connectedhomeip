@@ -30,6 +30,7 @@ TEST_NODE_ID = '0x12344321'
 class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
+    DOOR_LOCK = auto()
 
 
 @dataclass
@@ -94,6 +95,9 @@ class TestDefinition:
                 app_cmd = paths.all_clusters_app
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
+            elif self.target == TestTarget.DOOR_LOCK:
+                logging.info("Ignore test - test is made for door lock which is not supported yet")
+                return
             else:
                 raise Exception(
                     "Unknown test target - don't know which application to run")
