@@ -39,9 +39,7 @@
     nosubscribe {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
   {{~!Removes spaces~}} attribute {{type}} {{asLowerCamelCase name~}}
-    {{~#if isList~}}
-      [{{maxLength}}]
-    {{~/if}} = {{code}};
+    {{~#if isList~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
   {{#chip_cluster_commands}}
   {{#if arguments}}

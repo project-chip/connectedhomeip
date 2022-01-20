@@ -147,7 +147,7 @@ client cluster ApplicationBasic = 1293 {
   attribute ApplicationBasicApplication applicationApp = 4;
   readonly attribute ApplicationStatusEnum applicationStatus = 5;
   readonly attribute char_string applicationVersion = 6;
-  readonly attribute vendor_id allowedVendorList[32] = 7;
+  readonly attribute vendor_id allowedVendorList[] = 7;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -164,7 +164,7 @@ client cluster ApplicationLauncher = 1292 {
     CHAR_STRING applicationId = 1;
   }
 
-  readonly attribute INT16U applicationLauncherList[254] = 0;
+  readonly attribute INT16U applicationLauncherList[] = 0;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -207,7 +207,7 @@ client cluster AudioOutput = 1291 {
     CHAR_STRING<32> name = 2;
   }
 
-  readonly attribute OutputInfo audioOutputList[254] = 0;
+  readonly attribute OutputInfo audioOutputList[] = 0;
   readonly attribute int8u currentAudioOutput = 1;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -379,8 +379,8 @@ client cluster BridgedActions = 37 {
     ActionErrorEnum error = 3;
   }
 
-  readonly attribute ActionStruct actionList[256] = 0;
-  readonly attribute EndpointListStruct endpointList[256] = 1;
+  readonly attribute ActionStruct actionList[] = 0;
+  readonly attribute EndpointListStruct endpointList[] = 1;
   readonly attribute long_char_string setupUrl = 2;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -487,7 +487,7 @@ client cluster Channel = 1284 {
     CHAR_STRING<32> affiliateCallSign = 4;
   }
 
-  readonly attribute ChannelInfo channelList[254] = 0;
+  readonly attribute ChannelInfo channelList[] = 0;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -849,7 +849,7 @@ client cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute CHAR_STRING acceptHeaderList[254] = 0;
+  readonly attribute CHAR_STRING acceptHeaderList[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -881,10 +881,10 @@ client cluster Descriptor = 29 {
     INT16U revision = 1;
   }
 
-  readonly attribute DeviceType deviceList[254] = 0;
-  readonly attribute CLUSTER_ID serverList[254] = 1;
-  readonly attribute CLUSTER_ID clientList[254] = 2;
-  readonly attribute ENDPOINT_NO partsList[254] = 3;
+  readonly attribute DeviceType deviceList[] = 0;
+  readonly attribute CLUSTER_ID serverList[] = 1;
+  readonly attribute CLUSTER_ID clientList[] = 2;
+  readonly attribute ENDPOINT_NO partsList[] = 3;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1306,7 +1306,7 @@ client cluster EthernetNetworkDiagnostics = 55 {
 }
 
 client cluster FixedLabel = 64 {
-  readonly attribute LabelStruct labelList[254] = 0;
+  readonly attribute LabelStruct labelList[] = 0;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1339,7 +1339,7 @@ client cluster GeneralCommissioning = 48 {
   }
 
   attribute int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[254] = 1;
+  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1456,14 +1456,14 @@ client cluster GeneralDiagnostics = 51 {
     BootReasonType bootReason = 0;
   }
 
-  readonly attribute NetworkInterfaceType networkInterfaces[254] = 0;
+  readonly attribute NetworkInterfaceType networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
   readonly attribute int64u upTime = 2;
   readonly attribute int32u totalOperationalHours = 3;
   readonly attribute enum8 bootReasons = 4;
-  readonly attribute ENUM8 activeHardwareFaults[254] = 5;
-  readonly attribute ENUM8 activeRadioFaults[254] = 6;
-  readonly attribute ENUM8 activeNetworkFaults[254] = 7;
+  readonly attribute ENUM8 activeHardwareFaults[] = 5;
+  readonly attribute ENUM8 activeRadioFaults[] = 6;
+  readonly attribute ENUM8 activeNetworkFaults[] = 7;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1498,8 +1498,8 @@ client cluster GroupKeyManagement = 63 {
     INT64U epochStartTime2 = 7;
   }
 
-  readonly attribute GroupKey groupKeyMap[254] = 0;
-  readonly attribute GroupInfo groupTable[254] = 1;
+  readonly attribute GroupKey groupKeyMap[] = 0;
+  readonly attribute GroupInfo groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1846,7 +1846,7 @@ client cluster LevelControl = 8 {
 
 client cluster LocalizationConfiguration = 43 {
   attribute char_string activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[254] = 2;
+  readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
 client cluster LowPower = 1288 {
@@ -1879,7 +1879,7 @@ client cluster MediaInput = 1287 {
     CHAR_STRING<32> description = 3;
   }
 
-  readonly attribute InputInfo mediaInputList[254] = 0;
+  readonly attribute InputInfo mediaInputList[] = 0;
   readonly attribute int8u currentMediaInput = 1;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -1962,7 +1962,7 @@ client cluster ModeSelect = 80 {
   }
 
   readonly attribute int8u currentMode = 0;
-  readonly attribute ModeOptionStruct supportedModes[255] = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 1;
   attribute int8u onMode = 2;
   readonly attribute int8u startUpMode = 3;
   readonly attribute char_string description = 4;
@@ -2027,7 +2027,7 @@ client cluster NetworkCommissioning = 49 {
   }
 
   readonly attribute int8u maxNetworks = 0;
-  readonly attribute NetworkInfo networks[12] = 1;
+  readonly attribute NetworkInfo networks[] = 1;
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
@@ -2313,10 +2313,10 @@ client cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 5;
   }
 
-  readonly attribute FabricDescriptor fabricsList[320] = 1;
+  readonly attribute FabricDescriptor fabricsList[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
-  readonly attribute OCTET_STRING trustedRootCertificates[400] = 4;
+  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute fabric_idx currentFabricIndex = 5;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -2401,7 +2401,7 @@ client cluster PowerSource = 47 {
   readonly attribute int8u batteryPercentRemaining = 12;
   readonly attribute int32u batteryTimeRemaining = 13;
   readonly attribute enum8 batteryChargeLevel = 14;
-  readonly attribute ENUM8 activeBatteryFaults[8] = 18;
+  readonly attribute ENUM8 activeBatteryFaults[] = 18;
   readonly attribute enum8 batteryChargeState = 26;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
@@ -2409,7 +2409,7 @@ client cluster PowerSource = 47 {
 }
 
 client cluster PowerSourceConfiguration = 46 {
-  readonly attribute INT8U sources[6] = 0;
+  readonly attribute INT8U sources[] = 0;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2642,7 +2642,7 @@ client cluster SoftwareDiagnostics = 52 {
     SoftwareFault softwareFault = 0;
   }
 
-  readonly attribute ThreadMetrics threadMetrics[254] = 0;
+  readonly attribute ThreadMetrics threadMetrics[] = 0;
   readonly attribute int64u currentHeapFree = 1;
   readonly attribute int64u currentHeapUsed = 2;
   readonly attribute int64u currentHeapHighWatermark = 3;
@@ -2704,7 +2704,7 @@ client cluster TargetNavigator = 1285 {
     CHAR_STRING<32> name = 1;
   }
 
-  readonly attribute TargetInfo targetNavigatorList[254] = 0;
+  readonly attribute TargetInfo targetNavigatorList[] = 0;
   readonly attribute int8u currentNavigatorTarget = 1;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -2821,9 +2821,9 @@ client cluster TestCluster = 1295 {
   attribute single floatSingle = 23;
   attribute double floatDouble = 24;
   attribute octet_string octetString = 25;
-  attribute INT8U listInt8u[10] = 26;
-  attribute OCTET_STRING listOctetString[254] = 27;
-  attribute TestListStructOctet listStructOctetString[254] = 28;
+  attribute INT8U listInt8u[] = 26;
+  attribute OCTET_STRING listOctetString[] = 27;
+  attribute TestListStructOctet listStructOctetString[] = 28;
   attribute long_octet_string longOctetString = 29;
   attribute char_string charString = 30;
   attribute long_char_string longCharString = 31;
@@ -2837,7 +2837,7 @@ client cluster TestCluster = 1295 {
   attribute int8s rangeRestrictedInt8s = 39;
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
-  readonly attribute LONG_OCTET_STRING listLongOctetString[1000] = 42;
+  readonly attribute LONG_OCTET_STRING listLongOctetString[] = 42;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean unsupported = 255;
   attribute boolean nullableBoolean = 32768;
@@ -3148,8 +3148,8 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u extendedPanId = 4;
   readonly attribute octet_string meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute NeighborTable neighborTableList[254] = 7;
-  readonly attribute RouteTable routeTableList[254] = 8;
+  readonly attribute NeighborTable neighborTableList[] = 7;
+  readonly attribute RouteTable routeTableList[] = 8;
   readonly attribute int32u partitionId = 9;
   readonly attribute int8u weighting = 10;
   readonly attribute int8u dataVersion = 11;
@@ -3200,10 +3200,10 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u activeTimestamp = 56;
   readonly attribute int64u pendingTimestamp = 57;
   readonly attribute int32u delay = 58;
-  readonly attribute SecurityPolicy securityPolicy[6] = 59;
+  readonly attribute SecurityPolicy securityPolicy[] = 59;
   readonly attribute octet_string channelMask = 60;
-  readonly attribute OperationalDatasetComponents operationalDatasetComponents[14] = 61;
-  readonly attribute NetworkFault activeNetworkFaultsList[4] = 62;
+  readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -3212,7 +3212,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
 }
 
 client cluster UserLabel = 65 {
-  attribute LabelStruct labelList[254] = 0;
+  attribute LabelStruct labelList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 }
 
