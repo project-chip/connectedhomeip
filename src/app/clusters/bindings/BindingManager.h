@@ -35,8 +35,7 @@ namespace chip {
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * binding, DeviceProxy * peer_device,
-                                           Optional<GroupId> group, void * context);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * binding, DeviceProxy * peer_device, void * context);
 
 /**
  *

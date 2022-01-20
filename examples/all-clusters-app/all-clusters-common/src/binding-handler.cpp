@@ -67,13 +67,12 @@ static void RegisterSwitchCommands()
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::DeviceProxy * peer_device,
-                                      chip::Optional<chip::GroupId> group, void * context)
+static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::DeviceProxy * peer_device, void * context)
 {
     using namespace chip;
     using namespace chip::app;
 
-    if (group.HasValue())
+    if (binding->type == EMBER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;

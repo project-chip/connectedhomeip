@@ -90,7 +90,7 @@ void BindingManager::SyncPendingNotificationsToPeer(OperationalDeviceProxy * dev
             if (emberGetBinding(j, &entry) == EMBER_SUCCESS && entry.type == EMBER_UNICAST_BINDING && entry.clusterId == cluster &&
                 entry.local == endpoint && mBoundDeviceChangedHandler)
             {
-                mBoundDeviceChangedHandler(&entry, device, NullOptional, path.context);
+                mBoundDeviceChangedHandler(&entry, device, path.context);
             }
         }
     }
@@ -147,7 +147,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 if (peerDevice != nullptr && mBoundDeviceChangedHandler)
                 {
                     // We already have an active connection
-                    mBoundDeviceChangedHandler(&entry, peerDevice, NullOptional, context);
+                    mBoundDeviceChangedHandler(&entry, peerDevice, context);
                 }
                 else
                 {
@@ -159,7 +159,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
             }
             else if (entry.type == EMBER_MULTICAST_BINDING)
             {
-                mBoundDeviceChangedHandler(&entry, nullptr, Optional<GroupId>(entry.groupId), context);
+                mBoundDeviceChangedHandler(&entry, nullptr, context);
             }
         }
     }
