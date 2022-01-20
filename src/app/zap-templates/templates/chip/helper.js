@@ -453,23 +453,6 @@ async function if_chip_enum(type, options)
   return templateUtil.templatePromise(this.global, result);
 }
 
-/**
- * ZAP data model assumes pascal strings, so it always sets a size
- * for arrays, even if spec says "unlimited". As  such, we only
- * assume valid sizes for things that look  like a valid size
- *
- * Processes the block iff the current item has a maxLength that does not seem too
- * large
- */
-async function if_valid_list_size_restriction(options)
-{
-  if (this.maxLength && (this.maxLength < 254)) {
-    return options.fn(this);
-  } else {
-    return options.inverse(this);
-  }
-}
-
 //
 // Module exports
 //
@@ -496,4 +479,3 @@ exports.if_chip_enum                                         = if_chip_enum;
 exports.if_in_global_responses                               = if_in_global_responses;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
-exports.if_valid_list_size_restriction                       = if_valid_list_size_restriction;
