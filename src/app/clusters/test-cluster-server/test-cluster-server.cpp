@@ -412,11 +412,9 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
 CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        auto fabricTable = Server::GetInstance().GetFabricTable();
-
         chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
 
-        for (const auto & fb : fabricTable)
+        for (const auto & fb : Server::GetInstance().GetFabricTable())
         {
             val.fabricIndex = fb.GetFabricIndex();
             ReturnErrorOnFailure(encoder.Encode(val));
