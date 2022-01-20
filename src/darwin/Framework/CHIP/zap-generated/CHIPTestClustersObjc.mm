@@ -7625,7 +7625,10 @@ using namespace chip::app::Clusters;
                                 listHolder_0->mList[i_0].endpoints = ListType_2();
                             }
                         }
-                        listHolder_0->mList[i_0].groupName = [self asCharSpan:element_0.groupName];
+                        if (element_0.groupName != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].groupName.Emplace();
+                            definedValue_2 = [self asCharSpan:element_0.groupName];
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

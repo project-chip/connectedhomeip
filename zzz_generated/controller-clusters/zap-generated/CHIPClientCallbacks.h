@@ -63,7 +63,7 @@ typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(v
                                                                                chip::CharSpan debugText);
 typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback)(
     void * context, /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeySetIDs);
-typedef void (*GroupKeyManagementClusterKeySetReadResponseCallback)(void * context, GroupKeySetStruct GroupKeySetStruct);
+typedef void (*GroupKeyManagementClusterKeySetReadResponseCallback)(void * context, GroupKeySetStruct GroupKeySet);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);

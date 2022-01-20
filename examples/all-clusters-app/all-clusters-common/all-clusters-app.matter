@@ -1509,25 +1509,25 @@ server cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 0;
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
-    CHAR_STRING groupName = 3;
+    optional CHAR_STRING<16> groupName = 3;
   }
 
   struct GroupKeySetStruct {
     INT16U groupKeySetID = 0;
     GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
-    OCTET_STRING epochKey0 = 2;
-    epoch_us epochStartTime0 = 3;
-    OCTET_STRING epochKey1 = 4;
-    epoch_us epochStartTime1 = 5;
-    OCTET_STRING epochKey2 = 6;
-    epoch_us epochStartTime2 = 7;
+    nullable OCTET_STRING<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable OCTET_STRING<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable OCTET_STRING<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
   }
 
-  attribute(writable) GroupKeyMapStruct groupKeyMap[] = 0;
-  attribute(readonly) GroupInfoMapStruct groupTable[] = 1;
-  attribute(readonly) int16u maxGroupsPerFabric = 2;
-  attribute(readonly) int16u maxGroupKeysPerFabric = 3;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct KeySetReadRequest {
     INT16U groupKeySetID = 0;
@@ -1542,7 +1542,7 @@ server cluster GroupKeyManagement = 63 {
   }
 
   request struct KeySetWriteRequest {
-    GroupKeySetStruct groupKeySetStruct = 0;
+    GroupKeySetStruct groupKeySet = 0;
   }
 
   response struct KeySetReadAllIndicesResponse {
@@ -1550,7 +1550,7 @@ server cluster GroupKeyManagement = 63 {
   }
 
   response struct KeySetReadResponse {
-    GroupKeySetStruct groupKeySetStruct = 0;
+    GroupKeySetStruct groupKeySet = 0;
   }
 
   command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
