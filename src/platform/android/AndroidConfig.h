@@ -1,3 +1,5 @@
+
+
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
@@ -76,8 +78,6 @@ public:
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
-    static const Key kConfigKey_HourFormat;
-    static const Key kConfigKey_CalendarType;
     static const Key kConfigKey_ProductId;
     static const Key kConfigKey_ProductName;
     static const Key kConfigKey_SoftwareVersion;

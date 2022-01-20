@@ -103,8 +103,6 @@ public:
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen)   = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
-    virtual CHIP_ERROR GetHourFormat(uint8_t & format)                                 = 0;
-    virtual CHIP_ERROR GetCalendarType(uint8_t & type)                                 = 0;
     virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
     virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
     virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
@@ -116,8 +114,6 @@ public:
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
     virtual CHIP_ERROR StoreActiveLocale(const char * code, size_t codeLen)            = 0;
     virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
-    virtual CHIP_ERROR StoreHourFormat(uint8_t format)                                 = 0;
-    virtual CHIP_ERROR StoreCalendarType(uint8_t type)                                 = 0;
     virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
     virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
