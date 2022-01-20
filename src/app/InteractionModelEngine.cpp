@@ -177,6 +177,28 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::Interacti
     return count;
 }
 
+ReadHandler* InteractionModelEngine::GetActiveHandler(unsigned int aIndex)
+{
+    if (aIndex >= mReadHandlers.Allocated()) {
+        return nullptr;
+    }
+
+    unsigned int i = 0;
+    ReadHandler *ret = nullptr;
+
+    mReadHandlers.ForEachActiveObject([aIndex, &i, &ret](ReadHandler *handler) {
+        if (i == aIndex) {
+            ret = handler;
+            return Loop::Break;
+        }
+
+        i++;
+        return Loop::Continue;
+    });
+
+    return ret;
+}
+
 uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
 {
     uint32_t numActive = 0;

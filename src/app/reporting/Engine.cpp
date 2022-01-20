@@ -464,7 +464,7 @@ void Engine::Run()
 
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < imEngine->mReadHandlers.Allocated()))
     {
-        ReadHandler * readHandler = imEngine->mReadHandlers.At(mCurReadHandlerIdx % imEngine->mReadHandlers.Allocated());
+        ReadHandler * readHandler = imEngine->GetActiveHandler(mCurReadHandlerIdx % imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
         if (readHandler->IsReportable())
