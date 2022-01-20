@@ -106,6 +106,13 @@ CHIPDevice * GetConnectedDevice(void)
     _expectation = nil;
 }
 
+- (void)onCommissioningComplete:(NSError *)error
+{
+    XCTAssertEqual(error.code, 0);
+    [_expectation fulfill];
+    _expectation = nil;
+}
+
 - (void)onAddressUpdated:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
