@@ -100,7 +100,7 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(app::CommandHandler 
         }
     }
 
-    emberAfScenesClusterPrintln("%s","");
+    emberAfScenesClusterPrintln("%s", "");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -157,7 +157,7 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
         }
     }
 
-    emberAfScenesClusterPrintln("%s","");
+    emberAfScenesClusterPrintln("%s", "");
     emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
