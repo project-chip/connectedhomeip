@@ -142,7 +142,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             }
             else
             {
-                ChipLogDetail(SoftwareUpdate, "Already UpToDate!!");
+                ChipLogDetail(SoftwareUpdate, "Already up to date");
 
                 requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
                                                                    System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
