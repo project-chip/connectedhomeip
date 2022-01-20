@@ -73,6 +73,9 @@ struct Nullable : protected Optional<T>
     {
         return true;
     }
+
+    bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }
+    bool operator!=(const Nullable & other) const { return !(*this == other); }
 };
 
 } // namespace DataModel
