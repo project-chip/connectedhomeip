@@ -75,7 +75,7 @@ qpg_executable("lock_app") {
 
   cflags = [ "-Wconversion" ]
 
-  ldscript = "${qpg_sdk_root}/${qpg_target_ic}/ldscripts/chip-${qpg_target_ic}-example.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
 
   inputs = [ ldscript ]
 
