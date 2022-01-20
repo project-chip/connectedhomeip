@@ -278,9 +278,9 @@ void OTARequestor::CancelImageUpdate()
     mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
 
     // All Provider info should be invalidated
-    mProviderNodeId = kUndefinedNodeId;
+    mProviderNodeId      = kUndefinedNodeId;
     mProviderFabricIndex = kUndefinedFabricIndex;
-    mProviderEndpointId = kRootEndpointId;
+    mProviderEndpointId  = kRootEndpointId;
 
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
 }
