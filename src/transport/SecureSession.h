@@ -126,7 +126,7 @@ public:
             mFabric = fabricIndex;
         }
 #else
-        mFabric = fabricIndex;
+        mEffectiveFabric = fabricIndex;
 #endif
         return CHIP_NO_ERROR;
     }
@@ -156,11 +156,11 @@ private:
     const CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
+    const FabricIndex mFabric;
 
     // PASE sessions start with undefined fabric, but are migrated to a newly
     // commissioned fabric after successful OperationalCredentialsCluster::AddNOC
-    FabricIndex mFabric;
-
+    FabricIndex mEffectiveFabric = kUndefinedFabricIndex;
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;
     ReliableMessageProtocolConfig mMRPConfig;

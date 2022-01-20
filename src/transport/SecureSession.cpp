@@ -28,13 +28,21 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
         subjectDescriptor.authMode    = Access::AuthMode::kCase;
         subjectDescriptor.subject     = mPeerNodeId;
         subjectDescriptor.cats        = mPeerCATs;
-        subjectDescriptor.fabricIndex = mFabric;
+        VerifyOrDie(mEffectiveFabric == kUndefinedFabricIndex);
+        subjectDescriptor.fabricIndex = mEffectiveFabric;
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
         subjectDescriptor.authMode    = Access::AuthMode::kPase;
         subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.fabricIndex = mFabric;
+        if (mEffectiveFabric == kUndefinedFabricIndex)
+        {
+            subjectDescriptor.fabricIndex = mFabric;
+        }
+        else
+        {
+            subjectDescriptor.fabricIndex = mEffectiveFabric;
+        }
     }
     else
     {
