@@ -140,13 +140,12 @@ namespace WindowCovering {
 bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 {
     bool hasFeature     = false;
-    uint32_t FeatureMap = 0;
-    if (EMBER_ZCL_STATUS_SUCCESS ==
-        emberAfReadServerAttribute(endpoint, chip::app::Clusters::WindowCovering::Id,
-                                   chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id,
-                                   reinterpret_cast<uint8_t *>(&FeatureMap), sizeof(FeatureMap)))
+    uint32_t featureMap = 0;
+
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
     {
-        hasFeature = (FeatureMap & chip::to_underlying(feature));
+        hasFeature = (featureMap & chip::to_underlying(feature));
     }
 
     return hasFeature;
