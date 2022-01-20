@@ -177,6 +177,7 @@ protected:
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
     {
+        // NOTE: don't clear mSecureSessionType as it cannot change.
         mPeerNodeId  = kUndefinedNodeId;
         mPeerCATs    = kUndefinedCATs;
         mPeerAddress = Transport::PeerAddress::Uninitialized();
