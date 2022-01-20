@@ -323,10 +323,10 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
         return LimitStatus::IsDownOrClose;
 
     if ((limits.open > 0) && (position < limits.open))
-        return LimitStatus::IsOverUpOrOpen;
+        return LimitStatus::IsPostUpOrOpen;
 
     if ((limits.closed > 0) && (position > limits.closed))
-        return LimitStatus::IsOverDownOrClose;
+        return LimitStatus::IsPostDownOrClose;
 
     return LimitStatus::Intermediate;
 }

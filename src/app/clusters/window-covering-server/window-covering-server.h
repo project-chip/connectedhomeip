@@ -98,8 +98,8 @@ enum class LimitStatus : uint8_t
     IsUpOrOpen        = 0x01,
     IsDownOrClose     = 0x02,
     Inverted          = 0x03,
-    IsOverUpOrOpen    = 0x04,
-    IsOverDownOrClose = 0x05,
+    IsPostUpOrOpen    = 0x04,
+    IsPostDownOrClose = 0x05,
 };
 static_assert(sizeof(LimitStatus) == sizeof(uint8_t), "LimitStatus Size is not correct");
 
