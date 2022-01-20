@@ -15,8 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/lib/lib.gni")
+
 executable("chip-all-clusters-app") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "include/tv-callbacks.cpp",
@@ -34,6 +37,10 @@ executable("chip-all-clusters-app") {
       [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   cflags = [ "-Wconversion" ]
+
+  if (chip_build_libshell) {
+    defines = [ "ENABLE_CHIP_SHELL" ]
+  }
 
   output_dir = root_out_dir
 }
