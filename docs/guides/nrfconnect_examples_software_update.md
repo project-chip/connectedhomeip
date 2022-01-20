@@ -3,6 +3,7 @@
 Some examples for the development kits from Nordic Semiconductor support
 over-the-air (OTA) Device Firmware Upgrade (DFU) using one of the following
 protocols:
+
 -   Matter-compliant OTA update protocol that uses the Matter operational
     network for querying and downloading a new firmware image.
 -   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
@@ -36,7 +37,7 @@ To test the DFU over Matter, you need to complete the following steps:
 
         $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
 
-4.  Run OTA Provider application with _app\_update.bin_ replaced with the path to
+4.  Run OTA Provider application with _app_update.bin_ replaced with the path to
     the new firmware image which you wish to provide to the Matter device:
 
          $ out/provider/chip-ota-provider-app -f app_update.bin
