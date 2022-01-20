@@ -1808,7 +1808,7 @@ size_t GroupDataProviderImpl::SessionKeyIteratorImpl::Count()
             {
                 continue;
             }
-            
+
             uint8_t operational_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
             MutableByteSpan key_span(operational_key, sizeof(operational_key));
 

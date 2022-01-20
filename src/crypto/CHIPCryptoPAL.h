@@ -1306,7 +1306,7 @@ public:
 CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
 
 /**
- *  @brief Derives the Group Session ID from a given operational group key using 
+ *  @brief Derives the Group Session ID from a given operational group key using
  *         the Key Derivation Function (Group Key Hash)
  * @param[in] operational_key  The operational group key
  * @param[out] session_id  Output of the Group Key Hash
