@@ -780,7 +780,11 @@ tests:
     arguments:
       values:
         - name: "credential"
-          value: { CredentialType: 1, CredentialIndex: NumberOfPINUsersSupported + 1 }
+          value:
+            {
+              CredentialType: 1,
+              CredentialIndex: NumberOfPINUsersSupported + 1,
+            }
     response:
       error: INVALID_COMMAND
 
@@ -830,7 +834,7 @@ tests:
         - name: "credentialRule"
           value: 0
         - name: "credentials"
-          value: [ { CredentialType: 1, CredentialIndex: 1 } ]
+          value: [{ CredentialType: 1, CredentialIndex: 1 }]
         - name: "creatorFabricIndex"
           value: 1
         - name: "lastModifiedFabricIndex"
@@ -885,7 +889,11 @@ tests:
         - name: "operationType"
           value: 0
         - name: "credential"
-          value: { CredentialType: 1, CredentialIndex: NumberOfPINUsersSupported + 1 }
+          value:
+            {
+              CredentialType: 1,
+              CredentialIndex: NumberOfPINUsersSupported + 1,
+            }
         - name: "credentialData"
           value: "123456"
         - name: "userIndex"
@@ -924,7 +932,11 @@ tests:
     arguments:
       values:
         - name: "credential"
-          value: { CredentialType: 2, CredentialIndex: NumberOfRFIDUsersSupported + 1 }
+          value:
+            {
+              CredentialType: 2,
+              CredentialIndex: NumberOfRFIDUsersSupported + 1,
+            }
     response:
       error: INVALID_COMMAND
 
@@ -989,7 +1001,11 @@ tests:
         - name: "credentialRule"
           value: 0
         - name: "credentials"
-          value: [ { CredentialType: 1, CredentialIndex: 1 }, { CredentialType: 2, CredentialIndex: 2 } ]
+          value:
+            [
+              { CredentialType: 1, CredentialIndex: 1 },
+              { CredentialType: 2, CredentialIndex: 2 },
+            ]
         - name: "creatorFabricIndex"
           value: 1
         - name: "lastModifiedFabricIndex"
@@ -1044,7 +1060,11 @@ tests:
         - name: "operationType"
           value: 0
         - name: "credential"
-          value: { CredentialType: 2, CredentialIndex: NumberOfRFIDUsersSupported + 1 }
+          value:
+            {
+              CredentialType: 2,
+              CredentialIndex: NumberOfRFIDUsersSupported + 1,
+            }
         - name: "credentialData"
           value: "new_rfid_data_field"
         - name: "userIndex"
@@ -1085,7 +1105,7 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
-          value: 3
+          value: 4
 
   - label: "Create new credential and try to add it to 0 user"
     command: "SetCredential"
@@ -1110,7 +1130,7 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
-          value: 3
+          value: 4
 
   - label: "Create new credential and try to add it to out-of-bounds user"
     command: "SetCredential"
@@ -1135,7 +1155,7 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
-          value: 3
+          value: 4
 
   - label: "Create new PIN with too short data"
     command: "SetCredential"
@@ -1434,7 +1454,7 @@ tests:
         - name: "credentialRule"
           value: 0
         - name: "credentials"
-          value: [ { CredentialType: 2, CredentialIndex: 2 } ]
+          value: [{ CredentialType: 2, CredentialIndex: 2 }]
         - name: "creatorFabricIndex"
           value: 1
         - name: "lastModifiedFabricIndex"
@@ -1688,12 +1708,28 @@ tests:
         - name: "nextCredentialIndex"
           value: 7
 
-  - label: "Clear all the credentials"
+  # This test is disabled for now because ZAP generators are not generating working code when
+  # command has nullable as a parameter.
+  # - label: "Clear all the credentials"
+  #   command: "ClearCredential"
+  #   arguments:
+  #     values:
+  #       - name: "credential"
+  #         value: null
+
+  - label: "Clear all the PIN credentials"
     command: "ClearCredential"
     arguments:
       values:
         - name: "credential"
-          value: null
+          value: { CredentialType: 1, CredentialIndex: 0xFFFE }
+
+  - label: "Clear all the RFID credentials"
+    command: "ClearCredential"
+    arguments:
+      values:
+        - name: "credential"
+          value: { CredentialType: 2, CredentialIndex: 0xFFFE }
 
   - label: "Read back the first PIN credential and make sure it is deleted"
     command: "GetCredentialStatus"
@@ -1898,7 +1934,7 @@ tests:
         - name: "credentialRule"
           value: 0
         - name: "credentials"
-          value: [ { CredentialType: 0, CredentialIndex: 0 } ]
+          value: [{ CredentialType: 0, CredentialIndex: 0 }]
         - name: "creatorFabricIndex"
           value: 1
         - name: "lastModifiedFabricIndex"
@@ -1978,7 +2014,11 @@ tests:
     arguments:
       values:
         - name: "credential"
-          value: { CredentialType: 1, CredentialIndex: NumberOfPINUsersSupported + 1 }
+          value:
+            {
+              CredentialType: 1,
+              CredentialIndex: NumberOfPINUsersSupported + 1,
+            }
     response:
       error: INVALID_COMMAND
 
@@ -1996,13 +2036,17 @@ tests:
     arguments:
       values:
         - name: "credential"
-          value: { CredentialType: 2, CredentialIndex: NumberOfRFIDUsersSupported + 1 }
+          value:
+            {
+              CredentialType: 2,
+              CredentialIndex: NumberOfRFIDUsersSupported + 1,
+            }
     response:
       error: INVALID_COMMAND
 
-#
-# Door Lock/Unlock operations
-#
+  #
+  # Door Lock/Unlock operations
+  #
   - label: "Create new PIN credential and user to lock/unlock door"
     command: "SetCredential"
     arguments:
