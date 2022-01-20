@@ -80,8 +80,10 @@ void pychip_native_init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
-    int result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
+    int result = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
+#if CHIP_ERROR_LOGGING
     int tmpErrno = errno;
+#endif // CHIP_ERROR_LOGGING
 
     if (result != 0)
     {

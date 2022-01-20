@@ -123,8 +123,10 @@ void ReliableMessageMgr::ExecuteActions()
 
         VerifyOrDie(!entry->retainedBuf.IsNull());
 
-        uint8_t sendCount       = entry->sendCount;
+        uint8_t sendCount = entry->sendCount;
+#if CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
         uint32_t messageCounter = entry->retainedBuf.GetMessageCounter();
+#endif // CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
