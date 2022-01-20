@@ -12,7 +12,7 @@
     },
     {
       "key": "manufacturerCodes",
-      "value": "0x1307"
+      "value": "0x1002"
     }
   ],
   "package": [
