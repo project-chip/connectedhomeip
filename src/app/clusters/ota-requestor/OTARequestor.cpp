@@ -141,7 +141,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 
             if (update.softwareVersion > currentSoftwareVersion)
             {
-                ChipLogProgress(SoftwareUpdate, "Updating To Newer Version...");
+                ChipLogDetail(SoftwareUpdate, "Updating to newer version");
                 MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
                 CopySpanToMutableSpan(update.updateToken, updateToken);
                 requestorCore->mUpdateVersion = update.softwareVersion;
@@ -152,7 +152,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             }
             else
             {
-                ChipLogDetail(SoftwareUpdate, "Already UpToDate!!");
+                ChipLogDetail(SoftwareUpdate, "Already up to date");
 
                 requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
                                                                    System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
