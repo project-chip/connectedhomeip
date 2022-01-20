@@ -105,6 +105,11 @@
             "output": "ids/Commands.h"
         },
         {
+            "path": "../../zap-templates/templates/app/ids/Events.zapt",
+            "name": "Events Ids header",
+            "output": "ids/Events.h"
+        },
+        {
             "path": "../../zap-templates/templates/app/cluster-objects.zapt",
             "name": "Cluster objects header for Interaction Model",
             "output": "cluster-objects.h"
