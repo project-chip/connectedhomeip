@@ -106,19 +106,18 @@ public:
     };
 
     /**
-     *  Initialize the client object. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
+     *  Construct the client object. Within the lifetime
+     *  of this instance.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
-     *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
-     *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate,
-                    const Optional<uint16_t> & aTimedWriteTimeoutMs);
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,
+                const Optional<uint16_t> & aTimedWriteTimeoutMs) :
+        mpExchangeMgr(apExchangeMgr),
+        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs)
+    {}
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
@@ -181,6 +180,11 @@ private:
         ResponseReceived,    // We have gotten a response after sending write request
         AwaitingDestruction, // The object has completed its work and is awaiting destruction by the application.
     };
+
+    /**
+     * The actual init function, called during encoding first attribute data.
+     */
+    CHIP_ERROR Init();
 
     /**
      * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending

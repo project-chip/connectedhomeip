@@ -556,9 +556,8 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
 
     if (gWriteRespCount < kMaxWriteMessageCount)
     {
-        chip::app::WriteClient writeClient;
-        err = writeClient.Init(chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager(), &gMockDelegate,
-                               chip::Optional<uint16_t>::Missing());
+        chip::app::WriteClient writeClient(chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager(), &gMockDelegate,
+                                           chip::Optional<uint16_t>::Missing());
         SuccessOrExit(err);
 
         err = SendWriteRequest(writeClient);
