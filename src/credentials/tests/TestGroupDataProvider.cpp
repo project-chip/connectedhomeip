@@ -34,7 +34,7 @@ using GroupKey      = GroupDataProvider::GroupKey;
 using GroupEndpoint = GroupDataProvider::GroupEndpoint;
 using EpochKey      = GroupDataProvider::EpochKey;
 using KeySet        = GroupDataProvider::KeySet;
-using SessionKey    = GroupDataProvider::SessionKey;
+using GroupSession  = GroupDataProvider::GroupSession;
 
 namespace chip {
 namespace app {
@@ -1045,39 +1045,6 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet1));
 
-#if 0
-    // Prepare message
-
-
-    chip::PayloadHeader payloadHeader;
-    chip::PacketHeader packetHeader;
-
-    packetHeader.SetMessageCounter(1);
-    packetHeader.SetDestinationGroupId(kGroup2);
-    packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
-    packetHeader.SetSessionType(Header::SessionType::kGroupSession);
-    packetHeader.SetSourceNodeId(1001);
-
-    chip::System::PacketBufferHandle msg = chip::MessagePacketBuffer::NewWithData(kMessage, sizeof(kMessage));
-    NL_TEST_ASSERT(apSuite, !msg.IsNull());
-
-    // Encrypt
-
-    chip::MessageSecurity::Groups::OperationKeyType operational_key;
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR == chip::MessageSecurity::Groups::DeriveOperationalKey(kFabric2, kGroup2, operational_key));
-    NL_TEST_ASSERT(
-        apSuite,
-        CHIP_NO_ERROR ==
-            chip::MessageSecurity::Encrypt(ByteSpan(operational_key, sizeof(operational_key)), payloadHeader, packetHeader, msg));
-
-    // Decrypt
-
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->Decrypt(packetHeader, payloadHeader, msg));
-    NL_TEST_ASSERT(apSuite, sizeof(kMessage) == msg->TotalLength());
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kMessage, msg->Start(), msg->TotalLength()));
-#endif
-
     const uint8_t kMessage[] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9 };
     const uint8_t nonce[13]  = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18, 0x1a, 0x1b, 0x1c };
     const uint8_t aad[40]    = { 0x0a, 0x1a, 0x2a, 0x3a, 0x4a, 0x5a, 0x6a, 0x7a, 0x8a, 0x9a, 0x0b, 0x1b, 0x2b, 0x3b,
@@ -1090,9 +1057,9 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
 
     std::set<std::pair<FabricIndex, GroupId>> expected = { { kFabric1, kGroup1 }, { kFabric1, kGroup3 }, { kFabric2, kGroup2 } };
 
-    const uint16_t kSessionId = 0x8d03;
-    SessionKey session_key;
-    auto it      = provider->IterateSessionKeys(kSessionId);
+    const uint16_t kSessionId = 0xbc66;
+    GroupSession session;
+    auto it      = provider->IterateGroupSessions(kSessionId);
     size_t count = 0, total = 0;
 
     NL_TEST_ASSERT(apSuite, it);
@@ -1100,26 +1067,28 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     {
         total = it->Count();
         NL_TEST_ASSERT(apSuite, expected.size() == total);
-        while (it->Next(session_key))
+        while (it->Next(session))
         {
-            std::pair<FabricIndex, GroupId> result(session_key.fabric_index, session_key.group_id);
+            std::pair<FabricIndex, GroupId> result(session.fabric_index, session.group_id);
             NL_TEST_ASSERT(apSuite, expected.count(result) > 0);
-            NL_TEST_ASSERT(apSuite, session_key.key != nullptr);
+            NL_TEST_ASSERT(apSuite, session.key != nullptr);
 
             memcpy(buffer, kMessage, sizeof(kMessage));
             MutableByteSpan message(buffer, sizeof(kMessage));
             MutableByteSpan tag(mic, sizeof(mic));
 
             // Encrypt
-            NL_TEST_ASSERT(apSuite,
-                           CHIP_NO_ERROR ==
-                               session_key.key->Encrypt(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(
+                apSuite,
+                CHIP_NO_ERROR ==
+                    session.key->EncryptMessage(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
             NL_TEST_ASSERT(apSuite, memcmp(message.data(), kMessage, sizeof(kMessage)));
 
             // Decrypt
-            NL_TEST_ASSERT(apSuite,
-                           CHIP_NO_ERROR ==
-                               session_key.key->Decrypt(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(
+                apSuite,
+                CHIP_NO_ERROR ==
+                    session.key->DecryptMessage(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
             NL_TEST_ASSERT(apSuite, 0 == memcmp(message.data(), kMessage, sizeof(kMessage)));
             count++;
         }
@@ -1170,11 +1139,6 @@ int Test_Setup(void * inContext)
     memcpy(chip::app::TestGroups::kKeySet1.epoch_keys, kEpochKeys1, sizeof(kEpochKeys1));
     memcpy(chip::app::TestGroups::kKeySet2.epoch_keys, kEpochKeys2, sizeof(kEpochKeys2));
     memcpy(chip::app::TestGroups::kKeySet3.epoch_keys, kEpochKeys1, sizeof(kEpochKeys1));
-    // start time
-    uint64_t now                                             = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
-    chip::app::TestGroups::kKeySet1.epoch_keys[0].start_time = now;
-    chip::app::TestGroups::kKeySet2.epoch_keys[1].start_time = now;
-    chip::app::TestGroups::kKeySet3.epoch_keys[2].start_time = now;
 
     return SUCCESS;
 }

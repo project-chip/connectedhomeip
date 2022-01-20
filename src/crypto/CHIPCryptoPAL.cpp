@@ -21,6 +21,7 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
@@ -665,6 +666,13 @@ static const uint8_t kOperationalGroupKeySalt[0] = {};
 static const uint8_t kGroupKeyHashInfo[]  = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x48, 0x61, 0x73, 0x68 };
 static const uint8_t kGroupKeyHashSalt[0] = {};
 
+/*
+    OperationalGroupKey = Crypto_KDF (
+        InputKey = Epoch Key,
+        Salt = [],
+        Info = Group Security Salt,
+        Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS)
+*/
 CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key)
 {
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INTERNAL);
@@ -676,6 +684,13 @@ CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan
                               Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
 }
 
+/*
+    GKH = Crypto_KDF (
+        InputKey = OperationalGroupKey,
+        Salt = [],
+        Info = "GroupKeyHash",
+        Length = 16)
+*/
 CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id)
 {
     Crypto::HKDF_sha crypto;
@@ -684,7 +699,7 @@ CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & ses
     ReturnErrorOnFailure(crypto.HKDF_SHA256(operational_key.data(), operational_key.size(), kGroupKeyHashSalt,
                                             sizeof(kGroupKeyHashSalt), kGroupKeyHashInfo, sizeof(kGroupKeyHashInfo), out_key,
                                             sizeof(out_key)));
-    session_id = static_cast<uint16_t>(out_key[0] | (out_key[1] << 8));
+    session_id = Encoding::BigEndian::Get16(out_key);
     return CHIP_NO_ERROR;
 }
 
