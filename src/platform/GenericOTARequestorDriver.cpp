@@ -58,7 +58,16 @@ void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update
 
 void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
 {
-    // TODO: Schedule the next QueryImage
+    VerifyOrDie(mRequestor != nullptr);
+
+    System::Clock::Seconds32 delayedActionTime = System::Clock::Seconds32(120);
+    if (delay > delayedActionTime)
+    {
+        delayedActionTime = delay;
+    }
+
+    ScheduleDelayedAction(UpdateFailureState::kQuerying, delayedActionTime,
+                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->TriggerImmediateQuery(); });
 }
 
 void GenericOTARequestorDriver::UpdateDownloaded()
@@ -77,7 +86,14 @@ void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delay,
+
+    System::Clock::Seconds32 delayedActionTime = System::Clock::Seconds32(120);
+    if (delay > delayedActionTime)
+    {
+        delayedActionTime = delay;
+    }
+
+    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delayedActionTime,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); });
 }
 
