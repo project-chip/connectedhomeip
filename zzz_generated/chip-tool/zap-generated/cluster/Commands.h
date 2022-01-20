@@ -1514,6 +1514,14 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("Icac", indent + 1, value.icac);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Icac'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
     ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
     return CHIP_NO_ERROR;
 }
@@ -32513,6 +32521,7 @@ private:
 | * UpdateNOC                                                         |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * NOCs                                                              | 0x0000 |
 | * FabricsList                                                       | 0x0001 |
 | * SupportedFabrics                                                  | 0x0002 |
 | * CommissionedFabrics                                               | 0x0003 |
@@ -32743,6 +32752,39 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type mRequest;
+};
+
+/*
+ * Attribute NOCs
+ */
+class ReadOperationalCredentialsNOCs : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsNOCs() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nocs");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsNOCs() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeEventResponse(context, "OperationalCredentials.NOCs response", value);
+    }
 };
 
 /*
@@ -61342,6 +61384,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),  //
         make_unique<OperationalCredentialsUpdateFabricLabel>(),             //
         make_unique<OperationalCredentialsUpdateNOC>(),                     //
+        make_unique<ReadOperationalCredentialsNOCs>(),                      //
         make_unique<ReadOperationalCredentialsFabricsList>(),               //
         make_unique<ReportOperationalCredentialsFabricsList>(),             //
         make_unique<ReadOperationalCredentialsSupportedFabrics>(),          //
