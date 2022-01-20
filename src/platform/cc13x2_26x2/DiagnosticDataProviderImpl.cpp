@@ -119,4 +119,3 @@ void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetr
 
 } // namespace DeviceLayer
 } // namespace chip
-
