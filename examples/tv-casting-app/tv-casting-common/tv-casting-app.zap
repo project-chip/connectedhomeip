@@ -6536,9 +6536,9 @@
       ]
     },
     {
-      "name": "MA-rootdevice",
-      "deviceTypeName": "MA-rootdevice",
-      "deviceTypeCode": 22,
+      "name": "MA-videoplayer",
+      "deviceTypeName": "MA-videoplayer",
+      "deviceTypeCode": 35,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -13559,9 +13559,9 @@
       ]
     },
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "MA-rootdevice",
-      "deviceTypeCode": 22,
+      "name": "MA-occupancysensor",
+      "deviceTypeName": "MA-occupancysensor",
+      "deviceTypeCode": 263,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -16486,22 +16486,22 @@
       "deviceIdentifier": 22
     },
     {
-      "endpointTypeName": "MA-rootdevice",
+      "endpointTypeName": "MA-videoplayer",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "deviceIdentifier": 35
     },
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-occupancysensor",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 22
+      "deviceIdentifier": 263
     }
   ]
 }
