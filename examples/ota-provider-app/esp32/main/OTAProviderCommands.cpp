@@ -60,7 +60,7 @@ CHIP_ERROR OTAProviderHandler(int argc, char ** argv)
 void OTAProviderCommands::Register()
 {
     // These commands can be moved to src/lib/shell/commands/Ota.cpp along with the other OTA commands.
-    // But as of now only Linux and ESP32 platforms supprts OTA provider
+    // But as of now only Linux and ESP32 platforms supports OTA provider
 
     // Register subcommands of the `OTAProvider` commands.
     static const shell_command_t subCommands[] = {
