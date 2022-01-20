@@ -594,6 +594,39 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestAES_CCM_128Containers(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    uint8_t testVector[kAES_CCM128_Key_Length];
+    AesCcm128Key deepCopy;
+    AesCcm128KeySpan shallowCopy;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Give us some data.
+    err = DRBG_get_bytes(testVector, sizeof(testVector));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test deep copy from array.
+    deepCopy = AesCcm128Key(testVector);
+    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) ==  0);
+
+    // Test sanitization.
+    deepCopy = AesCcm128Key();
+    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)));
+    
+    // Give us different data.
+    err = DRBG_get_bytes(testVector, sizeof(testVector));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test deep copy from KeySpan.
+    shallowCopy = AesCcm128KeySpan(testVector);
+    deepCopy = AesCcm128Key(shallowCopy);
+    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) ==  0);
+
+    // Test Span getter.
+    NL_TEST_ASSERT(inSuite, memcmp(testVector, deepCopy.Span().data(), deepCopy.Span().size()) == 0);
+}
+
 static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
@@ -2129,6 +2162,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid tag", TestAES_CCM_128EncryptInvalidTagLen),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid IV", TestAES_CCM_128DecryptInvalidIVLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 Containers", TestAES_CCM_128Containers),
     NL_TEST_DEF("Test encrypting AES-CCM-256 test vectors", TestAES_CCM_256EncryptTestVectors),
     NL_TEST_DEF("Test decrypting AES-CCM-256 test vectors", TestAES_CCM_256DecryptTestVectors),
     NL_TEST_DEF("Test encrypting AES-CCM-256 using nil key", TestAES_CCM_256EncryptNilKey),

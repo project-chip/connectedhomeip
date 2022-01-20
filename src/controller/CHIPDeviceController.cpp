@@ -1274,7 +1274,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
 }
 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                    const ByteSpan & rcac)
+                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1323,6 +1323,9 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
         err = device->SetNOCCertBufferSize(nocCert.size());
         SuccessOrExit(err);
     }
+
+    device->SetIpk(ipk);
+    device->SetAdminSubject(adminSubject);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1373,8 +1376,12 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(CommissioneeDeviceProx
     Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ByteSpan(nullptr, 0),
-                                        mLocalId.GetNodeId(), mVendorId));
+    ReturnErrorOnFailure(
+        cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf,
+                       // TODO(#13825): If not passed by the signer, the commissioner should
+                       // provide its current IPK to the commissionee in the AddNOC command.
+                       device->GetIpk().HasValue() ? device->GetIpk().Value() : ByteSpan(nullptr, 0),
+                       device->GetAdminSubject().HasValue() ? device->GetAdminSubject().Value() : mLocalId.GetNodeId(), mVendorId));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
