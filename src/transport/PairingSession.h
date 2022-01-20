@@ -177,9 +177,9 @@ protected:
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
     {
-        mPeerNodeId        = kUndefinedNodeId;
-        mPeerCATs          = kUndefinedCATs;
-        mPeerAddress       = Transport::PeerAddress::Uninitialized();
+        mPeerNodeId  = kUndefinedNodeId;
+        mPeerCATs    = kUndefinedCATs;
+        mPeerAddress = Transport::PeerAddress::Uninitialized();
         mPeerSessionId.ClearValue();
         mLocalSessionId = kInvalidKeyId;
     }
