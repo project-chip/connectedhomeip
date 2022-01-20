@@ -35,12 +35,13 @@ using chip::Shell::streamer_printf;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 static bool sSwitchOnOffState = false;
+static chip::BindingManager sBindingManager;
 
 #if defined(ENABLE_CHIP_SHELL)
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+    chip::GetBindingManagerInstance()->NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
@@ -104,8 +105,9 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, ch
 
 CHIP_ERROR InitBindingHandlers()
 {
-    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+    sBindingManager.SetAppServer(&chip::Server::GetInstance());
+    sBindingManager.RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+    chip::SetBindingManagerInstance(&sBindingManager);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
 #endif

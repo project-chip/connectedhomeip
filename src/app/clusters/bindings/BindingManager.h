@@ -86,12 +86,8 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
-    static BindingManager & GetInstance() { return sBindingManager; }
-
 private:
-    static BindingManager sBindingManager;
-
-    static constexpr uint8_t kMaxPendingNotifications = 5;
+    static constexpr uint8_t kMaxPendingNotifications = 3;
 
     struct ClusterPath
     {
@@ -190,5 +186,10 @@ private:
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 };
+
+// The global instance getter & setter
+void SetBindingManagerInstance(BindingManager * instance);
+
+BindingManager * GetBindingManagerInstance();
 
 } // namespace chip

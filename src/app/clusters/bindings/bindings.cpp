@@ -79,6 +79,12 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
 
     ChipLogDetail(Zcl, "RX: BindCallback");
 
+    if (GetBindingManagerInstance() == nullptr)
+    {
+        ChipLogError(Zcl, "Binding: BindingManager not set");
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+        return true;
+    }
     if ((groupId != 0 && nodeId != 0) || (groupId == 0 && nodeId == 0) || (groupId != 0 && remoteEndpoint != 0))
     {
         ChipLogError(Zcl, "Binding: Invalid request");
@@ -110,7 +116,7 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
 
     if (nodeId)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(fabricIndex, nodeId);
+        CHIP_ERROR err = GetBindingManagerInstance()->UnicastBindingCreated(fabricIndex, nodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(
@@ -151,6 +157,12 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
 
     ChipLogDetail(Zcl, "RX: UnbindCallback");
 
+    if (GetBindingManagerInstance() == nullptr)
+    {
+        ChipLogError(Zcl, "Binding: BindingManager not set");
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+        return true;
+    }
     if ((groupId != 0 && nodeId != 0) || (groupId == 0 && nodeId == 0))
     {
         ChipLogError(Zcl, "Binding: Invalid request");
@@ -176,7 +188,7 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
     emberDeleteBinding(bindingIndex);
     if (nodeId != 0 && GetNumberOfUnicastBindingForNode(fabricIndex, nodeId) == 0)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().LastUnicastBindingRemoved(fabricIndex, nodeId);
+        CHIP_ERROR err = GetBindingManagerInstance()->LastUnicastBindingRemoved(fabricIndex, nodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Binding: Failed to disconnect device " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),

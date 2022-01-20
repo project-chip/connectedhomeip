@@ -1,0 +1,364 @@
+0000000000003f28 B chip::Server::sServer
+0000000000001f46 B attributeData
+00000000000018f0 B chip::app::sInteractionModelEngine
+00000000000015f8 b chip::Dnssd::(anonymous namespace)::gAdvertiser
+0000000000000c00 b (anonymous namespace)::EntryStorage::acl
+00000000000007f8 b chip::DeviceLayer::SystemLayerImpl()::gSystemLayerImpl
+0000000000000528 B chip::BindingManager::sBindingManager
+0000000000000488 b chip::app::Clusters::NetworkCommissioning::(anonymous namespace)::sNetworks
+0000000000000400 b chip::sCritEventBuffer
+0000000000000400 B appResponseData
+00000000000003eb b chip::app::(anonymous namespace)::attributeData
+0000000000000390 b chip::Dnssd::(anonymous namespace)::gResolver
+0000000000000368 b chip::Dnssd::GlobalMinimalMdnsServer::Instance()::_instance
+0000000000000360 b chip::app::CHIPDeviceCallbacksMgr::GetInstance()::instance
+00000000000002b1 b (anonymous namespace)::singletonAttributeData
+0000000000000220 b (anonymous namespace)::sLinuxThreadDriver
+0000000000000200 b chip::sDebugEventBuffer
+0000000000000200 b chip::sInfoEventBuffer
+0000000000000190 B chip::DeviceLayer::PlatformManagerImpl::sInstance
+0000000000000188 b chip::Shell::sShellDeviceSubcommands
+0000000000000188 b chip::Shell::sShellDeviceSubcommands
+0000000000000188 b chip::Shell::sShellConfigSubcommands
+0000000000000188 b chip::Shell::sShellWiFiSubCommands
+0000000000000188 B chip::Shell::Engine::theEngineRoot
+0000000000000188 b chip::Shell::(anonymous namespace)::sShellDnsBrowseSubcommands
+0000000000000188 b chip::Shell::(anonymous namespace)::sShellDnsSubcommands
+0000000000000188 B sShellBase64Commands
+0000000000000178 b (anonymous namespace)::gNullablesAndOptionalsStruct
+0000000000000168 b chip::sLoggingBuffer
+0000000000000120 B chip::DeviceLayer::ThreadStackManagerImpl::sInstance
+0000000000000110 B chip::DeviceLayer::Internal::BLEManagerImpl::sInstance
+0000000000000100 b chip::sErrorStr
+0000000000000100 b chip::app::(anonymous namespace)::gLineBuffer
+00000000000000f0 b bindingTable
+00000000000000e8 b (anonymous namespace)::sLinuxWiFiDriver
+00000000000000ba B emberAfPluginScenesServerSceneTable
+00000000000000a8 B emAfEndpoints
+00000000000000a0 b messageSentCallbacks
+0000000000000098 b chip::DeviceLayer::Internal::gChipLinuxCountersStorage
+0000000000000098 b chip::DeviceLayer::Internal::gChipLinuxFactoryStorage
+0000000000000098 b chip::DeviceLayer::Internal::gChipLinuxConfigStorage
+0000000000000098 B chip::DeviceLayer::PersistedStorage::KeyValueStoreManagerImpl::sInstance
+0000000000000098 b (anonymous namespace)::gDeviceOptions
+0000000000000090 b (anonymous namespace)::sThreadNetworkCommissioningInstance
+0000000000000090 b (anonymous namespace)::sWiFiNetworkCommissioningInstance
+0000000000000078 b (anonymous namespace)::gFabricBeingCommissioned
+0000000000000070 b chip::app::sInstance
+0000000000000070 B ColorControlServer::instance
+0000000000000060 b (anonymous namespace)::listStructOctetStringData
+0000000000000048 b chip::DeviceLayer::UDPEndPointManager()::gUDPEndPointManager
+0000000000000048 B chip::app::Clusters::ModeSelect::StaticSupportedModesManager::coffeeOptions
+0000000000000040 b chip::app::Compatibility::(anonymous namespace)::imCompatibilityEmberAfCluster
+0000000000000040 b (anonymous namespace)::gNullableStructAttributeValue
+0000000000000040 b (anonymous namespace)::gListOperationalCert
+0000000000000040 b (anonymous namespace)::gListOctetStringData
+0000000000000040 b (anonymous namespace)::EntryStorage::pool
+000000000000003c b chip::Shell::the_original_stdin_termios
+0000000000000038 b chip::Shell::(anonymous namespace)::sDnsShellResolverDelegate
+0000000000000038 B chip::DeviceLayer::ConnectivityManagerImpl::sInstance
+0000000000000038 b gIdentify1
+0000000000000038 b gIdentify0
+0000000000000030 B chip::DeviceLayer::ConnectivityManagerImpl::mWpaSupplicant
+0000000000000030 B OnOffServer::instance
+0000000000000028 B chip::DeviceLayer::ConnectivityManagerImpl::mWpaSupplicantMutex
+0000000000000020 b chip::DeviceLayer::Internal::MainLoop::Instance()::sMainLoop
+0000000000000020 b chip::sGlobalEventIdCounter
+0000000000000020 B gAdminCommissioningAttrAccess
+0000000000000018 B chip::app::Clusters::ModeSelect::StaticSupportedModesManager::supportedOptionsByEndpoints
+0000000000000018 b chip::app::Compatibility::(anonymous namespace)::imCompatibilityInterpanHeader
+0000000000000018 B chip::DeviceLayer::DeviceControlServer::sInstance
+0000000000000018 b (anonymous namespace)::gApplicationLauncherAttrAccess
+0000000000000018 b (anonymous namespace)::gApplicationBasicAttrAccess
+0000000000000018 b (anonymous namespace)::gTargetNavigatorAttrAccess
+0000000000000018 b (anonymous namespace)::gContentLauncherAttrAccess
+0000000000000018 b (anonymous namespace)::gMediaPlaybackAttrAccess
+0000000000000018 b (anonymous namespace)::gAudioOutputAttrAccess
+0000000000000018 b (anonymous namespace)::gModeSelectAttrAccess
+0000000000000018 b (anonymous namespace)::gMediaInputAttrAccess
+0000000000000018 b (anonymous namespace)::EntryIteratorDelegate::pool
+0000000000000018 b (anonymous namespace)::gWakeOnLanAttrAccess
+0000000000000018 b (anonymous namespace)::gChannelAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttrAccess
+0000000000000018 b (anonymous namespace)::gAttribute
+0000000000000018 b (anonymous namespace)::gAttribute
+0000000000000018 b interpanResponseHeader
+0000000000000018 b stateTable
+0000000000000018 B emberAfPluginIasZoneServerManageQueueEventControl
+0000000000000018 B emberAfPluginDoorLockServerRelockEventControl
+0000000000000018 B emberAfPluginDoorLockServerLockoutEventControl
+0000000000000018 B emberAfLevelControlClusterServerTickCallbackControl1
+0000000000000018 B emberAfIasZoneClusterServerTickCallbackControl1
+0000000000000018 B emberAfBarrierControlClusterServerTickCallbackControl1
+0000000000000010 b chip::Shell::(anonymous namespace)::sResolverProxy
+0000000000000010 B chip::Inet::IPAddress::Any
+0000000000000010 b chip::app::Compatibility::(anonymous namespace)::imCompatibilityEmberApsFrame
+0000000000000010 B chip::DeviceLayer::ConnectivityManagerImpl::sWiFiIfName
+0000000000000010 B emberAfResponseApsFrame
+0000000000000008 b chip::sErrorFormatterList
+0000000000000008 B chip::ArgParser::gActiveOptionSets
+0000000000000008 b chip::Logging::(anonymous namespace)::sLogRedirectCallback
+0000000000000008 B chip::System::Stats::sResourcesInUse
+0000000000000008 B chip::System::Stats::sHighWatermarks
+0000000000000008 B chip::app::Clusters::ModeSelect::StaticSupportedModesManager::instance
+0000000000000008 b chip::app::Compatibility::(anonymous namespace)::currentCommandObject
+0000000000000008 b chip::app::(anonymous namespace)::gCurLineBufferSize
+0000000000000008 b chip::app::(anonymous namespace)::gAttributeSaver
+0000000000000008 B chip::globalOTARequestorInstance
+0000000000000008 B chip::gDefaultMRPConfig
+0000000000000008 B chip::DeviceLayer::ConnectivityManagerImpl::mpConnectCallback
+0000000000000008 B chip::DeviceLayer::ConnectivityManagerImpl::mpScanCallback
+0000000000000008 B chip::DeviceLayer::gMockedSystemLayer
+0000000000000008 b chip::DeviceLayer::(anonymous namespace)::gInstance
+0000000000000008 b chip::DeviceLayer::(anonymous namespace)::gInstance
+0000000000000008 b chip::Credentials::(anonymous namespace)::gGroupsProvider
+0000000000000008 b (anonymous namespace)::gAttributeAccessOverrides
+0000000000000008 b (anonymous namespace)::gSimpleEnumCount
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gDelegateTable
+0000000000000008 b (anonymous namespace)::gAccessControl
+0000000000000008 b state
+0000000000000008 b firstIdentify
+0000000000000008 b firstEffect
+0000000000000008 b guard variable for chip::Access::Examples::GetAccessControlDelegate()::accessControlDelegate
+0000000000000008 b guard variable for chip::Dnssd::GlobalMinimalMdnsServer::Instance()::_instance
+0000000000000008 b guard variable for chip::app::CHIPDeviceCallbacksMgr::GetInstance()::instance
+0000000000000008 b guard variable for chip::DeviceLayer::Internal::MainLoop::Instance()::sMainLoop
+0000000000000008 b guard variable for chip::DeviceLayer::DiagnosticDataProviderImpl::GetDefaultInstance()::sInstance
+0000000000000008 b guard variable for chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance()::sInstance
+0000000000000008 b guard variable for chip::DeviceLayer::UDPEndPointManager()::gUDPEndPointManager
+0000000000000008 b guard variable for chip::DeviceLayer::SystemLayerImpl()::gSystemLayerImpl
+0000000000000008 b guard variable for chip::Credentials::Examples::GetExampleDACProvider()::example_dac_provider
+0000000000000008 b wpa_fi_w1_wpa_supplicant1_proxy_parent_class
+0000000000000008 b wpa_fi_w1_wpa_supplicant1_network_proxy_parent_class
+0000000000000008 b wpa_fi_w1_wpa_supplicant1_interface_proxy_parent_class
+0000000000000008 b wpa_fi_w1_wpa_supplicant1_bss_proxy_parent_class
+0000000000000008 b openthread_io_openthread_border_router_proxy_parent_class
+0000000000000008 b once_init_value.37718
+0000000000000008 b lookup_hash.37719
+0000000000000008 b g_define_type_id__volatile.37513
+0000000000000008 b g_define_type_id__volatile.37425
+0000000000000008 b g_define_type_id__volatile.37299
+0000000000000008 b g_define_type_id__volatile.37005
+0000000000000008 b g_define_type_id__volatile.36938
+0000000000000008 b g_define_type_id__volatile.36649
+0000000000000008 b g_define_type_id__volatile.36563
+0000000000000008 b g_define_type_id__volatile.36264
+0000000000000008 b g_define_type_id__volatile.36138
+0000000000000008 b g_define_type_id__volatile.35718
+0000000000000008 b g_define_type_id__volatile.35598
+0000000000000008 b g_define_type_id__volatile.35415
+0000000000000008 b g_define_type_id__volatile.35089
+0000000000000008 b g_define_type_id__volatile.34912
+0000000000000008 b g_define_type_id__volatile.34510
+0000000000000008 b g_define_type_id__volatile.34390
+0000000000000008 b g_define_type_id__volatile.34236
+0000000000000008 b g_define_type_id__volatile.33946
+0000000000000008 b g_define_type_id__volatile.33658
+0000000000000008 b g_define_type_id__volatile.33505
+0000000000000008 b g_define_type_id__volatile.33239
+0000000000000008 b g_define_type_id__volatile.33180
+0000000000000008 b g_define_type_id__volatile.32900
+0000000000000008 b g_define_type_id__volatile.32816
+0000000000000008 b g_define_type_id__volatile.32509
+0000000000000008 b g_define_type_id__volatile.32202
+0000000000000008 b g_define_type_id__volatile.31815
+0000000000000008 b g_define_type_id__volatile.31273
+0000000000000008 b g_define_type_id__volatile.30964
+0000000000000008 b g_define_type_id__volatile.30346
+0000000000000008 b g_define_type_id__volatile.29647
+0000000000000008 b g_define_type_id__volatile.29059
+0000000000000008 b g_define_type_id__volatile.28673
+0000000000000008 b g_define_type_id__volatile.28453
+0000000000000008 b g_define_type_id__volatile.28387
+0000000000000008 b g_define_type_id__volatile.28330
+0000000000000008 b g_define_type_id__volatile.28306
+0000000000000008 b g_define_type_id__volatile.28278
+0000000000000008 B emberAfResponseDestination
+0000000000000008 B emAfZclBuffer
+0000000000000008 B emAfResponseLengthPtr
+0000000000000008 B emAfExchangeMgr
+0000000000000008 B emAfCurrentCommand
+0000000000000008 B emAfCommandApsFrame
+0000000000000008 b bluez_profile_manager1_proxy_parent_class
+0000000000000008 b bluez_org_freedesktop_dbus_properties_proxy_parent_class
+0000000000000008 b bluez_org_freedesktop_dbus_object_manager_proxy_parent_class
+0000000000000008 b bluez_object_skeleton_parent_class
+0000000000000008 b bluez_object_proxy_parent_class
+0000000000000008 b bluez_leadvertising_manager1_proxy_parent_class
+0000000000000008 b bluez_leadvertisement1_skeleton_parent_class
+0000000000000008 b bluez_leadvertisement1_proxy_parent_class
+0000000000000008 b bluez_gatt_service1_skeleton_parent_class
+0000000000000008 b bluez_gatt_service1_proxy_parent_class
+0000000000000008 b bluez_gatt_manager1_proxy_parent_class
+0000000000000008 b bluez_gatt_descriptor1_proxy_parent_class
+0000000000000008 b bluez_gatt_characteristic1_skeleton_parent_class
+0000000000000008 b bluez_gatt_characteristic1_proxy_parent_class
+0000000000000008 b bluez_device1_proxy_parent_class
+0000000000000008 b bluez_adapter1_proxy_parent_class
+0000000000000007 B afDeviceEnabled
+0000000000000004 b chip::Platform::memoryInitializationCount
+0000000000000004 b chip::Platform::memoryInitialized
+0000000000000004 b chip::app::(anonymous namespace)::gPrettyPrintingDepthLevel
+0000000000000004 b (anonymous namespace)::gListUint8Data
+0000000000000004 b (anonymous namespace)::gSimpleEnums
+0000000000000004 b enrollmentMethod
+0000000000000004 b WpaFiW1Wpa_supplicant1Proxy_private_offset
+0000000000000004 b WpaFiW1Wpa_supplicant1NetworkProxy_private_offset
+0000000000000004 b WpaFiW1Wpa_supplicant1InterfaceProxy_private_offset
+0000000000000004 b WpaFiW1Wpa_supplicant1BSSProxy_private_offset
+0000000000000004 b OpenthreadIoOpenthreadBorderRouterProxy_private_offset
+0000000000000004 b BluezProfileManager1Proxy_private_offset
+0000000000000004 b BluezOrgFreedesktopDBusPropertiesProxy_private_offset
+0000000000000004 b BluezOrgFreedesktopDBusObjectManagerProxy_private_offset
+0000000000000004 b BluezObjectSkeleton_private_offset
+0000000000000004 b BluezObjectProxy_private_offset
+0000000000000004 b BluezLEAdvertisingManager1Proxy_private_offset
+0000000000000004 b BluezLEAdvertisement1Skeleton_private_offset
+0000000000000004 b BluezLEAdvertisement1Proxy_private_offset
+0000000000000004 b BluezGattService1Skeleton_private_offset
+0000000000000004 b BluezGattService1Proxy_private_offset
+0000000000000004 b BluezGattManager1Proxy_private_offset
+0000000000000004 b BluezGattDescriptor1Proxy_private_offset
+0000000000000004 b BluezGattCharacteristic1Skeleton_private_offset
+0000000000000004 b BluezGattCharacteristic1Proxy_private_offset
+0000000000000004 b BluezDevice1Proxy_private_offset
+0000000000000004 b BluezAdapter1Proxy_private_offset
+0000000000000002 B chip::DeviceLayer::ConnectivityManagerImpl::mConnectivityFlag
+0000000000000002 b (anonymous namespace)::emberEndpointCount
+0000000000000002 B emAfZclBufferLen
+0000000000000002 B appResponseLength
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b std::__ioinit
+0000000000000001 b chip::Ble::sBLEEndPointPool
+0000000000000001 B chip::DeviceLayer::ConnectivityManagerImpl::mAssociattionStarted
+0000000000000001 B DoorLockServer::instance
+0000000000000001 b minLevel
+0000000000000001 b emAfSavedDisableDefaultResponseVale
+0000000000000001 b emAfDisableDefaultResponse
+0000000000000001 b emberAfApsRetryOverride
+0000000000000001 b sSwitchOnOffState
+0000000000000001 B emberAfResponseType
+0000000000000001 B emberAfPluginScenesServerEntriesInUse
+0000000000000001 b completed.8060
