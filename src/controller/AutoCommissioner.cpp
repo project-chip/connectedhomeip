@@ -147,7 +147,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
     {
     case CommissioningStage::kWiFiNetworkEnable:
     case CommissioningStage::kThreadNetworkEnable:
-        return Optional<System::Clock::Timeout>(System::Clock::Timeout(System::Clock::Seconds16(30)));
+        return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
     default:
         // Use default timeout specified in the IM.
         return Optional<System::Clock::Timeout>();
