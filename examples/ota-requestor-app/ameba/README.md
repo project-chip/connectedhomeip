@@ -20,8 +20,8 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
           $ ./scripts/build/build_examples.py --target ameba-amebad-ota-requestor build
 
-    The output image files are stored in 
-	`out/ameba-amebad-ota-requestor/asdk/image` folder.
+    The output image files are stored in
+    `out/ameba-amebad-ota-requestor/asdk/image` folder.
 
     The bootloader image files are stored in
     `out/ameba-amebad-ota-requestor/asdk/bootloader` folder.
