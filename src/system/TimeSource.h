@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <stdlib.h>
 #include <lib/support/CodeUtils.h>
+#include <stdlib.h>
 #include <system/SystemClock.h>
 
 namespace chip {
