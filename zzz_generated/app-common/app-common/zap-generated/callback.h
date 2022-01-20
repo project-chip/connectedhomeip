@@ -14126,7 +14126,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
  */
 bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType GroupKeySetStruct);
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType GroupKeySet);
 /**
  * @brief Group Key Management Cluster KeySetRemove Command callback (from client)
  */

@@ -1675,11 +1675,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess( // GroupKeySetStruct: Struct GroupKeySetStruct
+    public void onSuccess( // GroupKeySet: Struct GroupKeySetStruct
         // Conversion from this type to Java is not properly implemented yet
         ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // GroupKeySetStruct: Struct GroupKeySetStruct
+      // GroupKeySet: Struct GroupKeySetStruct
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }

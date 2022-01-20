@@ -14559,13 +14559,13 @@ class GroupKeyManagement(Cluster):
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupId", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="endpoints", Tag=2, Type=typing.List[uint]),
-                            ClusterObjectFieldDescriptor(Label="groupName", Tag=3, Type=str),
+                            ClusterObjectFieldDescriptor(Label="groupName", Tag=3, Type=typing.Optional[str]),
                     ])
 
             fabricIndex: 'uint' = 0
             groupId: 'uint' = 0
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
-            groupName: 'str' = ""
+            groupName: 'typing.Optional[str]' = None
 
         @dataclass
         class GroupKeyMapStruct(ClusterObject):
@@ -14590,22 +14590,22 @@ class GroupKeyManagement(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="groupKeySetID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupKeySecurityPolicy", Tag=1, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
-                            ClusterObjectFieldDescriptor(Label="epochKey0", Tag=2, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="epochStartTime0", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="epochKey1", Tag=4, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="epochKey0", Tag=2, Type=typing.Union[Nullable, bytes]),
+                            ClusterObjectFieldDescriptor(Label="epochStartTime0", Tag=3, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="epochKey1", Tag=4, Type=typing.Union[Nullable, bytes]),
+                            ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=typing.Union[Nullable, bytes]),
+                            ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=typing.Union[Nullable, uint]),
                     ])
 
             groupKeySetID: 'uint' = 0
             groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = 0
-            epochKey0: 'bytes' = b""
-            epochStartTime0: 'uint' = 0
-            epochKey1: 'bytes' = b""
-            epochStartTime1: 'uint' = 0
-            epochKey2: 'bytes' = b""
-            epochStartTime2: 'uint' = 0
+            epochKey0: 'typing.Union[Nullable, bytes]' = NullValue
+            epochStartTime0: 'typing.Union[Nullable, uint]' = NullValue
+            epochKey1: 'typing.Union[Nullable, bytes]' = NullValue
+            epochStartTime1: 'typing.Union[Nullable, uint]' = NullValue
+            epochKey2: 'typing.Union[Nullable, bytes]' = NullValue
+            epochStartTime2: 'typing.Union[Nullable, uint]' = NullValue
 
 
 
@@ -14620,10 +14620,10 @@ class GroupKeyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupKeySetStruct", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySetStruct),
+                            ClusterObjectFieldDescriptor(Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySetStruct),
                     ])
 
-            groupKeySetStruct: 'GroupKeyManagement.Structs.GroupKeySetStruct' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySetStruct())
+            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySetStruct' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySetStruct())
 
         @dataclass
         class KeySetRead(ClusterCommand):
@@ -14650,10 +14650,10 @@ class GroupKeyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupKeySetStruct", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySetStruct),
+                            ClusterObjectFieldDescriptor(Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySetStruct),
                     ])
 
-            groupKeySetStruct: 'GroupKeyManagement.Structs.GroupKeySetStruct' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySetStruct())
+            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySetStruct' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySetStruct())
 
         @dataclass
         class KeySetRemove(ClusterCommand):

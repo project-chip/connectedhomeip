@@ -3881,7 +3881,7 @@ static void OnGroupKeyManagementKeySetReadResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupKeySetStruct", 1, data.groupKeySetStruct);
+        err = LogValue("groupKeySet", 1, data.groupKeySet);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -23952,7 +23952,7 @@ class GroupKeyManagementKeySetWrite : public ModelCommand
 public:
     GroupKeyManagementKeySetWrite() : ModelCommand("key-set-write"), mComplex_GroupKeySet(&mRequest.groupKeySet)
     {
-        // GroupKeySetStruct Struct parsing is not supported yet
+        // GroupKeySet Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -27746,48 +27746,6 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "LocalizationConfiguration.ClusterRevision response", value);
     }
-};
-
-class ReportLocalizationConfigurationClusterRevision : public ModelCommand
-{
-public:
-    ReportLocalizationConfigurationClusterRevision() : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportLocalizationConfigurationClusterRevision() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000002B) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::LocalizationConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("LocalizationConfiguration.ClusterRevision report", 0, value);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -33468,51 +33426,6 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OperationalCredentials.NOCs response", value);
     }
-};
-
-class ReportOperationalCredentialsNOCs : public ModelCommand
-{
-public:
-    ReportOperationalCredentialsNOCs() : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "nocs");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportOperationalCredentialsNOCs() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
-            value)
-    {
-        DataModelLogger::LogValue("OperationalCredentials.NOCs report", 0, value);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 /*
@@ -58002,30 +57915,6 @@ private:
 };
 
 /*
- * Command GetSceneMembership
- */
-class ScenesGetSceneMembership : public ClusterCommand
-{
-public:
-    ScenesGetSceneMembership(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-scene-membership", credsIssuerConfig)
-    {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x00000005, 0x00000006, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type mRequest;
-};
-
-/*
  * Command RecallScene
  */
 class ScenesRecallScene : public ClusterCommand
@@ -58051,29 +57940,6 @@ private:
 };
 
 /*
- * Command RemoveAllScenes
- */
-class ScenesRemoveAllScenes : public ClusterCommand
-{
-public:
-    ScenesRemoveAllScenes(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-all-scenes", credsIssuerConfig)
-    {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x00000005, 0x00000003, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type mRequest;
-};
-
-/*
  * Command RemoveScene
  */
 class ScenesRemoveScene : public ClusterCommand
@@ -58088,13 +57954,20 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002C) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
-        return ClusterCommand::SendCommand(device, endpointId, 0x00000005, 0x00000002, mRequest);
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::app::Clusters::Scenes::Commands::RemoveScene::Type mRequest;
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.SupportedCalendarTypes response", value);
+    }
 };
 
 /*
@@ -58121,295 +57994,17 @@ private:
     chip::app::Clusters::Scenes::Commands::StoreScene::Type mRequest;
 };
 
-/*
- * Command ViewScene
- */
-class ScenesViewScene : public ClusterCommand
-{
-public:
-    ScenesViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-scene", credsIssuerConfig)
-    {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x00000005, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Scenes::Commands::ViewScene::Type mRequest;
-};
-
 /*----------------------------------------------------------------------------*\
-| Cluster SoftwareDiagnostics                                         | 0x0034 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * ResetWatermarks                                                   |   0x00 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ThreadMetrics                                                     | 0x0000 |
-| * CurrentHeapFree                                                   | 0x0001 |
-| * CurrentHeapUsed                                                   | 0x0002 |
-| * CurrentHeapHighWatermark                                          | 0x0003 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-| * SoftwareFault                                                     | 0x0000 |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command ResetWatermarks
- */
-class SoftwareDiagnosticsResetWatermarks : public ClusterCommand
-{
-public:
-    SoftwareDiagnosticsResetWatermarks(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("reset-watermarks", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x00000034, 0x00000000, mRequest);
-    }
-
-private:
-    chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type mRequest;
-};
-
-/*----------------------------------------------------------------------------*\
-| Cluster Switch                                                      | 0x003B |
+| Cluster UserLabel                                                   | 0x0041 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * NumberOfPositions                                                 | 0x0000 |
-| * CurrentPosition                                                   | 0x0001 |
-| * MultiPressMax                                                     | 0x0002 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-| * SwitchLatched                                                     | 0x0000 |
-| * InitialPress                                                      | 0x0001 |
-| * LongPress                                                         | 0x0002 |
-| * ShortRelease                                                      | 0x0003 |
-| * LongRelease                                                       | 0x0004 |
-| * MultiPressOngoing                                                 | 0x0005 |
-| * MultiPressComplete                                                | 0x0006 |
-\*----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------*\
-| Cluster TargetNavigator                                             | 0x0505 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * NavigateTargetRequest                                             |   0x00 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * TargetNavigatorList                                               | 0x0000 |
-| * CurrentNavigatorTarget                                            | 0x0001 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
+| * LabelList                                                         | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
-
-/*
- * Command NavigateTargetRequest
- */
-class TargetNavigatorNavigateTargetRequest : public ClusterCommand
-{
-public:
-    TargetNavigatorNavigateTargetRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("navigate-target-request", credsIssuerConfig)
-    {
-        AddArgument("Target", 0, UINT8_MAX, &mRequest.target);
-        AddArgument("Data", &mRequest.data);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x00000505, 0x00000000, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Type mRequest;
-};
-
-/*----------------------------------------------------------------------------*\
-| Cluster TemperatureMeasurement                                      | 0x0402 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * MeasuredValue                                                     | 0x0000 |
-| * MinMeasuredValue                                                  | 0x0001 |
-| * MaxMeasuredValue                                                  | 0x0002 |
-| * Tolerance                                                         | 0x0003 |
-| * AttributeList                                                     | 0xFFFB |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-\*----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------*\
-| Cluster TestCluster                                                 | 0x050F |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * SimpleStructEchoRequest                                           |   0x11 |
-| * Test                                                              |   0x00 |
-| * TestAddArguments                                                  |   0x04 |
-| * TestEmitTestEventRequest                                          |   0x14 |
-| * TestEnumsRequest                                                  |   0x0E |
-| * TestListInt8UArgumentRequest                                      |   0x0A |
-| * TestListInt8UReverseRequest                                       |   0x0D |
-| * TestListNestedStructListArgumentRequest                           |   0x0C |
-| * TestListStructArgumentRequest                                     |   0x09 |
-| * TestNestedStructArgumentRequest                                   |   0x08 |
-| * TestNestedStructListArgumentRequest                               |   0x0B |
-| * TestNotHandled                                                    |   0x01 |
-| * TestNullableOptionalRequest                                       |   0x0F |
-| * TestSimpleOptionalArgumentRequest                                 |   0x13 |
-| * TestSpecific                                                      |   0x02 |
-| * TestStructArgumentRequest                                         |   0x07 |
-| * TestUnknownCommand                                                |   0x03 |
-| * TimedInvokeRequest                                                |   0x12 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * Boolean                                                           | 0x0000 |
-| * Bitmap8                                                           | 0x0001 |
-| * Bitmap16                                                          | 0x0002 |
-| * Bitmap32                                                          | 0x0003 |
-| * Bitmap64                                                          | 0x0004 |
-| * Int8u                                                             | 0x0005 |
-| * Int16u                                                            | 0x0006 |
-| * Int24u                                                            | 0x0007 |
-| * Int32u                                                            | 0x0008 |
-| * Int40u                                                            | 0x0009 |
-| * Int48u                                                            | 0x000A |
-| * Int56u                                                            | 0x000B |
-| * Int64u                                                            | 0x000C |
-| * Int8s                                                             | 0x000D |
-| * Int16s                                                            | 0x000E |
-| * Int24s                                                            | 0x000F |
-| * Int32s                                                            | 0x0010 |
-| * Int40s                                                            | 0x0011 |
-| * Int48s                                                            | 0x0012 |
-| * Int56s                                                            | 0x0013 |
-| * Int64s                                                            | 0x0014 |
-| * Enum8                                                             | 0x0015 |
-| * Enum16                                                            | 0x0016 |
-| * FloatSingle                                                       | 0x0017 |
-| * FloatDouble                                                       | 0x0018 |
-| * OctetString                                                       | 0x0019 |
-| * ListInt8u                                                         | 0x001A |
-| * ListOctetString                                                   | 0x001B |
-| * ListStructOctetString                                             | 0x001C |
-| * LongOctetString                                                   | 0x001D |
-| * CharString                                                        | 0x001E |
-| * LongCharString                                                    | 0x001F |
-| * EpochUs                                                           | 0x0020 |
-| * EpochS                                                            | 0x0021 |
-| * VendorId                                                          | 0x0022 |
-| * ListNullablesAndOptionalsStruct                                   | 0x0023 |
-| * EnumAttr                                                          | 0x0024 |
-| * StructAttr                                                        | 0x0025 |
-| * RangeRestrictedInt8u                                              | 0x0026 |
-| * RangeRestrictedInt8s                                              | 0x0027 |
-| * RangeRestrictedInt16u                                             | 0x0028 |
-| * RangeRestrictedInt16s                                             | 0x0029 |
-| * ListLongOctetString                                               | 0x002A |
-| * TimedWriteBoolean                                                 | 0x0030 |
-| * GeneralErrorBoolean                                               | 0x0031 |
-| * ClusterErrorBoolean                                               | 0x0032 |
-| * Unsupported                                                       | 0x00FF |
-| * NullableBoolean                                                   | 0x8000 |
-| * NullableBitmap8                                                   | 0x8001 |
-| * NullableBitmap16                                                  | 0x8002 |
-| * NullableBitmap32                                                  | 0x8003 |
-| * NullableBitmap64                                                  | 0x8004 |
-| * NullableInt8u                                                     | 0x8005 |
-| * NullableInt16u                                                    | 0x8006 |
-| * NullableInt24u                                                    | 0x8007 |
-| * NullableInt32u                                                    | 0x8008 |
-| * NullableInt40u                                                    | 0x8009 |
-| * NullableInt48u                                                    | 0x800A |
-| * NullableInt56u                                                    | 0x800B |
-| * NullableInt64u                                                    | 0x800C |
-| * NullableInt8s                                                     | 0x800D |
-| * NullableInt16s                                                    | 0x800E |
-| * NullableInt24s                                                    | 0x800F |
-| * NullableInt32s                                                    | 0x8010 |
-| * NullableInt40s                                                    | 0x8011 |
-| * NullableInt48s                                                    | 0x8012 |
-| * NullableInt56s                                                    | 0x8013 |
-| * NullableInt64s                                                    | 0x8014 |
-| * NullableEnum8                                                     | 0x8015 |
-| * NullableEnum16                                                    | 0x8016 |
-| * NullableFloatSingle                                               | 0x8017 |
-| * NullableFloatDouble                                               | 0x8018 |
-| * NullableOctetString                                               | 0x8019 |
-| * NullableCharString                                                | 0x801E |
-| * NullableEnumAttr                                                  | 0x8024 |
-| * NullableStruct                                                    | 0x8025 |
-| * NullableRangeRestrictedInt8u                                      | 0x8026 |
-| * NullableRangeRestrictedInt8s                                      | 0x8027 |
-| * NullableRangeRestrictedInt16u                                     | 0x8028 |
-| * NullableRangeRestrictedInt16s                                     | 0x8029 |
-| * ServerGeneratedCommandList                                        | 0xFFF8 |
-| * ClientGeneratedCommandList                                        | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-| * TestEvent                                                         | 0x0001 |
-| * TestFabricScopedEvent                                             | 0x0002 |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command SimpleStructEchoRequest
- */
-class TestClusterSimpleStructEchoRequest : public ClusterCommand
-{
-public:
-    TestClusterSimpleStructEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("simple-struct-echo-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x0000050F, 0x00000011, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
-};
 
 /*
  * Command Test
@@ -63308,36 +62903,12 @@ void registerClusterLocalizationConfiguration(Commands & commands, CredentialIss
     const char * clusterName = "LocalizationConfiguration";
 
     commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                        //
-        make_unique<ReadAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "supported-locales", Attributes::SupportedLocales::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                   credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),        //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                            //
-        make_unique<WriteLocalizationConfigurationActiveLocale>(credsIssuerConfig),                                    //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                        //
-        make_unique<SubscribeAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "supported-locales", Attributes::SupportedLocales::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                        credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadLocalizationConfigurationActiveLocale>(),       //
+        make_unique<WriteLocalizationConfigurationActiveLocale>(),      //
+        make_unique<ReportLocalizationConfigurationActiveLocale>(),     //
+        make_unique<ReadLocalizationConfigurationSupportedLocales>(),   //
+        make_unique<ReportLocalizationConfigurationSupportedLocales>(), //
+        make_unique<ReadLocalizationConfigurationClusterRevision>(),    //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -63835,55 +63406,30 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
     const char * clusterName = "OperationalCredentials";
 
     commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
-        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                       //
-        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),    //
-        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),           //
-        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),      //
-        make_unique<OperationalCredentialsOpCSRRequest>(credsIssuerConfig),                 //
-        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                 //
-        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(credsIssuerConfig), //
-        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),            //
-        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                    //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "nocs", Attributes::NOCs::Id, credsIssuerConfig),                                         //
-        make_unique<ReadAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "supported-fabrics", Attributes::SupportedFabrics::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "trusted-root-certificates", Attributes::TrustedRootCertificates::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "current-fabric-index", Attributes::CurrentFabricIndex::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                   credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
-        make_unique<SubscribeAttribute>(Id, "nocs", Attributes::NOCs::Id, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "supported-fabrics", Attributes::SupportedFabrics::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "trusted-root-certificates", Attributes::TrustedRootCertificates::Id,
-                                        credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "current-fabric-index", Attributes::CurrentFabricIndex::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                        credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<OperationalCredentialsAddNOC>(),                        //
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(),     //
+        make_unique<OperationalCredentialsAttestationRequest>(),            //
+        make_unique<OperationalCredentialsCertificateChainRequest>(),       //
+        make_unique<OperationalCredentialsOpCSRRequest>(),                  //
+        make_unique<OperationalCredentialsRemoveFabric>(),                  //
+        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),  //
+        make_unique<OperationalCredentialsUpdateFabricLabel>(),             //
+        make_unique<OperationalCredentialsUpdateNOC>(),                     //
+        make_unique<ReadOperationalCredentialsNOCs>(),                      //
+        make_unique<ReadOperationalCredentialsFabricsList>(),               //
+        make_unique<ReportOperationalCredentialsFabricsList>(),             //
+        make_unique<ReadOperationalCredentialsSupportedFabrics>(),          //
+        make_unique<ReportOperationalCredentialsSupportedFabrics>(),        //
+        make_unique<ReadOperationalCredentialsCommissionedFabrics>(),       //
+        make_unique<ReportOperationalCredentialsCommissionedFabrics>(),     //
+        make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),   //
+        make_unique<ReportOperationalCredentialsTrustedRootCertificates>(), //
+        make_unique<ReadOperationalCredentialsCurrentFabricIndex>(),        //
+        make_unique<ReportOperationalCredentialsCurrentFabricIndex>(),      //
+        make_unique<ReadOperationalCredentialsAttributeList>(),             //
+        make_unique<ReportOperationalCredentialsAttributeList>(),           //
+        make_unique<ReadOperationalCredentialsClusterRevision>(),           //
+        make_unique<ReportOperationalCredentialsClusterRevision>(),         //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -65099,40 +64645,12 @@ void registerClusterTimeFormatLocalization(Commands & commands, CredentialIssuer
     const char * clusterName = "TimeFormatLocalization";
 
     commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "hour-format", Attributes::HourFormat::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "active-calendar-type", Attributes::ActiveCalendarType::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "supported-calendar-types", Attributes::SupportedCalendarTypes::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                   credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<WriteTimeFormatLocalizationHourFormat>(credsIssuerConfig),                                              //
-        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(credsIssuerConfig),                                      //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                             //
-        make_unique<SubscribeAttribute>(Id, "hour-format", Attributes::HourFormat::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "active-calendar-type", Attributes::ActiveCalendarType::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "supported-calendar-types", Attributes::SupportedCalendarTypes::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                        credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadTimeFormatLocalizationHourFormat>(),             //
+        make_unique<WriteTimeFormatLocalizationHourFormat>(),            //
+        make_unique<ReadTimeFormatLocalizationActiveCalendarType>(),     //
+        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(),    //
+        make_unique<ReadTimeFormatLocalizationSupportedCalendarTypes>(), //
+        make_unique<ReadTimeFormatLocalizationClusterRevision>(),        //
     };
 
     commands.Register(clusterName, clusterCommands);

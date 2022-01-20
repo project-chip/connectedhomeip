@@ -523,7 +523,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _endpoints = [NSArray array];
 
-        _groupName = @"";
+        _groupName = nil;
     }
     return self;
 }
@@ -553,17 +553,17 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupKeySecurityPolicy = @(0);
 
-        _epochKey0 = [NSData data];
+        _epochKey0 = nil;
 
-        _epochStartTime0 = @(0);
+        _epochStartTime0 = nil;
 
-        _epochKey1 = [NSData data];
+        _epochKey1 = nil;
 
-        _epochStartTime1 = @(0);
+        _epochStartTime1 = nil;
 
-        _epochKey2 = [NSData data];
+        _epochKey2 = nil;
 
-        _epochStartTime2 = @(0);
+        _epochStartTime2 = nil;
     }
     return self;
 }
