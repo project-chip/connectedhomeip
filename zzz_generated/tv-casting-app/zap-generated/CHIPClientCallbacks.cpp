@@ -22,6 +22,7 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
+#include <app/data-model/DecodeWithoutFabricIndex.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -136,7 +137,7 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
                                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint16_t> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
+    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -157,7 +158,7 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
+    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -178,7 +179,7 @@ void ChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Call
                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
+    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -199,7 +200,7 @@ void ContentLauncherClusterAcceptHeaderListListAttributeFilter(TLV::TLVReader * 
                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::CharSpan> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
+    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -220,7 +221,7 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
+    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -242,7 +243,7 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
                                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
+    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)

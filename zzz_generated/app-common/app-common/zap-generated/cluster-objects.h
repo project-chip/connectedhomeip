@@ -27,6 +27,7 @@
 #include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
+#include <app/data-model/DecodeWithoutFabricIndex.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -6474,7 +6475,10 @@ public:
     AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
 };
 
 } // namespace AccessControlEntry
@@ -6492,7 +6496,7 @@ public:
     chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
     bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
@@ -7117,6 +7121,7 @@ public:
     chip::CharSpan name;
     EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -8639,7 +8644,7 @@ public:
     chip::EndpointId endpoint     = static_cast<chip::EndpointId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
     bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
@@ -14404,7 +14409,7 @@ public:
     chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
     bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
@@ -14427,7 +14432,7 @@ public:
     chip::ByteSpan icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
     bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
@@ -15124,6 +15129,7 @@ public:
     uint16_t groupId     = static_cast<uint16_t>(0);
     DataModel::DecodableList<uint16_t> endpoints;
     chip::CharSpan groupName;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -15144,7 +15150,7 @@ public:
     uint16_t groupKeySetID        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
     bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
@@ -32229,6 +32235,7 @@ public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
     DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -32251,6 +32258,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -33542,6 +33550,7 @@ public:
     DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
     Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
     Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -33604,6 +33613,7 @@ public:
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -33626,6 +33636,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -33642,7 +33653,7 @@ public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
     bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
