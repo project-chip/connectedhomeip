@@ -150,7 +150,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
         return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
     default:
         // Use default timeout specified in the IM.
-        return Optional<System::Clock::Timeout>();
+        return NullOptional;
     }
 }
 
