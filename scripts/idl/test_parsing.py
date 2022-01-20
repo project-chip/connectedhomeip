@@ -14,8 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from parser import CreateParser
-from matter_idl_types import *
+try:
+    from .parser import CreateParser
+    from .matter_idl_types import *
+except:
+    import os
+    import sys
+    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+    from parser import CreateParser
+    from matter_idl_types import *
 
 import unittest
 
