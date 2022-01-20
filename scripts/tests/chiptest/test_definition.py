@@ -96,7 +96,8 @@ class TestDefinition:
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
             elif self.target == TestTarget.DOOR_LOCK:
-                logging.info("Ignore test - test is made for door lock which is not supported yet")
+                logging.info(
+                    "Ignore test - test is made for door lock which is not supported yet")
                 return
             else:
                 raise Exception(

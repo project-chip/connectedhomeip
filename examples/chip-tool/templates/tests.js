@@ -252,7 +252,7 @@ function getTests()
   const DoorLock = [
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
-  ]
+  ];
 
   const tests = [
     BinaryInput, //
