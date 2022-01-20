@@ -67574,8 +67574,7 @@ public:
         // but before our function call returns, we won't end up with an
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++)
-        {
-        }
+        {}
 
         if (CHIP_NO_ERROR != err)
         {

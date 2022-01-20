@@ -128,8 +128,7 @@
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {                                                                                                                              \
-    }
+    {}
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
