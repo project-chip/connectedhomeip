@@ -20,17 +20,7 @@
 
 namespace chip {
 
-static BindingManager * s_manager_instance;
-
-void SetBindingManagerInstance(BindingManager * instance)
-{
-    s_manager_instance = instance;
-}
-
-BindingManager * GetBindingManagerInstance()
-{
-    return s_manager_instance;
-}
+BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
 {

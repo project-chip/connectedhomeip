@@ -86,14 +86,18 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
+    static BindingManager & GetInstance() { return sBindingManager; }
+
 private:
+    static BindingManager sBindingManager;
+
     static constexpr uint8_t kMaxPendingNotifications = 3;
 
     struct ClusterPath
     {
-        EndpointId endpoint;
-        ClusterId cluster;
         void * context;
+        ClusterId cluster;
+        EndpointId endpoint;
     };
 
     // A pending notification to be sent to a binding waiting for the CASE session to be established.
@@ -124,23 +128,24 @@ private:
             }
             if (mNumPendingNotifications < kMaxPendingNotifications)
             {
-                mPendingNotifications[mNumPendingNotifications++] = { endpoint, cluster, context };
+                mPendingNotifications[mNumPendingNotifications++] = { context, cluster, endpoint };
             }
             else
             {
-                mPendingNotifications[mNextToOverride] = { endpoint, cluster, context };
+                mPendingNotifications[mNextToOverride] = { context, cluster, endpoint };
                 mNextToOverride++;
                 mNextToOverride %= kMaxPendingNotifications;
             }
         }
 
     private:
+        PeerId mPeerId;
+        System::Clock::Timestamp mLastUpdateTime;
+        // TODO: Make the pending notifications list of binding table indecies and list of contexts
+        ClusterPath mPendingNotifications[kMaxPendingNotifications];
+
         uint8_t mNumPendingNotifications = 0;
         uint8_t mNextToOverride          = 0;
-
-        PeerId mPeerId;
-        ClusterPath mPendingNotifications[kMaxPendingNotifications];
-        System::Clock::Timestamp mLastUpdateTime;
     };
 
     // The pool for all the pending comands.
@@ -186,10 +191,5 @@ private:
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 };
-
-// The global instance getter & setter
-void SetBindingManagerInstance(BindingManager * instance);
-
-BindingManager * GetBindingManagerInstance();
 
 } // namespace chip
