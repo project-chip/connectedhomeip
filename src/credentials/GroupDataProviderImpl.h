@@ -147,9 +147,9 @@ private:
         void Clear();
 
         CHIP_ERROR SecurityEncrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                                MutableByteSpan & out_mic) override;
+                                   MutableByteSpan & out_mic) override;
         CHIP_ERROR SecurityDecrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                                const ByteSpan & mic) override;
+                                   const ByteSpan & mic) override;
         CHIP_ERROR PrivacyEncrypt(MutableByteSpan & plaintext, const ByteSpan & nonce) override;
         CHIP_ERROR PrivacyDecrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce) override;
 

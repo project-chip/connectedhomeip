@@ -1288,11 +1288,11 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 class SecureKeyContext
 {
 public:
-    virtual ~SecureKeyContext()                                  = default;
+    virtual ~SecureKeyContext()                                                             = default;
     virtual CHIP_ERROR SecurityEncrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                               MutableByteSpan & out_mic)        = 0;
+                                       MutableByteSpan & out_mic)                           = 0;
     virtual CHIP_ERROR SecurityDecrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                               const ByteSpan & mic)             = 0;
+                                       const ByteSpan & mic)                                = 0;
     virtual CHIP_ERROR PrivacyEncrypt(MutableByteSpan & plaintext, const ByteSpan & nonce)  = 0;
     virtual CHIP_ERROR PrivacyDecrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce) = 0;
 };

@@ -1111,15 +1111,17 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
             MutableByteSpan tag(mic, sizeof(mic));
 
             // Encrypt
-            NL_TEST_ASSERT(apSuite,
-                           CHIP_NO_ERROR ==
-                               session_key.key->SecurityEncrypt(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(
+                apSuite,
+                CHIP_NO_ERROR ==
+                    session_key.key->SecurityEncrypt(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
             NL_TEST_ASSERT(apSuite, memcmp(message.data(), kMessage, sizeof(kMessage)));
 
             // Decrypt
-            NL_TEST_ASSERT(apSuite,
-                           CHIP_NO_ERROR ==
-                               session_key.key->SecurityDecrypt(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(
+                apSuite,
+                CHIP_NO_ERROR ==
+                    session_key.key->SecurityDecrypt(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
             NL_TEST_ASSERT(apSuite, 0 == memcmp(message.data(), kMessage, sizeof(kMessage)));
             count++;
         }
