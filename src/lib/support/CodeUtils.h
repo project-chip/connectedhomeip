@@ -60,7 +60,7 @@
  *
  */
 #if !defined(NL_ASSERT_ABORT)
-#define NL_ASSERT_ABORT() chipDie()
+#define NL_ASSERT_ABORT() chipAbort()
 #endif
 
 /**
@@ -466,18 +466,25 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @endcode
  *
  */
+#ifndef chipAbort
+extern "C" void chipAbort(void) __attribute((noreturn));
+
+inline void chipAbort(void)
+{
+    while (true)
+    {
+        // NL_ASSERT_ABORT is redefined to be chipAbort, so not useful here.
+        CHIP_CONFIG_ABORT();
+    }
+}
+#endif // chipAbort
 #ifndef chipDie
 extern "C" void chipDie(void) __attribute((noreturn));
 
 inline void chipDie(void)
 {
     ChipLogError(NotSpecified, "chipDie chipDie chipDie");
-
-    while (true)
-    {
-        // NL_ASSERT_ABORT is redefined to be chipDie, so not useful here.
-        CHIP_CONFIG_ABORT();
-    }
+    chipAbort();
 }
 #endif // chipDie
 
