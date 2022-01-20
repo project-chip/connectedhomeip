@@ -269,7 +269,7 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
     std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
-        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback.get(),
+        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
         timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
 
     va_list args;

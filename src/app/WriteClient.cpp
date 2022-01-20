@@ -169,12 +169,13 @@ CHIP_ERROR WriteClient::FinalizeCurrentChunk(bool aHasMoreChunks)
 {
     System::PacketBufferHandle packet;
     VerifyOrReturnError(mState == State::AddAttribute, CHIP_ERROR_INCORRECT_STATE);
-    AttributeDataIBs::Builder & attributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
-    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
 
     TLV::TLVWriter * writer = mWriteRequestBuilder.GetWriter();
     ReturnErrorCodeIf(writer == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfRequestMessage));
+    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+
+    AttributeDataIBs::Builder & attributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
+    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
 
     mWriteRequestBuilder.MoreChunkedMessages(aHasMoreChunks).EndOfWriteRequestMessage();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
@@ -185,10 +186,31 @@ CHIP_ERROR WriteClient::FinalizeCurrentChunk(bool aHasMoreChunks)
 
 CHIP_ERROR WriteClient::CreateNewChunk()
 {
+    uint16_t reservedSize             = 0;
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
+    // Always limit the size of the packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer capacity.
+    if (packet->AvailableDataLength() > kMaxSecureSduLengthBytes)
+    {
+        reservedSize = static_cast<uint16_t>(packet->AvailableDataLength() - kMaxSecureSduLengthBytes);
+    }
+
+    // ... and we need to reserve some extra space for the MIC field.
+    reservedSize += chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
+
+    // ... and the overhead for end of AttributeDataIBs (end of container), more chunks flag, end of WriteRequestMessage (another
+    // end of container).
+    reservedSize += kReservedSizeForTLVEncodingOverhead;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    // ... and for unit tests.
+    reservedSize += mReservedSize;
+#endif
+
     mMessageWriter.Init(std::move(packet));
+
+    ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
@@ -198,11 +220,6 @@ CHIP_ERROR WriteClient::CreateNewChunk()
 
     TLV::TLVWriter * writer = mWriteRequestBuilder.GetWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(writer->ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfRequestMessage));
-
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    ReturnErrorOnFailure(writer->ReserveBuffer(mReservedSize));
-#endif
 
     return CHIP_NO_ERROR;
 }

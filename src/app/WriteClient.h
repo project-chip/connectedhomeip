@@ -225,7 +225,7 @@ public:
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+    void SetWriterReserved(uint16_t aReservedSize) { mReservedSize = aReservedSize; }
 #endif
 
     /*
@@ -318,13 +318,43 @@ private:
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
 
-    // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
-    static constexpr uint32_t kReservedSizeForMoreChunksFlag      = 1 + 1;
-    static constexpr uint32_t kReservedSizeForEndOfRequestMessage = 1;
-
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
-    uint32_t mReservedSize = 0;
+    uint16_t mReservedSize = 0;
+
+    /**
+     * Below we defines several const variables for encoding overheads.
+     * WriteRequestMessage =
+     * {
+     *  timedRequest = false,
+     *  AttributeDataIBs =
+     *  [
+     *     AttributeDataIB =             \
+     *     {                              |
+     *        DataVersion = 0x0,          |
+     *        AttributePathIB =           |
+     *        {                           |
+     *           Endpoint = 0x2,          |  "atomically" encodede via
+     *           Cluster = 0x50f,          > EncodeAttributeWritePayload or
+     *           Attribute = 0x0000_0006, |  PutPreencodedAttributeWritePayload
+     *           ListIndex = Null,        |
+     *        }                           |
+     *        Data = ...                  |
+     *     },                             /
+     *     (...)
+     *  ],                           <-- 1 byte  "end of AttributeDataIB" (end of container)
+     *  moreChunkedMessages = false, <-- 2 bytes "kReservedSizeForEndOfContainer"
+     * }                             <-- 1 byte  "end of WriteRequestMessage" (end of container)
+     */
+
+    // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
+    static constexpr uint16_t kReservedSizeForMoreChunksFlag = 1 + 1;
+    // End Of Container (0x18) coses one byte.
+    static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
+    // Reserved buffer for TLV level overhead (the overhead for end of AttributeDataIBs (end of container), more chunks flag, end
+    // of WriteRequestMessage (another end of container)).
+    static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
+        kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
 };
 
 } // namespace app

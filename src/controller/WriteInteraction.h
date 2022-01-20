@@ -110,10 +110,10 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
-    auto client   = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
-                                                         callback.get(), aTimedWriteTimeoutMs);
-
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    auto client = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
+                                                         callback->GetChunkedCallback(), aTimedWriteTimeoutMs);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (sessionHandle->IsGroupSession())
