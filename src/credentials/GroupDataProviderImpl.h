@@ -139,18 +139,19 @@ private:
         bool mFirstEndpoint   = true;
     };
 
-    class GroupAesCcmKey : public Crypto::AesCcmKeyContext
+    class GroupKeyContext : public Crypto::SecureKeyContext
     {
     public:
-        GroupAesCcmKey() = default;
+        GroupKeyContext() = default;
         CHIP_ERROR SetKey(const ByteSpan & value);
         void Clear();
 
-        CHIP_ERROR Encrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                           MutableByteSpan & out_mic) override;
-        CHIP_ERROR Decrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                           const ByteSpan & mic) override;
-        CHIP_ERROR DerivePrivacyKey(Crypto::AesCtrKeyContext *& out) override;
+        CHIP_ERROR SecurityEncrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                                MutableByteSpan & out_mic) override;
+        CHIP_ERROR SecurityDecrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                                const ByteSpan & mic) override;
+        CHIP_ERROR PrivacyEncrypt(MutableByteSpan & plaintext, const ByteSpan & nonce) override;
+        CHIP_ERROR PrivacyDecrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce) override;
 
     protected:
         uint8_t mKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
@@ -190,7 +191,7 @@ private:
         uint16_t mMapping        = 0;
         uint16_t mMapCount       = 0;
         bool mFirstMap           = true;
-        GroupAesCcmKey mKey;
+        GroupKeyContext mKey;
     };
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 

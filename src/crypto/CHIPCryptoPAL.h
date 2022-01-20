@@ -1285,27 +1285,33 @@ enum class MatterOid
  **/
 CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
 
-class AesCtrKeyContext
+class SecureKeyContext
 {
 public:
-    virtual ~AesCtrKeyContext()                                                      = default;
-    virtual CHIP_ERROR Encrypt(MutableByteSpan & plaintext, const ByteSpan & nonce)  = 0;
-    virtual CHIP_ERROR Decrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce) = 0;
-};
-
-class AesCcmKeyContext
-{
-public:
-    virtual ~AesCcmKeyContext()                                  = default;
-    virtual CHIP_ERROR Encrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+    virtual ~SecureKeyContext()                                  = default;
+    virtual CHIP_ERROR SecurityEncrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
                                MutableByteSpan & out_mic)        = 0;
-    virtual CHIP_ERROR Decrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+    virtual CHIP_ERROR SecurityDecrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
                                const ByteSpan & mic)             = 0;
-    virtual CHIP_ERROR DerivePrivacyKey(AesCtrKeyContext *& out) = 0;
+    virtual CHIP_ERROR PrivacyEncrypt(MutableByteSpan & plaintext, const ByteSpan & nonce)  = 0;
+    virtual CHIP_ERROR PrivacyDecrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce) = 0;
 };
 
+/**
+ *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
+ * @param[in] epoch_key  The epoch key
+ * @param[out] out_key  Symmetric key used as the encryption key during message processing for group communication.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
 CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
 
+/**
+ *  @brief Derives the Group Session ID from a given operational group key using 
+ *         the Key Derivation Function (Group Key Hash)
+ * @param[in] operational_key  The operational group key
+ * @param[out] session_id  Output of the Group Key Hash
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INVALID_ARGUMENT if the provided key is invalid.
+ **/
 CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id);
 
 } // namespace Crypto

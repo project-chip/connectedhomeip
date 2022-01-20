@@ -1718,35 +1718,42 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
 // Cryptography
 //
 
-CHIP_ERROR GroupDataProviderImpl::GroupAesCcmKey::SetKey(const ByteSpan & value)
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::SetKey(const ByteSpan & value)
 {
     VerifyOrReturnError(value.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcmp(mKey, value.data(), value.size());
     return CHIP_NO_ERROR;
 }
 
-void GroupDataProviderImpl::GroupAesCcmKey::Clear()
+void GroupDataProviderImpl::GroupKeyContext::Clear()
 {
     memset(mKey, 0, sizeof(mKey));
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupAesCcmKey::Encrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce, MutableByteSpan & out_mic)
+
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::SecurityEncrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                        MutableByteSpan & out_mic)
 {
     uint8_t *output = plaintext.data();
     return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mKey, Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, out_mic.data(), out_mic.size());
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupAesCcmKey::Decrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce, const ByteSpan & mic)
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::SecurityDecrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                        const ByteSpan & mic)
 {
     uint8_t *output = ciphertext.data();
     return Crypto::AES_CCM_decrypt(ciphertext.data(), ciphertext.size(), aad.data(), aad.size(), mic.data(), mic.size(), mKey, Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupAesCcmKey::DerivePrivacyKey(Crypto::AesCtrKeyContext *& out)
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(MutableByteSpan & plaintext, const ByteSpan & nonce)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
 GroupDataProviderImpl::SessionKeyIterator * GroupDataProviderImpl::IterateSessionKeys(uint16_t session_id)
 {
