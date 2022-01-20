@@ -12958,6 +12958,17 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeNOCsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPOperationalCredentialsNOCsListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = OperationalCredentials::Attributes::NOCs::TypeInfo;
+            auto successFn = Callback<OperationalCredentialsNOCsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {

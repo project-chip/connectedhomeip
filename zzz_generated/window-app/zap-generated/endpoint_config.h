@@ -609,7 +609,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 226
+#define GENERATED_ATTRIBUTE_COUNT 227
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -812,6 +812,7 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
+            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NOCs */              \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* fabrics list */      \
             { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* SupportedFabrics */  \
             { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() }, /* CommissionedFabrics */                                  \
@@ -972,31 +973,31 @@
                 0x0000003C, ZAP_ATTRIBUTE_INDEX(159), 4, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
             {                                                                                                                      \
-                0x0000003E, ZAP_ATTRIBUTE_INDEX(163), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+                0x0000003E, ZAP_ATTRIBUTE_INDEX(163), 7, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             {                                                                                                                      \
-                0x00000040, ZAP_ATTRIBUTE_INDEX(169), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+                0x00000040, ZAP_ATTRIBUTE_INDEX(170), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
             {                                                                                                                      \
-                0x00000041, ZAP_ATTRIBUTE_INDEX(171), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+                0x00000041, ZAP_ATTRIBUTE_INDEX(172), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 0, Cluster: User Label (server) */                                                                     \
             { 0x00000003,                                                                                                          \
-              ZAP_ATTRIBUTE_INDEX(173),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(174),                                                                                            \
               3,                                                                                                                   \
               5,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
               chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */                                         \
             {                                                                                                                      \
-                0x0000001D, ZAP_ATTRIBUTE_INDEX(176), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+                0x0000001D, ZAP_ATTRIBUTE_INDEX(177), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 1, Cluster: Descriptor (server) */                                                                     \
             {                                                                                                                      \
-                0x00000102, ZAP_ATTRIBUTE_INDEX(181), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+                0x00000102, ZAP_ATTRIBUTE_INDEX(182), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
             }, /* Endpoint: 1, Cluster: Window Covering (server) */                                                                \
             {                                                                                                                      \
-                0x0000001D, ZAP_ATTRIBUTE_INDEX(201), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+                0x0000001D, ZAP_ATTRIBUTE_INDEX(202), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 2, Cluster: Descriptor (server) */                                                                     \
             {                                                                                                                      \
-                0x00000102, ZAP_ATTRIBUTE_INDEX(206), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+                0x00000102, ZAP_ATTRIBUTE_INDEX(207), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
             }, /* Endpoint: 2, Cluster: Window Covering (server) */                                                                \
     }
 

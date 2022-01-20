@@ -32,14 +32,14 @@ server cluster Basic = 40 {
   readonly attribute char_string hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
   readonly attribute char_string softwareVersionString = 10;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -64,8 +64,8 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -163,8 +163,8 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
   readonly attribute octet_string lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -245,7 +245,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING updateToken = 0;
@@ -345,7 +345,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute int8u updateStateProgress = 3;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
     node_id providerNodeId = 0;
@@ -372,8 +372,14 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  struct NOCStruct {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING noc = 1;
+    OCTET_STRING icac = 2;
+  }
+
   struct FabricDescriptor {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
     OCTET_STRING rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
@@ -381,12 +387,13 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING label = 5;
   }
 
+  readonly attribute NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptor fabricsList[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute fabric_idx currentFabricIndex = 5;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
@@ -462,7 +469,7 @@ server cluster OperationalCredentials = 62 {
 
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 
