@@ -336,7 +336,7 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
 
         // appclusters, 5.2.4.36.1: We need to add next available user after userIndex if any.
         uint16_t nextAvailableUserIndex = 0;
-        if (findUnoccupiedUserSlot(commandPath.mEndpointId, userIndex + 1, nextAvailableUserIndex))
+        if (findUnoccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
         {
             SuccessOrExit(err =
                               writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), nextAvailableUserIndex));
@@ -466,7 +466,8 @@ void DoorLockServer::SetCredentialCommandHandler(
 
     // appclusters, 5.2.4.41: response should contain next available credential slot
     uint16_t nextAvailableCredentialSlot = 0;
-    findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextAvailableCredentialSlot);
+    findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
+                                 nextAvailableCredentialSlot);
 
     uint16_t maxNumberOfCredentials = 0;
     if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
@@ -647,7 +648,8 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
     {
         SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndexWithCredential));
     }
-    if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextCredentialIndex))
+    if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
+                                     nextCredentialIndex))
     {
         SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextCredentialIndex)), nextCredentialIndex));
     }
@@ -1175,21 +1177,21 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, creatorFabricIdx, creatorFabricIdx, newUserName, newUserUniqueId,
                                       newUserStatus, newUserType, newCredentialRule, newCredentials, newTotalCredentials))
     {
-        emberAfDoorLockClusterPrintln("[createUser] Unable to create user: app error "
-                                      "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus="
-                                      "%" PRIu8 ",userType=%" PRIu8 ",credentialRule=%" PRIu8 ",totalCredentials=%zu]",
-                                      endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId,
-                                      to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
-                                      newTotalCredentials);
+        emberAfDoorLockClusterPrintln(
+            "[createUser] Unable to create user: app error "
+            "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus="
+            "%" PRIu8 ",userType=%" PRIu8 ",credentialRule=%" PRIu8 ",totalCredentials=%zu]",
+            endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
+            to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    emberAfDoorLockClusterPrintln("[createUser] User created "
-                                  "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%"
-                                  "" PRIu8 ",userType=%" PRIu8 ",credentialRule=%" PRIu8 ",totalCredentials=%zu]",
-                                  endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId,
-                                  to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
-                                  newTotalCredentials);
+    emberAfDoorLockClusterPrintln(
+        "[createUser] User created "
+        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%"
+        "" PRIu8 ",userType=%" PRIu8 ",credentialRule=%" PRIu8 ",totalCredentials=%zu]",
+        endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
+        to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
 
     sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
@@ -1255,12 +1257,12 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    emberAfDoorLockClusterPrintln(
-        "[modifyUser] User modified "
-        "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%" PRIu8 ","
-        "userType=%" PRIu8 ",credentialRule=%" PRIu8 "]",
-        endpointId, modifierFabricIndex, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-        to_underlying(newUserType), to_underlying(newCredentialRule));
+    emberAfDoorLockClusterPrintln("[modifyUser] User modified "
+                                  "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
+                                  ",userStatus=%" PRIu8 ","
+                                  "userType=%" PRIu8 ",credentialRule=%" PRIu8 "]",
+                                  endpointId, modifierFabricIndex, userIndex, newUserName.data(), newUserUniqueId,
+                                  to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
 
     sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);
