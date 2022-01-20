@@ -129,7 +129,7 @@ limitations under the License.
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="OTA Software Update Requestor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="OTA Software Update Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="OTA Software Update Provider" client="true" server="false" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -155,6 +155,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
+            <include cluster="OTA Software Update Requestor" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="OTA Software Update Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
