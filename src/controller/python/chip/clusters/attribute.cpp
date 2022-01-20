@@ -256,14 +256,14 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
-    std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>();
+    std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
+        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback.get(),
+        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
 
     va_list args;
     va_start(args, n);
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(client->Init(app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback.get(),
-                               timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing()));
 
     {
         for (size_t i = 0; i < n; i++)

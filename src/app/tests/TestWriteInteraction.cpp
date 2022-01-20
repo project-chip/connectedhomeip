@@ -214,12 +214,10 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::WriteClient writeClient;
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataIB(apSuite, apContext, writeClient);
 
     err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
@@ -242,12 +240,10 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::WriteClient writeClient;
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataIB(apSuite, apContext, writeClient);
 
     SessionHandle groupSession = ctx.GetSessionBobToFriends();
@@ -333,9 +329,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    app::WriteClient writeClient;
-    err = writeClient.Init(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -401,9 +395,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    app::WriteClient writeClient;
-    err = writeClient.Init(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(apSuite, apContext, writeClient);
