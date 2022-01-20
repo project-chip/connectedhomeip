@@ -359,11 +359,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-        // Increment life time counter to protect against long-term tracking of rotating device ID.
-        ReturnErrorOnFailure(ConfigurationMgr().IncrementLifetimeCounter());
-#endif
-
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         {
             ChipDeviceEvent advChange;

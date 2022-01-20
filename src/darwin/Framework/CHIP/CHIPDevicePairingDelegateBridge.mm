@@ -95,17 +95,23 @@ void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
     }
 }
 
-void CHIPDevicePairingDelegateBridge::OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error)
+void CHIPDevicePairingDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
-    NSLog(@"OnAddressUpdateComplete. Status %s", chip::ErrorStr(error));
+    NSLog(@"DevicePairingDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onAddressUpdated:)]) {
+    if ([strongDelegate respondsToSelector:@selector(onCommissioningComplete:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
-                [strongDelegate onAddressUpdated:nsError];
+                [strongDelegate onCommissioningComplete:nsError];
             });
         }
     }
+}
+
+void CHIPDevicePairingDelegateBridge::OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error)
+{
+    // Todo, is there any benefit of exposing this anymore?
+    NSLog(@"OnAddressUpdateComplete. Status %s", chip::ErrorStr(error));
 }

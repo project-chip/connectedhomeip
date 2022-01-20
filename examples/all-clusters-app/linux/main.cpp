@@ -24,6 +24,7 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
 #include "AppMain.h"
+#include "binding-handler.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -110,6 +111,7 @@ void ApplicationInit()
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
     ChipLinuxAppMainLoop();
     return 0;
 }

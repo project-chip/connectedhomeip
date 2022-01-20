@@ -422,7 +422,9 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 {
     int fds[2] = { -1, -1 };
     GIOChannel * channel;
+#if CHIP_ERROR_LOGGING
     char * errStr;
+#endif // CHIP_ERROR_LOGGING
     GVariantDict options;
     bool isSuccess         = false;
     BluezConnection * conn = nullptr;
@@ -438,7 +440,9 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
+#if CHIP_ERROR_LOGGING
         errStr = strerror(errno);
+#endif // CHIP_ERROR_LOGGING
         ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;
@@ -490,7 +494,9 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 {
     int fds[2] = { -1, -1 };
     GIOChannel * channel;
+#if CHIP_ERROR_LOGGING
     char * errStr;
+#endif // CHIP_ERROR_LOGGING
     GVariantDict options;
     BluezConnection * conn = nullptr;
     bool isSuccess         = false;
@@ -515,7 +521,9 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     }
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
+#if CHIP_ERROR_LOGGING
         errStr = strerror(errno);
+#endif // CHIP_ERROR_LOGGING
         ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;

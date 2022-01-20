@@ -68,24 +68,4 @@ void DeviceProxy::CancelIMResponseHandler(void * commandObj)
     mCallbacksMgr.CancelResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */);
 }
 
-CHIP_ERROR DeviceProxy::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    app::WriteClient * writeClient = aHandle.Get();
-
-    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
-    {
-        AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
-    }
-    if ((err = aHandle.SendWriteRequest(GetSecureSession().Value())) != CHIP_NO_ERROR)
-    {
-        CancelIMResponseHandler(writeClient);
-    }
-    return err;
-}
-
 } // namespace chip
