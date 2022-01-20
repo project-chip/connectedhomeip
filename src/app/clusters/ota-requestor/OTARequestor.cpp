@@ -154,7 +154,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
                                                                    System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
-        
+
         break;
     }
     case OTAQueryStatus::kBusy:
