@@ -96,20 +96,14 @@ public:
 
     DeviceControllerSystemState * Retain()
     {
-        if (mRefCount == std::numeric_limits<uint32_t>::max())
-        {
-            abort();
-        }
+        VerifyOrDie(mRefCount < std::numeric_limits<uint32_t>::max());
         ++mRefCount;
         return this;
     };
 
     void Release()
     {
-        if (mRefCount == 0)
-        {
-            abort();
-        }
+        VerifyOrDie(mRefCount > 0);
 
         mRefCount--;
         if (mRefCount == 1)

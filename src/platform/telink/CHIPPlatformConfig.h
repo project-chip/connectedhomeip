@@ -25,7 +25,7 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define ChipDie() abort()
+#define CHIP_CONFIG_ABORT() abort()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE const char *
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2

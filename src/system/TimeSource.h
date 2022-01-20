@@ -23,6 +23,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -77,10 +78,7 @@ public:
 
     void SetMonotonicTimestamp(System::Clock::Timestamp value)
     {
-        if (value < mCurrentTime)
-        {
-            abort();
-        }
+        VerifyOrDie(value >= mCurrentTime);
         mCurrentTime = value;
     }
 
