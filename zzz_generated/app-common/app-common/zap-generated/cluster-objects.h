@@ -8811,7 +8811,8 @@ struct TypeInfo
 
         Attributes::DefaultOtaProviders::TypeInfo::DecodableType defaultOtaProviders;
         Attributes::UpdatePossible::TypeInfo::DecodableType updatePossible = static_cast<bool>(0);
-        Attributes::UpdateState::TypeInfo::DecodableType updateState       = static_cast<OTAUpdateStateEnum>(0);
+        Attributes::UpdateState::TypeInfo::DecodableType updateState =
+            static_cast<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum>(0);
         Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
@@ -10719,7 +10720,8 @@ struct TypeInfo
         Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType scanMaxTimeSeconds       = static_cast<uint8_t>(0);
         Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType connectMaxTimeSeconds = static_cast<uint8_t>(0);
         Attributes::InterfaceEnabled::TypeInfo::DecodableType interfaceEnabled           = static_cast<bool>(0);
-        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus = static_cast<NetworkCommissioningStatus>(0);
+        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus =
+            static_cast<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(0);
         Attributes::LastNetworkID::TypeInfo::DecodableType lastNetworkID;
         Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue = static_cast<uint32_t>(0);
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -19196,7 +19198,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::LockState::TypeInfo::DecodableType lockState;
-        Attributes::LockType::TypeInfo::DecodableType lockType               = static_cast<DlLockType>(0);
+        Attributes::LockType::TypeInfo::DecodableType lockType = static_cast<chip::app::Clusters::DoorLock::DlLockType>(0);
         Attributes::ActuatorEnabled::TypeInfo::DecodableType actuatorEnabled = static_cast<bool>(0);
         Attributes::DoorState::TypeInfo::DecodableType doorState;
         Attributes::DoorOpenEvents::TypeInfo::DecodableType doorOpenEvents                           = static_cast<uint32_t>(0);
@@ -19219,11 +19221,12 @@ struct TypeInfo
         Attributes::CredentialRulesSupport::TypeInfo::DecodableType credentialRulesSupport = static_cast<uint8_t>(0);
         Attributes::EnableLogging::TypeInfo::DecodableType enableLogging                   = static_cast<bool>(0);
         Attributes::Language::TypeInfo::DecodableType language;
-        Attributes::LEDSettings::TypeInfo::DecodableType LEDSettings                         = static_cast<uint8_t>(0);
-        Attributes::AutoRelockTime::TypeInfo::DecodableType autoRelockTime                   = static_cast<uint32_t>(0);
-        Attributes::SoundVolume::TypeInfo::DecodableType soundVolume                         = static_cast<uint8_t>(0);
-        Attributes::OperatingMode::TypeInfo::DecodableType operatingMode                     = static_cast<DlOperatingMode>(0);
-        Attributes::SupportedOperatingModes::TypeInfo::DecodableType supportedOperatingModes = static_cast<uint16_t>(0);
+        Attributes::LEDSettings::TypeInfo::DecodableType LEDSettings       = static_cast<uint8_t>(0);
+        Attributes::AutoRelockTime::TypeInfo::DecodableType autoRelockTime = static_cast<uint32_t>(0);
+        Attributes::SoundVolume::TypeInfo::DecodableType soundVolume       = static_cast<uint8_t>(0);
+        Attributes::OperatingMode::TypeInfo::DecodableType operatingMode =
+            static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+        Attributes::SupportedOperatingModes::TypeInfo::DecodableType supportedOperatingModes           = static_cast<uint16_t>(0);
         Attributes::DefaultConfigurationRegister::TypeInfo::DecodableType defaultConfigurationRegister = static_cast<uint16_t>(0);
         Attributes::EnableLocalProgramming::TypeInfo::DecodableType enableLocalProgramming             = static_cast<bool>(0);
         Attributes::EnableOneTouchLocking::TypeInfo::DecodableType enableOneTouchLocking               = static_cast<bool>(0);
@@ -31514,9 +31517,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PlaybackState::TypeInfo::DecodableType playbackState = static_cast<PlaybackStateEnum>(0);
-        Attributes::StartTime::TypeInfo::DecodableType startTime         = static_cast<uint64_t>(0);
-        Attributes::Duration::TypeInfo::DecodableType duration           = static_cast<uint64_t>(0);
+        Attributes::PlaybackState::TypeInfo::DecodableType playbackState =
+            static_cast<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>(0);
+        Attributes::StartTime::TypeInfo::DecodableType startTime = static_cast<uint64_t>(0);
+        Attributes::Duration::TypeInfo::DecodableType duration   = static_cast<uint64_t>(0);
         Attributes::Position::TypeInfo::DecodableType position;
         Attributes::PlaybackSpeed::TypeInfo::DecodableType playbackSpeed   = static_cast<float>(0);
         Attributes::SeekRangeEnd::TypeInfo::DecodableType seekRangeEnd     = static_cast<uint64_t>(0);
@@ -33253,7 +33257,8 @@ struct TypeInfo
         Attributes::ApplicationName::TypeInfo::DecodableType applicationName;
         Attributes::ProductId::TypeInfo::DecodableType productId = static_cast<uint16_t>(0);
         Attributes::ApplicationApp::TypeInfo::DecodableType applicationApp;
-        Attributes::ApplicationStatus::TypeInfo::DecodableType applicationStatus = static_cast<ApplicationStatusEnum>(0);
+        Attributes::ApplicationStatus::TypeInfo::DecodableType applicationStatus =
+            static_cast<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>(0);
         Attributes::ApplicationVersion::TypeInfo::DecodableType applicationVersion;
         Attributes::AllowedVendorList::TypeInfo::DecodableType allowedVendorList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -36050,7 +36055,7 @@ struct TypeInfo
         Attributes::EpochS::TypeInfo::DecodableType epochS     = static_cast<uint32_t>(0);
         Attributes::VendorId::TypeInfo::DecodableType vendorId = static_cast<chip::VendorId>(0);
         Attributes::ListNullablesAndOptionalsStruct::TypeInfo::DecodableType listNullablesAndOptionalsStruct;
-        Attributes::EnumAttr::TypeInfo::DecodableType enumAttr = static_cast<SimpleEnum>(0);
+        Attributes::EnumAttr::TypeInfo::DecodableType enumAttr = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(0);
         Attributes::StructAttr::TypeInfo::DecodableType structAttr;
         Attributes::RangeRestrictedInt8u::TypeInfo::DecodableType rangeRestrictedInt8u   = static_cast<uint8_t>(0);
         Attributes::RangeRestrictedInt8s::TypeInfo::DecodableType rangeRestrictedInt8s   = static_cast<int8_t>(0);
