@@ -10,7 +10,7 @@ Please follow the install step:
     source ./third_party/mw320_sdk/sdk_fixes/set_env.sh
 
 MW320_SDK_ROOT will be configured to build MW320 Matter application. Please go to examples folder to build MW320 Matter.
-lighting-app:
+lighting-app brief instructure:
     cd $MW320_LIGHTING
     source third_party/connectedhomeip/scripts/activate.sh
     gn gen out/mw320 --args='chip_bypass_rendezvous=true is_debug=false treat_warnings_as_errors=false'
@@ -25,5 +25,8 @@ lighting-app:
     wifi connect nxp_matter_ces nxp12345
     ./chip-tool pairing bypass FD17:BBF9:BE59:0:250:43FF:FE22:55E7 5540
     ./chip-tool onoff read on-off 1
+    ./chip-tool onoff on 1
+    ./chip-tool onoff off 1
+    
     
 
