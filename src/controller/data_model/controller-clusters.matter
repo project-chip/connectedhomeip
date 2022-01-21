@@ -140,13 +140,13 @@ client cluster ApplicationBasic = 1293 {
     CHAR_STRING applicationId = 1;
   }
 
-  readonly attribute char_string vendorName = 0;
+  readonly attribute char_string<32> vendorName = 0;
   readonly attribute int16u vendorId = 1;
-  readonly attribute char_string applicationName = 2;
+  readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productId = 3;
   attribute ApplicationBasicApplication applicationApp = 4;
   readonly attribute ApplicationStatusEnum applicationStatus = 5;
-  readonly attribute char_string applicationVersion = 6;
+  readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
@@ -257,24 +257,24 @@ client cluster Basic = 40 {
   }
 
   readonly attribute int16u interactionModelVersion = 0;
-  readonly attribute char_string vendorName = 1;
+  readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string productName = 3;
+  readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string nodeLabel = 5;
-  attribute char_string location = 6;
+  attribute char_string<32> nodeLabel = 5;
+  attribute char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string softwareVersionString = 10;
-  readonly attribute char_string manufacturingDate = 11;
-  readonly attribute char_string partNumber = 12;
-  readonly attribute long_char_string productURL = 13;
-  readonly attribute char_string productLabel = 14;
-  readonly attribute char_string serialNumber = 15;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
-  readonly attribute char_string uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -381,7 +381,7 @@ client cluster BridgedActions = 37 {
 
   readonly attribute ActionStruct actionList[] = 0;
   readonly attribute EndpointListStruct endpointList[] = 1;
-  readonly attribute long_char_string setupUrl = 2;
+  readonly attribute long_char_string<512> setupUrl = 2;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -567,7 +567,7 @@ client cluster ColorControl = 768 {
   readonly attribute int16u currentX = 3;
   readonly attribute int16u currentY = 4;
   readonly attribute enum8 driftCompensation = 5;
-  readonly attribute char_string compensationText = 6;
+  readonly attribute char_string<254> compensationText = 6;
   readonly attribute int16u colorTemperature = 7;
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 colorControlOptions = 15;
@@ -1171,7 +1171,7 @@ client cluster DoorLock = 257 {
   readonly attribute int16u numberOfPINUsersSupported = 18;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
-  attribute char_string language = 33;
+  attribute char_string<3> language = 33;
   attribute int32u autoRelockTime = 35;
   attribute int8u soundVolume = 36;
   attribute DlOperatingMode operatingMode = 37;
@@ -1845,7 +1845,7 @@ client cluster LevelControl = 8 {
 }
 
 client cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
@@ -1965,7 +1965,7 @@ client cluster ModeSelect = 80 {
   readonly attribute ModeOptionStruct supportedModes[] = 1;
   attribute int8u onMode = 2;
   readonly attribute int8u startUpMode = 3;
-  readonly attribute char_string description = 4;
+  readonly attribute char_string<32> description = 4;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -2032,7 +2032,7 @@ client cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2403,7 +2403,7 @@ client cluster OperationalCredentials = 62 {
 client cluster PowerSource = 47 {
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
-  readonly attribute char_string description = 2;
+  readonly attribute char_string<60> description = 2;
   readonly attribute int32u batteryVoltage = 11;
   readonly attribute int8u batteryPercentRemaining = 12;
   readonly attribute int32u batteryTimeRemaining = 13;
@@ -2827,13 +2827,13 @@ client cluster TestCluster = 1295 {
   attribute enum16 enum16 = 22;
   attribute single floatSingle = 23;
   attribute double floatDouble = 24;
-  attribute octet_string octetString = 25;
+  attribute octet_string<10> octetString = 25;
   attribute INT8U listInt8u[] = 26;
   attribute OCTET_STRING listOctetString[] = 27;
   attribute TestListStructOctet listStructOctetString[] = 28;
-  attribute long_octet_string longOctetString = 29;
-  attribute char_string charString = 30;
-  attribute long_char_string longCharString = 31;
+  attribute long_octet_string<1000> longOctetString = 29;
+  attribute char_string<10> charString = 30;
+  attribute long_char_string<1000> longCharString = 31;
   attribute epoch_us epochUs = 32;
   attribute epoch_s epochS = 33;
   attribute vendor_id vendorId = 34;
@@ -2872,8 +2872,8 @@ client cluster TestCluster = 1295 {
   attribute enum16 nullableEnum16 = 32790;
   attribute single nullableFloatSingle = 32791;
   attribute double nullableFloatDouble = 32792;
-  attribute octet_string nullableOctetString = 32793;
-  attribute char_string nullableCharString = 32798;
+  attribute octet_string<10> nullableOctetString = 32793;
+  attribute char_string<10> nullableCharString = 32798;
   attribute SimpleEnum nullableEnumAttr = 32804;
   attribute SimpleStruct nullableStruct = 32805;
   attribute int8u nullableRangeRestrictedInt8u = 32806;
@@ -3150,10 +3150,10 @@ client cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string networkName = 2;
+  readonly attribute octet_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string meshLocalPrefix = 5;
+  readonly attribute octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
@@ -3208,7 +3208,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u pendingTimestamp = 57;
   readonly attribute int32u delay = 58;
   readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string channelMask = 60;
+  readonly attribute octet_string<4> channelMask = 60;
   readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3224,7 +3224,7 @@ client cluster UserLabel = 65 {
 }
 
 client cluster WakeOnLan = 1283 {
-  readonly attribute char_string wakeOnLanMacAddress = 0;
+  readonly attribute char_string<32> wakeOnLanMacAddress = 0;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3273,7 +3273,7 @@ client cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string bssid = 0;
+  readonly attribute octet_string<6> bssid = 0;
   readonly attribute enum8 securityType = 1;
   readonly attribute enum8 wiFiVersion = 2;
   readonly attribute int16u channelNumber = 3;

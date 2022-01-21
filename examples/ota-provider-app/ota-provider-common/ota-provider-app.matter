@@ -70,7 +70,7 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
@@ -130,7 +130,7 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;

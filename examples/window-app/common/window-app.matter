@@ -58,21 +58,21 @@ server cluster Basic = 40 {
   }
 
   readonly attribute int16u interactionModelVersion = 0;
-  readonly attribute char_string vendorName = 1;
+  readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string productName = 3;
+  readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string nodeLabel = 5;
-  attribute char_string location = 6;
+  attribute char_string<32> nodeLabel = 5;
+  attribute char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string softwareVersionString = 10;
-  readonly attribute char_string manufacturingDate = 11;
-  readonly attribute char_string partNumber = 12;
-  readonly attribute long_char_string productURL = 13;
-  readonly attribute char_string productLabel = 14;
-  readonly attribute char_string serialNumber = 15;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute int16u clusterRevision = 65533;
@@ -316,7 +316,7 @@ server cluster Identify = 3 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
@@ -376,7 +376,7 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -551,7 +551,7 @@ server cluster OperationalCredentials = 62 {
 server cluster PowerSource = 47 {
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
-  readonly attribute char_string description = 2;
+  readonly attribute char_string<60> description = 2;
   readonly attribute int32u batteryVoltage = 11;
   readonly attribute int8u batteryPercentRemaining = 12;
   readonly attribute int32u batteryTimeRemaining = 13;
@@ -662,10 +662,10 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string networkName = 2;
+  readonly attribute octet_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string meshLocalPrefix = 5;
+  readonly attribute octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
@@ -720,7 +720,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u pendingTimestamp = 57;
   readonly attribute int32u delay = 58;
   readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string channelMask = 60;
+  readonly attribute octet_string<4> channelMask = 60;
   readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute bitmap32 featureMap = 65532;
@@ -776,7 +776,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string bssid = 0;
+  readonly attribute octet_string<6> bssid = 0;
   readonly attribute enum8 securityType = 1;
   readonly attribute enum8 wiFiVersion = 2;
   readonly attribute int16u channelNumber = 3;
