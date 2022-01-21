@@ -236,11 +236,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     fabric_idx fabricIndex = 0;
-    OCTET_STRING rootPublicKey = 1;
+    OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
-    CHAR_STRING label = 5;
+    CHAR_STRING<32> label = 5;
   }
 
   readonly attribute FabricDescriptor fabricsList[] = 1;

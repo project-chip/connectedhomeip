@@ -35,5 +35,6 @@
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
+    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
     MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

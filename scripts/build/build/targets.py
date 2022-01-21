@@ -19,6 +19,7 @@ from itertools import combinations
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
+from builders.cyw30739 import Cyw30739Builder, Cyw30739App, Cyw30739Board
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp, HostBoard
@@ -363,6 +364,10 @@ def K32WTargets():
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
 
 
+def Cyw30739Targets():
+    yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
+
+
 ALL = []
 
 target_generators = [
@@ -375,6 +380,7 @@ target_generators = [
     InfineonTargets(),
     AmebaTargets(),
     K32WTargets(),
+    Cyw30739Targets(),
 ]
 
 for generator in target_generators:

@@ -4116,6 +4116,32 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallback
+      implements ChipClusters.TimeFormatLocalizationCluster.SupportedCalendarTypesAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Object> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedUserLabelClusterLabelListAttributeCallback
       implements ChipClusters.UserLabelCluster.LabelListAttributeCallback,
           DelegatedClusterCallback {
@@ -4518,6 +4544,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.ThreadNetworkDiagnosticsCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInfo);
+    ClusterInfo timeFormatLocalizationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TimeFormatLocalizationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("timeFormatLocalization", timeFormatLocalizationClusterInfo);
     ClusterInfo userLabelClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.UserLabelCluster(ptr, endpointId),
@@ -4622,6 +4653,7 @@ public class ClusterInfoMapping {
     destination
         .get("threadNetworkDiagnostics")
         .combineCommands(source.get("threadNetworkDiagnostics"));
+    destination.get("timeFormatLocalization").combineCommands(source.get("timeFormatLocalization"));
     destination.get("userLabel").combineCommands(source.get("userLabel"));
     destination.get("wakeOnLan").combineCommands(source.get("wakeOnLan"));
     destination.get("wiFiNetworkDiagnostics").combineCommands(source.get("wiFiNetworkDiagnostics"));
@@ -9211,6 +9243,9 @@ public class ClusterInfoMapping {
     threadNetworkDiagnosticsClusterInteractionInfoMap.put(
         "resetCounts", threadNetworkDiagnosticsresetCountsInteractionInfo);
     commandMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInteractionInfoMap);
+    Map<String, InteractionInfo> timeFormatLocalizationClusterInteractionInfoMap =
+        new LinkedHashMap<>();
+    commandMap.put("timeFormatLocalization", timeFormatLocalizationClusterInteractionInfoMap);
     Map<String, InteractionInfo> userLabelClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("userLabel", userLabelClusterInteractionInfoMap);
     Map<String, InteractionInfo> wakeOnLanClusterInteractionInfoMap = new LinkedHashMap<>();
