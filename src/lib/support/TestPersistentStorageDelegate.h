@@ -28,7 +28,7 @@
 #include <vector>
 
 namespace chip {
-
+// TODO : Remove FabricStorage dependency
 class TestPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
 {
 public:
