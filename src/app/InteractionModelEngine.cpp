@@ -257,7 +257,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     // Let's first figure out if the client has requested we keep any existing
     // subscriptions from that source.
     //
-    if (aInteractionType == ReadHandler::InteractionType::Subscribe) {
+    if (aInteractionType == ReadHandler::InteractionType::Subscribe)
+    {
         System::PacketBufferTLVReader reader;
 
         reader.Init(aPayload.Retain());
@@ -278,7 +279,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
             if (handler->IsFromSubscriber(*apExchangeContext))
             {
-                ChipLogProgress(InteractionModel, "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                ChipLogProgress(InteractionModel,
+                                "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
                                 ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
                                 apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
                 mReadHandlers.ReleaseObject(handler);
@@ -550,7 +552,8 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, Cl
 bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)
 {
     return (mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
-        if (handler->IsType(ReadHandler::InteractionType::Subscribe) && (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
+        if (handler->IsType(ReadHandler::InteractionType::Subscribe) &&
+            (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
         {
             for (auto clusterInfo = handler->GetAttributeClusterInfolist(); clusterInfo != nullptr;
                  clusterInfo      = clusterInfo->mpNext)
