@@ -126,17 +126,22 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadAcceptHeaderAttribute(aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadSupportedStreamingProtocolsAttribute(aEncoder, delegate);
     }
     default: {
