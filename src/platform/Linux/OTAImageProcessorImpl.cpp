@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/basic/basic.h>
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <platform/OTARequestorInterface.h>
 
@@ -131,10 +132,12 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
+    BasicClusterServerSetSoftwareVersionAttribute(kRootEndpointId, imageProcessor->mHeader.softwareVersion);
+
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor != nullptr)
     {
-        requestor->NotifyUpdateApplied(imageProcessor->mHeader.softwareVersion);
+        requestor->NotifyUpdateApplied();
     }
 }
 

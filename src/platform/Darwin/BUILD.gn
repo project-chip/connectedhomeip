@@ -78,6 +78,9 @@ static_library("Darwin") {
 
   if (chip_enable_ota_requestor) {
     sources += [
+      "${chip_root}/src/app/clusters/basic/basic.h",
+      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h",
+
       # using the implements from Linux platform
       "../Linux/OTAImageProcessorImpl.cpp",
       "../Linux/OTAImageProcessorImpl.h",

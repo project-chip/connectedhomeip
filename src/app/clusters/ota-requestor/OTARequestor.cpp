@@ -20,6 +20,7 @@
  * OTA Requestor logic is contained in this class.
  */
 
+#include <app/clusters/basic/basic.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
@@ -385,15 +386,16 @@ void OTARequestor::ApplyUpdate()
     ConnectToProvider(kApplyUpdate);
 }
 
-void OTARequestor::NotifyUpdateApplied(uint32_t version)
+void OTARequestor::NotifyUpdateApplied()
 {
-    // New version is executing so update where applicable
-    VerifyOrReturn(Basic::Attributes::SoftwareVersion::Set(kRootEndpointId, version) == EMBER_ZCL_STATUS_SUCCESS);
+    // New version is executing so update cached version
+    uint32_t version;
+    VerifyOrReturn(BasicClusterServerGetSoftwareVersionAttribute(kRootEndpointId, version) == EMBER_ZCL_STATUS_SUCCESS);
     mCurrentVersion = version;
 
     // Log the VersionApplied event
     uint16_t productId;
-    VerifyOrReturn(Basic::Attributes::ProductID::Get(kRootEndpointId, &productId) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(BasicClusterServerGetProductIdAttribute(kRootEndpointId, productId) == EMBER_ZCL_STATUS_SUCCESS);
     OtaRequestorServerOnVersionApplied(version, productId);
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -491,26 +493,27 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
-    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &args.vendorId) == EMBER_ZCL_STATUS_SUCCESS,
+    VerifyOrReturnError(BasicClusterServerGetVendorIdAttribute(kRootEndpointId, args.vendorId) == EMBER_ZCL_STATUS_SUCCESS,
                         CHIP_ERROR_READ_FAILED);
 
-    VerifyOrReturnError(Basic::Attributes::ProductID::Get(kRootEndpointId, &args.productId) == EMBER_ZCL_STATUS_SUCCESS,
+    VerifyOrReturnError(BasicClusterServerGetProductIdAttribute(kRootEndpointId, args.productId) == EMBER_ZCL_STATUS_SUCCESS,
                         CHIP_ERROR_READ_FAILED);
 
-    VerifyOrReturnError(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &args.softwareVersion) == EMBER_ZCL_STATUS_SUCCESS,
+    VerifyOrReturnError(BasicClusterServerGetSoftwareVersionAttribute(kRootEndpointId, args.softwareVersion) ==
+                            EMBER_ZCL_STATUS_SUCCESS,
                         CHIP_ERROR_READ_FAILED);
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (Basic::Attributes::HardwareVersion::Get(kRootEndpointId, &hardwareVersion) == EMBER_ZCL_STATUS_SUCCESS)
+    if (BasicClusterServerGetHardwareVersionAttribute(kRootEndpointId, hardwareVersion) == EMBER_ZCL_STATUS_SUCCESS)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
-    if (Basic::Attributes::Location::Get(kRootEndpointId, MutableCharSpan(location)) == EMBER_ZCL_STATUS_SUCCESS)
+    if (BasicClusterServerGetLocationAttribute(kRootEndpointId, MutableCharSpan(location)) == EMBER_ZCL_STATUS_SUCCESS)
     {
         args.location.SetValue(CharSpan(location));
     }

@@ -63,8 +63,8 @@ public:
     // Send ApplyImage
     void ApplyUpdate() override;
 
-    // Send NotifyUpdateApplied, update Basic cluster SoftwareVersion attribute, log the VersionApplied event
-    void NotifyUpdateApplied(uint32_t version) override;
+    // Send NotifyUpdateApplied and log the VersionApplied event
+    void NotifyUpdateApplied() override;
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,

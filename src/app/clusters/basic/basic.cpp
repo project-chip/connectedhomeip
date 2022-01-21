@@ -318,6 +318,101 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     }
 }
 
+EmberAfStatus BasicClusterServerGetVendorIdAttribute(chip::EndpointId endpointId, chip::VendorId & value)
+{
+    return Attributes::VendorID::Get(endpointId, &value);
+}
+
+EmberAfStatus BasicClusterServerSetVendorIdAttribute(chip::EndpointId endpointId, chip::VendorId value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    chip::VendorId currentValue;
+    status = Attributes::VendorID::Get(endpointId, &currentValue);
+    VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+
+    if (currentValue != value)
+    {
+        status = Attributes::VendorID::Set(endpointId, value);
+        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+    }
+
+    return status;
+}
+
+EmberAfStatus BasicClusterServerGetProductIdAttribute(chip::EndpointId endpointId, uint16_t & value)
+{
+    return Attributes::ProductID::Get(endpointId, &value);
+}
+
+EmberAfStatus BasicClusterServerSetProductIdAttribute(chip::EndpointId endpointId, uint16_t value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    uint16_t currentValue;
+    status = Attributes::ProductID::Get(endpointId, &currentValue);
+    VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+
+    if (currentValue != value)
+    {
+        status = Attributes::ProductID::Set(endpointId, value);
+        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+    }
+
+    return status;
+}
+
+EmberAfStatus BasicClusterServerGetLocationAttribute(chip::EndpointId endpointId, chip::MutableCharSpan value)
+{
+    return Attributes::Location::Get(endpointId, value);
+}
+
+// EmberAfStatus BasicClusterServerSetLocationAttribute(chip::EndpointId endpointId, chip::CharSpan value)
+
+EmberAfStatus BasicClusterServerGetHardwareVersionAttribute(chip::EndpointId endpointId, uint16_t & value)
+{
+    return Attributes::HardwareVersion::Get(endpointId, &value);
+}
+
+EmberAfStatus BasicClusterServerSetHardtwareVersionAttribute(chip::EndpointId endpointId, uint16_t value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    uint16_t currentValue;
+    status = Attributes::HardwareVersion::Get(endpointId, &currentValue);
+    VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+
+    if (currentValue != value)
+    {
+        status = Attributes::HardwareVersion::Set(endpointId, value);
+        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+    }
+
+    return status;
+}
+
+EmberAfStatus BasicClusterServerGetSoftwareVersionAttribute(chip::EndpointId endpointId, uint32_t & value)
+{
+    return Attributes::SoftwareVersion::Get(endpointId, &value);
+}
+
+EmberAfStatus BasicClusterServerSetSoftwareVersionAttribute(chip::EndpointId endpointId, uint32_t value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    uint32_t currentValue;
+    status = Attributes::SoftwareVersion::Get(endpointId, &currentValue);
+    VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+
+    if (currentValue != value)
+    {
+        status = Attributes::SoftwareVersion::Set(endpointId, value);
+        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+    }
+
+    return status;
+}
+
 void MatterBasicPluginServerInitCallback()
 {
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);

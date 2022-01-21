@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
+#include <lib/support/Span.h>
 
 /** @brief Basic Cluster Server Init
  *
@@ -27,3 +29,19 @@
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
+
+// Global getter/setter for Basic cluster attributes
+EmberAfStatus BasicClusterServerGetVendorIdAttribute(chip::EndpointId endpointId, chip::VendorId & value);
+EmberAfStatus BasicClusterServerSetVendorIdAttribute(chip::EndpointId endpointId, chip::VendorId value);
+
+EmberAfStatus BasicClusterServerGetProductIdAttribute(chip::EndpointId endpointId, uint16_t & value);
+EmberAfStatus BasicClusterServerSetProductIdAttribute(chip::EndpointId endpointId, uint16_t value);
+
+EmberAfStatus BasicClusterServerGetLocationAttribute(chip::EndpointId endpointId, chip::MutableCharSpan value);
+EmberAfStatus BasicClusterServerSetLocationAttribute(chip::EndpointId endpointId, chip::CharSpan value);
+
+EmberAfStatus BasicClusterServerGetHardwareVersionAttribute(chip::EndpointId endpointId, uint16_t & value);
+EmberAfStatus BasicClusterServerSetHardtwareVersionAttribute(chip::EndpointId endpointId, uint16_t value);
+
+EmberAfStatus BasicClusterServerGetSoftwareVersionAttribute(chip::EndpointId endpointId, uint32_t & value);
+EmberAfStatus BasicClusterServerSetSoftwareVersionAttribute(chip::EndpointId endpointId, uint32_t value);
