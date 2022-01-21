@@ -29,13 +29,14 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
 
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
+
+#include "UserConsentProvider.h"
 
 using chip::BitFlags;
 using chip::app::Clusters::OTAProviderDelegate;
@@ -135,6 +136,7 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
+    UserConsentProvider userConsentProvider;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
@@ -178,6 +180,7 @@ int main(int argc, char * argv[])
 
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
+    otaProvider.SetUserConsentDelegate(&userConsentProvider);
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
 
