@@ -125,10 +125,16 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor != nullptr)
     {
-        requestor->NotifyUpdateApplied();
+        requestor->NotifyUpdateApplied(imageProcessor->mHeader.softwareVersion);
     }
 }
 

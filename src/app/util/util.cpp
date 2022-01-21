@@ -304,8 +304,7 @@ void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
-void MatterLocalizationUnitPluginServerInitCallback() {}
-void MatterLocalizationTimeFormatPluginServerInitCallback() {}
+void MatterUnitLocalizationPluginServerInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}

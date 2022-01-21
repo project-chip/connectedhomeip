@@ -41,25 +41,14 @@
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/util.h>
 
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/reporting/reporting.h>
-
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
-
-#ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
-#include "../zll-on-off-server/zll-on-off-server.h"
-#endif
-
-#ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
-#include "../zll-level-control-server/zll-level-control-server.h"
-#endif
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -189,13 +178,6 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
         }
     }
 
-#ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
-    if (initiatedByLevelChange)
-    {
-        emberAfPluginZllOnOffServerLevelControlZllExtensions(endpoint);
-    }
-#endif
-
 #ifdef EMBER_AF_PLUGIN_SCENES
     // the scene has been changed (the value of on/off has changed) so
     // the current scene as described in the attribute table is invalid,
@@ -273,12 +255,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 bool OnOffServer::offCommand(const app::ConcreteCommandPath & commandPath)
 {
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Off::Id, false);
-#ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfPluginZllOnOffServerOffZllExtensions(emberAfCurrentCommand());
-    }
-#endif
+
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -287,13 +264,6 @@ bool OnOffServer::onCommand(const app::ConcreteCommandPath & commandPath)
 {
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::On::Id, false);
 
-#ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfPluginZllOnOffServerOnZllExtensions(emberAfCurrentCommand());
-    }
-#endif
-
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -301,24 +271,21 @@ bool OnOffServer::onCommand(const app::ConcreteCommandPath & commandPath)
 bool OnOffServer::toggleCommand(const app::ConcreteCommandPath & commandPath)
 {
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Toggle::Id, false);
-#ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfPluginZllOnOffServerToggleZllExtensions(emberAfCurrentCommand());
-    }
-#endif
+
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool OnOffServer::offWithEffectCommand(const app::ConcreteCommandPath & commandPath,
+bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::OffWithEffect::DecodableType & commandData)
 {
     OnOffEffectIdentifier effectId = commandData.effectId;
     uint8_t effectVariant          = commandData.effectVariant;
     chip::EndpointId endpoint      = commandPath.mEndpointId;
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
-
+#ifdef EMBER_AF_PLUGIN_SCENES
+    FabricIndex fabric = commandObj->GetAccessingFabricIndex();
+#endif // EMBER_AF_PLUGIN_SCENES
     bool globalSceneControl = false;
     OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
 
@@ -327,6 +294,16 @@ bool OnOffServer::offWithEffectCommand(const app::ConcreteCommandPath & commandP
 
     if (globalSceneControl)
     {
+#ifdef EMBER_AF_PLUGIN_SCENES
+        GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
+        if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
+        {
+            groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
+        }
+
+        emberAfScenesClusterStoreCurrentSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+#endif // EMBER_AF_PLUGIN_SCENES
+
         OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
 
         status = setOnOffValue(endpoint, Commands::Off::Id, false);
@@ -355,10 +332,13 @@ bool OnOffServer::offWithEffectCommand(const app::ConcreteCommandPath & commandP
     return true;
 }
 
-bool OnOffServer::OnWithRecallGlobalSceneCommand(const app::ConcreteCommandPath & commandPath)
+bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
     chip::EndpointId endpoint = commandPath.mEndpointId;
     EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+#ifdef EMBER_AF_PLUGIN_SCENES
+    FabricIndex fabric = commandObj->GetAccessingFabricIndex();
+#endif // EMBER_AF_PLUGIN_SCENES
 
     bool globalSceneControl = false;
     OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
@@ -368,6 +348,16 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(const app::ConcreteCommandPath 
         emberAfSendImmediateDefaultResponse(status);
         return true;
     }
+
+#ifdef EMBER_AF_PLUGIN_SCENES
+    GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
+    if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
+    {
+        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
+    }
+
+    emberAfScenesClusterRecallSavedSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+#endif // EMBER_AF_PLUGIN_SCENES
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
     setOnOffValue(endpoint, Commands::On::Id, false);
@@ -631,14 +621,14 @@ bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const a
 bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::OffWithEffect::DecodableType & commandData)
 {
-    return OnOffServer::Instance().offWithEffectCommand(commandPath, commandData);
+    return OnOffServer::Instance().offWithEffectCommand(commandObj, commandPath, commandData);
 }
 
 bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::OnWithRecallGlobalScene::DecodableType & commandData)
 {
-    return OnOffServer::Instance().OnWithRecallGlobalSceneCommand(commandPath);
+    return OnOffServer::Instance().OnWithRecallGlobalSceneCommand(commandObj, commandPath);
 }
 
 bool emberAfOnOffClusterOnWithTimedOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,

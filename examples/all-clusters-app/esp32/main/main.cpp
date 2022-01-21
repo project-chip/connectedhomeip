@@ -61,6 +61,7 @@
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <binding-handler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
@@ -537,6 +538,7 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
     SetupPretendDevices();
+    InitBindingHandlers();
 }
 
 static void InitOTARequestor(void)

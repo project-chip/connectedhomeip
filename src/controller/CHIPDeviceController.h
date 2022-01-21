@@ -37,6 +37,7 @@
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
+#include <controller/CHIPCluster.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
@@ -561,7 +562,7 @@ public:
     void RendezvousCleanup(CHIP_ERROR status);
 
     void PerformCommissioningStep(DeviceProxy * device, CommissioningStage step, CommissioningParameters & params,
-                                  CommissioningDelegate * delegate);
+                                  CommissioningDelegate * delegate, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
 
     /**
      * @brief
@@ -689,6 +690,8 @@ private:
     DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
     uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
 
     void FreeRendezvousSession();
 

@@ -195,7 +195,21 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 {
     // TODO: check that there is no commissioning in progress currently.
     mCommissioneeDeviceProxy = proxy;
-    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this);
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this, 0,
+                                            GetCommandTimeout(CommissioningStage::kArmFailsafe));
+}
+
+Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
+{
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkEnable:
+    case CommissioningStage::kThreadNetworkEnable:
+        return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
+    default:
+        // Use default timeout specified in the IM.
+        return NullOptional;
+    }
 }
 
 CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac)
@@ -205,7 +219,9 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
         MutableByteSpan rootCert = MutableByteSpan(mNOCCertBuffer);
         ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(rcac, rootCert));
         mParams.SetRootCert(rootCert);
-        mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kSendTrustedRootCert, mParams, this);
+        CommissioningStage nextStage = CommissioningStage::kSendTrustedRootCert;
+        mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, 0,
+                                                GetCommandTimeout(nextStage));
     }
 
     NOCerts certs;
@@ -291,8 +307,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
     mParams.SetCompletionStatus(err);
-    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
+    // TODO: Get real endpoint
+    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }
 

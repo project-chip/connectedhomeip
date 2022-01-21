@@ -50,6 +50,7 @@ private:
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac);
+    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
 
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
