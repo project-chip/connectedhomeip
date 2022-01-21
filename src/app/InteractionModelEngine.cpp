@@ -122,17 +122,14 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::InteractionType aType) const
 {
-    uint32_t count                 = 0;
-    InteractionModelEngine * _this = const_cast<InteractionModelEngine *>(this);
+    uint32_t count = 0;
 
     //
     // NOTE: We cannot mark ForEachActiveObject as const, so explicitly const_cast our this pointer to permit us to poke a hole
     // in the const-ness for this brief bit of truly const work.
     //
-    _this->mReadHandlers.ForEachActiveObject([aType, &count](ReadHandler * handler) {
-        ReadHandler::InteractionType handlerType =
-            handler->IsReadType() ? ReadHandler::InteractionType::Read : ReadHandler::InteractionType::Subscribe;
-        if (aType == handlerType)
+    mReadHandlers.ForEachActiveObject([aType, &count](const ReadHandler * handler) {
+        if (handler->IsType(aType))
         {
             count++;
         }
@@ -143,17 +140,19 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::Interacti
     return count;
 }
 
-ReadHandler* InteractionModelEngine::GetActiveHandler(unsigned int aIndex)
+ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
 {
-    if (aIndex >= mReadHandlers.Allocated()) {
+    if (aIndex >= mReadHandlers.Allocated())
+    {
         return nullptr;
     }
 
-    unsigned int i = 0;
-    ReadHandler *ret = nullptr;
+    unsigned int i    = 0;
+    ReadHandler * ret = nullptr;
 
-    mReadHandlers.ForEachActiveObject([aIndex, &i, &ret](ReadHandler *handler) {
-        if (i == aIndex) {
+    mReadHandlers.ForEachActiveObject([aIndex, &i, &ret](ReadHandler * handler) {
+        if (i == aIndex)
+        {
             ret = handler;
             return Loop::Break;
         }
@@ -164,8 +163,6 @@ ReadHandler* InteractionModelEngine::GetActiveHandler(unsigned int aIndex)
 
     return ret;
 }
-
-
 
 uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 {
@@ -255,13 +252,12 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
     bool keepExistingSubscriptions = true;
     ReadHandler * handler;
-    size_t handlerPoolCapacity;
 
     //
     // Let's first figure out if the client has requested we keep any existing
     // subscriptions from that source.
     //
-    {
+    if (aInteractionType == ReadHandler::InteractionType::Subscribe) {
         System::PacketBufferTLVReader reader;
 
         reader.Init(aPayload.Retain());
@@ -270,20 +266,20 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         SubscribeRequestMessage::Parser subscribeRequestParser;
         ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
 
-        subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions);
+        ReturnErrorOnFailure(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions));
     }
 
-    //
-    // Walk through all existing subscriptions and shutdown those whose subscriber matches
-    // that which just came in.
-    //
     if (!keepExistingSubscriptions)
     {
+        //
+        // Walk through all existing subscriptions and shut down those whose subscriber matches
+        // that which just came in.
+        //
         mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
             if (handler->IsFromSubscriber(*apExchangeContext))
             {
-                ChipLogProgress(InteractionModel, "Deleting previous subscription from NodeId: %" PRIx64 ", FabricId: %" PRIu8,
-                                apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId(),
+                ChipLogProgress(InteractionModel, "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                                ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
                                 apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
                 mReadHandlers.ReleaseObject(handler);
             }
@@ -292,7 +288,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         });
     }
 
-    handlerPoolCapacity = mReadHandlers.Capacity();
+    size_t handlerPoolCapacity = mReadHandlers.Capacity();
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     if (mReadHandlerCapacityOverride != -1)
@@ -321,7 +317,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
     if (handler)
     {
-        handler->OnInitialRequest(std::move(aPayload));
+        ReturnErrorOnFailure(handler->OnInitialRequest(std::move(aPayload)));
+
         aStatus = Protocols::InteractionModel::Status::Success;
         return CHIP_NO_ERROR;
     }
@@ -553,7 +550,7 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, Cl
 bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)
 {
     return (mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
-        if (handler->IsSubscriptionType() && (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
+        if (handler->IsType(ReadHandler::InteractionType::Subscribe) && (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
         {
             for (auto clusterInfo = handler->GetAttributeClusterInfolist(); clusterInfo != nullptr;
                  clusterInfo      = clusterInfo->mpNext)
@@ -736,7 +733,7 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
 bool InteractionModelEngine::HasActiveRead()
 {
     return ((mReadHandlers.ForEachActiveObject([](ReadHandler * handler) {
-        if (handler->IsReadType())
+        if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Break;
         }

@@ -125,8 +125,7 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
     /**
-     *  Checks if the initiator of the provided exchange matches the subscriber that
-     *  created this subscription.
+     *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
 
@@ -144,8 +143,7 @@ public:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    bool IsReadType() { return mInteractionType == InteractionType::Read; }
-    bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
+    bool IsType(InteractionType type) const { return (mInteractionType == type); }
     bool IsChunkedReport() { return mIsChunkedReport; }
     bool IsPriming() { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
@@ -179,6 +177,12 @@ public:
 
 private:
     friend class TestReadInteraction;
+
+    //
+    // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe
+    // interaction. We do not want to make these methods public just to give an adjacent class in the IM access, since public
+    // should really be taking application usage considerations as well. Hence, make it a friend.
+    //
     friend class chip::app::reporting::Engine;
 
     enum class HandlerState
@@ -249,7 +253,7 @@ private:
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions
     // prior to receiving a subscribe response.
-    bool mIsPrimingReports              = false;
+    bool mIsPrimingReports              = true;
     InteractionType mInteractionType    = InteractionType::Read;
     uint64_t mSubscriptionId            = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;

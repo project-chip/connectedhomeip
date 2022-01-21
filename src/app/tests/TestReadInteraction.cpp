@@ -938,7 +938,6 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-
 void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1068,14 +1067,14 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         engine->GetReportingEngine().Run();
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
-        NL_TEST_ASSERT(apSuite, engine->GetActiveHandler(0) != nullptr);
-        delegate.mpReadHandler = engine->GetActiveHandler(0);
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
-   
+
         GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
@@ -1171,8 +1170,6 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
     }
 
-
-
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -1231,9 +1228,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // And attribute 3/2/4 is a list with 6 elements and list chunking is applied to it, thus we should receive ( 29 + 6 ) * 2 =
         // 70 attribute data in total.
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 70);
-	    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
-        NL_TEST_ASSERT(apSuite, engine->GetActiveHandler(0) != nullptr);
-        delegate.mpReadHandler = engine->GetActiveHandler(0);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
         // Set a concrete path dirty
         {
@@ -1324,8 +1321,8 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine.GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
-        NL_TEST_ASSERT(apSuite, engine.GetActiveHandler(0) != nullptr);
-        delegate.mpReadHandler = engine.GetActiveHandler(0);
+        NL_TEST_ASSERT(apSuite, engine.ActiveHandlerAt(0) != nullptr);
+        delegate.mpReadHandler = engine.ActiveHandlerAt(0);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler != nullptr);
 
         // Shutdown the subscription
@@ -1381,8 +1378,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
 
-        NL_TEST_ASSERT(apSuite, engine->GetActiveHandler(0) != nullptr);
-        delegate.mpReadHandler = engine->GetActiveHandler(0);
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
         delegate.mpReadHandler->mHoldReport = false;
         InteractionModelEngine::GetInstance()->GetReportingEngine().Run();

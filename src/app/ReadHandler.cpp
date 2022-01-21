@@ -39,12 +39,11 @@ namespace app {
 ReadHandler::ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType) :
     mCallback(apCallback)
 {
-    mpExchangeMgr      = apExchangeContext->GetExchangeMgr();
-    mpExchangeCtx      = apExchangeContext;
-    mInteractionType    = aInteractionType;
+    mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
+    mpExchangeCtx           = apExchangeContext;
+    mInteractionType        = aInteractionType;
     mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
     mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
-    mIsPrimingReports  = true;
     mLastWrittenEventsBytes = 0;
     if (apExchangeContext != nullptr)
     {
@@ -83,7 +82,7 @@ ReadHandler::~ReadHandler()
 {
     Abort(true);
 
-    if (IsSubscriptionType())
+    if (IsType(InteractionType::Subscribe))
     {
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
             OnRefreshSubscribeTimerSyncCallback, this);
@@ -108,7 +107,7 @@ void ReadHandler::Close()
 
     MoveToState(HandlerState::AwaitingDestruction);
     mCallback.OnDone(*this);
-    mLastWrittenEventsBytes    = 0;
+    mLastWrittenEventsBytes = 0;
 }
 
 CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
@@ -116,7 +115,7 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
 
-    if (IsSubscriptionType())
+    if (IsType(InteractionType::Subscribe))
     {
         err = ProcessSubscribeRequest(std::move(aPayload));
     }
@@ -155,7 +154,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             // Trigger ReportingEngine run for sending next chunk of data.
             SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         }
-        else if (IsSubscriptionType())
+        else if (IsType(InteractionType::Subscribe))
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsPriming())
@@ -209,7 +208,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mIsChunkedReport        = aMoreChunks;
-    bool noResponseExpected = IsReadType() && !mIsChunkedReport;
+    bool noResponseExpected = IsType(InteractionType::Read) && !mIsChunkedReport;
     if (!noResponseExpected)
     {
         MoveToState(HandlerState::AwaitingReportResponse);
@@ -226,7 +225,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
     if (err == CHIP_NO_ERROR)
     {
-        if (IsSubscriptionType() && !IsPriming())
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
             err = RefreshSubscribeSyncTimer();
         }
@@ -256,7 +255,8 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
 bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext)
 {
-    return (IsSubscriptionType() && GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
+    return (IsType(InteractionType::Subscribe) &&
+            GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
             GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetFabricIndex());
 }
 

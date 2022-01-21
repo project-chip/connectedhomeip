@@ -237,7 +237,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 
     VerifyOrExit(!IsIdle(), err = CHIP_ERROR_INCORRECT_STATE);
 
-
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         err = ProcessReportData(std::move(aPayload));

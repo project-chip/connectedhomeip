@@ -315,7 +315,7 @@ public:
     }
 
     /*
-     * This method exists purely to line-up with the static allocator version.
+     * This method exists purely to line up with the static allocator version.
      * Consequently, return a nonsensically large number to normalize comparison
      * operations that act on this value.
      */

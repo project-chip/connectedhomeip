@@ -344,7 +344,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     err = reportDataBuilder.Init(&reportDataWriter);
     SuccessOrExit(err);
 
-    if (apReadHandler->IsSubscriptionType())
+    if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
         uint64_t subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
@@ -382,7 +382,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     {
         reportDataBuilder.MoreChunkedMessages(true);
     }
-    else if (apReadHandler->IsReadType())
+    else if (apReadHandler->IsType(ReadHandler::InteractionType::Read))
     {
         reportDataBuilder.SuppressResponse(true);
     }
@@ -415,7 +415,7 @@ exit:
         //
         apReadHandler->Abort();
     }
-    else if (apReadHandler->IsReadType() && !hasMoreChunks)
+    else if (apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks)
     {
         //
         // In the case of successful report generation and we're on the last chunk of a read, we don't expect
@@ -471,7 +471,7 @@ void Engine::Run()
 
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < imEngine->mReadHandlers.Allocated()))
     {
-        ReadHandler * readHandler = imEngine->GetActiveHandler(mCurReadHandlerIdx % imEngine->mReadHandlers.Allocated());
+        ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
         if (readHandler->IsReportable())
@@ -576,7 +576,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     {
         return;
     }
-    if (!aReadHandler.IsSubscriptionType())
+
+    if (!aReadHandler.IsType(ReadHandler::InteractionType::Subscribe))
     {
         return;
     }
@@ -624,9 +625,8 @@ void Engine::OnReportConfirm()
 
 void Engine::GetMinEventLogPosition(uint32_t & aMinLogPosition)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aMinLogPosition](ReadHandler * handler)
-    {
-        if (handler->IsReadType())
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aMinLogPosition](ReadHandler * handler) {
+        if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
         }
@@ -657,7 +657,7 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
 CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
 {
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath](ReadHandler * handler) {
-        if (handler->IsReadType())
+        if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
         }
