@@ -416,6 +416,7 @@ fsl
 fstab
 fsync
 fullclean
+gbl
 gcloud
 GDB
 GeneralCommissioning
