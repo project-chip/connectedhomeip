@@ -6077,6 +6077,30 @@
               "outgoing": 1
             },
             {
+              "name": "SetWeekDaySchedule",
+              "code": 11,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetWeekDaySchedule",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "ClearWeekDaySchedule",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "SetUser",
               "code": 26,
               "mfgCode": null,
@@ -6151,6 +6175,14 @@
           "side": "server",
           "enabled": 1,
           "commands": [
+            {
+              "name": "GetWeekDayScheduleResponse",
+              "code": 12,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
             {
               "name": "GetUserResponse",
               "code": 28,
@@ -6347,11 +6379,11 @@
               "code": 20,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "10",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6366,7 +6398,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "10",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
