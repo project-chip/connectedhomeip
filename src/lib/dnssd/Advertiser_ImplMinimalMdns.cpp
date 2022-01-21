@@ -340,7 +340,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     /// need to set server name
-    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerInfo()));
 
     QNamePart nameCheckParts[]  = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
     FullQName nameCheck         = FullQName(nameCheckParts);
@@ -412,7 +412,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         }
     }
     MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                       DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
+                       DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerInfo().GetCompressedFabricId()));
     FullQName compressedFabricIdSubtype = operationalAllocator->AllocateQName(
         nameBuffer, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
     ReturnErrorCodeIf(compressedFabricIdSubtype.nameCount == 0, CHIP_ERROR_NO_MEMORY);

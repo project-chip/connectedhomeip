@@ -25,8 +25,8 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/PeerId.h>
 #include <lib/dnssd/DnssdCache.h>
+#include <lib/dnssd/PeerInfo.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
@@ -52,7 +52,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
 {
     const int sizeOfCache = 5;
     DnssdCache<sizeOfCache> tDnssdCache;
-    PeerId peerId;
+    PeerInfo peerInfo;
     int64_t id                         = 0x100;
     uint16_t port                      = 2000;
     const System::Clock::Timestamp ttl = System::Clock::Seconds16(2);
@@ -65,13 +65,13 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     nodeData.mInterfaceId = Inet::InterfaceId::Null();
     nodeData.mExpiryTime  = fakeClock.GetMonotonicTimestamp() + ttl;
 
-    peerId.SetCompressedFabricId(KNOWN_FABRIC);
-    nodeData.mPeerId.SetCompressedFabricId(KNOWN_FABRIC);
+    peerInfo.SetCompressedFabricId(KNOWN_FABRIC);
+    nodeData.mPeerInfo.SetCompressedFabricId(KNOWN_FABRIC);
 
     for (uint16_t i = 0; i < 10; i++)
     {
         CHIP_ERROR result;
-        nodeData.mPeerId.SetNodeId(static_cast<NodeId>(id + i));
+        nodeData.mPeerInfo.SetNodeId(static_cast<NodeId>(id + i));
         // Need to re-cast to uint16_t because of integer type promotion
         nodeData.mPort = static_cast<uint16_t>(port + i);
         result         = tDnssdCache.Insert(nodeData);
@@ -95,7 +95,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR result;
 
-        nodeData.mPeerId.SetNodeId(static_cast<NodeId>(id + i));
+        nodeData.mPeerInfo.SetNodeId(static_cast<NodeId>(id + i));
         nodeData.mPort = static_cast<uint16_t>(port + i);
         result         = tDnssdCache.Insert(nodeData);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
@@ -105,8 +105,8 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     for (uint16_t i = 0; i < sizeOfCache; i++)
     {
         CHIP_ERROR result;
-        peerId.SetNodeId(static_cast<NodeId>(id + i));
-        result = tDnssdCache.Delete(peerId);
+        peerInfo.SetNodeId(static_cast<NodeId>(id + i));
+        result = tDnssdCache.Delete(peerInfo);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
 
@@ -119,7 +119,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR result;
 
-        nodeData.mPeerId.SetNodeId(static_cast<NodeId>(id + i));
+        nodeData.mPeerInfo.SetNodeId(static_cast<NodeId>(id + i));
         nodeData.mPort = static_cast<uint16_t>(port + i);
 
         result = tDnssdCache.Insert(nodeData);
@@ -128,15 +128,18 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
 
     tDnssdCache.DumpCache();
 
-    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerId, nodeDataOut) == CHIP_NO_ERROR);
-    peerId.SetCompressedFabricId(KNOWN_FABRIC + 1);
-    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerId, nodeDataOut) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerInfo, nodeDataOut) == CHIP_NO_ERROR);
+    peerInfo.SetCompressedFabricId(KNOWN_FABRIC + 1);
+    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerInfo, nodeDataOut) != CHIP_NO_ERROR);
 }
 
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCreate), NL_TEST_DEF_FN(TestInsert), NL_TEST_SENTINEL() };
 
 static int TestSetup(void * inContext)
 {
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
     realClock = &System::SystemClock();
     System::Clock::Internal::SetSystemClockForTesting(&fakeClock);
     return SUCCESS;

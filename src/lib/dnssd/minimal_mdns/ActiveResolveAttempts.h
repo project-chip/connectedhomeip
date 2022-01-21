@@ -21,7 +21,8 @@
 #include <cstdint>
 
 #include <lib/core/Optional.h>
-#include <lib/core/PeerId.h>
+#include <lib/dnssd/PeerInfo.h>
+#include <lib/support/Pool.h>
 #include <system/SystemClock.h>
 
 namespace mdns {
@@ -41,19 +42,17 @@ public:
     static constexpr size_t kRetryQueueSize                      = 4;
     static constexpr chip::System::Clock::Timeout kMaxRetryDelay = chip::System::Clock::Seconds16(16);
 
-    ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) { Reset(); }
-
-    /// Clear out the internal queue
-    void Reset();
+    ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) {}
+    ~ActiveResolveAttempts() { mRetryQueue.ReleaseAll(); }
 
     /// Mark a resolution as a success, removing it from the internal list
-    void Complete(const chip::PeerId & peerId);
+    void Complete(const chip::PeerInfo & peerInfo);
 
     /// Mark that a resolution is pending, adding it to the internal list
     ///
     /// Once this complete, this peer id will be returned immediately
     /// by NextScheduledPeer (potentially with others as well)
-    void MarkPending(const chip::PeerId & peerId);
+    void MarkPending(const chip::PeerInfo & peerInfo);
 
     // Get minimum time until the next pending reply is required.
     //
@@ -68,15 +67,17 @@ public:
     //    now'
     //  - there is NO sorting implied by this call. Returned value will be
     //    any peer that needs a new request sent
-    chip::Optional<chip::PeerId> NextScheduledPeer();
+    chip::Optional<chip::PeerInfo> NextScheduledPeer();
 
 private:
     struct RetryEntry
     {
+        RetryEntry(chip::PeerInfo aPeerInfo) : peerInfo(aPeerInfo), nextRetryDelay(chip::System::Clock::Seconds16(1)) {}
+
         // What peer id is pending resolution.
         //
         // Inactive entries are marked by having NodeId == kUndefinedNodeId
-        chip::PeerId peerId;
+        const chip::PeerInfo peerInfo;
 
         // When a reply is expected for this item
         chip::System::Clock::Timestamp queryDueTime;
@@ -89,11 +90,14 @@ private:
         //      one second
         //    - the intervals between successive queries MUST increase by at
         //      least a factor of two
-        chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
+        chip::System::Clock::Timeout nextRetryDelay;
     };
 
+    RetryEntry * FindEntry(const chip::PeerInfo & peerInfo);
+    void MarkPending(RetryEntry * entryToUse);
+
     chip::System::Clock::ClockBase * mClock;
-    RetryEntry mRetryQueue[kRetryQueueSize];
+    chip::ObjectPool<RetryEntry, kRetryQueueSize> mRetryQueue;
 };
 
 } // namespace Minimal

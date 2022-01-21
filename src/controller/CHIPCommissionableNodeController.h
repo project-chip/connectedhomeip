@@ -55,7 +55,7 @@ public:
         ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
     }
 
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
+    void OnNodeIdResolutionFailed(const chip::PeerInfo & peerInfo, CHIP_ERROR error) override
     {
         ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
     }

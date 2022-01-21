@@ -114,17 +114,17 @@ public:
     static constexpr size_t kTxtTotalKeySize   = kCommonTxtTotalKeySize;
     static constexpr size_t kTxtTotalValueSize = kCommonTxtTotalValueSize;
 
-    OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
+    OperationalAdvertisingParameters & SetPeerInfo(const PeerInfo & peerInfo)
     {
-        mPeerId = peerId;
+        mPeerInfo = peerInfo;
         return *this;
     }
-    PeerId GetPeerId() const { return mPeerId; }
+    PeerInfo GetPeerInfo() const { return mPeerInfo; }
 
-    CompressedFabricId GetCompressedFabricId() const { return mPeerId.GetCompressedFabricId(); }
+    CompressedFabricId GetCompressedFabricId() const { return mPeerInfo.GetCompressedFabricId(); }
 
 private:
-    PeerId mPeerId;
+    PeerInfo mPeerInfo;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>

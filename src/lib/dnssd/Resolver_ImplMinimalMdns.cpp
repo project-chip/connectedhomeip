@@ -144,7 +144,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
         return;
     }
 
-    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
+    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerInfo) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
         mHasNodePort = false;
@@ -328,7 +328,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
     }
     else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
     {
-        activeAttempts.Complete(mNodeData.mPeerId);
+        activeAttempts.Complete(mNodeData.mPeerInfo);
 
         mNodeData.LogNodeIdResolved();
         mDelegate->OnNodeIdResolved(mNodeData);
@@ -350,7 +350,7 @@ public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
+    CHIP_ERROR ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
@@ -505,10 +505,10 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     return SendQuery(qname, mdns::Minimal::QType::ANY);
 }
 
-CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
 {
     mDiscoveryType = DiscoveryType::kOperational;
-    mActiveResolves.MarkPending(peerId);
+    mActiveResolves.MarkPending(peerInfo);
 
     return SendPendingResolveQueries();
 }
@@ -537,9 +537,9 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 {
     while (true)
     {
-        Optional<PeerId> peerId = mActiveResolves.NextScheduledPeer();
+        Optional<PeerInfo> peerInfo = mActiveResolves.NextScheduledPeer();
 
-        if (!peerId.HasValue())
+        if (!peerInfo.HasValue())
         {
             break;
         }
@@ -554,7 +554,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             char nameBuffer[kMaxOperationalServiceNameSize] = "";
 
             // Node and fabricid are encoded in server names.
-            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId.Value()));
+            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerInfo.Value()));
 
             const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
             Query query(instanceQName);
@@ -602,11 +602,11 @@ Resolver & chip::Dnssd::Resolver::Instance()
 // updating the delegate that ends up being used by the server by calling 'SetResolverDelegate'.
 // This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
 // it won't work well if requests are issued in parallel.
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type, dnssdCacheBypass);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerInfo, type, dnssdCacheBypass);
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)

@@ -259,7 +259,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
 
             const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
-                                                 .SetPeerId(fabricInfo.GetPeerId())
+                                                 .SetPeerInfo(PeerInfo(fabricInfo.GetPeerId().GetNodeId(), fabricInfo.GetCachedCompressidFabricId()))
                                                  .SetMac(mac)
                                                  .SetPort(GetSecuredPort())
                                                  .SetMRPConfig(gDefaultMRPConfig)
@@ -269,8 +269,8 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
             ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
-                            ChipLogValueX64(advertiseParameters.GetPeerId().GetCompressedFabricId()),
-                            ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
+                            ChipLogValueX64(advertiseParameters.GetPeerInfo().GetCompressedFabricId()),
+                            ChipLogValueX64(advertiseParameters.GetPeerInfo().GetNodeId()));
             // Should we keep trying to advertise the other operational
             // identities on failure?
             ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));

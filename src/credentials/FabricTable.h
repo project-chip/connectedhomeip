@@ -31,6 +31,7 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
@@ -41,6 +42,8 @@
 #endif
 
 namespace chip {
+
+static constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
 static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_DEVICE_ADMINS);
@@ -140,17 +143,13 @@ public:
         ReleaseOperationalCerts();
     }
 
-    PeerId GetPeerId() const { return mOperationalId; }
-    PeerId GetPeerIdForNode(const NodeId node) const
-    {
-        PeerId peer = mOperationalId;
-        peer.SetNodeId(node);
-        return peer;
-    }
+    PeerId GetPeerId() const { return PeerId(mNodeId, mFabric); }
+    PeerId GetPeerIdForNode(const NodeId node) const { return PeerId(node, mFabric); }
 
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
     uint16_t GetVendorId() const { return mVendorId; }
+    CompressedFabricId GetCachedCompressidFabricId() const { return mCachedCompressidFabricId; }
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
@@ -182,7 +181,7 @@ public:
     CHIP_ERROR SetICACert(const Optional<ByteSpan> & cert) { return SetICACert(cert.ValueOr(ByteSpan())); }
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
-    bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
+    bool IsInitialized() const { return IsOperationalNodeId(mNodeId); }
 
     CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
                                      MutableByteSpan & destinationId);
@@ -223,17 +222,18 @@ public:
         return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
-    CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
-                                 PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
+    CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context, NodeId & nodeId, CompressedFabricId & compressedFabricId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
      */
     void Reset()
     {
-        mOperationalId  = PeerId();
+        mNodeId = kUndefinedNodeId;
+        mFabric = kUndefinedFabricIndex;
         mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
+        mCachedCompressidFabricId = kUndefinedCompressedFabricId;
 
         if (mOperationalKey != nullptr)
         {
@@ -248,12 +248,13 @@ public:
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the fabric. The generated compressed ID is returned via compressedPeerId
        output parameter */
-    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, CompressedFabricId & compressedFabricId) const;
 
     friend class FabricTable;
 
 private:
-    PeerId mOperationalId;
+    NodeId mNodeId;
+    CompressedFabricId mCachedCompressidFabricId;
 
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = kUndefinedVendorId;

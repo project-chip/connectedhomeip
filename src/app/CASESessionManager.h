@@ -82,6 +82,10 @@ public:
     CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    // DEPRECATED, for backward competibility, the one takes a PeerId should be used instead.
+    [[deprecated]] CHIP_ERROR FindOrEstablishSession(PeerInfo peerInfo, Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+
     OperationalDeviceProxy * FindExistingSession(PeerId peerId);
 
     void ReleaseSession(PeerId peerId);
@@ -105,9 +109,12 @@ public:
      */
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
+    // DEPRECATED, for backward competibility, the one takes a PeerId should be used instead.
+    [[deprecated]] CHIP_ERROR GetPeerAddress(PeerInfo peerInfo, Transport::PeerAddress & addr);
+
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
+    void OnNodeIdResolutionFailed(const PeerInfo & peerInfo, CHIP_ERROR error) override;
     void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override {}
 
 private:

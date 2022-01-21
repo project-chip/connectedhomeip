@@ -1264,12 +1264,13 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
 
     ReturnErrorOnFailure(SetEffectiveTime());
 
-    PeerId peerId;
+    NodeId nodeId;
+    CompressedFabricId compressedFabricId;
     FabricId rawFabricId;
     ReturnErrorOnFailure(
-        mFabricInfo->VerifyCredentials(responderNOC, responderICAC, mValidContext, peerId, rawFabricId, responderID));
+        mFabricInfo->VerifyCredentials(responderNOC, responderICAC, mValidContext, nodeId, compressedFabricId, rawFabricId, responderID));
 
-    SetPeerNodeId(peerId.GetNodeId());
+    SetPeerNodeId(nodeId);
 
     return CHIP_NO_ERROR;
 }

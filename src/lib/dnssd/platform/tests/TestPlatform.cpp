@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <lib/core/PeerId.h>
 #include <lib/dnssd/Discovery_ImplPlatform.h>
+#include <lib/dnssd/PeerInfo.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -36,10 +36,10 @@ using namespace chip::Dnssd;
 const uint8_t kMac[kMaxMacSize] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 const char host[]               = "0102030405060708";
 
-const PeerId kPeerId1 = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
-const PeerId kPeerId2 = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
+const PeerInfo kPeerInfo1 = PeerInfo(0x1111222233334444, 0xBEEFBEEFF00DF00D);
+const PeerInfo kPeerInfo2 = PeerInfo(0x1212343456567878, 0x5555666677778888);
 OperationalAdvertisingParameters operationalParams1 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters().SetPeerInfo(kPeerInfo1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -47,7 +47,7 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetHostName(host)
                                           .AddSubtype("_IBEEFBEEFF00DF00D");
 OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId2)
+                                                          .SetPeerInfo(kPeerInfo2)
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)

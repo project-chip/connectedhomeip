@@ -53,12 +53,12 @@ const FullQName kHostnameName       = FullQName(kHostnameParts);
 // Operational records and queries.
 const QNamePart kMatterOperationalQueryParts[3] = { "_matter", "_tcp", "local" };
 const FullQName kMatterOperationalQueryName     = FullQName(kMatterOperationalQueryParts);
-const PeerId kPeerId1                           = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
-const PeerId kPeerId2                           = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-const PeerId kPeerId3                           = PeerId().SetCompressedFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
-const PeerId kPeerId4                           = PeerId().SetCompressedFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
-const PeerId kPeerId5                           = PeerId().SetCompressedFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
-const PeerId kPeerId6                           = PeerId().SetCompressedFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
+const PeerInfo kPeerInfo1                           = PeerInfo(0x1111222233334444, 0xBEEFBEEFF00DF00D);
+const PeerInfo kPeerInfo2                           = PeerInfo(0x1212343456567878, 0x5555666677778888);
+const PeerInfo kPeerInfo3                           = PeerInfo(0x3333333333333333, 0x3333333333333333);
+const PeerInfo kPeerInfo4                           = PeerInfo(0x4444444444444444, 0x4444444444444444);
+const PeerInfo kPeerInfo5                           = PeerInfo(0x5555555555555555, 0x5555555555555555);
+const PeerInfo kPeerInfo6                           = PeerInfo(0x6666666666666666, 0x6666666666666666);
 const QNamePart kInstanceNameParts1[]           = { "BEEFBEEFF00DF00D-1111222233334444", "_matter", "_tcp", "local" };
 const FullQName kInstanceName1                  = FullQName(kInstanceNameParts1);
 const QNamePart kInstanceNameParts2[]           = { "5555666677778888-1212343456567878", "_matter", "_tcp", "local" };
@@ -73,22 +73,22 @@ PtrResourceRecord ptrServiceSubCompressedId1    = PtrResourceRecord(kDnsSdQueryN
 PtrResourceRecord ptrServiceSubCompressedId2    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName2);
 
 OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId1)
+                                                          .SetPeerInfo(kPeerInfo1)
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
                                                           .SetTcpSupported(chip::Optional<bool>(false))
                                                           .SetMRPConfig(ReliableMessageProtocolConfig(32_ms32, 33_ms32));
 OperationalAdvertisingParameters operationalParams2 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters().SetPeerInfo(kPeerInfo2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId3).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters().SetPeerInfo(kPeerInfo3).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams4 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId4).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters().SetPeerInfo(kPeerInfo4).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams5 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters().SetPeerInfo(kPeerInfo5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams6 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters().SetPeerInfo(kPeerInfo6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 const QNamePart txtOperational1Parts[]  = { "CRI=32", "CRA=33", "T=0" };
 PtrResourceRecord ptrOperationalService = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
 PtrResourceRecord ptrOperational1       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);

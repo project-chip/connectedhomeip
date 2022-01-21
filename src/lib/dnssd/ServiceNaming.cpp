@@ -28,12 +28,12 @@
 namespace chip {
 namespace Dnssd {
 
-CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId)
+CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerInfo & peerInfo)
 {
     ReturnErrorCodeIf(bufferLen <= Operational::kInstanceNameMaxLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    NodeId nodeId               = peerId.GetNodeId();
-    CompressedFabricId fabricId = peerId.GetCompressedFabricId();
+    NodeId nodeId               = peerInfo.GetNodeId();
+    CompressedFabricId fabricId = peerInfo.GetCompressedFabricId();
 
     snprintf(buffer, bufferLen, "%08" PRIX32 "%08" PRIX32 "-%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(fabricId >> 32),
              static_cast<uint32_t>(fabricId), static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
@@ -41,10 +41,10 @@ CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peer
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
+CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerInfo * peerInfo)
 {
     ReturnErrorCodeIf(name == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(peerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(peerInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Make sure the string is long enough.
     static constexpr size_t fabricIdByteLength   = 8;
@@ -64,19 +64,19 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
     ReturnErrorCodeIf(name[fabricIdStringLength] != '-', CHIP_ERROR_WRONG_NODE_ID);
 
     static constexpr size_t bufferSize = max(fabricIdByteLength, nodeIdByteLength);
-    uint8_t buf[bufferSize];
+    uint8_t bufCompressedFabricId[bufferSize];
+    uint8_t bufNodeId[bufferSize];
 
-    ReturnErrorCodeIf(Encoding::HexToBytes(name, fabricIdStringLength, buf, bufferSize) == 0, CHIP_ERROR_WRONG_NODE_ID);
+    ReturnErrorCodeIf(Encoding::HexToBytes(name, fabricIdStringLength, bufCompressedFabricId, bufferSize) == 0, CHIP_ERROR_WRONG_NODE_ID);
     // Buf now stores the fabric id, as big-endian bytes.
     static_assert(fabricIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
-    peerId->SetCompressedFabricId(Encoding::BigEndian::Get64(buf));
 
-    ReturnErrorCodeIf(Encoding::HexToBytes(name + fabricIdStringLength + 1, nodeIdStringLength, buf, bufferSize) == 0,
+    ReturnErrorCodeIf(Encoding::HexToBytes(name + fabricIdStringLength + 1, nodeIdStringLength, bufNodeId, bufferSize) == 0,
                       CHIP_ERROR_WRONG_NODE_ID);
     // Buf now stores the node id id, as big-endian bytes.
     static_assert(nodeIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
-    peerId->SetNodeId(Encoding::BigEndian::Get64(buf));
 
+    *peerInfo = PeerInfo(Encoding::BigEndian::Get64(bufNodeId), Encoding::BigEndian::Get64(bufCompressedFabricId));
     return CHIP_NO_ERROR;
 }
 

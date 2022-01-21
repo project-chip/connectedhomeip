@@ -51,7 +51,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
     StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
     ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mOperationalId.GetNodeId());
+    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
     info->mFabric   = Encoding::LittleEndian::HostSwap16(mFabric);
     info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
@@ -171,10 +171,11 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     ChipLogProgress(Inet, "Loading certs from storage");
     SuccessOrExit(err = SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
 
+    mNodeId = nodeId;
     // The compressed fabric ID doesn't change for a fabric over time.
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
-    SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, &mOperationalId));
+    SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, mCachedCompressidFabricId));
 
     SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
     SuccessOrExit(err = SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
@@ -187,9 +188,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, CompressedFabricId & compressedFabricId) const
 {
-    ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
     MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
     P256PublicKey rootPubkey;
@@ -209,9 +209,7 @@ CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId 
 
     // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
     // returns a binary buffer and is agnostic of usage of the output as an integer type.
-    CompressedFabricId compressedFabricId = Encoding::BigEndian::Get64(compressedFabricIdBuf);
-    compressedPeerId->SetCompressedFabricId(compressedFabricId);
-    compressedPeerId->SetNodeId(nodeId);
+    compressedFabricId = Encoding::BigEndian::Get64(compressedFabricIdBuf);
     return CHIP_NO_ERROR;
 }
 
@@ -284,8 +282,7 @@ CHIP_ERROR FabricInfo::SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, ValidationContext & context,
-                                         PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const
+CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, ValidationContext & context, NodeId & nodeId, CompressedFabricId & compressedFabricId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const
 {
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
@@ -313,8 +310,8 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     // It confirms that the certs link correctly (noc -> icac -> mRootCert), and have been correctly signed.
     ReturnErrorOnFailure(certificates.FindValidCert(nocSubjectDN, nocSubjectKeyId, context, &resultCert));
 
-    NodeId nodeId;
-    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetLastCert()[0], &nodeId, &fabricId));
+    NodeId tmpNodeId;
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetLastCert()[0], &tmpNodeId, &fabricId));
 
     if (!icac.empty())
     {
@@ -325,7 +322,8 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
         }
     }
 
-    ReturnErrorOnFailure(GetCompressedId(fabricId, nodeId, &nocPeerId));
+    ReturnErrorOnFailure(GetCompressedId(fabricId, tmpNodeId, compressedFabricId));
+    nodeId = tmpNodeId;
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;
@@ -384,7 +382,7 @@ CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, 
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     for (size_t ipkIdx = 0; ipkIdx < ipkListEntries; ++ipkIdx)
     {
-        if (GenerateDestinationID(ipkList[ipkIdx], initiatorRandom, mOperationalId.GetNodeId(), localDestIDSpan) == CHIP_NO_ERROR &&
+        if (GenerateDestinationID(ipkList[ipkIdx], initiatorRandom, mNodeId, localDestIDSpan) == CHIP_NO_ERROR &&
             targetDestinationId.data_equal(localDestIDSpan))
         {
             return CHIP_NO_ERROR;
@@ -421,7 +419,7 @@ FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId
     {
         FabricInfo * fabric = FindFabricWithIndex(i);
 
-        if (fabric != nullptr && fabricId == fabric->GetPeerId().GetCompressedFabricId())
+        if (fabric != nullptr && fabricId == fabric->GetCachedCompressidFabricId())
         {
             LoadFromStorage(fabric);
             return fabric;
@@ -497,7 +495,7 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
 
     ChipLogProgress(Discovery, "Verifying the received credentials");
     ReturnErrorOnFailure(
-        VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, validContext, mOperationalId, mFabricId, pubkey));
+        VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, validContext, mNodeId, mCachedCompressidFabricId, mFabricId, pubkey));
 
     SetICACert(newFabric.mICACert);
     SetNOCCert(newFabric.mNOCCert);
@@ -505,7 +503,7 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     SetFabricLabel(newFabric.GetFabricLabel());
     ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", GetFabricIndex(), IsInitialized());
     ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
-                    ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
+                    ChipLogValueX64(mCachedCompressidFabricId), ChipLogValueX64(mNodeId));
     return CHIP_NO_ERROR;
 }
 

@@ -40,15 +40,7 @@ template <size_t CACHE_SIZE>
 class DnssdCache
 {
 public:
-    DnssdCache() : elementsUsed(CACHE_SIZE)
-    {
-        for (ResolvedNodeData & e : mLookupTable)
-        {
-            // each unused entry decrements the count
-            MarkEntryUnused(e);
-        }
-        MdnsLogProgress(Discovery, "construct mdns cache of size %ld", CACHE_SIZE);
-    }
+    ~DnssdCache() { mLookupTable.ReleaseAll(); }
 
     // insert this entry into the cache.
     // return error if cache is full
@@ -60,40 +52,42 @@ public:
 
         ResolvedNodeData * entry;
 
-        entry = FindPeerId(nodeData.mPeerId, currentTime);
+        entry = FindPeer(nodeData.mPeerInfo, currentTime);
         if (entry)
         {
             *entry = nodeData;
             return CHIP_NO_ERROR;
         }
 
-        VerifyOrReturnError(entry = findSlot(currentTime), CHIP_ERROR_TOO_MANY_KEYS);
+        if (mLookupTable.Allocated() >= CACHE_SIZE)
+        {
+            return CHIP_ERROR_TOO_MANY_KEYS;
+        }
 
-        // have a free slot for this entry
-        *entry = nodeData;
-        elementsUsed++;
+        entry = mLookupTable.CreateObject(nodeData);
+        VerifyOrReturnError(entry != nullptr, CHIP_ERROR_TOO_MANY_KEYS);
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Delete(PeerId peerId)
+    CHIP_ERROR Delete(PeerInfo peerInfo)
     {
         ResolvedNodeData * pentry;
         const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-        VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
+        VerifyOrReturnError(pentry = FindPeer(peerInfo, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
-        MarkEntryUnused(*pentry);
+        mLookupTable.ReleaseObject(pentry);
         return CHIP_NO_ERROR;
     }
 
-    // given a peerId, find the parameters if its in the cache, or return error
-    CHIP_ERROR Lookup(PeerId peerId, ResolvedNodeData & nodeData)
+    // given a node/fabric, find the parameters if its in the cache, or return error
+    CHIP_ERROR Lookup(PeerInfo peerInfo, ResolvedNodeData & nodeData)
     {
         ResolvedNodeData * pentry;
         const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-        VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
+        VerifyOrReturnError(pentry = FindPeer(peerInfo, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
         nodeData = *pentry;
 
@@ -103,80 +97,64 @@ public:
     // only useful if MDNS_LOGGING is set.   If not used, should be optimized out
     void DumpCache()
     {
-        int i = 0;
+        MdnsLogProgress(Discovery, "cache size = %d", mLookupTable.Allocated());
+        mLookupTable.ForEachActiveObject([] (ResolvedNodeData * e) {
+            MdnsLogProgress(Discovery, "Entry: node %lx fabric %lx, port = %d", e->mNodeId, e->mCompressedFabricId, e->port);
+            for (size_t j = 0; j < e->mNumIPs; ++j)
+            {
+                char address[Inet::IPAddress::kMaxStringLength];
+                e->mAddress[j].ToString(address);
+                MdnsLogProgress(Discovery, "    address %d: %s", j, address);
+            }
+            return Loop::Continue;
+        });
+    }
 
-        MdnsLogProgress(Discovery, "cache size = %d", elementsUsed);
-        for (ResolvedNodeData & e : mLookupTable)
-        {
-            if (e.mPeerId == nullPeerId)
-            {
-                MdnsLogProgress(Discovery, "Entry %d unused", i);
-            }
-            else
-            {
-                MdnsLogProgress(Discovery, "Entry %d: node %lx fabric %lx, port = %d", i, e.mPeerId.GetNodeId(),
-                                e.peerId.GetFabricId(), e.port);
-                for (size_t j = 0; j < e.mNumIPs; ++j)
-                {
-                    char address[Inet::IPAddress::kMaxStringLength];
-                    e.mAddress[i].ToString(address);
-                    MdnsLogProgress(Discovery, "    address %d: %s", j, address);
-                }
-            }
-            i++;
-        }
+    CHIP_ERROR Delete(PeerId peerId, FabricTable * fabricTable) {
+        PeerInfo peerInfo;
+        ReturnErrorOnFailure(PeerInfo::FromPeerId(peerInfo, peerId, fabricTable));
+        return Delete(peerInfo);
+    }
+
+    CHIP_ERROR Lookup(PeerId peerId, ResolvedNodeData & nodeData, FabricTable * fabricTable)
+    {
+        PeerInfo peerInfo;
+        ReturnErrorOnFailure(PeerInfo::FromPeerId(peerInfo, peerId, fabricTable));
+        return Lookup(peerInfo, nodeData);
     }
 
 private:
-    PeerId nullPeerId; // indicates a cache entry is unused
-    int elementsUsed;  // running count of how many entries are used -- for a sanity check
+    ObjectPool<ResolvedNodeData, CACHE_SIZE> mLookupTable;
 
-    ResolvedNodeData mLookupTable[CACHE_SIZE];
-
-    ResolvedNodeData * findSlot(System::Clock::Timestamp currentTime)
+    ResolvedNodeData * FindPeer(PeerInfo peerInfo, System::Clock::Timestamp current_time)
     {
-        for (ResolvedNodeData & entry : mLookupTable)
-        {
-            if (entry.mPeerId == nullPeerId)
-                return &entry;
+        ResolvedNodeData * result = nullptr;
 
-            if (entry.mExpiryTime <= currentTime)
+        mLookupTable.ForEachActiveObject([&] (ResolvedNodeData * entry) {
+            if (entry->mPeerInfo == peerInfo)
             {
-                MarkEntryUnused(entry);
-                return &entry;
-            }
-        }
-        return nullptr;
-    }
-
-    ResolvedNodeData * FindPeerId(PeerId peerId, System::Clock::Timestamp current_time)
-    {
-        for (ResolvedNodeData & entry : mLookupTable)
-        {
-            if (entry.mPeerId == peerId)
-            {
-                if (entry.mExpiryTime < current_time)
+                if (entry->mExpiryTime < current_time)
                 {
-                    MarkEntryUnused(entry);
-                    break; // return nullptr
+                    mLookupTable.ReleaseObject(entry);
                 }
                 else
-                    return &entry;
+                {
+                    result = entry;
+                }
+                return Loop::Break;
             }
-            if (entry.mPeerId != nullPeerId && entry.mExpiryTime < current_time)
+            else
             {
-                MarkEntryUnused(entry);
+                if (entry->mExpiryTime < current_time)
+                {
+                    mLookupTable.ReleaseObject(entry);
+                }
+
+                return Loop::Continue;
             }
-        }
+        });
 
-        return nullptr;
-    }
-
-    // have a method to mark ununused --  so its easy to change
-    void MarkEntryUnused(ResolvedNodeData & pentry)
-    {
-        pentry.mPeerId = nullPeerId;
-        elementsUsed--;
+        return result;
     }
 };
 

@@ -20,14 +20,14 @@
 #include <cstdint>
 #include <limits>
 
-#include "lib/support/logging/CHIPLogging.h"
+#include <lib/support/logging/CHIPLogging.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
-#include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
+#include <lib/dnssd/PeerInfo.h>
 #include <lib/support/BytesToHex.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
@@ -45,7 +45,7 @@ struct ResolvedNodeData
 
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerInfo.GetNodeId()));
         for (size_t i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);
@@ -75,7 +75,7 @@ struct ResolvedNodeData
         return false;
     }
 
-    PeerId mPeerId;
+    PeerInfo mPeerInfo;
     size_t mNumIPs = 0;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress[kMaxIPAddresses];
@@ -261,7 +261,7 @@ public:
     virtual void OnNodeIdResolved(const ResolvedNodeData & nodeData) = 0;
 
     /// Called when a CHIP node ID resolution has failed
-    virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+    virtual void OnNodeIdResolutionFailed(const PeerInfo & peerInfo, CHIP_ERROR error) = 0;
 
     // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
     virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
@@ -310,7 +310,7 @@ public:
      * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
      * `OnNodeIdResolutionFailed` method, respectively.
      */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
+    virtual CHIP_ERROR ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type,
                                      Resolver::CacheBypass dnssdCacheBypass = CacheBypass::Off) = 0;
 
     /**

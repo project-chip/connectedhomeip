@@ -343,6 +343,16 @@ void DeviceController::PersistNextKeyId()
     }
 }
 
+CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerInfo peerInfo, Inet::IPAddress & addr, uint16_t & port)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    Transport::PeerAddress peerAddr;
+    ReturnErrorOnFailure(mCASESessionManager->GetPeerAddress(peerInfo, peerAddr));
+    addr = peerAddr.GetIPAddress();
+    port = peerAddr.GetPort();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -564,11 +574,11 @@ void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & no
     mCASESessionManager->OnNodeIdResolved(nodeData);
     if (mDeviceAddressUpdateDelegate != nullptr)
     {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), CHIP_NO_ERROR);
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerInfo.GetNodeId(), CHIP_NO_ERROR);
     }
 };
 
-void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
+void DeviceController::OnNodeIdResolutionFailed(const chip::PeerInfo & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
     VerifyOrReturn(mState == State::Initialized,
@@ -1644,10 +1654,10 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err)
 void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
-                    ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+                    ChipLogValueX64(nodeData.mPeerInfo.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
 
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerInfo.GetNodeId())
     {
         // Let's release the device that's being paired, if pairing was successful,
         // and the device is available on the operational network.
@@ -1657,11 +1667,11 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
     mDNSCache.Insert(nodeData);
 
-    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerInfo, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnNodeIdResolved(nodeData);
 }
 
-void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
+void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerInfo & peer, CHIP_ERROR error)
 {
     if (mDeviceBeingCommissioned != nullptr)
     {

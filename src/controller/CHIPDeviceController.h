@@ -204,6 +204,9 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
+    // DEPRECATED, for backward competibility, the one takes a PeerId should be used instead.
+    [[deprecated]] CHIP_ERROR GetPeerAddressAndPort(PeerInfo peerInfo, Inet::IPAddress & addr, uint16_t & port);
+
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
@@ -319,7 +322,7 @@ public:
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
+    uint64_t GetCompressedFabricId() const { return mFabricInfo->GetCachedCompressidFabricId(); }
 
     /**
      * @brief Get the raw Fabric ID assigned to the device.
@@ -383,7 +386,7 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnNodeIdResolutionFailed(const chip::PeerInfo & peerInfo, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
@@ -602,7 +605,7 @@ public:
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
     void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnNodeIdResolutionFailed(const chip::PeerInfo & peerInfo, CHIP_ERROR error) override;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**

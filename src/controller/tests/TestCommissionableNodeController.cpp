@@ -34,7 +34,7 @@ public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override { return InitStatus; }
     void Shutdown() override {}
     void SetResolverDelegate(ResolverDelegate *) override {}
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override
+    CHIP_ERROR ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override
     {
         return ResolveNodeIdStatus;
     }

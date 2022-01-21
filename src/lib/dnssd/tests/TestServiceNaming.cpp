@@ -33,15 +33,10 @@ void TestMakeInstanceName(nlTestSuite * inSuite, void * inContext)
 {
     char buffer[128];
 
-    NL_TEST_ASSERT(inSuite,
-                   MakeInstanceName(buffer, sizeof(buffer), PeerId().SetCompressedFabricId(0x1234).SetNodeId(0x5678)) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, sizeof(buffer), PeerInfo(0x5678, 0x1234)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "0000000000001234-0000000000005678") == 0);
 
-    NL_TEST_ASSERT(inSuite,
-                   MakeInstanceName(buffer, sizeof(buffer),
-                                    PeerId().SetCompressedFabricId(0x1122334455667788ULL).SetNodeId(0x123456789abcdefULL)) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, sizeof(buffer), PeerInfo(0x123456789abcdefULL, 0x1122334455667788ULL)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "1122334455667788-0123456789ABCDEF") == 0);
 
     // insufficient buffer size:
@@ -49,52 +44,52 @@ void TestMakeInstanceName(nlTestSuite * inSuite, void * inContext)
     constexpr size_t kMinBufferSize = 2 * 16 + 1 + 1;
     for (size_t shortSize = 0; shortSize < kMinBufferSize; shortSize++)
     {
-        NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, shortSize, PeerId()) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, shortSize, PeerInfo()) != CHIP_NO_ERROR);
     }
-    NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, kMinBufferSize, PeerId()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, kMinBufferSize, PeerInfo()) == CHIP_NO_ERROR);
 }
 
 void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
 {
-    PeerId peerId;
+    PeerInfo peerInfo;
 
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName(nullptr, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("ACDEF1234567890-1234567890ABCDEF", nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName(nullptr, &peerId) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName(nullptr, &peerInfo) == CHIP_ERROR_INVALID_ARGUMENT);
 
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("ABCDEF1234567890-1234567890ABCDEF", &peerId) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetCompressedFabricId(0xABCDEF1234567890ULL).SetNodeId(0x1234567890ABCDEFULL));
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("ABCDEF1234567890-1234567890ABCDEF", &peerInfo) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, peerInfo == PeerInfo(0x1234567890ABCDEFULL, 0xABCDEF1234567890ULL));
 
     // ending in period (partial name) is acceptable
     NL_TEST_ASSERT(inSuite,
-                   ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF1122.some.suffix.here", &peerId) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetCompressedFabricId(0x1122334455667788ULL).SetNodeId(0xaabbccddeeff1122ULL));
+                   ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF1122.some.suffix.here", &peerInfo) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, peerInfo == PeerInfo(0xaabbccddeeff1122ULL, 0x1122334455667788ULL));
 
     // Invalid: non hex character
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1x22334455667788-AABBCCDDEEDD1122", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1x22334455667788-AABBCCDDEEDD1122", &peerInfo) != CHIP_NO_ERROR);
 
     // Invalid: missing node id part (no - separator)
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788x2233445566778899", &peerId) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788x2233445566778899.12-33.4455", &peerId) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788x2233445566778899.4455", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788x2233445566778899", &peerInfo) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788x2233445566778899.12-33.4455", &peerInfo) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788x2233445566778899.4455", &peerInfo) != CHIP_NO_ERROR);
 
     // Invalid: missing part
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("-1234567890ABCDEF", &peerId) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1234567890ABCDEF-", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("-1234567890ABCDEF", &peerInfo) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1234567890ABCDEF-", &peerInfo) != CHIP_NO_ERROR);
 
     // Invalid: separator in wrong place
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("112233445566778-8AABBCCDDEEFF1122", &peerId) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788A-ABBCCDDEEFF1122", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("112233445566778-8AABBCCDDEEFF1122", &peerInfo) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788A-ABBCCDDEEFF1122", &peerInfo) != CHIP_NO_ERROR);
 
     // Invalid: fabric part too short
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("11223344556677-AABBCCDDEEFF1122", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("11223344556677-AABBCCDDEEFF1122", &peerInfo) != CHIP_NO_ERROR);
     // Invalid: fabric part too long
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("112233445566778899-AABBCCDDEEFF1122", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("112233445566778899-AABBCCDDEEFF1122", &peerInfo) != CHIP_NO_ERROR);
 
     // Invalid: node part too short
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF11", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF11", &peerInfo) != CHIP_NO_ERROR);
     // Invalid: node part too long
-    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF112233", &peerId) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF112233", &peerInfo) != CHIP_NO_ERROR);
 }
 
 void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)

@@ -18,8 +18,8 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
+#include <lib/dnssd/PeerInfo.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/Span.h>
 
@@ -49,13 +49,13 @@ constexpr size_t kMaxOperationalServiceNameSize =
     Operational::kInstanceNameMaxLength + 1 + sizeof(kOperationalServiceName) + sizeof(kOperationalProtocol) + sizeof(kLocalDomain);
 
 /// builds the MDNS advertising name for a given fabric + nodeid pair
-CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId);
+CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerInfo & peerInfo);
 
 /// Inverse of MakeInstanceName.  Will return errors on non-spec-compliant ids,
 /// _except_ for allowing lowercase hex, not just the spec-defined uppercase
 /// hex.  The part of "name" up to the first '.' (or end of string, whichever
 /// comes first) is parsed as a FABRICID-NODEID.
-CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId);
+CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerInfo * peerInfo);
 
 /// Generates the host name that a CHIP device is to use for a given unique
 /// identifier (MAC address or EUI64)

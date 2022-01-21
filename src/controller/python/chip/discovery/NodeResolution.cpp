@@ -44,12 +44,12 @@ public:
 
             // TODO: For now, just provide addr 0, but this should really provide all and
             // allow the caller to choose.
-            mSuccessCallback(                                                            //
-                nodeData.mPeerId.GetCompressedFabricId(),                                //
-                nodeData.mPeerId.GetNodeId(),                                            //
-                nodeData.mInterfaceId.GetPlatformInterface(),                            //
-                nodeData.mAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
-                nodeData.mPort                                                           //
+            mSuccessCallback(
+                nodeData.mPeerInfo.GetCompressedFabricId(),
+                nodeData.mPeerInfo.GetNodeId(),
+                nodeData.mInterfaceId.GetPlatformInterface(),
+                nodeData.mAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)),
+                nodeData.mPort
             );
         }
         else
@@ -58,11 +58,11 @@ public:
         }
     }
 
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    void OnNodeIdResolutionFailed(const PeerInfo & peerInfo, CHIP_ERROR error) override
     {
         if (mFailureCallback != nullptr)
         {
-            mFailureCallback(peerId.GetCompressedFabricId(), peerId.GetNodeId(), error.AsInteger());
+            mFailureCallback(peerInfo.GetCompressedFabricId(), peerInfo.GetNodeId(), error.AsInteger());
         }
         else
         {
@@ -99,8 +99,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
         ReturnOnFailure(result);
         Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 
-        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
-                                                    chip::Inet::IPAddressType::kAny);
+        result = Resolver::Instance().ResolveNodeId(chip::PeerInfo(nodeId, fabricId), chip::Inet::IPAddressType::kAny);
     });
 
     return result.AsInteger();

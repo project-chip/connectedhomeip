@@ -35,7 +35,7 @@ public:
         ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
         chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
         ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
+        return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerInfo(remoteId, fabricId),
                                                                chip::Inet::IPAddressType::kAny,
                                                                chip::Dnssd::Resolver::CacheBypass::On);
     }
@@ -44,7 +44,7 @@ public:
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
 
-        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Port: %" PRIu16, nodeData.mPeerId.GetNodeId(), nodeData.mPort);
+        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Port: %" PRIu16, nodeData.mPeerInfo.GetNodeId(), nodeData.mPort);
         ChipLogProgress(chipTool, "    Hostname: %s", nodeData.mHostName);
         for (size_t i = 0; i < nodeData.mNumIPs; ++i)
         {
@@ -66,7 +66,7 @@ public:
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
+    void OnNodeIdResolutionFailed(const chip::PeerInfo & peerInfo, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(CHIP_ERROR_INTERNAL);

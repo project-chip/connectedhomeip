@@ -37,11 +37,11 @@ public:
         }
     }
 
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    void OnNodeIdResolutionFailed(const PeerInfo & peerInfo, CHIP_ERROR error) override
     {
         if (mDelegate != nullptr)
         {
-            mDelegate->OnNodeIdResolutionFailed(peerId, error);
+            mDelegate->OnNodeIdResolutionFailed(peerInfo, error);
         }
     }
 
@@ -85,7 +85,7 @@ public:
         mDelegate = nullptr;
     }
 
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
+    CHIP_ERROR ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type,
                              Resolver::CacheBypass dnssdCacheBypass = CacheBypass::Off) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;

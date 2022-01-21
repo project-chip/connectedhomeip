@@ -17,51 +17,54 @@
 
 #pragma once
 
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 
 namespace chip {
 
-using CompressedFabricId = uint64_t;
 using FabricId           = uint64_t;
-
-constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 
 constexpr FabricId kUndefinedFabricId = 0ULL;
 constexpr uint16_t kUndefinedVendorId = 0U;
 
-/// A peer is identified by a node id within a compressed fabric ID
+/// A peer is identified by a node id within a fabric.
 class PeerId
 {
 public:
-    PeerId() {}
+    PeerId() : mNodeId(kUndefinedNodeId), mFabricIndex(kUndefinedFabricIndex) {}
+    PeerId(NodeId nodeId, FabricIndex fabricIndex) : mNodeId(nodeId), mFabricIndex(fabricIndex) {}
+
+    PeerId(const PeerId &) = default;
+    PeerId(PeerId &&) = default;
+    PeerId & operator=(const PeerId &) = default;
+    PeerId & operator=(PeerId &&) = default;
 
     NodeId GetNodeId() const { return mNodeId; }
-    PeerId & SetNodeId(NodeId id)
-    {
-        mNodeId = id;
-        return *this;
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    bool operator==(const PeerId & other) const {
+        if (mFabricIndex == kUndefinedFabricIndex)
+        {
+            if (mNodeId == kUndefinedNodeId || other.mNodeId == kUndefinedNodeId)
+            {
+                return false; // (kUndefinedFabricIndex, kUndefinedNodeId) are not equal to each other.
+            }
+            else
+            {
+                return mNodeId == other.mNodeId;
+            }
+        }
+        else
+        {
+            return (mNodeId == other.mNodeId) && (mFabricIndex == other.mFabricIndex);
+        }
     }
 
-    CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
-    PeerId & SetCompressedFabricId(CompressedFabricId id)
-    {
-        mCompressedFabricId = id;
-        return *this;
-    }
-
-    bool operator==(const PeerId & other) const
-    {
-        return (mNodeId == other.mNodeId) && (mCompressedFabricId == other.mCompressedFabricId);
-    }
-    bool operator!=(const PeerId & other) const
-    {
-        return (mNodeId != other.mNodeId) || (mCompressedFabricId != other.mCompressedFabricId);
-    }
+    bool operator!=(const PeerId & other) const { return !(*this == other); }
 
 private:
-    NodeId mNodeId = kUndefinedNodeId;
-
-    CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
+    NodeId mNodeId;
+    FabricIndex mFabricIndex;
 };
 
 } // namespace chip

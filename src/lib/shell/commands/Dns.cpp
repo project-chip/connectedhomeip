@@ -44,7 +44,7 @@ public:
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
-                        ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+                        ChipLogValueX64(nodeData.mPeerInfo.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerInfo.GetNodeId()));
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.mHostName);
         for (size_t i = 0; i < nodeData.mNumIPs; ++i)
         {
@@ -65,7 +65,7 @@ public:
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.mSupportsTcp ? "yes" : "no");
     }
 
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
+    void OnNodeIdResolutionFailed(const PeerInfo & peerInfo, CHIP_ERROR error) override {}
 
     void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override
     {
@@ -122,11 +122,8 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Resolving ...\r\n");
 
-    PeerId peerId;
-    peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
-    peerId.SetNodeId(strtoull(argv[1], NULL, 10));
-
-    return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny, Dnssd::Resolver::CacheBypass::On);
+    PeerInfo peerInfo(strtoull(argv[1], NULL, 10), strtoull(argv[0], NULL, 10));
+    return sResolverProxy.ResolveNodeId(peerInfo, Inet::IPAddressType::kAny, Dnssd::Resolver::CacheBypass::On);
 }
 
 bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)

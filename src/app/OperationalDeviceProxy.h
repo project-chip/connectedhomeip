@@ -87,7 +87,7 @@ public:
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mInitParams  = params;
         mPeerId      = peerId;
-        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
+        mFabricInfo  = params.fabricTable->FindFabricWithIndex(peerId.GetFabricIndex());
 
         mState = State::NeedsAddress;
     }
