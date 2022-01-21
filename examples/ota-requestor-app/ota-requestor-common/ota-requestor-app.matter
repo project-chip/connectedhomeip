@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 0;
-    CHAR_STRING value = 1;
+    CHAR_STRING<16> label = 0;
+    CHAR_STRING<16> value = 1;
 }
 
 server cluster Basic = 40 {
@@ -22,24 +22,24 @@ server cluster Basic = 40 {
   }
 
   readonly attribute int16u interactionModelVersion = 0;
-  readonly attribute char_string vendorName = 1;
+  readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string productName = 3;
+  readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string nodeLabel = 5;
-  attribute char_string location = 6;
+  attribute char_string<32> nodeLabel = 5;
+  attribute char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string softwareVersionString = 10;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly global attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -64,8 +64,8 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -101,8 +101,9 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -161,10 +162,10 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -245,7 +246,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING updateToken = 0;
@@ -337,7 +338,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   info event DownloadError = 2 {
     INT32U softwareVersion = 0;
     INT64U bytesDownloaded = 1;
-    INT8U progressPercent = 2;
+    nullable INT8U progressPercent = 2;
     nullable INT64S platformCode = 3;
   }
 
@@ -345,7 +346,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute int8u updateStateProgress = 3;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
     node_id providerNodeId = 0;
@@ -372,21 +373,28 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  struct NOCStruct {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING noc = 1;
+    OCTET_STRING icac = 2;
+  }
+
   struct FabricDescriptor {
-    INT8U fabricIndex = 0;
-    OCTET_STRING rootPublicKey = 1;
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
-    CHAR_STRING label = 5;
+    CHAR_STRING<32> label = 5;
   }
 
+  readonly attribute NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptor fabricsList[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute fabric_idx currentFabricIndex = 5;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
@@ -460,9 +468,36 @@ server cluster OperationalCredentials = 62 {
   command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
 }
 
+server cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 
@@ -475,6 +510,7 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
   server  cluster OtaSoftwareUpdateRequestor;
   server  cluster OperationalCredentials;
+  server  cluster TimeFormatLocalization;
   server  cluster UserLabel;
 }
 

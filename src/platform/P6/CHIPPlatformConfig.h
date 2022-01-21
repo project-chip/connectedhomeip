@@ -48,7 +48,7 @@
 #define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
 #define CHIP_CONFIG_TIME_ENABLE_SERVER 0
 
-#define ChipDie() abort()
+#define CHIP_CONFIG_ABORT() abort()
 
 // ==================== Security Adaptations ====================
 

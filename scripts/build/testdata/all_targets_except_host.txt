@@ -14,6 +14,7 @@ android-arm64-chip-tv-casting-app
 android-arm64-chip-tvserver
 android-x64-chip-tool
 android-x86-chip-tool
+cyw30739-cyw930739m2evb_01-light
 efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock

@@ -21,6 +21,7 @@
  */
 
 #include <app/AttributeAccessInterface.h>
+#include <app/EventLogging.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/OTARequestorInterface.h>
@@ -85,7 +86,7 @@ EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    // Find all endpoints that has OtaSoftwareUpdateRequestor implemented
+    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         OTAUpdateStateEnum currentValue;
@@ -102,17 +103,18 @@ EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
     return status;
 }
 
-EmberAfStatus OtaRequestorServerSetUpdateStateProgress(uint8_t value)
+EmberAfStatus OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    // Find all endpoints that has OtaSoftwareUpdateRequestor implemented
+    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         app::DataModel::Nullable<uint8_t> currentValue;
         status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
         VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
-        if (currentValue.IsNull() || currentValue.Value() != value)
+
+        if (currentValue != value)
         {
             status = Attributes::UpdateStateProgress::Set(endpoint, value);
             VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
@@ -120,6 +122,62 @@ EmberAfStatus OtaRequestorServerSetUpdateStateProgress(uint8_t value)
     }
 
     return status;
+}
+
+void OtaRequestorServerOnStateTransition(DataModel::Nullable<OTAUpdateStateEnum> previousState, OTAUpdateStateEnum newState,
+                                         OTAChangeReasonEnum reason, DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
+{
+    if (!previousState.IsNull() && previousState.Value() == newState)
+    {
+        ChipLogError(Zcl, "Previous state and new state are the same, no event to log");
+        return;
+    }
+
+    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
+    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    {
+        Events::StateTransition::Type event{ previousState, newState, reason, targetSoftwareVersion };
+        EventNumber eventNumber;
+
+        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(Zcl, "Failed to record StateTransition event: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+void OtaRequestorServerOnVersionApplied(uint32_t softwareVersion, uint16_t productId)
+{
+    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
+    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    {
+        Events::VersionApplied::Type event{ softwareVersion, productId };
+        EventNumber eventNumber;
+
+        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(Zcl, "Failed to record VersionApplied event: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
+                                       DataModel::Nullable<uint8_t> progressPercent, DataModel::Nullable<int64_t> platformCode)
+{
+    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
+    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    {
+        Events::DownloadError::Type event{ softwareVersion, bytesDownloaded, progressPercent, platformCode };
+        EventNumber eventNumber;
+
+        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(Zcl, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------

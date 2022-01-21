@@ -5297,17 +5297,17 @@ class AccessControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
-                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=AccessControl.Structs.AccessControlEntry),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]),
                     ])
 
             adminFabricIndex: 'uint' = 0
-            adminNodeID: 'uint' = 0
-            adminPasscodeID: 'uint' = 0
+            adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
+            adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
-            latestValue: 'AccessControl.Structs.AccessControlEntry' = field(default_factory=lambda: AccessControl.Structs.AccessControlEntry())
+            latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]' = NullValue
 
         @dataclass
         class AccessControlExtensionChanged(ClusterEvent):
@@ -5324,17 +5324,17 @@ class AccessControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
-                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=AccessControl.Structs.ExtensionEntry),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]),
                     ])
 
             adminFabricIndex: 'uint' = 0
-            adminNodeID: 'uint' = 0
-            adminPasscodeID: 'uint' = 0
+            adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
+            adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
-            latestValue: 'AccessControl.Structs.ExtensionEntry' = field(default_factory=lambda: AccessControl.Structs.ExtensionEntry())
+            latestValue: 'typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]' = NullValue
 
 
 @dataclass
@@ -7031,13 +7031,13 @@ class OtaSoftwareUpdateRequestor(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="bytesDownloaded", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="progressPercent", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="progressPercent", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="platformCode", Tag=3, Type=typing.Union[Nullable, int]),
                     ])
 
             softwareVersion: 'uint' = 0
             bytesDownloaded: 'uint' = 0
-            progressPercent: 'uint' = 0
+            progressPercent: 'typing.Union[Nullable, uint]' = NullValue
             platformCode: 'typing.Union[Nullable, int]' = NullValue
 
 
@@ -7156,16 +7156,16 @@ class TimeFormatLocalization(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="hourFormat", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="calendarType", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="hourFormat", Tag=0x00000000, Type=TimeFormatLocalization.Enums.HourFormat),
+                ClusterObjectFieldDescriptor(Label="activeCalendarType", Tag=0x00000001, Type=typing.Optional[TimeFormatLocalization.Enums.CalendarType]),
                 ClusterObjectFieldDescriptor(Label="supportedCalendarTypes", Tag=0x00000002, Type=typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    hourFormat: 'uint' = None
-    calendarType: 'typing.Optional[uint]' = None
+    hourFormat: 'TimeFormatLocalization.Enums.HourFormat' = None
+    activeCalendarType: 'typing.Optional[TimeFormatLocalization.Enums.CalendarType]' = None
     supportedCalendarTypes: 'typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
@@ -7206,12 +7206,12 @@ class TimeFormatLocalization(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=TimeFormatLocalization.Enums.HourFormat)
 
-            value: 'uint' = 0
+            value: 'TimeFormatLocalization.Enums.HourFormat' = 0
 
         @dataclass
-        class CalendarType(ClusterAttributeDescriptor):
+        class ActiveCalendarType(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x002C
@@ -7222,9 +7222,9 @@ class TimeFormatLocalization(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[TimeFormatLocalization.Enums.CalendarType])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[TimeFormatLocalization.Enums.CalendarType]' = None
 
         @dataclass
         class SupportedCalendarTypes(ClusterAttributeDescriptor):
@@ -12419,6 +12419,7 @@ class OperationalCredentials(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="NOCs", Tag=0x00000000, Type=typing.List[OperationalCredentials.Structs.NOCStruct]),
                 ClusterObjectFieldDescriptor(Label="fabricsList", Tag=0x00000001, Type=typing.List[OperationalCredentials.Structs.FabricDescriptor]),
                 ClusterObjectFieldDescriptor(Label="supportedFabrics", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
@@ -12429,6 +12430,7 @@ class OperationalCredentials(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    NOCs: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = None
     fabricsList: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = None
     supportedFabrics: 'uint' = None
     commissionedFabrics: 'uint' = None
@@ -12482,10 +12484,12 @@ class OperationalCredentials(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="noc", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="icac", Tag=2, Type=bytes),
                     ])
 
             fabricIndex: 'uint' = 0
             noc: 'bytes' = b""
+            icac: 'bytes' = b""
 
 
 
@@ -12705,6 +12709,22 @@ class OperationalCredentials(Cluster):
 
 
     class Attributes:
+        @dataclass
+        class NOCs(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[OperationalCredentials.Structs.NOCStruct])
+
+            value: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = field(default_factory=lambda: [])
+
         @dataclass
         class FabricsList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
