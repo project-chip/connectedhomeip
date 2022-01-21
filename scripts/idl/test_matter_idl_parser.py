@@ -70,6 +70,7 @@ class TestParser(unittest.TestCase):
                 CHAR_STRING astring = 1;
                 optional CLUSTER_ID idlist[] = 2;
                 nullable int valueThatIsNullable = 0x123;
+                char_string<123> sized_string = 222;
             }
         """)
 
@@ -82,6 +83,7 @@ class TestParser(unittest.TestCase):
                             [FieldAttribute.OPTIONAL])),
                         Field(data_type=DataType(name="int"), code=0x123, name="valueThatIsNullable", attributes=set(
                             [FieldAttribute.NULLABLE])),
+                        Field(data_type=DataType(name="char_string", max_length=123), code=222, name="sized_string", attributes=set()),
                    ])]
         )
         self.assertEqual(actual, expected)
