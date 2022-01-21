@@ -318,7 +318,8 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 #endif
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
-    if (!aShuttingDown) {
+    if (!aShuttingDown)
+    {
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
         // OpenCommissioningWindow) that will call StartAdvertisement as needed.
