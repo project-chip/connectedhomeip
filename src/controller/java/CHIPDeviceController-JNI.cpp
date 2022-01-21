@@ -677,4 +677,3 @@ CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jobje
 exit:
     return err;
 }
-
