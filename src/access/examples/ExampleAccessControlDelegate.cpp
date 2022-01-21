@@ -128,31 +128,15 @@ public:
     }
 
 public:
-    static constexpr uint8_t kTagNode = 1;
-
     CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
     {
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagNode), mNode));
-
-        return writer.EndContainer(container);
+        return writer.Put(chip::TLV::AnonymousTag(), mNode);
     }
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
     {
         ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INTERNAL);
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        // mNode
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagNode)));
-        ReturnErrorOnFailure(reader.Get(mNode));
-
-        return reader.ExitContainer(container);
+        return reader.Get(mNode);
     }
 
 private:
@@ -211,36 +195,20 @@ public:
     }
 
 public:
-    static constexpr uint8_t kTagCluster    = 1;
-    static constexpr uint8_t kTagDeviceType = 2;
-
     CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
     {
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagCluster), mCluster));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagDeviceType), mDeviceType));
-
-        return writer.EndContainer(container);
+        ReturnErrorOnFailure(writer.Put(chip::TLV::AnonymousTag(), mCluster));
+        return writer.Put(chip::TLV::AnonymousTag(), mDeviceType);
     }
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
     {
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INTERNAL);
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
         // mCluster
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagCluster)));
+        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
         ReturnErrorOnFailure(reader.Get(mCluster));
         // mFabricIndex
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagDeviceType)));
-        ReturnErrorOnFailure(reader.Get(mDeviceType));
-
-        return reader.ExitContainer(container);
+        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
+        return reader.Get(mDeviceType);
     }
 
 private:
@@ -559,7 +527,7 @@ public:
     {
         uint8_t buffer[kStorageBufferSize] = { 0 };
         chip::TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        writer.Init(buffer);
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
 
@@ -597,8 +565,7 @@ public:
         chip::TLV::TLVReader reader;
         reader.Init(buffer, bufferSize);
 
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Structure, chip::TLV::AnonymousTag()));
 
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
@@ -618,8 +585,7 @@ public:
 
         // mSubjects
         chip::TLV::TLVType innerContainer;
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagSubjects)));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Array, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Array, chip::TLV::ContextTag(kTagSubjects)));
         ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
         for (size_t i = 0; i < kMaxSubjects; ++i)
         {
@@ -628,8 +594,7 @@ public:
         ReturnErrorOnFailure(reader.ExitContainer(innerContainer));
 
         // mTargets
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagTargets)));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Array, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Array, chip::TLV::ContextTag(kTagTargets)));
         ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
         for (size_t i = 0; i < kMaxTargets; ++i)
         {
@@ -1275,8 +1240,7 @@ private:
         chip::TLV::TLVReader reader;
         reader.Init(buffer, size);
 
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::kTLVType_Structure, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
 
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
@@ -1301,7 +1265,7 @@ private:
 
         uint8_t buffer[kStorageBufferSize] = { 0 };
         chip::TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        writer.Init(buffer);
         chip::DefaultStorageKeyAllocator key;
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
