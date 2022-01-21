@@ -184,7 +184,8 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     {
         return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
     }
-    if (id == EMBER_AF_INVALID_ENDPOINT) {
+    if (id == EMBER_AF_INVALID_ENDPOINT)
+    {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
 
