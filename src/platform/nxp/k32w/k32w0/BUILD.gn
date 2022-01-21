@@ -50,6 +50,13 @@ static_library("k32w0") {
     "ble_function_mux.c",
   ]
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
   deps = []
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

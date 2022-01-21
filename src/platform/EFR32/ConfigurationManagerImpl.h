@@ -77,10 +77,12 @@ private:
     static void DoFactoryReset(intptr_t arg);
 };
 
+#ifndef SL_WIFI
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+#endif /* SL_WIFI */
 } // namespace DeviceLayer
 } // namespace chip

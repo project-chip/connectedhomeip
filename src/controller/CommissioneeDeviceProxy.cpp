@@ -58,9 +58,8 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParametersIfNeeded(bool & d
     {
         if (mSecureSession)
         {
-            Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Get());
             // Check if the connection state has the correct transport information
-            if (secureSession->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
+            if (mSecureSession->AsSecureSession()->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
             {
                 mState = ConnectionState::NotConnected;
                 ReturnErrorOnFailure(LoadSecureSessionParameters());
@@ -86,12 +85,9 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
     return commandObj->SendCommandRequest(mSecureSession.Get());
 }
 
-void CommissioneeDeviceProxy::OnSessionReleased(SessionHandle session)
+void CommissioneeDeviceProxy::OnSessionReleased()
 {
-    VerifyOrReturn(mSecureSession.Contains(session),
-                   ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = ConnectionState::NotConnected;
-    mSecureSession.Release();
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
@@ -130,10 +126,26 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
         return CHIP_NO_ERROR;
     }
 
-    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Get());
+    Transport::SecureSession * secureSession = mSecureSession.Get()->AsSecureSession();
     secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommissioneeDeviceProxy::SetConnected()
+{
+    if (mState != ConnectionState::Connecting)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    mState = ConnectionState::SecureConnected;
+    bool _didLoad;
+    CHIP_ERROR err = LoadSecureSessionParametersIfNeeded(_didLoad);
+    if (err != CHIP_NO_ERROR)
+    {
+        mState = ConnectionState::NotConnected;
+    }
+    return err;
 }
 
 void CommissioneeDeviceProxy::Reset()
@@ -155,6 +167,7 @@ void CommissioneeDeviceProxy::Reset()
 CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    SessionHolder sessionHolder;
 
     if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
     {

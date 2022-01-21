@@ -214,25 +214,28 @@ bool InterfaceAddressIterator::Next()
     return false;
 }
 
-IPAddress InterfaceAddressIterator::GetAddress()
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
-    if (HasCurrent())
+    if (!HasCurrent())
     {
-        struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
-
-        if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
-        {
-            return IPAddress(*netif_ip6_addr(curIntf, mCurAddrIndex));
-        }
-#if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
-        else
-        {
-            return IPAddress(*netif_ip4_addr(curIntf));
-        }
-#endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+        return CHIP_ERROR_SENTINEL;
     }
 
-    return IPAddress::Any;
+    struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
+
+    if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
+    {
+        outIPAddress = IPAddress(*netif_ip6_addr(curIntf, mCurAddrIndex));
+        return CHIP_NO_ERROR;
+    }
+#if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+    else
+    {
+        outIPAddress = IPAddress(*netif_ip4_addr(curIntf));
+        return CHIP_NO_ERROR;
+    }
+#endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+    return CHIP_ERROR_INTERNAL;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -694,9 +697,9 @@ bool InterfaceAddressIterator::Next()
     }
 }
 
-IPAddress InterfaceAddressIterator::GetAddress()
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
-    return HasCurrent() ? IPAddress::FromSockAddr(*mCurAddr->ifa_addr) : IPAddress::Any;
+    return HasCurrent() ? IPAddress::GetIPAddressFromSockAddr(*mCurAddr->ifa_addr, outIPAddress) : CHIP_ERROR_SENTINEL;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -945,9 +948,14 @@ bool InterfaceAddressIterator::Next()
     return false;
 }
 
-IPAddress InterfaceAddressIterator::GetAddress()
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
-    return HasCurrent() ? IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr) : IPAddress::Any;
+    if (HasCurrent())
+    {
+        outIPAddress = IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_SENTINEL;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -1011,8 +1019,8 @@ InterfaceId InterfaceId::FromIPAddress(const IPAddress & addr)
 
     for (; addrIter.HasCurrent(); addrIter.Next())
     {
-        IPAddress curAddr = addrIter.GetAddress();
-        if (addr == curAddr)
+        IPAddress curAddr;
+        if ((addrIter.GetAddress(curAddr) == CHIP_NO_ERROR) && (addr == curAddr))
         {
             return addrIter.GetInterfaceId();
         }
@@ -1031,7 +1039,8 @@ bool InterfaceId::MatchLocalIPv6Subnet(const IPAddress & addr)
     for (; ifAddrIter.HasCurrent(); ifAddrIter.Next())
     {
         IPPrefix addrPrefix;
-        addrPrefix.IPAddr = ifAddrIter.GetAddress();
+        if (ifAddrIter.GetAddress(addrPrefix.IPAddr) != CHIP_NO_ERROR)
+            continue;
 #if INET_CONFIG_ENABLE_IPV4
         if (addrPrefix.IPAddr.IsIPv4())
             continue;
@@ -1044,19 +1053,6 @@ bool InterfaceId::MatchLocalIPv6Subnet(const IPAddress & addr)
     }
 
     return false;
-}
-
-void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
-{
-    if (HasCurrent())
-    {
-        addrWithPrefix.IPAddr = GetAddress();
-        addrWithPrefix.Length = GetPrefixLength();
-    }
-    else
-    {
-        addrWithPrefix = IPPrefix::Zero;
-    }
 }
 
 uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen)

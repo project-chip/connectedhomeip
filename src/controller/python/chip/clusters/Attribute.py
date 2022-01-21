@@ -417,6 +417,7 @@ class SubscriptionTransaction:
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
+        self._isDone = False
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -456,7 +457,14 @@ class SubscriptionTransaction:
         return self._onEventChangeCb
 
     def Shutdown(self):
-        self._devCtrl.ZCLShutdownSubscription(self._subscriptionId)
+        if (self._isDone):
+            print("Subscription was already terminated previously!")
+            return
+
+        handle = chip.native.GetLibraryHandle()
+        handle.pychip_ReadClient_Abort(
+            self._readTransaction._pReadClient, self._readTransaction._pReadCallback)
+        self._isDone = True
 
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
@@ -517,6 +525,12 @@ class AsyncReadTransaction:
         self._transactionType = transactionType
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet = set()
+        self._pReadClient = None
+        self._pReadCallback = None
+
+    def SetClientObjPointers(self, pReadClient, pReadCallback):
+        self._pReadClient = pReadClient
+        self._pReadCallback = pReadCallback
 
     def GetAllEventValues(self):
         return self._events
@@ -749,12 +763,14 @@ def _OnWriteDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest]) -> int:
+def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None) -> int:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncWriteTransaction(future, eventLoop)
 
     writeargs = []
     for attr in attributes:
+        if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+            raise ValueError(
+                f"Attribute {attr.__class__} must use timed write, please specify a valid timedRequestTimeoutMs value.")
         path = chip.interaction_model.AttributePathIBstruct.parse(
             b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
@@ -766,9 +782,10 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
         writeargs.append(ctypes.c_char_p(bytes(tlv)))
         writeargs.append(ctypes.c_int(len(tlv)))
 
+    transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = handle.pychip_WriteClient_WriteAttributes(
-        ctypes.py_object(transaction), device, ctypes.c_size_t(len(attributes)), *writeargs)
+        ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs)
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
@@ -795,14 +812,25 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     minInterval = 0
     maxInterval = 0
+
+    readClientObj = ctypes.POINTER(c_void_p)()
+    readCallbackObj = ctypes.POINTER(c_void_p)()
+
     if subscriptionParameters is not None:
         minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+
     res = handle.pychip_ReadClient_ReadAttributes(
-        ctypes.py_object(transaction), device,
+        ctypes.py_object(transaction),
+        ctypes.byref(readClientObj),
+        ctypes.byref(readCallbackObj),
+        device,
         ctypes.c_bool(subscriptionParameters is not None),
         ctypes.c_uint32(minInterval), ctypes.c_uint32(maxInterval),
         ctypes.c_size_t(len(attributes)), *readargs)
+
+    transaction.SetClientObjPointers(readClientObj, readCallbackObj)
+
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res

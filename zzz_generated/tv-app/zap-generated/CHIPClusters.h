@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,6 +29,19 @@
 
 namespace chip {
 namespace Controller {
+
+class DLL_EXPORT BindingCluster : public ClusterBase
+{
+public:
+    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    ~BindingCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
+                    chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+    CHIP_ERROR Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
+                      chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+};
 
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {

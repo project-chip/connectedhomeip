@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@
     MatterBooleanStatePluginServerInitCallback();                                                                                  \
     MatterBridgedActionsPluginServerInitCallback();                                                                                \
     MatterBridgedDeviceBasicPluginServerInitCallback();                                                                            \
+    MatterChannelPluginServerInitCallback();                                                                                       \
     MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterContentLauncherPluginServerInitCallback();                                                                               \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
@@ -53,12 +54,13 @@
     MatterIlluminanceMeasurementPluginServerInitCallback();                                                                        \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterLowPowerPluginServerInitCallback();                                                                                      \
     MatterMediaInputPluginServerInitCallback();                                                                                    \
     MatterMediaPlaybackPluginServerInitCallback();                                                                                 \
     MatterModeSelectPluginServerInitCallback();                                                                                    \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
-    MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
     MatterOnOffPluginServerInitCallback();                                                                                         \
@@ -72,7 +74,6 @@
     MatterScenesPluginServerInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterSwitchPluginServerInitCallback();                                                                                        \
-    MatterTvChannelPluginServerInitCallback();                                                                                     \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterTestClusterPluginServerInitCallback();                                                                                   \

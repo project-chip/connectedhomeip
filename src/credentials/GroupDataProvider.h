@@ -16,12 +16,14 @@
  */
 #pragma once
 
+#include <algorithm>
+#include <stdint.h>
+#include <sys/types.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <stdint.h>
-#include <sys/types.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -30,9 +32,6 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    static constexpr uint16_t kMaxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC;
-    static constexpr uint16_t kMaxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC;
-
     struct GroupInfo
     {
         static constexpr size_t kGroupNameMax = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
@@ -195,12 +194,20 @@ public:
     using EndpointIterator  = Iterator<GroupEndpoint>;
     using KeySetIterator    = Iterator<KeySet>;
 
-    GroupDataProvider()          = default;
+    GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
+                      uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
+        mMaxGroupsPerFabric(maxGroupsPerFabric),
+        mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
+    {}
+
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
     GroupDataProvider(const GroupDataProvider &) = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
+
+    uint16_t GetMaxGroupsPerFabric() { return mMaxGroupsPerFabric; }
+    uint16_t GetMaxGroupKeysPerFabric() { return mMaxGroupKeysPerFabric; }
 
     /**
      *  Initialize the GroupDataProvider, including any persistent data store
@@ -254,6 +261,7 @@ public:
     virtual CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
     virtual CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
     virtual CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)                     = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index)                                    = 0;
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
@@ -298,6 +306,8 @@ protected:
             mListener->OnGroupAdded(fabric_index, new_group);
         }
     }
+    const uint16_t mMaxGroupsPerFabric;
+    const uint16_t mMaxGroupKeysPerFabric;
     GroupListener * mListener = nullptr;
 };
 

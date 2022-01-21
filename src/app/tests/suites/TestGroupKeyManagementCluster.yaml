@@ -1,0 +1,181 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#`
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: GroupKeyManagement Cluster Tests
+
+config:
+    cluster: "Group Key Management"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Add Group 1"
+      disabled: true
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 11
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 11
+
+    - label: "Add Group 2"
+      disabled: true
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 12
+              - name: "groupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 12
+
+    - label: "KeySetWrite 1"
+      disabled: true
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "groupKeySet"
+                value:
+                    {
+                        groupKeySetID: 101,
+                        securityPolicy: 0,
+                        epochKey0:
+                            [
+                                0xa0,
+                                0xa1,
+                                0xa2,
+                                0xa3,
+                                0xa4,
+                                0xa5,
+                                0xa6,
+                                0xa7,
+                                0xa8,
+                                0xa9,
+                                0xaa,
+                                0xab,
+                                0xac,
+                                0xad,
+                                0xae,
+                                0xaf,
+                            ],
+                        epochStartTime0: 1110000,
+                        epochKey1:
+                            [
+                                0xb0,
+                                0xb1,
+                                0xb2,
+                                0xb3,
+                                0xb4,
+                                0xb5,
+                                0xb6,
+                                0xb7,
+                                0xb8,
+                                0xb9,
+                                0xba,
+                                0xbb,
+                                0xbc,
+                                0xbd,
+                                0xbe,
+                                0xbf,
+                            ],
+                        epochStartTime1: 1110001,
+                        epochKey2:
+                            [
+                                0xc0,
+                                0xc1,
+                                0xc2,
+                                0xc3,
+                                0xc4,
+                                0xc5,
+                                0xc6,
+                                0xc7,
+                                0xc8,
+                                0xc9,
+                                0xca,
+                                0xcb,
+                                0xcc,
+                                0xcd,
+                                0xce,
+                                0xcf,
+                            ],
+                        epochStartTime2: 1110002,
+                    }
+
+    - label: "Write Group Keys"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "groupKeyMap"
+      arguments:
+          value:
+              [
+                  { fabricIndex: 1, groupId: 11, groupKeySetID: 101 },
+                  { fabricIndex: 1, groupId: 12, groupKeySetID: 102 },
+              ]
+
+    - label: "Read Group Keys"
+      disabled: true
+      command: "readAttribute"
+      attribute: "groupKeyMap"
+      response:
+          value:
+              [
+                  { fabricIndex: 1, groupId: 11, groupKeySetID: 101 },
+                  { fabricIndex: 1, groupId: 12, groupKeySetID: 102 },
+              ]
+
+    - label: "Read GroupTable"
+      disabled: true
+      command: "readAttribute"
+      attribute: "groupTable"
+      response:
+          value:
+              [
+                  {
+                      fabricIndex: 1,
+                      groupId: 11,
+                      endpoints: [1],
+                      groupName: "Group #1",
+                  },
+              ]
+
+    - label: "Read maxGroupsPerFabric"
+      command: "readAttribute"
+      attribute: "maxGroupsPerFabric"
+      response:
+          value: 1
+
+    - label: "Read maxGroupKeysPerFabric"
+      command: "readAttribute"
+      attribute: "maxGroupKeysPerFabric"
+      response:
+          value: 1

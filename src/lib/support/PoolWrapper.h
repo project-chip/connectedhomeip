@@ -47,10 +47,21 @@ public:
         return ForEachActiveObjectInner(
             &proxy, [](void * context, U * target) -> Loop { return (*static_cast<decltype(proxy) *>(context))(target); });
     }
+    template <typename Function>
+    Loop ForEachActiveObject(Function && function) const
+    {
+        static_assert(std::is_same<Loop, decltype(function(std::declval<U *>()))>::value,
+                      "The function must take const T* and return Loop");
+        auto proxy = [&](const U * target) -> Loop { return function(target); };
+        return ForEachActiveObjectInner(
+            &proxy, [](void * context, const U * target) -> Loop { return (*static_cast<decltype(proxy) *>(context))(target); });
+    }
 
 protected:
-    using Lambda                                                         = Loop (*)(void *, U *);
-    virtual Loop ForEachActiveObjectInner(void * context, Lambda lambda) = 0;
+    using Lambda                                                                    = Loop (*)(void *, U *);
+    using LambdaConst                                                               = Loop (*)(void *, const U *);
+    virtual Loop ForEachActiveObjectInner(void * context, Lambda lambda)            = 0;
+    virtual Loop ForEachActiveObjectInner(void * context, LambdaConst lambda) const = 0;
 };
 
 template <class T, size_t N, ObjectPoolMem M, typename Interface>
@@ -82,8 +93,14 @@ protected:
     {
         return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });
     }
+    virtual Loop ForEachActiveObjectInner(void * context,
+                                          typename PoolInterface<U, ConstructorArguments...>::LambdaConst lambda) const override
+    {
+        return Impl().ForEachActiveObject([&](const T * target) { return lambda(context, static_cast<const U *>(target)); });
+    }
 
-    virtual ObjectPool<T, N, M> & Impl() = 0;
+    virtual ObjectPool<T, N, M> & Impl()             = 0;
+    virtual const ObjectPool<T, N, M> & Impl() const = 0;
 };
 
 /*
@@ -107,6 +124,7 @@ public:
 
 protected:
     virtual ObjectPool<T, N, M> & Impl() override { return mImpl; }
+    virtual const ObjectPool<T, N, M> & Impl() const override { return mImpl; }
 
 private:
     ObjectPool<T, N, M> mImpl;

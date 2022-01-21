@@ -75,7 +75,7 @@ private:
     CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
-    CHIP_ERROR _GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
     void ChangeWiFiStationState(WiFiStationState newState);
     WiFiAPMode _GetWiFiAPMode(void);
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);

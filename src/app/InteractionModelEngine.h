@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicitied IM message, and
+ *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicited IM message, and
  *      manage different kinds of IM client and handlers.
  *
  */
@@ -96,24 +96,6 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
-     *  Creates a new read client and send ReadRequest message to the node using the read client,
-     *  shutdown if fail to send it out
-     *
-     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
-
-    /**
-     *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
-     *  Shuts down on transmission failure.
-     *
-     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
-
-    /**
      * Tears down an active subscription.
      *
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
@@ -129,58 +111,12 @@ public:
      */
     CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
-    /**
-     *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
-     *  see WriteClient documentation for lifetime handling.
-     *
-     *  The Write interaction is more like Invoke interaction (cluster specific commands) since it will include cluster specific
-     * payload, and may have the need to encode non-scalar values (like structs and arrays). Thus we use WriteClientHandle to
-     * prevent user's code from leaking WriteClients.
-     *
-     *  @param[out]    apWriteClient    A pointer to the WriteClient object.
-     *
-     *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback,
-                              const Optional<uint16_t> & aTimedWriteTimeoutMs = NullOptional);
-
-    /**
-     *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
-     *
-     *  @param[in,out] 	apReadClient	      A double pointer to a ReadClient that is updated to point to a valid ReadClient
-     *                                      on successful completion of this function. On failure, it will be updated to point to
-     *                                      nullptr.
-     *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
-     *  @param[in]      aCallback           If not-null, permits overriding the default delegate registered with the
-     *                                      InteractionModelEngine that will be used by the ReadClient.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                             ReadClient::Callback * aCallback);
-
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
-    uint32_t GetNumActiveReadClients() const;
 
     uint32_t GetNumActiveWriteHandlers() const;
-    uint32_t GetNumActiveWriteClients() const;
 
     ReadHandler* GetActiveHandler(unsigned int aIndex);
-
-    /**
-     *  Get read client index in mReadClients
-     *
-     *  @param[in]    apReadClient    A pointer to a read client object.
-     *
-     *  @retval  the index in mReadClients array
-     */
-    uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
-
-    uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
@@ -191,9 +127,6 @@ public:
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
     CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
-    // Merges aAttributePath inside apAttributePathList if current path is overlapped with existing path in apAttributePathList
-    // Overlap means the path is superset or subset of another path
-    bool MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath);
     bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
@@ -222,6 +155,27 @@ public:
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+    /**
+     * Add a read client to the internally tracked list of weak references. This list is used to
+     * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
+     */
+    void AddReadClient(ReadClient * apReadClient);
+
+    /**
+     * Remove a read client from the internally tracked list of weak references.
+     */
+    void RemoveReadClient(ReadClient * apReadClient);
+
+    /**
+     * Test to see if a read client is in the actively tracked list.
+     */
+    bool InActiveReadClientList(ReadClient * apReadClient);
+
+    /**
+     * Return the number of active read clients being tracked by the engine.
+     */
+    size_t GetNumActiveReadClients();
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -244,13 +198,18 @@ public:
     //
     void ShutdownActiveReads()
     {
-        for (auto & client : mReadClients)
+        for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
         {
-            if (!client.IsFree())
-            {
-                client.Shutdown();
-            }
+            readClient->mpImEngine = nullptr;
+            auto * tmpClient       = readClient->GetNextClient();
+            readClient->SetNextClient(nullptr);
+            readClient = tmpClient;
         }
+
+        //
+        // After that, we just null out our tracker.
+        //
+        mpActiveReadClientList = nullptr;
 
         mReadHandlers.ReleaseAll();
     }
@@ -319,17 +278,14 @@ private:
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
-    // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
-    // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
-    ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
-    WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
-    ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
-    ClusterInfo * mpNextAvailableClusterInfo = nullptr;
+    BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
+
+    ReadClient * mpActiveReadClientList = nullptr;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
@@ -371,7 +327,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *
  *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
  *  @param[in]    aPath                 The concrete path of the data being read.
- *  @param[in]    aAttributeReport      The TLV Builder for Cluter attribute builder.
+ *  @param[in]    aAttributeReports      The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */

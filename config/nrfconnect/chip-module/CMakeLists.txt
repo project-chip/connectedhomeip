@@ -28,6 +28,7 @@
 if (CONFIG_CHIP)
 
 include(ExternalProject)
+include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
 
 # ==============================================================================
@@ -195,6 +196,11 @@ chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
+if (CONFIG_CHIP_ROTATING_DEVICE_ID)
+    chip_gn_arg_bool  ("chip_enable_rotating_device_id"          "true")
+    chip_gn_arg_bool  ("chip_enable_additional_data_advertising" "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()
@@ -261,5 +267,17 @@ endif()
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
 
 add_dependencies(chip chip-gn)
+
+# ==============================================================================
+# Define 'chip-ota-image' target for building CHIP OTA image
+# ==============================================================================
+
+if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    chip_ota_image(chip-ota-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/app_update.bin
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/matter_ota.bin
+    )
+    add_dependencies(chip-ota-image mcuboot_sign_target)
+endif()
 
 endif() # CONFIG_CHIP

@@ -66,12 +66,12 @@ function asTestValue()
   }
 }
 
-function asObjectiveCBasicType(type)
+function asObjectiveCBasicType(type, options)
 {
   if (StringHelper.isOctetString(type)) {
-    return 'NSData *';
+    return options.hash.is_mutable ? 'NSMutableData *' : 'NSData *';
   } else if (StringHelper.isCharString(type)) {
-    return 'NSString *';
+    return options.hash.is_mutable ? 'NSMutableString *' : 'NSString *';
   } else {
     return ChipTypesHelper.asBasicType(this.chipType);
   }
@@ -161,11 +161,6 @@ async function asObjectiveCType(type, cluster, options)
   return typeStr;
 }
 
-function incrementDepth(depth)
-{
-  return depth + 1;
-}
-
 function asStructPropertyName(prop)
 {
   prop = appHelper.asLowerCamelCase(prop);
@@ -206,7 +201,6 @@ exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCType             = asObjectiveCType;
-exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;
 exports.commandHasRequiredField      = commandHasRequiredField;

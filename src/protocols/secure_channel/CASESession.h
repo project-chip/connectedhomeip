@@ -156,17 +156,11 @@ public:
      **/
     CHIP_ERROR FromCachable(const CASESessionCachable & output);
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
@@ -226,8 +220,15 @@ private:
 
     void CloseExchange();
 
-    // TODO: Remove this and replace with system method to retrieve current time
-    CHIP_ERROR SetEffectiveTime(void);
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
+
+    CHIP_ERROR GetHardcodedTime();
+
+    CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle & msg);
@@ -249,7 +250,6 @@ private:
     uint8_t mIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     FabricTable * mFabricsTable = nullptr;
     FabricInfo * mFabricInfo    = nullptr;

@@ -175,6 +175,7 @@ public:
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
+    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
 
 private:
     friend class TestReadInteraction;
@@ -253,7 +254,11 @@ private:
     uint64_t mSubscriptionId            = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
-    Optional<SessionHandle> mSessionHandle;
+    SessionHolder mSessionHandle;
+    // mHoldReport is used to prevent subscription data delivery while we are
+    // waiting for the min reporting interval to elapse.  If we have to send a
+    // report immediately due to an urgent event being queued,
+    // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;
@@ -263,7 +268,12 @@ private:
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
-    bool mHoldSync                                           = false;
+    // mHoldSync is used to prevent subscription empty report delivery while we
+    // are waiting for the max reporting interval to elaps.  When mHoldSync
+    // becomes false, we are allowed to send an empty report to keep the
+    // subscription alive on the client.
+    bool mHoldSync                   = false;
+    uint32_t mLastWrittenEventsBytes = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;

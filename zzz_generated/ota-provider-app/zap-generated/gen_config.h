@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_FIXED_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -47,6 +48,11 @@
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING
+
+// Use this macro to check if the server side of the Localization Configuration cluster is included
+#define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION_SERVER
+#define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER

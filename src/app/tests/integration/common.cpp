@@ -27,7 +27,9 @@
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>
 
 chip::Messaging::ExchangeManager gExchangeManager;
@@ -65,7 +67,7 @@ void ShutdownChip(void)
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
-void TLVPrettyPrinter(const char * aFormat, ...)
+void ENFORCE_FORMAT(1, 2) TLVPrettyPrinter(const char * aFormat, ...)
 {
     va_list args;
 

@@ -234,7 +234,7 @@ private:
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     /**********************************************************
-     * Attributes Decleration
+     * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
 
@@ -270,3 +270,7 @@ void emberAfPluginColorControlServerXyTransitionEventHandler(chip::EndpointId en
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointId endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+void emberAfPluginLevelControlCoupledColorTempChangeCallback(chip::EndpointId endpoint);
+#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP

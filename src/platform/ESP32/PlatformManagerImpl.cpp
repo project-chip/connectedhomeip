@@ -29,6 +29,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -123,6 +124,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
@@ -182,40 +184,40 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         switch (eventId)
         {
         case WIFI_EVENT_SCAN_DONE:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaScanDone, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaScanDone));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaScanDone, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaScanDone));
             break;
         case WIFI_EVENT_STA_CONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaConnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaConnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaConnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaConnected));
             break;
         case WIFI_EVENT_STA_DISCONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaDisconnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaDisconnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaDisconnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaDisconnected));
             break;
         case WIFI_EVENT_STA_AUTHMODE_CHANGE:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaAuthModeChange, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaAuthModeChange));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaAuthModeChange, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaAuthModeChange));
             break;
         case WIFI_EVENT_STA_WPS_ER_PIN:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaWpsErPin, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaWpsErPin));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaWpsErPin, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaWpsErPin));
             break;
         case WIFI_EVENT_STA_WPS_ER_FAILED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaWpsErFailed, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaWpsErFailed));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaWpsErFailed, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaWpsErFailed));
             break;
         case WIFI_EVENT_AP_STACONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApStaConnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApStaConnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApStaConnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApStaConnected));
             break;
         case WIFI_EVENT_AP_STADISCONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApStaDisconnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApStaDisconnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApStaDisconnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApStaDisconnected));
             break;
         case WIFI_EVENT_AP_PROBEREQRECVED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApProbeReqRecved, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApProbeReqRecved));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApProbeReqRecved, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApProbeReqRecved));
             break;
         default:
             break;

@@ -41,11 +41,11 @@ ReadHandler::ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apE
 {
     mpExchangeMgr      = apExchangeContext->GetExchangeMgr();
     mpExchangeCtx      = apExchangeContext;
-    mInteractionType   = aInteractionType;
-    mInitiatorNodeId   = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mSubjectDescriptor = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
+    mInteractionType    = aInteractionType;
+    mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
     mIsPrimingReports  = true;
-
+    mLastWrittenEventsBytes = 0;
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -108,6 +108,7 @@ void ReadHandler::Close()
 
     MoveToState(HandlerState::AwaitingDestruction);
     mCallback.OnDone(*this);
+    mLastWrittenEventsBytes    = 0;
 }
 
 CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
@@ -197,12 +198,13 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
-        mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
+        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
     }
     else
     {
         VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Value(), this);
+        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+        mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
         mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -254,8 +256,8 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
 bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext)
 {
-    return (IsSubscriptionType() && GetInitiatorNodeId() == apExchangeContext.GetSessionHandle().GetPeerNodeId() &&
-            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle().GetFabricIndex());
+    return (IsSubscriptionType() && GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
+            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetFabricIndex());
 }
 
 CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -347,7 +349,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
         ClusterInfo clusterInfo;
         AttributePathIB::Parser path;
@@ -421,7 +423,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         ClusterInfo clusterInfo;
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
@@ -478,7 +480,7 @@ CHIP_ERROR ReadHandler::ProcessEventFilters(EventFilterIBs::Parser & aEventFilte
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         EventFilterIB::Parser filter;
         ReturnErrorOnFailure(filter.Init(reader));
         // this is for current node, and would have only one event filter.
@@ -531,7 +533,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
         if ((lastEventNumber != 0) && (mEventMin <= lastEventNumber))
         {
             // We have more events. snapshot last event number
-            aEventManager.SetScheduledEventNumber(mLastScheduledEventNumber);
+            aEventManager.SetScheduledEventInfo(mLastScheduledEventNumber, mLastWrittenEventsBytes);
             return false;
         }
     }

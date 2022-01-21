@@ -148,7 +148,7 @@ void DataSeriesGenerator::Generate()
                 ChipLogProgress(DataManagement, "\t -- Generating A");
 
                 Clusters::TestCluster::Attributes::Int16u::TypeInfo::Type value = instruction.mInstructionId;
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
                 break;
             }
 
@@ -159,7 +159,7 @@ void DataSeriesGenerator::Generate()
                 uint8_t buf[] = { 'h', 'e', 'l', 'l', 'o' };
                 value         = buf;
 
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
                 break;
             }
 
@@ -169,7 +169,7 @@ void DataSeriesGenerator::Generate()
                 Clusters::TestCluster::Attributes::StructAttr::TypeInfo::Type value;
                 value.a = instruction.mInstructionId;
                 value.b = true;
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
                 break;
             }
 
@@ -187,7 +187,7 @@ void DataSeriesGenerator::Generate()
                 path.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
                 value = buf;
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
                 break;
             }
 

@@ -48,19 +48,21 @@ struct VariantState : Variant<Ts...>
 
 private:
     template <typename T>
-    void Enter()
+    void Enter(bool & ever)
     {
-        if (chip::Variant<Ts...>::template Is<T>())
+        if (!ever && chip::Variant<Ts...>::template Is<T>())
         {
+            ever = true;
             chip::Variant<Ts...>::template Get<T>().Enter();
         }
     }
 
     template <typename T>
-    void Exit()
+    void Exit(bool & ever)
     {
-        if (chip::Variant<Ts...>::template Is<T>())
+        if (!ever && chip::Variant<Ts...>::template Is<T>())
         {
+            ever = true;
             chip::Variant<Ts...>::template Get<T>().Exit();
         }
     }
@@ -68,17 +70,18 @@ private:
     template <typename T>
     void GetName(const char ** name)
     {
-        if (name && chip::Variant<Ts...>::template Is<T>())
+        if (name && !*name && chip::Variant<Ts...>::template Is<T>())
         {
             *name = chip::Variant<Ts...>::template Get<T>().GetName();
         }
     }
 
     template <typename T>
-    void LogTransition(const char * previous)
+    void LogTransition(bool & ever, const char * previous)
     {
-        if (chip::Variant<Ts...>::template Is<T>())
+        if (!ever && chip::Variant<Ts...>::template Is<T>())
         {
+            ever = true;
             chip::Variant<Ts...>::template Get<T>().LogTransition(previous);
         }
     }
@@ -94,12 +97,14 @@ public:
 
     void Enter()
     {
-        [](...) {}((this->template Enter<Ts>(), 0)...);
+        bool ever = false;
+        [](...) {}((this->template Enter<Ts>(ever), 0)...);
     }
 
     void Exit()
     {
-        [](...) {}((this->template Exit<Ts>(), 0)...);
+        bool ever = false;
+        [](...) {}((this->template Exit<Ts>(ever), 0)...);
     }
 
     const char * GetName()
@@ -111,7 +116,8 @@ public:
 
     void LogTransition(const char * previous)
     {
-        [](...) {}((this->template LogTransition<Ts>(previous), 0)...);
+        bool ever = false;
+        [](...) {}((this->template LogTransition<Ts>(ever, previous), 0)...);
     }
 };
 
@@ -215,13 +221,13 @@ public:
         auto newState = mTransitions(mCurrentState, evt);
         if (newState.HasValue())
         {
-            auto oldState = mCurrentState;
-            oldState.Exit();
+            auto oldState = mCurrentState.GetName();
+            mCurrentState.Exit();
             mCurrentState = newState.Value();
-            mCurrentState.LogTransition(oldState.GetName());
+            mCurrentState.LogTransition(oldState);
             // It is impermissible to dispatch events from Exit() or
             // LogTransition(), or from the transitions table when a transition
-            // has also been returned.  Verify that this hasn't occured.
+            // has also been returned.  Verify that this hasn't occurred.
             VerifyOrDie(prev == mSequence);
             mCurrentState.Enter();
         }

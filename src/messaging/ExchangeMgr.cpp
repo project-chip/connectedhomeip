@@ -83,11 +83,9 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
-    sessionManager->RegisterReleaseDelegate(*this);
     sessionManager->SetMessageDelegate(this);
 
     mReliableMessageMgr.Init(sessionManager->SystemLayer());
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
 
@@ -107,7 +105,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
     if (mSessionManager != nullptr)
     {
         mSessionManager->SetMessageDelegate(nullptr);
-        mSessionManager->UnregisterReleaseDelegate(*this);
         mSessionManager = nullptr;
     }
 
@@ -116,7 +113,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
@@ -188,8 +185,8 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                                        System::PacketBufferHandle && msgBuf)
+                                        const SessionHandle & session, const Transport::PeerAddress & source,
+                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
@@ -312,24 +309,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
         }
     }
-}
-
-void ExchangeManager::OnSessionReleased(SessionHandle session)
-{
-    ExpireExchangesForSession(session);
-}
-
-void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
-{
-    mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSession.Contains(session))
-        {
-            ec->OnConnectionExpired();
-            // Continue to iterate because there can be multiple exchanges
-            // associated with the connection.
-        }
-        return Loop::Continue;
-    });
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

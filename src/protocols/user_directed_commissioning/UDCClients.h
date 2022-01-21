@@ -159,7 +159,7 @@ public:
             }
 
             // TODO: check length of instanceName
-            if (strncmp(stateiter.GetInstanceName(), instanceName, Dnssd::Commissionable::kInstanceNameMaxLength + 1) == 0)
+            if (strncmp(stateiter.GetInstanceName(), instanceName, Dnssd::Commission::kInstanceNameMaxLength + 1) == 0)
             {
                 state = &stateiter;
                 break;

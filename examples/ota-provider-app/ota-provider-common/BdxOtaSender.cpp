@@ -121,6 +121,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         blockData.IsEof  = (blockData.Length < blockSize) ||
             (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
         mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+        otaFile.close();
 
         VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
                        ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));

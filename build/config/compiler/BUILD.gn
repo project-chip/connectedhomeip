@@ -202,6 +202,9 @@ config("strict_warnings") {
     "-Wshadow",
     "-Wunreachable-code",
     "-Wvla",
+    "-Wformat",
+    "-Wformat-nonliteral",
+    "-Wformat-security",
   ]
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
@@ -303,9 +306,6 @@ declare_args() {
 
   # enable undefined behavior sanitizer
   is_ubsan = false
-
-  # enable libfuzzer
-  is_libfuzzer = false
 
   # Exit on sanitize error. Generally standard libraries may get errors
   # so not stopping on the first error is often useful

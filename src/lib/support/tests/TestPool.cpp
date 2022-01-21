@@ -35,10 +35,10 @@
 namespace chip {
 
 template <class POOL>
-size_t GetNumObjectsInUse(POOL & pool)
+size_t GetNumObjectsInUse(const POOL & pool)
 {
     size_t count = 0;
-    pool.ForEachActiveObject([&count](void *) {
+    pool.ForEachActiveObject([&count](const void *) {
         ++count;
         return Loop::Continue;
     });
@@ -62,20 +62,20 @@ void TestReleaseNull(nlTestSuite * inSuite, void * inContext)
 
 void TestReleaseNullStatic(nlTestSuite * inSuite, void * inContext)
 {
-    TestReleaseNull<uint32_t, 10, ObjectPoolMem::kStatic>(inSuite, inContext);
+    TestReleaseNull<uint32_t, 10, ObjectPoolMem::kInline>(inSuite, inContext);
 }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 void TestReleaseNullDynamic(nlTestSuite * inSuite, void * inContext)
 {
-    TestReleaseNull<uint32_t, 10, ObjectPoolMem::kDynamic>(inSuite, inContext);
+    TestReleaseNull<uint32_t, 10, ObjectPoolMem::kHeap>(inSuite, inContext);
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 template <typename T, size_t N, ObjectPoolMem P>
 void TestCreateReleaseObject(nlTestSuite * inSuite, void * inContext)
 {
-    ObjectPool<uint32_t, N, ObjectPoolMem::kStatic> pool;
+    ObjectPool<uint32_t, N, ObjectPoolMem::kInline> pool;
     uint32_t * obj[N];
 
     NL_TEST_ASSERT(inSuite, pool.Allocated() == 0);
@@ -104,9 +104,9 @@ void TestCreateReleaseObject(nlTestSuite * inSuite, void * inContext)
 void TestCreateReleaseObjectStatic(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const size_t kSize = 100;
-    TestCreateReleaseObject<uint32_t, kSize, ObjectPoolMem::kStatic>(inSuite, inContext);
+    TestCreateReleaseObject<uint32_t, kSize, ObjectPoolMem::kInline>(inSuite, inContext);
 
-    ObjectPool<uint32_t, kSize, ObjectPoolMem::kStatic> pool;
+    ObjectPool<uint32_t, kSize, ObjectPoolMem::kInline> pool;
     uint32_t * obj[kSize];
 
     for (size_t i = 0; i < kSize; ++i)
@@ -144,7 +144,7 @@ void TestCreateReleaseObjectStatic(nlTestSuite * inSuite, void * inContext)
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 void TestCreateReleaseObjectDynamic(nlTestSuite * inSuite, void * inContext)
 {
-    TestCreateReleaseObject<uint32_t, 100, ObjectPoolMem::kDynamic>(inSuite, inContext);
+    TestCreateReleaseObject<uint32_t, 100, ObjectPoolMem::kHeap>(inSuite, inContext);
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
@@ -201,13 +201,13 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
 
 void TestCreateReleaseStructStatic(nlTestSuite * inSuite, void * inContext)
 {
-    TestCreateReleaseStruct<ObjectPoolMem::kStatic>(inSuite, inContext);
+    TestCreateReleaseStruct<ObjectPoolMem::kInline>(inSuite, inContext);
 }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 void TestCreateReleaseStructDynamic(nlTestSuite * inSuite, void * inContext)
 {
-    TestCreateReleaseStruct<ObjectPoolMem::kDynamic>(inSuite, inContext);
+    TestCreateReleaseStruct<ObjectPoolMem::kHeap>(inSuite, inContext);
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
@@ -334,13 +334,13 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
 
 void TestForEachActiveObjectStatic(nlTestSuite * inSuite, void * inContext)
 {
-    TestForEachActiveObject<ObjectPoolMem::kStatic>(inSuite, inContext);
+    TestForEachActiveObject<ObjectPoolMem::kInline>(inSuite, inContext);
 }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 void TestForEachActiveObjectDynamic(nlTestSuite * inSuite, void * inContext)
 {
-    TestForEachActiveObject<ObjectPoolMem::kDynamic>(inSuite, inContext);
+    TestForEachActiveObject<ObjectPoolMem::kHeap>(inSuite, inContext);
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
@@ -397,23 +397,24 @@ void TestPoolInterface(nlTestSuite * inSuite, void * inContext)
 
 void TestPoolInterfaceStatic(nlTestSuite * inSuite, void * inContext)
 {
-    TestPoolInterface<ObjectPoolMem::kStatic>(inSuite, inContext);
+    TestPoolInterface<ObjectPoolMem::kInline>(inSuite, inContext);
 }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 void TestPoolInterfaceDynamic(nlTestSuite * inSuite, void * inContext)
 {
-    TestPoolInterface<ObjectPoolMem::kDynamic>(inSuite, inContext);
+    TestPoolInterface<ObjectPoolMem::kHeap>(inSuite, inContext);
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 int Setup(void * inContext)
 {
-    return SUCCESS;
+    return ::chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
 int Teardown(void * inContext)
 {
+    ::chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 

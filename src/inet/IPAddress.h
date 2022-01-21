@@ -33,10 +33,12 @@
 #include <string.h>
 #include <type_traits>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 
 #include <inet/InetConfig.h>
+#include <inet/InetError.h>
 
 #include "inet/IANAConstants.h"
 
@@ -485,6 +487,15 @@ public:
     ip_addr_t ToLwIPAddr(void) const;
 
     /**
+     * Extract the IP address as a LwIP ip_addr_t structure.
+     *
+     * If the IP address is Any, the result is IP6_ADDR_ANY unless the requested addressType is kIPv4.
+     * If the requested addressType is IPAddressType::kAny, extracts the IP address as an LwIP ip_addr_t structure.
+     * Otherwise, returns INET_ERROR_WRONG_ADDRESS_TYPE if the requested addressType does not match the IP address.
+     */
+    CHIP_ERROR ToLwIPAddr(IPAddressType addressType, ip_addr_t & outAddress) const;
+
+    /**
      * @brief   Convert the INET layer address type to its underlying LwIP type.
      *
      * @details
@@ -512,8 +523,11 @@ public:
     /**
      * Get the IP address from a SockAddr.
      */
-    static IPAddress FromSockAddr(const SockAddr & sockaddr);
-    static IPAddress FromSockAddr(const sockaddr & sockaddr) { return FromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr)); }
+    static CHIP_ERROR GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress);
+    static CHIP_ERROR GetIPAddressFromSockAddr(const sockaddr & sockaddr, IPAddress & outIPAddress)
+    {
+        return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr), outIPAddress);
+    }
     static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
 #if INET_CONFIG_ENABLE_IPV4
     static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }

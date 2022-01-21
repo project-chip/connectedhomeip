@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicitied IM message, and
+ *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicited IM message, and
  *      manage different kinds of IM client and handlers.
  *
  */
@@ -44,14 +44,9 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
-    for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
-    {
-        mClusterInfoPool[index].mpNext = &mClusterInfoPool[index + 1];
-    }
-    mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
-    mpNextAvailableClusterInfo                                      = mClusterInfoPool;
-
     mMagic++;
+
+    StatusIB::RegisterErrorFormatter();
 
     return CHIP_NO_ERROR;
 }
@@ -82,25 +77,32 @@ void InteractionModelEngine::Shutdown()
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
         return Loop::Continue;
     });
-    mTimedHandlers.ReleaseAll();
 
-    for (auto & readClient : mReadClients)
-    {
-        if (!readClient.IsFree())
-        {
-            readClient.Shutdown();
-        }
-    }
+    mTimedHandlers.ReleaseAll();
 
     mReadHandlers.ReleaseAll();
 
-    for (auto & writeClient : mWriteClients)
+    //
+    // We hold weak references to ReadClient objects. The application ultimately
+    // actually owns them, so it's on them to eventually shut them down and free them
+    // up.
+    //
+    // However, we should null out their pointers back to us at the very least so that
+    // at destruction time, they won't attempt to reach back here to remove themselves
+    // from this list.
+    //
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
-        if (!writeClient.IsFree())
-        {
-            writeClient.Shutdown();
-        }
+        readClient->mpImEngine = nullptr;
+        auto * tmpClient       = readClient->GetNextClient();
+        readClient->SetNextClient(nullptr);
+        readClient = tmpClient;
     }
+
+    //
+    // After that, we just null out our tracker.
+    //
+    mpActiveReadClientList = nullptr;
 
     for (auto & writeHandler : mWriteHandlers)
     {
@@ -108,45 +110,9 @@ void InteractionModelEngine::Shutdown()
     }
 
     mReportingEngine.Shutdown();
+    mClusterInfoPool.ReleaseAll();
 
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
-}
-
-CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                                                 ReadClient::Callback * aCallback)
-{
-    *apReadClient = nullptr;
-    for (auto & readClient : mReadClients)
-    {
-        if (readClient.IsFree())
-        {
-            CHIP_ERROR err;
-
-            *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, aCallback, aInteractionType);
-            if (CHIP_NO_ERROR != err)
-            {
-                *apReadClient = nullptr;
-            }
-            return err;
-        }
-    }
-    return CHIP_ERROR_NO_MEMORY;
-}
-
-uint32_t InteractionModelEngine::GetNumActiveReadClients() const
-{
-    uint32_t numActive = 0;
-
-    for (auto & readClient : mReadClients)
-    {
-        if (!readClient.IsFree())
-        {
-            numActive++;
-        }
-    }
-
-    return numActive;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
@@ -199,20 +165,7 @@ ReadHandler* InteractionModelEngine::GetActiveHandler(unsigned int aIndex)
     return ret;
 }
 
-uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
-{
-    uint32_t numActive = 0;
 
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
-        {
-            numActive++;
-        }
-    }
-
-    return numActive;
-}
 
 uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 {
@@ -231,54 +184,30 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
-    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
-
-    for (auto & readClient : mReadClients)
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.IsMatchingClient(aSubscriptionId))
+        if (readClient->IsSubscriptionType() && readClient->IsMatchingClient(aSubscriptionId))
         {
-            readClient.Shutdown();
-            err = CHIP_NO_ERROR;
+            readClient->Close(CHIP_NO_ERROR);
+            return CHIP_NO_ERROR;
         }
     }
 
-    return err;
+    return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
-    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
-
-    for (ReadClient & readClient : mReadClients)
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.GetFabricIndex() == aFabricIndex &&
-            readClient.GetPeerNodeId() == aPeerNodeId)
+        if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
+            readClient->GetPeerNodeId() == aPeerNodeId)
         {
-            readClient.Shutdown();
-            err = CHIP_NO_ERROR;
+            readClient->Close(CHIP_NO_ERROR);
         }
     }
 
-    return err;
-}
-
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback,
-                                                  const Optional<uint16_t> & aTimedWriteTimeoutMs)
-{
-    apWriteClient.SetWriteClient(nullptr);
-
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
-        {
-            continue;
-        }
-        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback, aTimedWriteTimeoutMs));
-        apWriteClient.SetWriteClient(&writeClient);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
+    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -354,8 +283,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             if (handler->IsFromSubscriber(*apExchangeContext))
             {
                 ChipLogProgress(InteractionModel, "Deleting previous subscription from NodeId: %" PRIx64 ", FabricId: %" PRIu8,
-                                apExchangeContext->GetSessionHandle().GetPeerNodeId(),
-                                apExchangeContext->GetSessionHandle().GetFabricIndex());
+                                apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId(),
+                                apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
                 mReadHandlers.ReleaseObject(handler);
             }
 
@@ -456,18 +385,21 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     uint64_t subscriptionId = 0;
     ReturnLogErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
 
-    for (auto & readClient : mReadClients)
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (!readClient.IsSubscriptionIdle())
+        if (!readClient->IsSubscriptionIdle())
         {
             continue;
         }
-        if (!readClient.IsMatchingClient(subscriptionId))
+
+        if (!readClient->IsMatchingClient(subscriptionId))
         {
             continue;
         }
-        return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+
+        return readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -526,90 +458,96 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                     ChipLogValueExchange(ec));
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
+void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
-    ReadClient * client = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendRequest(aReadPrepareParams);
-    if (err != CHIP_NO_ERROR)
+    apReadClient->SetNextClient(mpActiveReadClientList);
+    mpActiveReadClientList = apReadClient;
+}
+
+void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
+{
+    ReadClient * pPrevListItem = nullptr;
+    ReadClient * pCurListItem  = mpActiveReadClientList;
+
+    while (pCurListItem != apReadClient)
     {
-        client->Shutdown();
+        pPrevListItem = pCurListItem;
+        pCurListItem  = pCurListItem->GetNextClient();
     }
-    return err;
+
+    //
+    // Item must exist in this tracker list. If not, there's a bug somewhere.
+    //
+    VerifyOrDie(pCurListItem != nullptr);
+
+    if (pPrevListItem)
+    {
+        pPrevListItem->SetNextClient(apReadClient->GetNextClient());
+    }
+    else
+    {
+        mpActiveReadClientList = apReadClient->GetNextClient();
+    }
+
+    apReadClient->SetNextClient(nullptr);
 }
 
-CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
+size_t InteractionModelEngine::GetNumActiveReadClients()
 {
-    ReadClient * client = nullptr;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendRequest(aReadPrepareParams));
-    return CHIP_NO_ERROR;
+    ReadClient * pListItem = mpActiveReadClientList;
+    size_t count           = 0;
+
+    while (pListItem)
+    {
+        pListItem = pListItem->GetNextClient();
+        count++;
+    }
+
+    return count;
 }
 
-uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
+bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
 {
-    return static_cast<uint16_t>(apReadClient - mReadClients);
-}
+    ReadClient * pListItem = mpActiveReadClientList;
 
-uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const
-{
-    return static_cast<uint16_t>(apWriteClient - mWriteClients);
+    while (pListItem)
+    {
+        if (pListItem == apReadClient)
+        {
+            return true;
+        }
+
+        pListItem = pListItem->GetNextClient();
+    }
+
+    return false;
 }
 
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 {
-    ClusterInfo * lastClusterInfo = aClusterInfo;
-    if (lastClusterInfo == nullptr)
+    ClusterInfo * current = aClusterInfo;
+    while (current != nullptr)
     {
-        return;
+        ClusterInfo * next = current->mpNext;
+        mClusterInfoPool.ReleaseObject(current);
+        current = next;
     }
 
-    while (lastClusterInfo != nullptr && lastClusterInfo->mpNext != nullptr)
-    {
-        lastClusterInfo = lastClusterInfo->mpNext;
-    }
-    lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
-    mpNextAvailableClusterInfo = aClusterInfo;
-    aClusterInfo               = nullptr;
+    aClusterInfo = nullptr;
 }
 
 CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, ClusterInfo & aClusterInfo)
 {
-    ClusterInfo * last = aClusterInfoList;
-    if (mpNextAvailableClusterInfo == nullptr)
+    ClusterInfo * clusterInfo = mClusterInfoPool.CreateObject();
+    if (clusterInfo == nullptr)
     {
         ChipLogError(InteractionModel, "ClusterInfo pool full, cannot handle more entries!");
         return CHIP_ERROR_NO_MEMORY;
     }
-    aClusterInfoList           = mpNextAvailableClusterInfo;
-    mpNextAvailableClusterInfo = mpNextAvailableClusterInfo->mpNext;
-    *aClusterInfoList          = aClusterInfo;
-    aClusterInfoList->mpNext   = last;
+    *clusterInfo        = aClusterInfo;
+    clusterInfo->mpNext = aClusterInfoList;
+    aClusterInfoList    = clusterInfo;
     return CHIP_NO_ERROR;
-}
-
-bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath)
-{
-    ClusterInfo * runner = apAttributePathList;
-    while (runner != nullptr)
-    {
-        // If overlapped, we would skip this target path,
-        // --If targetPath is part of previous path, return true
-        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
-        if (runner->IsAttributePathSupersetOf(aAttributePath))
-        {
-            return true;
-        }
-        if (aAttributePath.IsAttributePathSupersetOf(*runner))
-        {
-            runner->mListIndex   = aAttributePath.mListIndex;
-            runner->mAttributeId = aAttributePath.mAttributeId;
-            return true;
-        }
-        runner = runner->mpNext;
-    }
-    return false;
 }
 
 bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)

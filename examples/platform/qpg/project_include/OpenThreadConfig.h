@@ -62,6 +62,7 @@
 #define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
 
 #define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
+#define OPENTHREAD_CONFIG_DNS_CLIENT_ENABLE 1
 #define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
 
 #define OPENTHREAD_CONFIG_LOG_LEVEL_DYNAMIC_ENABLE 0
@@ -86,4 +87,4 @@
 // NB: This file gets included during the build of OpenThread.  Hence
 // it cannot use "openthread" in the path to the included file.
 //
-#include "openthread-core-qpg6100-config.h"
+#include "openthread-core-qpg6105-config.h"

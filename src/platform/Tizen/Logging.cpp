@@ -18,6 +18,7 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 #include <dlog.h>
@@ -30,7 +31,7 @@ namespace Platform {
 /**
  * CHIP log output functions.
  */
-void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     constexpr const char * kLogTag                = "CHIP";
     char msgBuf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {

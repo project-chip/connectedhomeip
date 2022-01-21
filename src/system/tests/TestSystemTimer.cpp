@@ -442,6 +442,11 @@ static int TestSetup(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
+    if (::chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
@@ -471,6 +476,7 @@ static int TestTeardown(void * aContext)
     tcpip_finish(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 
+    ::chip::Platform::MemoryShutdown();
     return (SUCCESS);
 }
 

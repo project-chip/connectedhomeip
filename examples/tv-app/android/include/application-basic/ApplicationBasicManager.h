@@ -18,26 +18,17 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
+#include <app/clusters/application-basic-server/application-basic-server.h>
 
-#include "../endpoint-configuration/EndpointConfigurationStorage.h"
-#include "Application.h"
-#include <vector>
-
-class ApplicationBasicManager
+class ApplicationBasicManager : public chip::app::Clusters::ApplicationBasic::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, Application * application);
-    Application getApplicationForEndpoint(chip::EndpointId endpoint);
-
-    static ApplicationBasicManager & GetInstance()
-    {
-        static ApplicationBasicManager instance;
-        return instance;
-    }
-
-private:
-    EndpointConfigurationStorage * es = nullptr;
+    chip::CharSpan HandleGetVendorName() override;
+    uint16_t HandleGetVendorId() override;
+    chip::CharSpan HandleGetApplicationName() override;
+    uint16_t HandleGetProductId() override;
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication() override;
+    chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum HandleGetStatus() override;
+    chip::CharSpan HandleGetApplicationVersion() override;
+    std::list<uint16_t> HandleGetAllowedVendorList() override;
 };

@@ -25,31 +25,40 @@
 
 namespace chip {
 namespace trace {
+
 namespace {
 
+struct TraceHandlerEntry
+{
+    // Handler callback that will receive the event
+    TraceHandlerCallback callback;
+    // Registration-time context provided for the given handler
+    void * context;
+};
+
 std::mutex handlerLock;
-std::vector<TraceHandlerCallback> traceHandlers;
+std::vector<TraceHandlerEntry> traceHandlers;
 
 } // namespace
 
 void TraceEvent(const char * module, const char * label, TraceEventType eventType, const char * group, uint32_t traceId,
                 uint8_t flags, const char * dataFormat, const void * dataBuffer, size_t dataSize)
 {
-    TraceEventFields fields = { module, label, eventType, group, traceId, flags, dataFormat, dataBuffer, dataSize };
+    TraceEventFields eventFields = { module, label, eventType, group, traceId, flags, dataFormat, dataBuffer, dataSize };
     std::lock_guard<std::mutex> guard(handlerLock);
     for (const auto & handler : traceHandlers)
     {
-        if (handler(fields))
+        if (handler.callback(eventFields, handler.context))
         {
             return;
         }
     }
 }
 
-void RegisterTraceHandler(TraceHandlerCallback callback)
+void RegisterTraceHandler(TraceHandlerCallback callback, void * context)
 {
     std::lock_guard<std::mutex> guard(handlerLock);
-    traceHandlers.push_back(callback);
+    traceHandlers.push_back(TraceHandlerEntry{ callback, context });
 }
 
 void UnregisterAllTraceHandlers()

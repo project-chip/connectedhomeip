@@ -32,6 +32,10 @@
 
 #include "em_rmu.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#include "wfx_host_events.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -287,10 +291,30 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+#if CHIP_KVS_AVAILABLE
+    PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
+#endif // CHIP_KVS_AVAILABLE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
+    wfx_clear_wifi_provision();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     NVIC_SystemReset();
 }
+
+#ifdef SL_WIFI
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+    sl_wfx_mac_address_t macaddr;
+    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
+    memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -74,13 +74,13 @@ struct DeviceProxyInitParams
 class OperationalDeviceProxy;
 
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
-typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
+typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
 
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
 {
 public:
     virtual ~OperationalDeviceProxy();
-    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId)
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
         VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
@@ -124,7 +124,7 @@ public:
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased() override;
 
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
     {
@@ -143,6 +143,15 @@ public:
      */
     CHIP_ERROR Disconnect() override;
 
+    /**
+     * Use SetConnectedSession if 'this' object is a newly allocated device proxy.
+     * It will take an existing session, such as the one established
+     * during commissioning, and use it for this device proxy.
+     *
+     * Note: Avoid using this function generally as it is Deprecated
+     */
+    void SetConnectedSession(const SessionHandle & handle);
+
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
     /**
@@ -155,7 +164,7 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
@@ -210,7 +219,7 @@ private:
 
     State mState = State::Uninitialized;
 
-    SessionHolder mSecureSession;
+    SessionHolderWithDelegate mSecureSession;
 
     uint8_t mSequenceNumber = 0;
 
@@ -226,7 +235,7 @@ private:
 
     static void CloseCASESessionTask(System::Layer * layer, void * context);
 
-    void DeferCloseCASESession();
+    void CloseCASESession();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);

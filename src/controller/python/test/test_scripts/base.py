@@ -176,29 +176,29 @@ class BaseTestHelper:
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
         try:
-            commonArgs = dict(transitionTime=0, optionMask=0, optionOverride=0)
+            commonArgs = dict(transitionTime=0, optionMask=1, optionOverride=1)
 
-            # Move to 0
+            # Move to 1
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
-                                 endpoint, group, dict(**commonArgs, level=0), blocking=True)
+                                 endpoint, group, dict(**commonArgs, level=1), blocking=True)
             res = self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
                                                 attribute="CurrentLevel",
                                                 nodeid=nodeid,
                                                 endpoint=endpoint,
                                                 groupid=group)
             TestResult("Read attribute LevelControl.CurrentLevel",
-                       res).assertValueEqual(0)
+                       res).assertValueEqual(1)
 
-            # Move to 255
+            # Move to 254
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
-                                 endpoint, group, dict(**commonArgs, level=255), blocking=True)
+                                 endpoint, group, dict(**commonArgs, level=254), blocking=True)
             res = self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
                                                 attribute="CurrentLevel",
                                                 nodeid=nodeid,
                                                 endpoint=endpoint,
                                                 groupid=group)
             TestResult("Read attribute LevelControl.CurrentLevel",
-                       res).assertValueEqual(255)
+                       res).assertValueEqual(254)
 
             return True
         except Exception as ex:

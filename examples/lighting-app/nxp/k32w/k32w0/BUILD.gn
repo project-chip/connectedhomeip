@@ -76,7 +76,7 @@ k32w0_executable("light_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",

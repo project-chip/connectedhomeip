@@ -97,6 +97,7 @@ static void _logSSLError()
     unsigned long ssl_err_code = ERR_get_error();
     while (ssl_err_code != 0)
     {
+#if CHIP_ERROR_LOGGING
         const char * err_str_lib     = ERR_lib_error_string(ssl_err_code);
         const char * err_str_routine = ERR_func_error_string(ssl_err_code);
         const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
@@ -104,6 +105,7 @@ static void _logSSLError()
         {
             ChipLogError(Crypto, " ssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
         }
+#endif // CHIP_ERROR_LOGGING
         ssl_err_code = ERR_get_error();
     }
 }
@@ -170,7 +172,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO: Remove suport for AES-256 since not in 1.0
+    // TODO: Remove support for AES-256 since not in 1.0
     // Determine crypto type by key length
     type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
@@ -279,7 +281,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO: Remove suport for AES-256 since not in 1.0
+    // TODO: Remove support for AES-256 since not in 1.0
     // Determine crypto type by key length
     type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 

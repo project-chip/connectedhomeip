@@ -78,6 +78,7 @@ public:
             mOnDone(apWriteClient);
         }
 
+        chip::Platform::Delete(apWriteClient);
         // Always needs to be the last call
         chip::Platform::Delete(this);
     }
@@ -95,36 +96,41 @@ private:
  * with a small number of instantiations (one per type).
  */
 template <typename AttrType>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                          const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId, ClusterId clusterId,
+                          AttributeId attributeId, const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
-    app::WriteClientHandle handle;
-
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
-    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto client   = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
+                                                         callback.get(), aTimedWriteTimeoutMs);
 
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get(), aTimedWriteTimeoutMs));
-    if (sessionHandle.IsGroupSession())
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (sessionHandle->IsGroupSession())
     {
         ReturnErrorOnFailure(
-            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else
     {
         ReturnErrorOnFailure(
-            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
     }
 
-    ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
+    ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));
 
+    // At this point the handle will ensure our callback's OnDone is always
+    // called.
+    client.release();
     callback.release();
+
     return CHIP_NO_ERROR;
 }
 
 template <typename AttributeInfo>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
@@ -134,7 +140,7 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
 }
 
 template <typename AttributeInfo>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, uint16_t aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
@@ -144,7 +150,7 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
 }
 
 template <typename AttributeInfo, typename std::enable_if_t<!AttributeInfo::MustUseTimedWrite(), int> = 0>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {

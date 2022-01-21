@@ -193,25 +193,6 @@
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
 /**
- *  @def INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
- *
- *  @brief
- *    When this flag is set, the InetLayer enables
- *    callbacks to the upper layer notifying it when
- *    the send channel of the TCP connection changes
- *    between being idle or not idle.
- *
- *  @note
- *    When enabled, the TCP send queue is actively
- *    polled to determine if sent data has been
- *    acknowledged.
- *
- */
-#ifndef INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-#define INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS         0
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
-/**
  *  @def INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC
  *
  *  @brief

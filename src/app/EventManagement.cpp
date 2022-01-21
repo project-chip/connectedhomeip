@@ -441,7 +441,8 @@ void EventManagement::VendEventNumber()
     mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
 }
 
-CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
+CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
+                                     EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     {
@@ -456,16 +457,16 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions,
+CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
                                             EventNumber & aEventNumber)
 {
     CircularTLVWriter writer;
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint32_t requestSize           = 0;
-    aEventNumber                   = 0;
-    CircularEventBuffer checkpoint = *mpEventBuffer;
-    CircularEventBuffer * buffer   = nullptr;
-    EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    uint32_t requestSize         = 0;
+    aEventNumber                 = 0;
+    CircularTLVWriter checkpoint = writer;
+    CircularEventBuffer * buffer = nullptr;
+    EventLoadOutContext ctxt     = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
     EventOptions opts;
 #if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
     Timestamp timestamp;
@@ -525,7 +526,8 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        *mpEventBuffer = checkpoint;
+        ChipLogError(EventLogging, "Log event with error %s", ErrorStr(err));
+        writer = checkpoint;
     }
     else if (opts.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY)
     {
@@ -534,17 +536,15 @@ exit:
         mLastEventTimestamp = timestamp;
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u, endpoint id:  0x%" PRIx16
+                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%" PRIx16
                       " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), opts.mPath.mEndpointId,
                       ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId,
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        if (opts.mUrgent == EventOptions::Type::kUrgent)
-        {
-            err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDelivery(opts.mPath);
-        }
+        err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleEventDelivery(opts.mPath, opts.mUrgent,
+                                                                                                mBytesWritten);
     }
 
     return err;
@@ -560,7 +560,7 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
 
     reader.Init(aReader);
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
-    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag, kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
 
     ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(reader.EnterContainer(containerType1));
@@ -792,13 +792,14 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
     return CHIP_END_OF_TLV;
 }
 
-void EventManagement::SetScheduledEventNumber(EventNumber & aEventNumber)
+void EventManagement::SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes)
 {
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    aEventNumber = mLastEventNumber;
+    aEventNumber              = mLastEventNumber;
+    aInitialWrittenEventBytes = mBytesWritten;
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,

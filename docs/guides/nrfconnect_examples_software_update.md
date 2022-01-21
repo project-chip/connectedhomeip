@@ -69,7 +69,7 @@ Complete the following steps to perform DFU using mcumgr:
 4.  Upload the application firmware image to the device by running the following
     command in your example directory:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0
+        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0 -w 1
 
     The operation can take a few minutes. Wait until the progress bar reaches
     100%.
@@ -125,7 +125,7 @@ Complete the following steps to perform DFU using mcumgr:
 7.  Upload the network core firmware image to the device by running the
     following command in your example directory:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1
+        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1 -w 1
 
     The operation can take a few minutes. Wait until the progress bar reaches
     100%.

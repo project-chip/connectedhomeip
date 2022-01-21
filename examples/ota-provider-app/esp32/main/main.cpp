@@ -41,15 +41,11 @@
 
 #include <lib/support/ErrorStr.h>
 
-#include <BdxOtaSender.h>
 #include <app/clusters/ota-provider/ota-provider.h>
+#include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
 
-using chip::BitFlags;
-using chip::app::Clusters::OTAProviderDelegate;
-using chip::bdx::TransferControlFlags;
 using chip::Callback::Callback;
-using chip::Messaging::ExchangeManager;
 using namespace ::chip;
 using namespace ::chip::System;
 using namespace ::chip::Credentials;
@@ -64,17 +60,13 @@ namespace {
 const char * TAG               = "ota-provider-app";
 const uint8_t kMaxImagePathlen = 35;
 static DeviceCallbacks EchoCallbacks;
-BdxOtaSender bdxServer;
 
 // TODO: this should probably be done dynamically
-constexpr chip::EndpointId kOtaProviderEndpoint     = 0;
-constexpr uint32_t kMaxBdxBlockSize                 = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
-constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
-const char * otaFilename                            = CONFIG_OTA_IMAGE_NAME;
-FILE * otaImageFile                                 = NULL;
-uint32_t otaImageLen                                = 0;
-uint32_t otaTransferInProgress                      = false;
+constexpr chip::EndpointId kOtaProviderEndpoint = 0;
+const char * otaFilename                        = CONFIG_OTA_IMAGE_NAME;
+FILE * otaImageFile                             = NULL;
+uint32_t otaImageLen                            = 0;
+uint32_t otaTransferInProgress                  = false;
 static OTAProviderExample otaProvider;
 
 chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nullptr);
@@ -93,8 +85,12 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         }
         otaTransferInProgress = true;
     }
+
+    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
+    VerifyOrReturnError(bdxOtaSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
-    uint16_t transferBlockSize       = bdxServer.GetTransferBlockSize();
+    uint16_t transferBlockSize       = bdxOtaSender->GetTransferBlockSize();
 
     size = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
     if (offset + size >= otaImageLen)
@@ -167,9 +163,12 @@ extern "C" void app_main()
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
+    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
+    VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));
+
     // Register handler to handle bdx messages
     error = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
-                                                                                                          &bdxServer);
+                                                                                                          bdxOtaSender);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
@@ -180,7 +179,7 @@ extern "C" void app_main()
     callbacks.onBlockQuery       = &onBlockQueryCallback;
     callbacks.onTransferComplete = &onTransferCompleteCallback;
     callbacks.onTransferFailed   = &onTransferFailedCallback;
-    bdxServer.SetCallbacks(callbacks);
+    bdxOtaSender->SetCallbacks(callbacks);
 
     esp_vfs_spiffs_conf_t spiffs_conf = {
         .base_path              = "/spiffs",
@@ -217,14 +216,4 @@ extern "C" void app_main()
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
-
-    BitFlags<TransferControlFlags> bdxFlags;
-    bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-    error = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                         kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(BDX, "Failed to init BDX server: %s", chip::ErrorStr(error));
-        return;
-    }
 }

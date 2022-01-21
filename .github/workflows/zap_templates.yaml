@@ -27,7 +27,12 @@ jobs:
         name: ZAP templates generation
         timeout-minutes: 60
 
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-20.04
+        container:
+            image: connectedhomeip/chip-build-zap:0.5.48
+        defaults:
+            run:
+                shell: sh
         if: github.actor != 'restyled-io[bot]'
 
         steps:
@@ -35,18 +40,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Use Node.js 14.x
-              uses: actions/setup-node@v1
-              with:
-                node-version: '14.x'
-            - name: Use Java
-              uses: actions/setup-java@v2
-              with:
-                distribution: 'zulu'
-                java-version: '11'
-                java-package: jre
-            - run: sudo apt-get update
-            - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
             - name: Setup ZAP
               timeout-minutes: 5
               run: |

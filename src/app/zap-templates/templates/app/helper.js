@@ -21,11 +21,20 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const queryCommand = require(zapPath + 'db/query-command.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const queryEvents  = require(zapPath + 'db/query-event.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
+const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+
+zclHelper['isEvent'] = function(db, event_name, packageId) {
+    return queryEvents
+      .selectAllEvents(db, packageId)
+      .then(events => events.find(event => event.name == event_name))
+      .then(events => events ? 'event' : dbEnum.zclType.unknown);
+}
 
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
@@ -109,7 +118,7 @@ var endpointClusterWithInit = [
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
@@ -352,6 +361,16 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+// Not to be exported.
+function nsValueToNamespace(ns)
+{
+  if (ns == "detail") {
+    return ns;
+  }
+
+  return asUpperCamelCase(ns);
+}
+
 /*
  * @brief
  *
@@ -372,7 +391,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
   let passByReference = false;
   async function fn(pkgId)
   {
-    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + nsValueToNamespace(options.hash.ns) + '::') : '';
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
@@ -386,6 +405,10 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     if (await typeChecker('isStruct')) {
       passByReference = true;
       return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
+    if (await typeChecker('isEvent')) {
+      return ns + 'Events::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
@@ -611,13 +634,10 @@ async function getResponseCommandName(responseRef, options)
 function isWeaklyTypedEnum(label)
 {
   return [
-    "ApplicationLauncherStatus",
     "AttributeWritePermission",
-    "AudioOutputType",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
     "BootReasonType",
-    "ChangeReasonEnum",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
@@ -645,26 +665,17 @@ function isWeaklyTypedEnum(label)
     "IdentifyEffectVariant",
     "IdentifyIdentifyType",
     "InterfaceType",
-    "KeypadInputCecKeyCode",
-    "KeypadInputStatus",
     "KeypadLockout",
     "LevelControlOptions",
-    "MediaInputType",
-    "MediaPlaybackState",
-    "MediaPlaybackStatus",
     "MoveMode",
     "NetworkFaultType",
     "NodeOperationalCertStatus",
-    "OTAAnnouncementReason",
-    "OTAApplyUpdateAction",
-    "OTADownloadProtocol",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
     "PHYRateType",
     "RadioFaultType",
     "RoutingRole",
-    "RegulatoryLocationType",
     "SaturationMoveMode",
     "SaturationStepMode",
     "SecurityType",
@@ -676,11 +687,36 @@ function isWeaklyTypedEnum(label)
     "ThermostatControlSequence",
     "ThermostatRunningMode",
     "ThermostatSystemMode",
-    "UpdateStateEnum",
     "WcEndProductType",
     "WcType",
     "WiFiVersionType",
   ].includes(label);
+}
+
+function incrementDepth(depth)
+{
+  return depth + 1;
+}
+
+function hasProperty(obj, prop)
+{
+  return prop in obj;
+}
+
+async function zcl_events_fields_by_event_name(name, options)
+{
+  const { db, sessionId } = this.global;
+  const packageId         = await templateUtil.ensureZclPackageId(this)
+
+  const promise = queryEvents.selectAllEvents(db, packageId)
+                      .then(events => events.find(event => event.name == name))
+                      .then(evt => queryEvents.selectEventFieldsByEventId(db, evt.id))
+                      .then(fields => fields.map(field => {
+                        field.label = field.name;
+                        return field;
+                      }))
+                      .then(fields => templateUtil.collectBlocks(fields, options, this))
+  return templateUtil.templatePromise(this.global, promise)
 }
 
 //
@@ -693,6 +729,7 @@ exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
 exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasProperty                         = hasProperty;
 exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
@@ -701,3 +738,5 @@ exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
 exports.getResponseCommandName              = getResponseCommandName;
 exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
 exports.getPythonFieldDefault               = getPythonFieldDefault;
+exports.incrementDepth                      = incrementDepth;
+exports.zcl_events_fields_by_event_name     = zcl_events_fields_by_event_name;

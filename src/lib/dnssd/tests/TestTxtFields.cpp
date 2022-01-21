@@ -75,7 +75,7 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalActive);
 
     strcpy(key, "T");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupport);
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupported);
 
     strcpy(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);

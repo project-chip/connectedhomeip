@@ -1330,7 +1330,7 @@
  *          1 -- Message Type
  *          2 -- Exchange Id
  *          4 -- Profile Id
- *          4 -- Acknowleged Message Id
+ *          4 -- Acknowledged Message Id
  *
  *    @note A number of these fields are optional or not presently used.
  *          So most headers will be considerably smaller than this.
@@ -2307,6 +2307,15 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
+ * @def CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP groups.
+ */
+#ifndef CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE 8
+#endif // CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2425,6 +2434,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
  *      * #CHIP_IM_MAX_NUM_TIMED_HANDLER
@@ -2475,6 +2485,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
 #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#endif
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
+ *
+ * @brief Defines the maximum number of dirty set, limits the number of attributes being read or subscribed at the same time.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
+#define CHIP_IM_SERVER_MAX_NUM_DIRTY_SET 8
 #endif
 
 /**
@@ -2723,21 +2742,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
- *
- * @brief Defines the max number of SessionCreationDelegates
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES 2
-#endif
-
-/**
  * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
  *
  * @brief Defines the max number of SessionReleaseDelegate
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 4
 #endif
 
 /**
@@ -2746,7 +2756,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the max number of SessionRecoveryDelegate
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 3
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
 #endif
 
 /**
@@ -2758,6 +2768,26 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
 #define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
 #endif
+
+/**
+ * @def CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+ *
+ * @brief The number of bytes written to the event logging system that
+ *   will trigger Report Delivery.
+ *
+ * The configuration captures the number of bytes written to the event
+ * logging subsystem needed to trigger a report. For example, if an application wants to offload all DEBUG events
+ * reliably, the threshold should be set to less than the size of the
+ * DEBUG buffer (plus a slop factor to account for events generated
+ * during the scheduling and event offload).  Similarly, if the
+ * application does not want to drop INFO events, the threshold should
+ * be set to the sum of DEBUG and INFO buffers (with the same
+ * correction).
+ *
+ */
+#ifndef CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+#define CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD 512
+#endif /* CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD */
 
 /**
  * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT

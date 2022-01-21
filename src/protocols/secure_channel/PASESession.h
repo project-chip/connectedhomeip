@@ -90,8 +90,8 @@ public:
 
     virtual ~PASESession();
 
-    // TODO: The SetPeerNodeId method should not be exposed; we should not need
-    // to associate a node ID with a PASE session.
+    // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
+    // should not need to be told their peer node ID
     using PairingSession::SetPeerNodeId;
 
     /**
@@ -165,7 +165,7 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param session     Referene to the secure session that will be
+     * @param session     Reference to the secure session that will be
      *                    initialized once pairing is complete
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
@@ -201,8 +201,6 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     /**
      * @brief
@@ -229,11 +227,7 @@ public:
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
 private:
     enum Spake2pErrorType : uint8_t
@@ -269,6 +263,12 @@ private:
 
     void CloseExchange();
 
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
+
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
@@ -299,8 +299,6 @@ private:
     uint8_t * mSalt          = nullptr;
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 

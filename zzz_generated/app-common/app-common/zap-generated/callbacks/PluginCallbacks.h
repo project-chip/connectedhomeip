@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -65,10 +65,8 @@ void __attribute__((weak)) MatterOtaSoftwareUpdateRequestorPluginClientInitCallb
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback();
-void __attribute__((weak)) MatterLocalizationTimeFormatPluginClientInitCallback() {}
-void MatterLocalizationTimeFormatPluginServerInitCallback();
-void __attribute__((weak)) MatterLocalizationUnitPluginClientInitCallback() {}
-void MatterLocalizationUnitPluginServerInitCallback();
+void __attribute__((weak)) MatterTimeFormatLocalizationPluginClientInitCallback() {}
+void MatterTimeFormatLocalizationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
 void MatterPowerSourceConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}
@@ -217,8 +215,8 @@ void __attribute__((weak)) MatterIasWdPluginClientInitCallback() {}
 void MatterIasWdPluginServerInitCallback();
 void __attribute__((weak)) MatterWakeOnLanPluginClientInitCallback() {}
 void MatterWakeOnLanPluginServerInitCallback();
-void __attribute__((weak)) MatterTvChannelPluginClientInitCallback() {}
-void MatterTvChannelPluginServerInitCallback();
+void __attribute__((weak)) MatterChannelPluginClientInitCallback() {}
+void MatterChannelPluginServerInitCallback();
 void __attribute__((weak)) MatterTargetNavigatorPluginClientInitCallback() {}
 void MatterTargetNavigatorPluginServerInitCallback();
 void __attribute__((weak)) MatterMediaPlaybackPluginClientInitCallback() {}

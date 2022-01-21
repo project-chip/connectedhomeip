@@ -237,7 +237,7 @@ struct GroupMembershipResponse
                     {
                         if (mapping.endpoint_id == mEndpoint)
                         {
-                            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag, mapping.group_id));
+                            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                             matchCount++;
                             ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group_id);
                         }
@@ -252,7 +252,7 @@ struct GroupMembershipResponse
                         {
                             if (mapping.endpoint_id == mEndpoint && mapping.group_id == iter.GetValue())
                             {
-                                ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag, mapping.group_id));
+                                ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                                 matchCount++;
                                 ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group_id);
                                 break;
@@ -342,7 +342,6 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
 #ifdef EMBER_AF_PLUGIN_SCENES
     {
         GroupDataProvider::EndpointIterator * iter = provider->IterateEndpoints(fabricIndex);
-        ;
         GroupDataProvider::GroupEndpoint mapping;
 
         VerifyOrExit(nullptr != iter, status = EMBER_ZCL_STATUS_FAILURE);

@@ -92,59 +92,21 @@
  * @return Returns pointer to the attribute metadata location.
  */
 EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                          chip::AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
-
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-/** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
-                              uint16_t manufacturerCode);
-#else
-#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode)                                         \
-    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, manufacturerCode) != NULL)
-#endif
-
-/**
- * @brief Returns true if endpoint contains a cluster, checking for mfg code.
- *
- * This function returns true regardless of whether
- * the endpoint contains server, client or both.
- * For standard libraries (when ClusterId < FC00),
- * the manufacturerCode is ignored.
- */
-bool emberAfContainsClusterWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
+                                                          chip::AttributeId attributeId, uint8_t mask);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
  *
  * This function returns true regardless of whether
  * the endpoint contains server, client or both in the Zigbee cluster Library.
- * This wraps emberAfContainsClusterWithMfgCode with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Returns true if endpoint has cluster server, checking for mfg code.
- *
- * This function returns true if
- * the endpoint contains server of a given cluster.
- * For standard librarys (when ClusterId < FC00), the manufacturerCode is ignored.
- */
-bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL server with specified id.
  *
  * This function returns true if
  * the endpoint contains server of a given cluster.
- * This wraps emberAfContainsServer with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
@@ -160,25 +122,10 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
 /**
- * @brief Returns true if endpoint contains cluster client.
- *
- * This function returns true if
- * the endpoint contains client of a given cluster.
- * For standard library clusters (when ClusterId < FC00),
- * the manufacturerCode is ignored.
- */
-bool emberAfContainsClientWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
-
-/**
  * @brief Returns true if endpoint contains the ZCL client with specified id.
  *
  * This function returns true if
  * the endpoint contains client of a given cluster.
- * This wraps emberAfContainsClient with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
@@ -198,8 +145,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * to perform the given operation.
  *
  * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
@@ -213,8 +158,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  * is used frequently throughout the framework
  *
  * @see emberAfWriteClientAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfWriteServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType);
@@ -228,43 +171,9 @@ EmberAfStatus emberAfWriteServerAttribute(chip::EndpointId endpoint, chip::Clust
  * is used frequently throughout the framework
  *
  * @see emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfWriteClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
- * @brief write a manufacturer specific server attribute.
- *
- * This function is the same as emberAfWriteAttribute
- * except that it saves having to pass the cluster mask
- * and allows passing of a manufacturer code.
- * This is useful for code savings since write attribute
- * is used frequently throughout the framework
- *
- * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute
- */
-EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                              uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
- * @brief write a manufacturer specific client attribute.
- *
- * This function is the same as emberAfWriteAttribute
- * except that it saves having to pass the cluster mask.
- * and allows passing of a manufacturer code.
- * This is useful for code savings since write attribute
- * is used frequently throughout the framework
- *
- * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
- */
-EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                              uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Function that test the success of attribute write.
@@ -281,8 +190,7 @@ EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(chip::EndpointId e
  * @param dataType ZCL attribute type.
  */
 EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
-                                          EmberAfAttributeType dataType);
+                                          uint8_t mask, uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -293,8 +201,6 @@ EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::Clust
  * value or type is not desired.
  *
  * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                    uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
@@ -308,8 +214,6 @@ EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cl
  * value or type is not desired.
  *
  * @see emberAfReadClientAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                          uint8_t * dataPtr, uint16_t readLength);
@@ -323,41 +227,9 @@ EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::Cluste
  * value or type is not desired.
  *
  * @see emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                          uint8_t * dataPtr, uint16_t readLength);
-
-/**
- * @brief Read the manufacturer-specific server attribute value, performing all checks.
- *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
- *
- * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute
- */
-EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                             chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint16_t readLength);
-
-/**
- * @brief Read the manufacturer-specific client attribute value, performing all checks.
- *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
- *
- * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
- */
-EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                             chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -380,13 +252,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
  * @param metadata EmberAfAttributeMetadata* to consider.
  */
 #define emberAfAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
-
-/**
- * @brief macro that returns true if attribute is saved to token.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsTokenized(metadata) (((metadata)->mask & ATTRIBUTE_MASK_TOKENIZE) != 0)
 
 /**
  * @brief macro that returns true if attribute is saved in external storage.
@@ -559,16 +424,6 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
  * destination buffer not including the length bytes.
  */
 void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
  * @brief Function that determines the size of a zigbee Cluster Library
@@ -640,12 +495,6 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index);
  * @return true if data type is a string.
  */
 bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType);
-
-/** @brief Returns true if the given attribute type is a string. */
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
-
-/** @brief Returns true if the given attribute type is a long string. */
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
 
 /** @brief Returns true if a given ZCL data type is a list type. */
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);

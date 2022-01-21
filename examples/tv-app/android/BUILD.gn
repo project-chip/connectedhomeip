@@ -38,6 +38,8 @@ shared_library("jni") {
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
     "include/target-navigator/TargetNavigatorManager.h",
+    "java/ChannelManager.cpp",
+    "java/ChannelManager.h",
     "java/ContentLauncherManager.cpp",
     "java/ContentLauncherManager.h",
     "java/KeypadInputManager.cpp",
@@ -49,8 +51,6 @@ shared_library("jni") {
     "java/MediaPlaybackManager.cpp",
     "java/MediaPlaybackManager.h",
     "java/TVApp-JNI.cpp",
-    "java/TvChannelManager.cpp",
-    "java/TvChannelManager.h",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
   ]
@@ -83,6 +83,11 @@ android_library("java") {
   ]
 
   sources = [
+    "java/src/com/tcl/chip/tvapp/ChannelInfo.java",
+    "java/src/com/tcl/chip/tvapp/ChannelLineupInfo.java",
+    "java/src/com/tcl/chip/tvapp/ChannelManager.java",
+    "java/src/com/tcl/chip/tvapp/ChannelManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/Clusters.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchBrandingInformation.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchManager.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchManagerStub.java",
@@ -97,11 +102,9 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/MediaInputManagerStub.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManager.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/MediaPlaybackPosition.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
-    "java/src/com/tcl/chip/tvapp/TvChannelInfo.java",
-    "java/src/com/tcl/chip/tvapp/TvChannelLineupInfo.java",
-    "java/src/com/tcl/chip/tvapp/TvChannelManager.java",
-    "java/src/com/tcl/chip/tvapp/TvChannelManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
   ]

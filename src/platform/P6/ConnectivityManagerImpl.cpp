@@ -55,6 +55,11 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
+    uint32_t curWiFiMode;
+    mWiFiStationMode = (Internal::P6Utils::wifi_get_mode(curWiFiMode) == CHIP_NO_ERROR &&
+                        (curWiFiMode == WIFI_MODE_APSTA || curWiFiMode == WIFI_MODE_STA))
+        ? kWiFiStationMode_Enabled
+        : kWiFiStationMode_Disabled;
     return mWiFiStationMode;
 }
 
@@ -153,7 +158,7 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
+CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 {
     cy_wcm_associated_ap_info_t ap_info;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -166,7 +171,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     }
 
     ChipLogProgress(DeviceLayer,
-                    "Wifi-Telemetry\n"
+                    "WiFi-Telemetry\n"
                     "BSSID: %02x:%02x:%02x:%02x:%02x:%02x\n"
                     "RSSI: %d\n"
                     "Channel: %d\n"
@@ -181,7 +186,6 @@ exit:
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
-    cy_rslt_t result              = CY_RSLT_SUCCESS;
     mLastStationConnectFailTime   = System::Clock::kZero;
     mLastAPDemandTime             = System::Clock::kZero;
     mWiFiStationMode              = kWiFiStationMode_Disabled;
@@ -208,13 +212,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
         memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD,
                min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
         wifiConfig.sta.security = CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY;
-        result                  = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-        if (result != CY_RSLT_SUCCESS)
-        {
-            ChipLogError(DeviceLayer, "p6_wifi_set_config() failed: %d", (int) result);
-            SuccessOrExit(CHIP_ERROR_INTERNAL);
-        }
-        err = CHIP_NO_ERROR;
+        err                     = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+        SuccessOrExit(err);
     }
     // Force AP mode off for now.
     err = Internal::P6Utils::SetAPMode(false);
@@ -323,7 +322,6 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
-    cy_rslt_t result = CY_RSLT_SUCCESS;
 
     memset(&wifiConfig.ap, 0, sizeof(wifi_config_ap_t));
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
@@ -336,13 +334,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     wifiConfig.ap.ip_settings.gateway    = ap_mode_ip_settings.gateway;
 
     ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
-    result = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_AP, &wifiConfig);
-    if (result != CY_RSLT_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "p6_wifi_set_config(WIFI_IF_AP) failed: %d", (int) result);
-        err = CHIP_ERROR_INTERNAL;
-        SuccessOrExit(err);
-    }
+    err = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_AP, &wifiConfig);
+    SuccessOrExit(err);
 
     err = Internal::P6Utils::p6_start_ap();
     if (err != CHIP_NO_ERROR)
@@ -478,6 +471,9 @@ void ConnectivityManagerImpl::DriveStationState()
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool stationConnected;
 
+    // Refresh the current station mode by reading the configuration from storage.
+    GetWiFiStationMode();
+
     // If the station interface is NOT under application control...
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
@@ -609,6 +605,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
                 event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
                 PlatformMgr().PostEventOrDie(&event);
+                ChipLogProgress(DeviceLayer, "IPv4 Address Assigned : %s", ip4addr_ntoa(netif_ip4_addr(net_interface)));
             }
             // Search among the IPv6 addresses assigned to the interface for a Global Unicast
             // address (2000::/3) that is in the valid state.  If such an address is found...
@@ -622,6 +619,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
                     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
                     PlatformMgr().PostEventOrDie(&event);
+                    ChipLogProgress(DeviceLayer, "IPv6 Address Assigned : %s", ip6addr_ntoa(netif_ip6_addr(net_interface, i)));
                 }
             }
         }

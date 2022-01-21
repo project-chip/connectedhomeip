@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -140,6 +140,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
+    Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("channel", writeChannelInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -693,6 +695,28 @@ public class ClusterWriteMapping {
         "writeStartUpCurrentLevelAttribute",
         writeLevelControlStartUpCurrentLevelAttributeInteractionInfo);
     writeAttributeMap.put("levelControl", writeLevelControlInteractionInfo);
+    Map<String, InteractionInfo> writeLocalizationConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeLocalizationConfigurationActiveLocaleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo localizationConfigurationactiveLocaleCommandParameterInfo =
+        new CommandParameterInfo("value", String.class);
+    writeLocalizationConfigurationActiveLocaleCommandParams.put(
+        "value", localizationConfigurationactiveLocaleCommandParameterInfo);
+    InteractionInfo writeLocalizationConfigurationActiveLocaleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LocalizationConfigurationCluster) cluster)
+                  .writeActiveLocaleAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeLocalizationConfigurationActiveLocaleCommandParams);
+    writeLocalizationConfigurationInteractionInfo.put(
+        "writeActiveLocaleAttribute",
+        writeLocalizationConfigurationActiveLocaleAttributeInteractionInfo);
+    writeAttributeMap.put(
+        "localizationConfiguration", writeLocalizationConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeLowPowerInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("lowPower", writeLowPowerInteractionInfo);
     Map<String, InteractionInfo> writeMediaInputInteractionInfo = new LinkedHashMap<>();
@@ -743,25 +767,6 @@ public class ClusterWriteMapping {
         "otaSoftwareUpdateProvider", writeOtaSoftwareUpdateProviderInteractionInfo);
     Map<String, InteractionInfo> writeOtaSoftwareUpdateRequestorInteractionInfo =
         new LinkedHashMap<>();
-    Map<String, CommandParameterInfo>
-        writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo otaSoftwareUpdateRequestordefaultOtaProviderCommandParameterInfo =
-        new CommandParameterInfo("value", byte[].class);
-    writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams.put(
-        "value", otaSoftwareUpdateRequestordefaultOtaProviderCommandParameterInfo);
-    InteractionInfo writeOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
-                  .writeDefaultOtaProviderAttribute(
-                      (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
-            },
-            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams);
-    writeOtaSoftwareUpdateRequestorInteractionInfo.put(
-        "writeDefaultOtaProviderAttribute",
-        writeOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo);
     writeAttributeMap.put(
         "otaSoftwareUpdateRequestor", writeOtaSoftwareUpdateRequestorInteractionInfo);
     Map<String, InteractionInfo> writeOccupancySensingInteractionInfo = new LinkedHashMap<>();
@@ -933,8 +938,6 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("softwareDiagnostics", writeSoftwareDiagnosticsInteractionInfo);
     Map<String, InteractionInfo> writeSwitchInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("switch", writeSwitchInteractionInfo);
-    Map<String, InteractionInfo> writeTvChannelInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("tvChannel", writeTvChannelInteractionInfo);
     Map<String, InteractionInfo> writeTargetNavigatorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("targetNavigator", writeTargetNavigatorInteractionInfo);
     Map<String, InteractionInfo> writeTemperatureMeasurementInteractionInfo = new LinkedHashMap<>();
@@ -1556,7 +1559,9 @@ public class ClusterWriteMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .writeTimedWriteBooleanAttribute(
-                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+                      (DefaultClusterCallback) callback,
+                      (Boolean) commandArguments.get("value"),
+                      10000);
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterTimedWriteBooleanCommandParams);

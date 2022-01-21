@@ -98,6 +98,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     ReturnErrorOnFailure(invokeRequestMessage.GetTimedRequest(&mTimedRequest));
     ReturnErrorOnFailure(invokeRequestMessage.GetInvokeRequests(&invokeRequests));
 
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     if (mTimedRequest != isTimedInvoke)
     {
         // The message thinks it should be part of a timed interaction but it's
@@ -105,9 +107,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
                                    /* aExpectResponse = */ false);
 
-        // Some unit tests call this function in an abnormal state when we don't
-        // even have an exchange.
-        if (err != CHIP_NO_ERROR && mpExchangeCtx)
+        if (err != CHIP_NO_ERROR)
         {
             // We have to manually close the exchange, because we called
             // WillSendMessage already.
@@ -124,7 +124,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
         ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
@@ -252,9 +252,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     SuccessOrExit(err);
 
     VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+    VerifyOrExit(mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
@@ -436,7 +437,17 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+    FabricIndex fabric = kUndefinedFabricIndex;
+    if (mpExchangeCtx->GetSessionHandle()->IsGroupSession())
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetFabricIndex();
+    }
+    else
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    }
+
+    return fabric;
 }
 
 CommandHandler * CommandHandler::Handle::Get()

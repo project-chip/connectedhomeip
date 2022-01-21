@@ -154,9 +154,9 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"));
 QNamePart txtCommissionableNodeParamsLargeBasicParts[] = { "D=22",          "VP=555+897",       "CM=1",       "DT=25",
                                                            "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3" };
 FullQName txtCommissionableNodeParamsLargeBasicName    = FullQName(txtCommissionableNodeParamsLargeBasicParts);
@@ -174,9 +174,9 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
         .SetMRPConfig(ReliableMessageProtocolConfig(3600000_ms32, 3600005_ms32));

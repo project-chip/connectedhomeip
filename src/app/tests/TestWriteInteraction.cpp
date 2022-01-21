@@ -50,7 +50,7 @@ public:
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
+    static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, bool aIsTimedWrite,
                                      System::PacketBufferHandle & aPayload);
@@ -84,7 +84,7 @@ public:
     int mOnDoneCalled    = 0;
 };
 
-void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient)
+void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
@@ -92,15 +92,15 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    err = aWriteClient->PrepareAttribute(attributePathParams);
+    err = aWriteClient.PrepareAttribute(attributePathParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::TLV::TLVWriter * writer = aWriteClient->GetAttributeDataIBTLVWriter();
+    chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataIBTLVWriter();
 
     err = writer->PutBoolean(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = aWriteClient->FinishAttribute();
+    err = aWriteClient.FinishAttribute();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -214,27 +214,21 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::WriteClient writeClient;
-    app::WriteClientHandle writeClientHandle;
-    writeClientHandle.SetWriteClient(&writeClient);
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AddAttributeDataIB(apSuite, apContext, writeClientHandle);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
 
-    err = writeClientHandle.SendWriteRequest(ctx.GetSessionBobToAlice());
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    // The internal WriteClient should be nullptr once we SendWriteRequest.
-    NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
 
     GenerateWriteResponse(apSuite, apContext, buf);
 
     err = writeClient.ProcessWriteResponseMessage(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    writeClient.Shutdown();
+    writeClient.Close();
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -246,24 +240,20 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::WriteClient writeClient;
-    app::WriteClientHandle writeClientHandle;
-    writeClientHandle.SetWriteClient(&writeClient);
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AddAttributeDataIB(apSuite, apContext, writeClientHandle);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
 
     SessionHandle groupSession = ctx.GetSessionBobToFriends();
-    NL_TEST_ASSERT(apSuite, groupSession.IsGroupSession());
+    NL_TEST_ASSERT(apSuite, groupSession->IsGroupSession());
 
-    err = writeClientHandle.SendWriteRequest(groupSession);
+    err = writeClient.SendWriteRequest(groupSession);
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    // The internal WriteClient should be shutdown once we SendWriteRequest for group.
-    NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
+    // The WriteClient should be shutdown once we SendWriteRequest for group.
+    NL_TEST_ASSERT(apSuite, writeClient.mState == WriteClient::State::AwaitingDestruction);
 }
 
 void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
@@ -317,7 +307,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 {
     TLV::TLVWriter writer;
     writer.Init(attributeDataTLV);
-    writer.CopyElement(TLV::AnonymousTag, aReader);
+    writer.CopyElement(TLV::AnonymousTag(), aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
     return aWriteHandler->AddStatus(
         AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
@@ -339,9 +329,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    app::WriteClientHandle writeClient;
-    err = engine->NewWriteClient(writeClient, &callback);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -407,9 +395,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    app::WriteClientHandle writeClient;
-    err = engine->NewWriteClient(writeClient, &callback);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(apSuite, apContext, writeClient);

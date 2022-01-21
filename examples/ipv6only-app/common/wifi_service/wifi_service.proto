@@ -147,11 +147,11 @@ message ConnectionResult {
   CONNECTION_ERROR error = 1;
 }
 
-// The Wifi service provides the common RPC interface for interacting
+// The WiFi service provides the common RPC interface for interacting
 // with a WIFI capable CHIP device.
 // The current state can be retrieved using the various 'Get' RPCs.
 // A device can be connected to an AP using the StartScan, and Connect RPCs.
-service Wifi {
+service WiFi {
   rpc GetChannel(pw.protobuf.Empty) returns (Channel) {}
   rpc GetSsid(pw.protobuf.Empty) returns (Ssid) {}
   rpc GetState(pw.protobuf.Empty) returns (State) {}

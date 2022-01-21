@@ -161,6 +161,8 @@ public:
         {
             HandleReadComplete();
         }
+
+        chip::Platform::Delete(apReadClient);
     }
 
     void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
@@ -185,7 +187,7 @@ public:
         gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
-    void OnDone(chip::app::CommandSender * apCommandSender) override {}
+    void OnDone(chip::app::CommandSender * apCommandSender) override { delete apCommandSender; }
 
     void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
                     chip::app::StatusIB status) override
@@ -318,8 +320,14 @@ CHIP_ERROR SendReadRequest()
     readPrepareParams.mAttributePathParamsListSize = 1;
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &gMockDelegate);
-    SuccessOrExit(err);
+
+    auto readClient =
+        chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
+                                                          gMockDelegate, chip::app::ReadClient::InteractionType::Read);
+
+    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+
+    readClient.release();
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -330,10 +338,11 @@ exit:
     {
         printf("Send read request failed, err: %s\n", chip::ErrorStr(err));
     }
+
     return err;
 }
 
-CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
+CHIP_ERROR SendWriteRequest(chip::app::WriteClient & apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
@@ -346,13 +355,13 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    SuccessOrExit(err = apWriteClient->PrepareAttribute(attributePathParams));
+    SuccessOrExit(err = apWriteClient.PrepareAttribute(attributePathParams));
 
-    writer = apWriteClient->GetAttributeDataIBTLVWriter();
+    writer = apWriteClient.GetAttributeDataIBTLVWriter();
 
     SuccessOrExit(err =
                       writer->PutBoolean(chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)), true));
-    SuccessOrExit(err = apWriteClient->FinishAttribute());
+    SuccessOrExit(err = apWriteClient.FinishAttribute());
     SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
 
     gWriteCount++;
@@ -395,8 +404,13 @@ CHIP_ERROR SendSubscribeRequest()
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &gMockDelegate);
-    SuccessOrExit(err);
+    auto readClient =
+        chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
+                                                          gMockDelegate, chip::app::ReadClient::InteractionType::Subscribe);
+
+    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+
+    readClient.release();
 
     gSubCount++;
 
@@ -431,6 +445,10 @@ exit:
     else
     {
         printf("Establish secure session succeeded\n");
+    }
+    if (testSecurePairingSecret)
+    {
+        chip::Platform::Delete(testSecurePairingSecret);
     }
 
     return err;
@@ -539,8 +557,8 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
 
     if (gWriteRespCount < kMaxWriteMessageCount)
     {
-        chip::app::WriteClientHandle writeClient;
-        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(writeClient, &gMockDelegate);
+        chip::app::WriteClient writeClient(chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager(), &gMockDelegate,
+                                           chip::Optional<uint16_t>::Missing());
         SuccessOrExit(err);
 
         err = SendWriteRequest(writeClient);

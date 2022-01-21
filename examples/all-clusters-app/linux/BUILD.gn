@@ -14,13 +14,18 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
 
-executable("chip-all-clusters-app") {
+import("${chip_root}/src/lib/lib.gni")
+
+source_set("chip-all-clusters-common") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "include/tv-callbacks.cpp",
-    "main.cpp",
+    "include/tv-callbacks.h",
+    "main-common.cpp",
   ]
 
   deps = [
@@ -34,9 +39,47 @@ executable("chip-all-clusters-app") {
 
   cflags = [ "-Wconversion" ]
 
-  output_dir = root_out_dir
+  if (chip_build_libshell) {
+    defines = [ "ENABLE_CHIP_SHELL" ]
+  }
+}
+
+if (is_libfuzzer) {
+  executable("chip-all-clusters-app-fuzzing") {
+    sources = [ "fuzzing-main.cpp" ]
+
+    deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+
+    cflags = [ "-Wconversion" ]
+
+    output_dir = root_out_dir
+  }
+} else {
+  executable("chip-all-clusters-app") {
+    sources = [ "main.cpp" ]
+
+    deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+
+    cflags = [ "-Wconversion" ]
+
+    include_dirs =
+        [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+
+    output_dir = root_out_dir
+  }
 }
 
 group("linux") {
-  deps = [ ":chip-all-clusters-app" ]
+  deps = []
+  if (is_libfuzzer) {
+    deps += [ ":chip-all-clusters-app-fuzzing" ]
+  } else {
+    deps += [ ":chip-all-clusters-app" ]
+  }
 }

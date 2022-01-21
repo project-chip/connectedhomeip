@@ -48,7 +48,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public SessionReleaseDelegate, public Dnssd::ResolverDelegate
+class CASESessionManager : public Dnssd::ResolverDelegate
 {
 public:
     CASESessionManager() = delete;
@@ -79,12 +79,12 @@ public:
      * these will be used to inform the caller about successful or failed connection establishment.
      * If the connection is already established, the `onConnection` callback will be immediately called.
      */
-    CHIP_ERROR FindOrEstablishSession(FabricInfo * fabric, NodeId nodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+    CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(NodeId nodeId);
+    OperationalDeviceProxy * FindExistingSession(PeerId peerId);
 
-    void ReleaseSession(NodeId nodeId);
+    void ReleaseSession(PeerId peerId);
 
     /**
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
@@ -103,10 +103,7 @@ public:
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
-    CHIP_ERROR GetPeerAddress(FabricInfo * fabric, NodeId nodeId, Transport::PeerAddress & addr);
-
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;
@@ -114,7 +111,7 @@ public:
     void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override {}
 
 private:
-    OperationalDeviceProxy * FindSession(SessionHandle session);
+    OperationalDeviceProxy * FindSession(const SessionHandle & session);
     void ReleaseSession(OperationalDeviceProxy * device);
 
     CASESessionManagerConfig mConfig;

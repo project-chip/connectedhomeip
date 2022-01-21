@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -28,8 +29,23 @@ namespace chip {
 struct OTAImageProcessorParams
 {
     CharSpan imageFile;
-    uint64_t downloadedBytes;
-    uint64_t totalFileBytes;
+    uint64_t downloadedBytes = 0;
+    uint64_t totalFileBytes  = 0;
+};
+
+// TODO: Parse the header when the image is received
+struct OTAImageProcessorHeader
+{
+    uint16_t vendorId;
+    uint16_t productId;
+    uint32_t softwareVersion;
+    CharSpan softwareVersionString;
+    uint64_t payloadSize;
+    uint16_t minApplicableSoftwareVersion;
+    uint16_t maxApplicableSoftwareVersion;
+    CharSpan releaseNotesUrl;
+    uint8_t imageDigestType;
+    ByteSpan imageDigest;
 };
 
 /**
@@ -83,20 +99,26 @@ public:
     /**
      * Called to check the current download status of the OTA image download.
      */
-    virtual uint8_t GetPercentComplete()
+    virtual void GetPercentComplete(app::DataModel::Nullable<uint8_t> & percent)
     {
         if (mParams.totalFileBytes == 0)
         {
-            return 0;
+            percent.SetNull();
         }
         else
         {
-            return static_cast<uint8_t>((mParams.downloadedBytes * 100) / mParams.totalFileBytes);
+            percent.SetNonNull(static_cast<uint8_t>((mParams.downloadedBytes * 100) / mParams.totalFileBytes));
         }
     }
 
+    /**
+     * Called to check the current number of bytes that have been downloaded of the OTA image
+     */
+    virtual uint64_t GetBytesDownloaded() { return mParams.downloadedBytes; }
+
 protected:
     OTAImageProcessorParams mParams;
+    OTAImageProcessorHeader mHeader;
 };
 
 } // namespace chip

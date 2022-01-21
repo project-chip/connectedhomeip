@@ -97,7 +97,7 @@ public:
         {}
 
         /**
-         * OnError will be called when an error occurr *after* a successful call to SendCommandRequest(). The following
+         * OnError will be called when an error occur *after* a successful call to SendCommandRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
@@ -117,7 +117,7 @@ public:
         virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
 
         /**
-         * OnDone will be called when CommandSender has finished all work and is safe to destory and free the
+         * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
          * allocated CommandSender object.
          *
          * This function will:
@@ -170,6 +170,8 @@ public:
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
 
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
@@ -202,7 +204,7 @@ public:
     // Upon successful return from this call, all subsequent errors that occur during this interaction
     // will be conveyed through the OnError callback above. In addition, upon completion of work regardless of
     // whether it was successful or not, the OnDone callback will be invoked to indicate completion of work on this
-    // object and to indicate to the application that it can destory and free this object.
+    // object and to indicate to the application that it can destroy and free this object.
     //
     // Applications can, however, destroy this object at any time after this call, except while handling
     // an OnResponse or OnError callback, and it will safely clean-up.
@@ -213,7 +215,7 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     friend class TestCommandInteraction;
@@ -277,8 +279,6 @@ private:
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
     CHIP_ERROR SendInvokeRequest();
-
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 

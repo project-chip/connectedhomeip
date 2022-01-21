@@ -599,7 +599,7 @@ Resolver & chip::Dnssd::Resolver::Instance()
 }
 
 // Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
-// updating the delegate that ends up beeing used by the server by calling 'SetResolverDelegate'.
+// updating the delegate that ends up being used by the server by calling 'SetResolverDelegate'.
 // This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
 // it won't work well if requests are issued in parallel.
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -113,6 +113,13 @@ class DLL_EXPORT BridgedDeviceBasicClusterTest : public BridgedDeviceBasicCluste
 public:
     BridgedDeviceBasicClusterTest() : BridgedDeviceBasicCluster() {}
     ~BridgedDeviceBasicClusterTest() {}
+};
+
+class DLL_EXPORT ChannelClusterTest : public ChannelCluster
+{
+public:
+    ChannelClusterTest() : ChannelCluster() {}
+    ~ChannelClusterTest() {}
 };
 
 class DLL_EXPORT ColorControlClusterTest : public ColorControlCluster
@@ -232,6 +239,13 @@ class DLL_EXPORT LevelControlClusterTest : public LevelControlCluster
 public:
     LevelControlClusterTest() : LevelControlCluster() {}
     ~LevelControlClusterTest() {}
+};
+
+class DLL_EXPORT LocalizationConfigurationClusterTest : public LocalizationConfigurationCluster
+{
+public:
+    LocalizationConfigurationClusterTest() : LocalizationConfigurationCluster() {}
+    ~LocalizationConfigurationClusterTest() {}
 };
 
 class DLL_EXPORT LowPowerClusterTest : public LowPowerCluster
@@ -365,13 +379,6 @@ class DLL_EXPORT SwitchClusterTest : public SwitchCluster
 public:
     SwitchClusterTest() : SwitchCluster() {}
     ~SwitchClusterTest() {}
-};
-
-class DLL_EXPORT TvChannelClusterTest : public TvChannelCluster
-{
-public:
-    TvChannelClusterTest() : TvChannelCluster() {}
-    ~TvChannelClusterTest() {}
 };
 
 class DLL_EXPORT TargetNavigatorClusterTest : public TargetNavigatorCluster

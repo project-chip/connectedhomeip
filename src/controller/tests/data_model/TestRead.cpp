@@ -277,15 +277,13 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
-    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionBobToAlice());
+    ctx.ExpireSessionBobToAlice();
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
-    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
 
     //
     // TODO: Figure out why I cannot enable this line below.
@@ -296,9 +294,16 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
-    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionAliceToBob());
+    ctx.ExpireSessionAliceToBob();
 
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+
+    //
+    // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
+    // can function correctly.
+    //
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
 
     //
     // TODO: Figure out why I cannot enable this line below.

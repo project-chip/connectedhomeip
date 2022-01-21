@@ -48,6 +48,9 @@ static const size_t kSize2  = strlen(kValue2) + 1;
 constexpr chip::FabricIndex kFabric1 = 1;
 constexpr chip::FabricIndex kFabric2 = 7;
 
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
 constexpr chip::GroupId kGroup1 = kMinFabricGroupId;
 constexpr chip::GroupId kGroup2 = 0x2222;
 constexpr chip::GroupId kGroup3 = kMaxFabricGroupId;
@@ -591,6 +594,23 @@ void TestGroupKeys(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric2, 0, pair));
     NL_TEST_ASSERT(apSuite, pair == kGroup3Keyset1);
+
+    // Remove all
+
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupKeys(kFabric1));
+
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric1, 3, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric1, 2, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric1, 1, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric1, 0, pair));
+
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric2, 3, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric2, 2, pair));
+    NL_TEST_ASSERT(apSuite, pair == kGroup2Keyset3);
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric2, 1, pair));
+    NL_TEST_ASSERT(apSuite, pair == kGroup2Keyset2);
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric2, 0, pair));
+    NL_TEST_ASSERT(apSuite, pair == kGroup3Keyset1);
 }
 
 void TestGroupKeyIterator(nlTestSuite * apSuite, void * apContext)
@@ -978,7 +998,8 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
 namespace {
 
 static chip::TestPersistentStorageDelegate sDelegate;
-static GroupDataProviderImpl sProvider(sDelegate);
+static GroupDataProviderImpl sProvider(sDelegate, chip::app::TestGroups::kMaxGroupsPerFabric,
+                                       chip::app::TestGroups::kMaxGroupKeysPerFabric);
 
 static EpochKey kEpochKeys0[] = {
     { 0x1111111111111111, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },

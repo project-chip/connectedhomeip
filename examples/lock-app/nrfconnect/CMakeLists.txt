@@ -25,13 +25,8 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 # Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-if (EXISTS boards/${BOARD}.conf)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
   list(APPEND CONF_FILE boards/${BOARD}.conf)
-endif()
-
-# TODO: temporary fix to remove after solving static addressing problem on nrf5340
-if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
 option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)

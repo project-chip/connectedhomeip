@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -180,6 +180,21 @@ NS_ASSUME_NONNULL_BEGIN
         _type = @(0);
 
         _endpoints = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateRequestorClusterProviderLocation
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _providerNodeID = @(0);
+
+        _endpoint = @(0);
     }
     return self;
 }
@@ -451,6 +466,25 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _noc = [NSData data];
+
+        _icac = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterGroupInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _groupId = @(0);
+
+        _endpoints = [NSArray array];
+
+        _groupName = @"";
     }
     return self;
 }
@@ -461,30 +495,36 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _vendorId = @(0);
+        _fabricIndex = @(0);
 
-        _groupKeyIndex = @(0);
+        _groupId = @(0);
 
-        _groupKeyRoot = [NSData data];
-
-        _groupKeyEpochStartTime = @(0);
-
-        _groupKeySecurityPolicy = @(0);
+        _groupKeySetID = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupState
+@implementation CHIPGroupKeyManagementClusterGroupKeySet
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _vendorId = @(0);
+        _groupKeySetID = @(0);
 
-        _vendorGroupId = @(0);
+        _securityPolicy = @(0);
 
-        _groupKeySetIndex = @(0);
+        _epochKey0 = [NSData data];
+
+        _epochStartTime0 = @(0);
+
+        _epochKey1 = [NSData data];
+
+        _epochStartTime1 = @(0);
+
+        _epochKey2 = [NSData data];
+
+        _epochStartTime2 = @(0);
     }
     return self;
 }
@@ -570,7 +610,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterTvChannelInfo
+@implementation CHIPChannelClusterChannelInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -589,7 +629,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterTvChannelLineupInfo
+@implementation CHIPChannelClusterLineupInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -606,7 +646,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetTargetInfo
+@implementation CHIPTargetNavigatorClusterTargetInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -619,7 +659,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPlaybackPosition
+@implementation CHIPMediaPlaybackClusterPlaybackPosition
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -632,7 +672,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterMediaInputInfo
+@implementation CHIPMediaInputClusterInputInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -649,7 +689,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterContentLaunchDimension
+@implementation CHIPContentLauncherClusterDimension
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -664,7 +704,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterContentLaunchAdditionalInfo
+@implementation CHIPContentLauncherClusterAdditionalInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -677,7 +717,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterContentLaunchParamater
+@implementation CHIPContentLauncherClusterParameter
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -692,7 +732,18 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterContentLaunchStyleInformation
+@implementation CHIPContentLauncherClusterContentSearch
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _parameterList = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPContentLauncherClusterStyleInformation
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -701,34 +752,34 @@ NS_ASSUME_NONNULL_BEGIN
 
         _color = @"";
 
-        _size = [CHIPContentLauncherClusterContentLaunchDimension new];
+        _size = [CHIPContentLauncherClusterDimension new];
     }
     return self;
 }
 @end
 
-@implementation CHIPContentLauncherClusterContentLaunchBrandingInformation
+@implementation CHIPContentLauncherClusterBrandingInformation
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _providerName = @"";
 
-        _background = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+        _background = [CHIPContentLauncherClusterStyleInformation new];
 
-        _logo = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+        _logo = [CHIPContentLauncherClusterStyleInformation new];
 
-        _progressBar = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+        _progressBar = [CHIPContentLauncherClusterStyleInformation new];
 
-        _splash = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+        _splash = [CHIPContentLauncherClusterStyleInformation new];
 
-        _waterMark = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+        _waterMark = [CHIPContentLauncherClusterStyleInformation new];
     }
     return self;
 }
 @end
 
-@implementation CHIPAudioOutputClusterAudioOutputInfo
+@implementation CHIPAudioOutputClusterOutputInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -743,7 +794,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterApplicationLauncherApp
+@implementation CHIPApplicationLauncherClusterApplicationLauncherApplication
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -756,12 +807,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterApplicationLauncherEndpoint
+@implementation CHIPApplicationLauncherClusterApplicationEP
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
 
         _endpoint = @"";
     }
@@ -769,7 +820,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationBasicClusterApplicationBasicApp
+@implementation CHIPApplicationBasicClusterApplicationBasicApplication
 - (instancetype)init
 {
     if (self = [super init]) {

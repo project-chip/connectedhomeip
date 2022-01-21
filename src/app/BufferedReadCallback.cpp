@@ -79,7 +79,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), totalBufSize);
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Array, outerType));
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
     for (auto & bufHandle : mBufferedList)
     {
@@ -88,7 +88,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
         reader.Init(std::move(bufHandle));
 
         ReturnErrorOnFailure(reader.Next());
-        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag, reader));
+        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), reader));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
@@ -120,7 +120,7 @@ CHIP_ERROR BufferedReadCallback::BufferListItem(TLV::TLVReader & reader)
 
     writer.Init(std::move(handle), false);
 
-    ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag, reader));
+    ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), reader));
     ReturnErrorOnFailure(writer.Finalize(&handle));
 
     // Compact the buffer down to a more reasonably sized packet buffer

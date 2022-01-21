@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,11 +62,17 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
+    case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID:
+        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
+        break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
     case ZCL_OTA_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
+        break;
+    case ZCL_OTA_REQUESTOR_CLUSTER_ID:
+        emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
     case ZCL_OCCUPANCY_SENSING_CLUSTER_ID:
         emberAfOccupancySensingClusterInitCallback(endpoint);
@@ -156,12 +162,22 @@ void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -222,19 +238,17 @@ void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfAppli
 
 EmberAfAttributeWritePermission __attribute__((weak))
 emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type)
+                                          uint8_t * value, uint8_t type)
 {
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
 }
 
-bool __attribute__((weak))
-emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, uint16_t manufacturerCode, AttributeId attributeId)
+bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     return true;
 }
 
-bool __attribute__((weak))
-emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, uint16_t manufacturerCode, AttributeId attributeId)
+bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     return true;
 }
@@ -257,14 +271,14 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
 
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength)
+                                     uint8_t * buffer, uint16_t maxReadLength)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                      uint16_t manufacturerCode, uint8_t * buffer)
+                                      uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }

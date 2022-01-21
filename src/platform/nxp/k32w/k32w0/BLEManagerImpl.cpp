@@ -70,7 +70,7 @@ namespace {
 /* Timeout of BLE commands */
 #define CHIP_BLE_KW_EVNT_TIMEOUT 1000
 
-/** BLE advertisment state changed */
+/** BLE advertisement state changed */
 #define CHIP_BLE_KW_EVNT_ADV_CHANGED 0x0001
 /** BLE advertisement command failed */
 #define CHIP_BLE_KW_EVNT_ADV_FAILED 0x0002
@@ -1545,7 +1545,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisment");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
 
         sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
         // stop advertiser, change interval and restart it;

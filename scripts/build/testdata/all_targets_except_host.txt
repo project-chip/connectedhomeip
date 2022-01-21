@@ -1,13 +1,16 @@
 ameba-amebad-all-clusters
 ameba-amebad-light
+ameba-amebad-pigweed
 android-androidstudio-arm-chip-tool
 android-androidstudio-arm64-chip-tool
 android-androidstudio-x64-chip-tool
 android-androidstudio-x86-chip-tool
 android-arm-chip-tool
+android-arm-chip-tv-casting-app
 android-arm-chip-tvserver
 android-arm64-chip-test
 android-arm64-chip-tool
+android-arm64-chip-tv-casting-app
 android-arm64-chip-tvserver
 android-x64-chip-tool
 android-x86-chip-tool
@@ -63,6 +66,7 @@ esp32-c3devkit-all-clusters
 esp32-devkitc-all-clusters
 esp32-devkitc-all-clusters-ipv6only
 esp32-devkitc-bridge
+esp32-devkitc-light
 esp32-devkitc-lock
 esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
@@ -70,9 +74,15 @@ esp32-m5stack-all-clusters
 esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
+esp32-qemu-tests
 infineon-p6-all-clusters
 infineon-p6-light
 infineon-p6-lock
+k32w-light (NOGLOB: Debug builds broken due to LWIP_DEBUG redefition)
+k32w-light-release
+k32w-lock-low-power-release (NOGLOB: Only on demand build)
+k32w-lock-release
+k32w-shell-release
 mbed-CY8CPROTO_062_4343W-all-clusters-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-all-clusters-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-all-clusters-release
@@ -89,18 +99,19 @@ mbed-CY8CPROTO_062_4343W-shell-debug (NOGLOB: Compile only for debugging purpose
 mbed-CY8CPROTO_062_4343W-shell-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-shell-release
 nrf-native-posix-64-tests
-nrf-nrf52840-light
-nrf-nrf52840-light-rpc
-nrf-nrf52840-lock
-nrf-nrf52840-pump
-nrf-nrf52840-pump-controller
-nrf-nrf52840-shell
-nrf-nrf5340-light
-nrf-nrf5340-light-rpc (NOGLOB: Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760)
-nrf-nrf5340-lock
-nrf-nrf5340-pump
-nrf-nrf5340-pump-controller
-nrf-nrf5340-shell
+nrf-nrf52840dk-light
+nrf-nrf52840dk-light-rpc
+nrf-nrf52840dk-lock
+nrf-nrf52840dk-pump
+nrf-nrf52840dk-pump-controller
+nrf-nrf52840dk-shell
+nrf-nrf52840dongle-light
+nrf-nrf5340dk-light
+nrf-nrf5340dk-light-rpc (NOGLOB: Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760)
+nrf-nrf5340dk-lock
+nrf-nrf5340dk-pump
+nrf-nrf5340dk-pump-controller
+nrf-nrf5340dk-shell
 qpg-qpg6100-lock
 telink-tlsr9518adk80d-light
 tizen-arm-light

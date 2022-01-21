@@ -21,17 +21,14 @@
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::FindOrEstablishSession(FabricInfo * fabric, NodeId nodeId,
-                                                      Callback::Callback<OnDeviceConnected> * onConnection,
+CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    PeerId peerId = fabric->GetPeerIdForNode(nodeId);
-
     bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
 
-    OperationalDeviceProxy * session = FindExistingSession(nodeId);
+    OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
         // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
@@ -46,7 +43,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(FabricInfo * fabric, NodeI
 
         if (session == nullptr)
         {
-            onFailure->mCall(onFailure->mContext, nodeId, CHIP_ERROR_NO_MEMORY);
+            onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
             return CHIP_ERROR_NO_MEMORY;
         }
     }
@@ -58,15 +55,16 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(FabricInfo * fabric, NodeI
     CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
     if (err != CHIP_NO_ERROR)
     {
-        ReleaseSession(session);
+        // Release the peer rather than the pointer in case the failure handler has already released the session.
+        ReleaseSession(peerId);
     }
 
     return err;
 }
 
-void CASESessionManager::ReleaseSession(NodeId nodeId)
+void CASESessionManager::ReleaseSession(PeerId peerId)
 {
-    ReleaseSession(FindExistingSession(nodeId));
+    ReleaseSession(FindExistingSession(peerId));
 }
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
@@ -84,7 +82,7 @@ void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeDa
         LogErrorOnFailure(mConfig.dnsCache->Insert(nodeData));
     }
 
-    OperationalDeviceProxy * session = FindExistingSession(nodeData.mPeerId.GetNodeId());
+    OperationalDeviceProxy * session = FindExistingSession(nodeData.mPeerId);
     VerifyOrReturn(session != nullptr,
                    ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
 
@@ -96,38 +94,30 @@ void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERRO
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 }
 
-CHIP_ERROR CASESessionManager::GetPeerAddress(FabricInfo * fabric, NodeId nodeId, Transport::PeerAddress & addr)
+CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
     if (mConfig.dnsCache != nullptr)
     {
         Dnssd::ResolvedNodeData resolutionData;
-        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(fabric->GetPeerIdForNode(nodeId), resolutionData));
+        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(peerId, resolutionData));
         addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
         return CHIP_NO_ERROR;
     }
 
-    OperationalDeviceProxy * session = FindExistingSession(nodeId);
+    OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
 
-void CASESessionManager::OnSessionReleased(SessionHandle sessionHandle)
-{
-    OperationalDeviceProxy * session = FindSession(sessionHandle);
-    VerifyOrReturn(session != nullptr, ChipLogDetail(Controller, "OnSessionReleased was called for unknown device, ignoring it."));
-
-    session->OnSessionReleased(sessionHandle);
-}
-
-OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)
+OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session)
 {
     return mConfig.devicePool->FindDevice(session);
 }
 
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(NodeId id)
+OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId)
 {
-    return mConfig.devicePool->FindDevice(id);
+    return mConfig.devicePool->FindDevice(peerId);
 }
 
 void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)

@@ -97,7 +97,7 @@ static uint16_t AvailableDataCount(Fifo_t * fifo)
     // if equal there is no data return 0 directly
     if (fifo->Tail != fifo->Head)
     {
-        // determine if a wrap around occured to get the right data size avalaible.
+        // determine if a wrap around occurred to get the right data size avalaible.
         size = (fifo->Tail < fifo->Head) ? (fifo->MaxSize - fifo->Head + fifo->Tail) : (fifo->Tail - fifo->Head);
     }
 
@@ -200,7 +200,9 @@ void USART_IRQHandler(void)
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
-#ifndef PW_RPC_ENABLED
+#if defined(SL_WIFI)
+    /* TODO */
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }
@@ -224,7 +226,9 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
-#ifndef PW_RPC_ENABLED
+#if defined(SL_WIFI)
+    /* TODO */
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }

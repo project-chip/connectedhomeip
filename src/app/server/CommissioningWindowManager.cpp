@@ -161,7 +161,6 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
 
     mPairingSession.Clear();
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(&mServer->GetSecureSessionManager()));
 
     if (mCommissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
@@ -271,6 +270,11 @@ void CommissioningWindowManager::CloseCommissioningWindow()
 
 CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 {
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // notify device layer that advertisement is beginning (to do work such as increment rotating id)
+    DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
+#endif
+
     if (mIsBLE)
     {
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));

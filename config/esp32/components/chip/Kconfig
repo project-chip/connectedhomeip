@@ -149,6 +149,12 @@ menu "CHIP Core"
             help
                 The maximum number of simultaneously timers in the CHIP System Layer.
 
+        config ENABLE_OTA_REQUESTOR
+            bool "Enable OTA Requestor"
+            default n
+            help
+                Enable this option to enable OTA Requestor for example
+
     endmenu # "System Options"
 
     menu "Security Options"
@@ -699,6 +705,11 @@ menu "CHIP Device Layer"
             help
                 Setting this to y will cause the commissioner to send commissioning commands to the
                 various clusters after establishing a PASE session.
+
+        config ENABLE_ROTATING_DEVICE_ID
+            depends on ENABLE_CHIPOBLE
+            bool "Enable Rotating Device Identifier Support"
+            default n
 
     endmenu
 

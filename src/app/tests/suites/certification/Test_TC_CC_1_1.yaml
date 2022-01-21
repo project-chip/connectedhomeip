@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 21.1.1. [TC-CC-1.1] Global attributes with server as DUT
+name: 27.1.1. [TC-CC-1.1] Global attributes with server as DUT
 
 config:
     cluster: "Color Control"
@@ -55,6 +55,7 @@ tests:
           value: 4
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
+    #disabled due to issue #13442
     - label: "Read the global attribute: AttributeList"
       disabled: true
       command: "readAttribute"
@@ -97,6 +98,7 @@ tests:
 
     - label: "read the optional global attribute: FeatureMap"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -104,6 +106,7 @@ tests:
 
     - label: "Read the optional global attribute : FeatureMap"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -112,6 +115,7 @@ tests:
 
     - label: "write the default values to optional global attribute: FeatureMap"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "FeatureMap"
       arguments:
