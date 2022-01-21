@@ -205,6 +205,9 @@ private:
     // TODO: Maybe use CHIP_APPLICATION_ERROR instead of boolean in class methods?
     bool credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type);
 
+    bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex);
+    bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex, uint8_t & weekDaysSupported);
+
     bool sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
                                   chip::NodeId nodeId, chip::FabricIndex fabricIndex, uint16_t userIndex = 0,
                                   uint16_t dataIndex = 0);
