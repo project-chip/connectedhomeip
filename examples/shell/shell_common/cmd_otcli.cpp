@@ -105,11 +105,13 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
         }
     }
     buff_ptr = 0;
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
 #if OPENTHREAD_API_VERSION >= 85
     otCliInputLine(buff);
 #else
     otCliConsoleInputLine(buff, buff_ptr - buff);
 #endif
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 exit:
     return error;
 }
