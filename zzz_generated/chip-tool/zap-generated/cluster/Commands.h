@@ -27034,6 +27034,7 @@ private:
 | Attributes:                                                         |        |
 | * ActiveLocale                                                      | 0x0001 |
 | * SupportedLocales                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
@@ -27206,6 +27207,36 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadLocalizationConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "LocalizationConfiguration.ClusterRevision response", value);
+    }
 };
 
 /*----------------------------------------------------------------------------*\
@@ -61308,6 +61339,7 @@ void registerClusterLocalizationConfiguration(Commands & commands)
         make_unique<ReportLocalizationConfigurationActiveLocale>(),     //
         make_unique<ReadLocalizationConfigurationSupportedLocales>(),   //
         make_unique<ReportLocalizationConfigurationSupportedLocales>(), //
+        make_unique<ReadLocalizationConfigurationClusterRevision>(),    //
     };
 
     commands.Register(clusterName, clusterCommands);

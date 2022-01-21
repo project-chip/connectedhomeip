@@ -3381,6 +3381,19 @@ public class ClusterReadMapping {
     readLocalizationConfigurationInteractionInfo.put(
         "readSupportedLocalesAttribute",
         readLocalizationConfigurationSupportedLocalesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readLocalizationConfigurationClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readLocalizationConfigurationClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LocalizationConfigurationCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readLocalizationConfigurationClusterRevisionCommandParams);
+    readLocalizationConfigurationInteractionInfo.put(
+        "readClusterRevisionAttribute",
+        readLocalizationConfigurationClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("localizationConfiguration", readLocalizationConfigurationInteractionInfo);
     Map<String, InteractionInfo> readLowPowerInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readLowPowerAttributeListCommandParams =

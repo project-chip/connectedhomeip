@@ -37,6 +37,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'DiagnosticLogs':
   case 'GeneralCommissioning':
   case 'GeneralDiagnostics':
+  case 'LocalizationConfiguration':
   case 'SoftwareDiagnostics':
   case 'ThreadNetworkDiagnostics':
   case 'EthernetNetworkDiagnostics':

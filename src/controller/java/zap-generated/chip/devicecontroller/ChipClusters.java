@@ -7766,6 +7766,10 @@ public class ChipClusters {
       readSupportedLocalesAttribute(chipClusterPtr, callback);
     }
 
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
     private native void readActiveLocaleAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
@@ -7783,6 +7787,9 @@ public class ChipClusters {
 
     private native void readSupportedLocalesAttribute(
         long chipClusterPtr, SupportedLocalesAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
