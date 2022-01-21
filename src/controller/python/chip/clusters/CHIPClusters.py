@@ -2581,6 +2581,7 @@ class ChipClusters:
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
                     "type": "int",
+                    "reportable": True,
                 },
             },
     }
@@ -5389,23 +5390,27 @@ class ChipClusters:
                     "attributeName": "HourFormat",
                     "attributeId": 0x00000000,
                     "type": "int",
+                    "reportable": True,
                     "writable": True,
                 },
                 0x00000001: {
                     "attributeName": "ActiveCalendarType",
                     "attributeId": 0x00000001,
                     "type": "int",
+                    "reportable": True,
                     "writable": True,
                 },
                 0x00000002: {
                     "attributeName": "SupportedCalendarTypes",
                     "attributeId": 0x00000002,
                     "type": "int",
+                    "reportable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
                     "type": "int",
+                    "reportable": True,
                 },
             },
     }
