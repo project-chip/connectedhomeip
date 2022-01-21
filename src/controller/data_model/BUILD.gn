@@ -30,36 +30,38 @@ chip_data_model("data_model") {
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
 
-pw_python_action("java-jni-generate") {
-  script = "${chip_root}/scripts/codegen.py"
+if (current_os == "android") {
+  pw_python_action("java-jni-generate") {
+    script = "${chip_root}/scripts/codegen.py"
 
-  _idl_file = "../data_model/controller-clusters.matter"
+    _idl_file = "../data_model/controller-clusters.matter"
 
-  args = [
-    "--generator",
-    "java",
-    "--output-dir",
-    rebase_path(target_gen_dir),
-    rebase_path(_idl_file),
-  ]
+    args = [
+      "--generator",
+      "java",
+      "--output-dir",
+      rebase_path(target_gen_dir),
+      rebase_path(_idl_file),
+    ]
 
-  deps = [ "${chip_root}/scripts/idl" ]
+    deps = [ "${chip_root}/scripts/idl" ]
 
-  inputs = [ _idl_file ]
-  sources = [ _idl_file ]
-  outputs = [ "$target_gen_dir/jni/CHIPClustersRead.cpp" ]
-}
+    inputs = [ _idl_file ]
+    sources = [ _idl_file ]
+    outputs = [ "$target_gen_dir/jni/CHIPClustersRead.cpp" ]
+  }
 
-source_set("java-jni-sources") {
-  sources = get_target_outputs(":java-jni-generate")
-  public_configs = [ "${chip_root}/src:includes" ]
+  source_set("java-jni-sources") {
+    sources = get_target_outputs(":java-jni-generate")
+    public_configs = [ "${chip_root}/src:includes" ]
 
-  deps = [
-    ":java-jni-generate",
-    "${chip_root}/src/controller/data_model",
-    "${chip_root}/src/inet",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/platform",
-    "${chip_root}/src/platform/android",
-  ]
+    deps = [
+      ":data_model",
+      ":java-jni-generate",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/android",
+    ]
+  }
 }
