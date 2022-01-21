@@ -478,8 +478,8 @@ JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle
     err = N2J_NetworkLocation(env, env->NewStringUTF(addrStr), static_cast<jint>(port), networkLocation);
     if (err != CHIP_NO_ERROR)
     {
-      ChipLogError(Controller, "Failed to create NetworkLocation");
-      JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        ChipLogError(Controller, "Failed to create NetworkLocation");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 
     return networkLocation;
