@@ -26,9 +26,17 @@
 #include "lib/core/CHIPError.h"
 
 #define TAG "OTAImageProcessor"
+using namespace chip::System;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
+namespace {
+
+void HandleRestart(Layer * systemLayer, void * appState)
+{
+    esp_restart();
+}
+} // namespace
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -168,6 +176,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
+
+    // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
