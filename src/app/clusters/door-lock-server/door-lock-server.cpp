@@ -792,6 +792,39 @@ void DoorLockServer::LockUnlockDoorCommandHandler(chip::app::CommandHandler * co
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
+void DoorLockServer::SetWeekDayScheduleCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("[SetWeekDaySchedule]: Incoming command [endpointId=%d]", commandPath.mEndpointId);
+
+    // TODO: Implement setting weekday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return;
+}
+
+void DoorLockServer::GetWeekDayScheduleCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+
+    // TODO: Implement getting weekday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return;
+}
+
+void DoorLockServer::ClearWeekDayScheduleCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+
+    // TODO: Implement clearing weekday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return;
+}
+
 bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
 {
     uint32_t featureMap = 0;
@@ -2098,10 +2131,7 @@ bool emberAfDoorLockClusterSetWeekDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("SetWeekDaySchedule: command not implemented");
-
-    // TODO: Implement setting weekday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().SetWeekDayScheduleCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -2109,10 +2139,7 @@ bool emberAfDoorLockClusterGetWeekDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("GetWeekDaySchedule: command not implemented");
-
-    // TODO: Implement getting weekday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().GetWeekDayScheduleCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -2120,10 +2147,7 @@ bool emberAfDoorLockClusterClearWeekDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("ClearWeekDaySchedule: command not implemented");
-
-    // TODO: Implement clearing weekday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().ClearWeekDayScheduleCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -2417,4 +2441,17 @@ emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credent
                                    DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
     return false;
+}
+
+DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex,
+                                                                uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
+{
+    return DlStatus::kFailure;
+}
+
+DlStatus __attribute__((weak))
+emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlDaysMaskMap daysMask,
+                                 uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+{
+    return DlStatus::kFailure;
 }
