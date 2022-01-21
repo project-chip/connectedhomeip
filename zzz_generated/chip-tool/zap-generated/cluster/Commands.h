@@ -4608,6 +4608,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | Thermostat                                                          | 0x0201 |
 | ThermostatUserInterfaceConfiguration                                | 0x0204 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
+| TimeFormatLocalization                                              | 0x002C |
 | UserLabel                                                           | 0x0041 |
 | WakeOnLan                                                           | 0x0503 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
@@ -56684,6 +56685,194 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster TimeFormatLocalization                                      | 0x002C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * HourFormat                                                        | 0x0000 |
+| * ActiveCalendarType                                                | 0x0001 |
+| * SupportedCalendarTypes                                            | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute HourFormat
+ */
+class ReadTimeFormatLocalizationHourFormat : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationHourFormat() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "hour-format");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.HourFormat response", value);
+    }
+};
+
+class WriteTimeFormatLocalizationHourFormat : public ModelCommand
+{
+public:
+    WriteTimeFormatLocalizationHourFormat() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "hour-format");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTimeFormatLocalizationHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) WriteAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TimeFormatLocalization::HourFormat mValue;
+};
+
+/*
+ * Attribute ActiveCalendarType
+ */
+class ReadTimeFormatLocalizationActiveCalendarType : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationActiveCalendarType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.ActiveCalendarType response", value);
+    }
+};
+
+class WriteTimeFormatLocalizationActiveCalendarType : public ModelCommand
+{
+public:
+    WriteTimeFormatLocalizationActiveCalendarType() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTimeFormatLocalizationActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) WriteAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TimeFormatLocalization::CalendarType mValue;
+};
+
+/*
+ * Attribute SupportedCalendarTypes
+ */
+class ReadTimeFormatLocalizationSupportedCalendarTypes : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationSupportedCalendarTypes() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-calendar-types");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationSupportedCalendarTypes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.SupportedCalendarTypes response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadTimeFormatLocalizationClusterRevision : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster UserLabel                                                   | 0x0041 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -62207,6 +62396,21 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterTimeFormatLocalization(Commands & commands)
+{
+    const char * clusterName = "TimeFormatLocalization";
+
+    commands_list clusterCommands = {
+        make_unique<ReadTimeFormatLocalizationHourFormat>(),             //
+        make_unique<WriteTimeFormatLocalizationHourFormat>(),            //
+        make_unique<ReadTimeFormatLocalizationActiveCalendarType>(),     //
+        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(),    //
+        make_unique<ReadTimeFormatLocalizationSupportedCalendarTypes>(), //
+        make_unique<ReadTimeFormatLocalizationClusterRevision>(),        //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterUserLabel(Commands & commands)
 {
     const char * clusterName = "UserLabel";
@@ -62402,6 +62606,7 @@ void registerClusters(Commands & commands)
     registerClusterThermostat(commands);
     registerClusterThermostatUserInterfaceConfiguration(commands);
     registerClusterThreadNetworkDiagnostics(commands);
+    registerClusterTimeFormatLocalization(commands);
     registerClusterUserLabel(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWiFiNetworkDiagnostics(commands);

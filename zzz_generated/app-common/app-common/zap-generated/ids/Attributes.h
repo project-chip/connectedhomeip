@@ -1124,9 +1124,9 @@ namespace HourFormat {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace HourFormat
 
-namespace CalendarType {
+namespace ActiveCalendarType {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CalendarType
+} // namespace ActiveCalendarType
 
 namespace SupportedCalendarTypes {
 static constexpr AttributeId Id = 0x00000002;

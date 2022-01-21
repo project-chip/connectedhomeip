@@ -40276,7 +40276,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 23);
+            XCTAssertEqual([actualValue count], 24);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 3UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 4UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 29UL);
@@ -40285,21 +40285,22 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[5] unsignedIntValue], 40UL);
             XCTAssertEqual([actualValue[6] unsignedIntValue], 42UL);
             XCTAssertEqual([actualValue[7] unsignedIntValue], 43UL);
-            XCTAssertEqual([actualValue[8] unsignedIntValue], 46UL);
-            XCTAssertEqual([actualValue[9] unsignedIntValue], 48UL);
-            XCTAssertEqual([actualValue[10] unsignedIntValue], 49UL);
-            XCTAssertEqual([actualValue[11] unsignedIntValue], 50UL);
-            XCTAssertEqual([actualValue[12] unsignedIntValue], 51UL);
-            XCTAssertEqual([actualValue[13] unsignedIntValue], 52UL);
-            XCTAssertEqual([actualValue[14] unsignedIntValue], 53UL);
-            XCTAssertEqual([actualValue[15] unsignedIntValue], 54UL);
-            XCTAssertEqual([actualValue[16] unsignedIntValue], 55UL);
-            XCTAssertEqual([actualValue[17] unsignedIntValue], 60UL);
-            XCTAssertEqual([actualValue[18] unsignedIntValue], 62UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 63UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 64UL);
-            XCTAssertEqual([actualValue[21] unsignedIntValue], 65UL);
-            XCTAssertEqual([actualValue[22] unsignedIntValue], 1029UL);
+            XCTAssertEqual([actualValue[8] unsignedIntValue], 44UL);
+            XCTAssertEqual([actualValue[9] unsignedIntValue], 46UL);
+            XCTAssertEqual([actualValue[10] unsignedIntValue], 48UL);
+            XCTAssertEqual([actualValue[11] unsignedIntValue], 49UL);
+            XCTAssertEqual([actualValue[12] unsignedIntValue], 50UL);
+            XCTAssertEqual([actualValue[13] unsignedIntValue], 51UL);
+            XCTAssertEqual([actualValue[14] unsignedIntValue], 52UL);
+            XCTAssertEqual([actualValue[15] unsignedIntValue], 53UL);
+            XCTAssertEqual([actualValue[16] unsignedIntValue], 54UL);
+            XCTAssertEqual([actualValue[17] unsignedIntValue], 55UL);
+            XCTAssertEqual([actualValue[18] unsignedIntValue], 60UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 62UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 63UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 64UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65UL);
+            XCTAssertEqual([actualValue[23] unsignedIntValue], 1029UL);
         }
 
         [expectation fulfill];
@@ -54003,6 +54004,157 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"ThreadNetworkDiagnostics ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTimeFormatLocalizationReadAttributeHourFormatWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TimeFormatLocalizationReadAttributeHourFormatWithCompletionHandler"];
+
+    [cluster readAttributeHourFormatWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TimeFormatLocalization HourFormat Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTimeFormatLocalizationWriteAttributeHourFormatWithValue
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TimeFormatLocalizationWriteAttributeHourFormatWithValue"];
+
+    NSNumber * _Nonnull value = @(0x00);
+    [cluster writeAttributeHourFormatWithValue:value
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"TimeFormatLocalization HourFormat Error: %@", err);
+                                 XCTAssertEqual(err.code, 0);
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTimeFormatLocalizationReadAttributeActiveCalendarTypeWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TimeFormatLocalizationReadAttributeActiveCalendarTypeWithCompletionHandler"];
+
+    [cluster readAttributeActiveCalendarTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TimeFormatLocalization ActiveCalendarType Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTimeFormatLocalizationWriteAttributeActiveCalendarTypeWithValue
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TimeFormatLocalizationWriteAttributeActiveCalendarTypeWithValue"];
+
+    NSNumber * _Nonnull value = @(0);
+    [cluster writeAttributeActiveCalendarTypeWithValue:value
+                                     completionHandler:^(NSError * _Nullable err) {
+                                         NSLog(@"TimeFormatLocalization ActiveCalendarType Error: %@", err);
+                                         XCTAssertEqual(err.code, 0);
+                                         [expectation fulfill];
+                                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTimeFormatLocalizationReadAttributeSupportedCalendarTypesWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TimeFormatLocalizationReadAttributeSupportedCalendarTypesWithCompletionHandler"];
+
+    [cluster readAttributeSupportedCalendarTypesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TimeFormatLocalization SupportedCalendarTypes Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTimeFormatLocalizationReadAttributeClusterRevisionWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TimeFormatLocalizationReadAttributeClusterRevisionWithCompletionHandler"];
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"TimeFormatLocalization ClusterRevision Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

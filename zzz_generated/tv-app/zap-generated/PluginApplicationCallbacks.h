@@ -56,6 +56,7 @@
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
     MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWakeOnLanPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

@@ -48,8 +48,8 @@ limitations under the License.
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="ENUM8" writable="true" optional="false">HourFormat</attribute>
-    <attribute side="server" code="0x01" define="CALENDAR_TYPE" type="ENUM8" writable="true" optional="true">CalendarType</attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarType" length="254" writable="false" optional="true">SupportedCalendarTypes</attribute>  
+    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormat" min="0x00" max="0x01" writable="true" optional="false">HourFormat</attribute>
+    <attribute side="server" code="0x01" define="CALENDAR_TYPE" type="CalendarType" writable="true" optional="true">ActiveCalendarType</attribute>
+    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarType" writable="false" optional="true">SupportedCalendarTypes</attribute>  
   </cluster>
 </configurator>
