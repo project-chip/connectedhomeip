@@ -231,7 +231,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     err = mCASESessionManager.Init();
-#if !CONFIG_OPENTHREAD_ENABLED
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     {
         ChipLogProgress(AppServer, "Adding Multicast groups");
         ConstFabricIterator fabricIterator = mFabrics.cbegin();
@@ -259,7 +259,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
             iterator->Release();
         }
     }
-#endif // CONFIG_OPENTHREAD_ENABLED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 exit:
     if (err != CHIP_NO_ERROR)
     {
