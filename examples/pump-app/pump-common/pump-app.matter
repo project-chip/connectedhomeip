@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 0;
-    CHAR_STRING value = 1;
+    CHAR_STRING<16> label = 0;
+    CHAR_STRING<16> value = 1;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -58,16 +58,16 @@ server cluster Basic = 40 {
   }
 
   readonly attribute int16u interactionModelVersion = 0;
-  readonly attribute char_string vendorName = 1;
+  readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string productName = 3;
+  readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string nodeLabel = 5;
-  attribute char_string location = 6;
+  attribute char_string<32> nodeLabel = 5;
+  attribute char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string softwareVersionString = 10;
+  readonly attribute char_string<64> softwareVersionString = 10;
   readonly global attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
@@ -244,11 +244,11 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING name = 0;
+    CHAR_STRING<32> name = 0;
     BOOLEAN fabricConnected = 1;
     BOOLEAN offPremiseServicesReachableIPv4 = 2;
     BOOLEAN offPremiseServicesReachableIPv6 = 3;
-    OCTET_STRING hardwareAddress = 4;
+    OCTET_STRING<8> hardwareAddress = 4;
     InterfaceType type = 5;
   }
 
@@ -350,7 +350,7 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
@@ -410,7 +410,7 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -519,11 +519,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     fabric_idx fabricIndex = 0;
-    OCTET_STRING rootPublicKey = 1;
+    OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
-    CHAR_STRING label = 5;
+    CHAR_STRING<32> label = 5;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
@@ -719,7 +719,7 @@ server cluster PumpConfigurationAndControl = 512 {
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
     INT64U id = 0;
-    CHAR_STRING name = 1;
+    CHAR_STRING<8> name = 1;
     INT32U stackFreeCurrent = 2;
     INT32U stackFreeMinimum = 3;
     INT32U stackSize = 4;
@@ -830,10 +830,10 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string networkName = 2;
+  readonly attribute octet_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string meshLocalPrefix = 5;
+  readonly attribute octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
@@ -888,7 +888,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u pendingTimestamp = 57;
   readonly attribute int32u delay = 58;
   readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string channelMask = 60;
+  readonly attribute octet_string<4> channelMask = 60;
   readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly global attribute bitmap32 featureMap = 65532;
