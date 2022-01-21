@@ -2469,6 +2469,9 @@ NS_ASSUME_NONNULL_BEGIN
                                             reportHandler:
                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
 @end
 
 /**
