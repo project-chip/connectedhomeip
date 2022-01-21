@@ -360,8 +360,8 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
     auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
                                              CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
-    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                                         kTestEndpointId, onSuccessCb, onFailureCb);
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
