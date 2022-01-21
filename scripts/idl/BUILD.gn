@@ -23,10 +23,17 @@ pw_python_package("idl") {
   inputs = [
     # Dependency grammar
     "matter_grammar.lark",
+
+    # Templates used for generation
+    "generators/java/ChipClustersRead.jinja",
   ]
 
   sources = [
     "__init__.py",
+    "generators/__init__.py",
+    "generators/filters.py",
+    "generators/java/__init__.py",
+    "generators/types.py",
     "matter_idl_parser.py",
     "matter_idl_types.py",
   ]

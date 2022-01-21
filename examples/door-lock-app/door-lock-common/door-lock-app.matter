@@ -350,10 +350,10 @@ server cluster DoorLock = 257 {
     nullable INT16U dataIndex = 6;
   }
 
-  readonly attribute DlLockState lockState = 0;
+  readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute DlDoorState doorState = 3;
+  readonly attribute nullable DlDoorState doorState = 3;
   readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
   readonly attribute int8u maxPINCodeLength = 23;

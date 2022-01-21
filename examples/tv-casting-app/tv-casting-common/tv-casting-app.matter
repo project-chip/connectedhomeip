@@ -879,10 +879,10 @@ server cluster DoorLock = 257 {
     nullable INT16U dataIndex = 6;
   }
 
-  readonly attribute DlLockState lockState = 0;
+  readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute DlDoorState doorState = 3;
+  readonly attribute nullable DlDoorState doorState = 3;
   attribute int32u doorOpenEvents = 4;
   attribute int32u doorClosedEvents = 5;
   attribute int16u openPeriod = 6;
@@ -1468,11 +1468,11 @@ server cluster LevelControl = 8 {
   readonly attribute int16u maxFrequency = 6;
   attribute bitmap8 options = 15;
   attribute int16u onOffTransitionTime = 16;
-  attribute int8u onLevel = 17;
-  attribute int16u onTransitionTime = 18;
-  attribute int16u offTransitionTime = 19;
-  attribute int8u defaultMoveRate = 20;
-  attribute int8u startUpCurrentLevel = 16384;
+  attribute nullable int8u onLevel = 17;
+  attribute nullable int16u onTransitionTime = 18;
+  attribute nullable int16u offTransitionTime = 19;
+  attribute nullable int8u defaultMoveRate = 20;
+  attribute nullable int8u startUpCurrentLevel = 16384;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct MoveRequest {
@@ -2471,17 +2471,17 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 server cluster WindowCovering = 258 {
   readonly attribute enum8 type = 0;
-  readonly attribute int16u currentPositionLift = 3;
-  readonly attribute int16u currentPositionTilt = 4;
+  readonly attribute nullable int16u currentPositionLift = 3;
+  readonly attribute nullable int16u currentPositionTilt = 4;
   readonly attribute bitmap8 configStatus = 7;
-  readonly attribute Percent currentPositionLiftPercentage = 8;
-  readonly attribute Percent currentPositionTiltPercentage = 9;
+  readonly attribute nullable Percent currentPositionLiftPercentage = 8;
+  readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
-  readonly attribute Percent100ths targetPositionLiftPercent100ths = 11;
-  readonly attribute Percent100ths targetPositionTiltPercent100ths = 12;
+  readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
+  readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute enum8 endProductType = 13;
-  readonly attribute Percent100ths currentPositionLiftPercent100ths = 14;
-  readonly attribute Percent100ths currentPositionTiltPercent100ths = 15;
+  readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
+  readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
   readonly attribute int16u installedOpenLimitLift = 16;
   readonly attribute int16u installedClosedLimitLift = 17;
   readonly attribute int16u installedOpenLimitTilt = 18;

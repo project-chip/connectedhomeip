@@ -313,11 +313,11 @@ server cluster LevelControl = 8 {
   readonly attribute int16u maxFrequency = 6;
   attribute bitmap8 options = 15;
   attribute int16u onOffTransitionTime = 16;
-  attribute int8u onLevel = 17;
-  attribute int16u onTransitionTime = 18;
-  attribute int16u offTransitionTime = 19;
-  attribute int8u defaultMoveRate = 20;
-  attribute int8u startUpCurrentLevel = 16384;
+  attribute nullable int8u onLevel = 17;
+  attribute nullable int16u onTransitionTime = 18;
+  attribute nullable int16u offTransitionTime = 19;
+  attribute nullable int8u defaultMoveRate = 20;
+  attribute nullable int8u startUpCurrentLevel = 16384;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
