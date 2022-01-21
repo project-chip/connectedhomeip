@@ -613,7 +613,7 @@ static void TestAES_CCM_128Containers(nlTestSuite * inSuite, void * inContext)
     // Test sanitization.
     deepCopy = AesCcm128Key();
     NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)));
-    
+
     // Give us different data.
     err = DRBG_get_bytes(testVector, sizeof(testVector));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
