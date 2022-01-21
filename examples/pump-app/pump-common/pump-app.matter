@@ -29,18 +29,18 @@ server cluster AccessControl = 31 {
 
   info event AccessControlEntryChanged = 0 {
     fabric_idx adminFabricIndex = 0;
-    node_id adminNodeID = 1;
-    INT16U adminPasscodeID = 2;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    AccessControlEntry latestValue = 4;
+    nullable AccessControlEntry latestValue = 4;
   }
 
   info event AccessControlExtensionChanged = 1 {
     fabric_idx adminFabricIndex = 0;
-    node_id adminNodeID = 1;
-    INT16U adminPasscodeID = 2;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    ExtensionEntry latestValue = 4;
+    nullable ExtensionEntry latestValue = 4;
   }
 
 }
@@ -331,7 +331,7 @@ server cluster GroupKeyManagement = 63 {
 
 server cluster Groups = 4 {
   readonly attribute bitmap8 nameSupport = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
     INT16U groupId = 0;
@@ -408,7 +408,7 @@ server cluster Identify = 3 {
   }
 
   attribute int16u identifyTime = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
     INT16U identifyTime = 0;
@@ -871,7 +871,7 @@ server cluster Scenes = 5 {
   readonly attribute int16u currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
   readonly attribute bitmap8 nameSupport = 4;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     INT16U groupId = 0;
