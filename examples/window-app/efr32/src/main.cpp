@@ -28,8 +28,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
-#if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
+#if CHIP_ENABLE_OPENTHREAD
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -42,6 +42,10 @@
 #include <openthread/thread.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#if defined(RS911X_WIFI) || defined(WF200_WIFI)
+#include "wfx_host_events.h"
+#endif /* RS911X_WIFI */
+
 #if PW_RPC_ENABLED
 #include <Rpc.h>
 #endif
@@ -50,6 +54,7 @@
 #include "matter_shell.h"
 #endif
 
+#define BLE_DEV_NAME "EFR32_WINDOW"
 using namespace ::chip::DeviceLayer;
 
 // ================================================================================
@@ -107,7 +112,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(err);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_WINDOW");
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     err = PlatformMgr().StartEventLoopTask();
@@ -143,6 +148,14 @@ int main(void)
         appError(err);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+#ifdef WF200_WIFI
+    // Start wfx bus communication task.
+    wfx_bus_start();
+#ifdef SL_WFX_USE_SECURE_LINK
+    wfx_securelink_task_start(); // start securelink key renegotiation task
+#endif                           // SL_WFX_USE_SECURE_LINK
+#endif                           /* WF200_WIFI */
 
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();

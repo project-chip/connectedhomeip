@@ -99,14 +99,13 @@ if (current_os == "zephyr" || current_os == "mbed") {
 
   lwip_target("lwip") {
     public = [
-      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/arch/cc.h",
-      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/arch/perf.h",
-      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/lwipopts.h",
-      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/lwippools.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/cc.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/perf.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwipopts.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwippools.h",
       "freertos/arch/sys_arch.h",
     ]
-    sources =
-        [ "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/sys_arch.c" ]
+    sources = [ "${qpg_sdk_root}/Components/ThirdParty/Lwip/sys_arch.c" ]
 
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]

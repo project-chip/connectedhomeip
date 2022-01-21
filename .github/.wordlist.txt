@@ -258,6 +258,7 @@ DataFrame
 dataset
 datasets
 dbf
+DBG
 dBm
 DBUILD
 dbus
@@ -316,6 +317,7 @@ DMM
 DNS
 Dnsmasq
 dnsmasqd
+DNSSD
 DNSStubListener
 Dockerfile
 Dockerfiles
@@ -650,6 +652,7 @@ MoveToSaturation
 MoveWithOnOff
 MPSL
 MRP
+MTD
 MTU
 Multiband
 Multicast
@@ -940,6 +943,7 @@ submodules
 subprocess
 SubscribeResponse
 SubscriptionId
+subtype
 sudo
 svg
 SVR
@@ -978,6 +982,7 @@ testws
 texinfo
 textboxes
 TFT
+threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
 Thunderboard
@@ -988,6 +993,7 @@ TLV
 tmp
 tngvndl
 TODO
+tokenized
 toolchain
 toolchains
 topologies

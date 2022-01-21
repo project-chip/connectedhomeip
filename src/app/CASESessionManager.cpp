@@ -55,7 +55,8 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
     CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
     if (err != CHIP_NO_ERROR)
     {
-        ReleaseSession(session);
+        // Release the peer rather than the pointer in case the failure handler has already released the session.
+        ReleaseSession(peerId);
     }
 
     return err;

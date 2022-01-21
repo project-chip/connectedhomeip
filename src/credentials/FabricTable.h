@@ -200,13 +200,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetICACert(ByteSpan & cert)
+    CHIP_ERROR GetICACert(ByteSpan & cert) const
     {
         cert = mICACert;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetNOCCert(ByteSpan & cert)
+    CHIP_ERROR GetNOCCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mNOCCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mNOCCert;
