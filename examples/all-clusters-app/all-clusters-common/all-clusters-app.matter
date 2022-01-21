@@ -1689,6 +1689,7 @@ server cluster LevelControl = 8 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster LowPower = 1288 {
@@ -3107,7 +3108,6 @@ endpoint 1 {
   server  cluster IlluminanceMeasurement;
   server  cluster KeypadInput;
   server  cluster LevelControl;
-  server  cluster LocalizationConfiguration;
   server  cluster LowPower;
   server  cluster MediaInput;
   server  cluster MediaPlayback;
