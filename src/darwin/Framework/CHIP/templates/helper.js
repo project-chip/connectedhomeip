@@ -44,6 +44,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
   case 'OperationalCredentials':
+  case 'TimeFormatLocalization':
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':

@@ -249,6 +249,10 @@
 @property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
 @end
 
+@interface CHIPTimeFormatLocalization ()
+@property (readonly) chip::Controller::TimeFormatLocalizationCluster cppCluster;
+@end
+
 @interface CHIPUserLabel ()
 @property (readonly) chip::Controller::UserLabelCluster cppCluster;
 @end

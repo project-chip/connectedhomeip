@@ -234,6 +234,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterNOCStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull noc;
+@property (strong, nonatomic) NSData * _Nonnull icac;
 - (instancetype)init;
 @end
 
