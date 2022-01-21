@@ -3104,6 +3104,10 @@ NS_ASSUME_NONNULL_BEGIN
                                 NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeNOCsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeNOCsWithMinInterval:(uint16_t)minInterval
+                                  maxInterval:(uint16_t)maxInterval
+                      subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;

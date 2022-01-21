@@ -3321,6 +3321,7 @@ class ChipClusters:
                     "attributeName": "NOCs",
                     "attributeId": 0x00000000,
                     "type": "",
+                    "reportable": True,
                 },
                 0x00000001: {
                     "attributeName": "FabricsList",

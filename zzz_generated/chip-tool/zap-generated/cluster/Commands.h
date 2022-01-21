@@ -32787,6 +32787,51 @@ public:
     }
 };
 
+class ReportOperationalCredentialsNOCs : public ModelCommand
+{
+public:
+    ReportOperationalCredentialsNOCs() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nocs");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOperationalCredentialsNOCs() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value)
+    {
+        LogValue("OperationalCredentials.NOCs report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FabricsList
  */
@@ -61385,6 +61430,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<OperationalCredentialsUpdateFabricLabel>(),             //
         make_unique<OperationalCredentialsUpdateNOC>(),                     //
         make_unique<ReadOperationalCredentialsNOCs>(),                      //
+        make_unique<ReportOperationalCredentialsNOCs>(),                    //
         make_unique<ReadOperationalCredentialsFabricsList>(),               //
         make_unique<ReportOperationalCredentialsFabricsList>(),             //
         make_unique<ReadOperationalCredentialsSupportedFabrics>(),          //
