@@ -1193,14 +1193,14 @@ namespace TimeFormatLocalization {
 namespace Attributes {
 
 namespace HourFormat {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::HourFormat * value); // HourFormat
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::HourFormat value);
 } // namespace HourFormat
 
-namespace CalendarType {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CalendarType
+namespace ActiveCalendarType {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::CalendarType * value); // CalendarType
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::CalendarType value);
+} // namespace ActiveCalendarType
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

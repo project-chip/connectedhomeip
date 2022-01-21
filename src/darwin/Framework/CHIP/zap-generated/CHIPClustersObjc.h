@@ -5452,6 +5452,28 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Time Format Localization
+ *
+ */
+@interface CHIPTimeFormatLocalization : CHIPCluster
+
+- (void)readAttributeHourFormatWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeHourFormatWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeActiveCalendarTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+- (void)writeAttributeActiveCalendarTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeSupportedCalendarTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster User Label
  *
  */

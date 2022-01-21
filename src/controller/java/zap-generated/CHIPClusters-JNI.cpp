@@ -25974,6 +25974,15 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeClusterRevisionAttrib
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(jlong, TimeFormatLocalizationCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    TimeFormatLocalizationCluster * cppCluster = new TimeFormatLocalizationCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, UserLabelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;

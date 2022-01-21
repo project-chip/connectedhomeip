@@ -423,6 +423,13 @@ public:
     ~ThreadNetworkDiagnosticsClusterTest() {}
 };
 
+class DLL_EXPORT TimeFormatLocalizationClusterTest : public TimeFormatLocalizationCluster
+{
+public:
+    TimeFormatLocalizationClusterTest() : TimeFormatLocalizationCluster() {}
+    ~TimeFormatLocalizationClusterTest() {}
+};
+
 class DLL_EXPORT UserLabelClusterTest : public UserLabelCluster
 {
 public:
