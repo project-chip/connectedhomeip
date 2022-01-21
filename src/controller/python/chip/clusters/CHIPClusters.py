@@ -2577,6 +2577,11 @@ class ChipClusters:
                     "type": "str",
                     "reportable": True,
                 },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
             },
     }
     _LOW_POWER_CLUSTER_INFO = {

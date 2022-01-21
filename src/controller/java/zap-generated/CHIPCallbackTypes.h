@@ -590,6 +590,8 @@ typedef void (*CHIPLocalizationConfigurationClusterActiveLocaleAttributeCallback
     void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo::DecodableArgType);
 typedef void (*CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType)(
     void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo::DecodableType &);
+typedef void (*CHIPLocalizationConfigurationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPLowPowerClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo::DecodableType &);
