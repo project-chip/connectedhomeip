@@ -799,9 +799,8 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Incoming command [endpointId=%d]", commandPath.mEndpointId);
-
     auto endpointId = commandPath.mEndpointId;
+    emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Incoming command [endpointId=%d]", endpointId);
 
     auto weekDayIndex     = commandData.weekDayIndex;
     auto userIndex        = commandData.userIndex;
@@ -892,19 +891,40 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
                                   "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                   endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
 
+    // TODO: Send lockUserChange event
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return;
 }
 
 void DoorLockServer::GetWeekDayScheduleCommandHandler(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+    auto endpointId = commandPath.mEndpointId;
+    emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Incoming command [endpointId=%d]", endpointId);
 
-    // TODO: Implement getting weekday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return;
+    auto weekDayIndex = commandData.weekDayIndex;
+    auto userIndex    = commandData.userIndex;
+
+    if (!weekDayIndexValid(endpointId, weekDayIndex) || !userIndexValid(endpointId, userIndex))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[GetWeekDaySchedule] Unable to get weekday schedule - index out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
+            endpointId, weekDayIndex, userIndex);
+        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kInvalidField);
+        return;
+    }
+
+    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo;
+    auto status = emberAfPluginDoorLockGetSchedule(endpointId, weekDayIndex, userIndex, scheduleInfo);
+    if (DlStatus::kSuccess != status)
+    {
+        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, status);
+        return;
+    }
+
+    sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kSuccess, scheduleInfo.daysMask,
+                                   scheduleInfo.startHour, scheduleInfo.startMinute, scheduleInfo.endHour, scheduleInfo.endMinute);
 }
 
 void DoorLockServer::ClearWeekDayScheduleCommandHandler(
@@ -1861,6 +1881,30 @@ bool DoorLockServer::weekDayIndexValid(chip::EndpointId endpointId, uint8_t week
         return false;
     }
     return true;
+}
+
+CHIP_ERROR DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t weekdayIndex,
+                                                          uint16_t userIndex, DlStatus status, DlDaysMaskMap daysMask,
+                                                          uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                                          uint8_t endMinute)
+{
+    VerifyOrDie(nullptr != commandObj);
+
+    Commands::GetWeekDayScheduleResponse::Type response;
+    response.weekDayIndex = weekdayIndex;
+    response.userIndex    = userIndex;
+    response.status       = status;
+    if (DlStatus::kSuccess != status)
+    {
+        response.daysMask    = daysMask;
+        response.startHour   = startHour;
+        response.startMinute = startMinute;
+        response.endHour     = endHour;
+        response.endMinute   = endMinute;
+    }
+
+    return commandObj->AddResponseData(commandPath, response);
 }
 
 EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,

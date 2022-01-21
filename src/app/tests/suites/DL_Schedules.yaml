@@ -356,6 +356,74 @@ tests:
     response:
       error: INVALID_FIELD
   
+  - label: "Get Week Day schedule with 0 index"
+    command: "GetWeekDaySchedule"
+    arguments:
+      values:
+        - name: "weekDayIndex"
+          value: 0
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "weekDayIndex"
+          value: 0
+        - name: "userIndex"
+          value: 1
+        - name: "status"
+          value: 0x85
+  
+  - label: "Get Week Day schedule with out-of-bounds index"
+    command: "GetWeekDaySchedule"
+    arguments:
+      values:
+        - name: "weekDayIndex"
+          value: static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1)
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "weekDayIndex"
+          value: static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1)
+        - name: "userIndex"
+          value: 1
+        - name: "status"
+          value: 0x85
+  
+  - label: "Get Week Day schedule with 0 user index"
+    command: "GetWeekDaySchedule"
+    arguments:
+      values:
+        - name: "weekDayIndex"
+          value: 1
+        - name: "userIndex"
+          value: 0
+    response:
+      values:
+        - name: "weekDayIndex"
+          value: 1
+        - name: "userIndex"
+          value: 0
+        - name: "status"
+          value: 0x85
+  
+  - label: "Get Week Day schedule with out-of-bounds user index"
+    command: "GetWeekDaySchedule"
+    arguments:
+      values:
+        - name: "weekDayIndex"
+          value: 1
+        - name: "userIndex"
+          value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+    response:
+      values:
+        - name: "weekDayIndex"
+          value: 1
+        - name: "userIndex"
+          value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+        - name: "status"
+          value: 0x85
+  
   - label: "Cleanup"
     command: "ClearUser"
     arguments:

@@ -208,6 +208,12 @@ private:
     bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex);
     bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex, uint8_t & weekDaysSupported);
 
+    CHIP_ERROR sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint8_t weekdayIndex,
+                                              uint16_t userIndex, DlStatus status, DlDaysMaskMap daysMask = DlDaysMaskMap(0),
+                                              uint8_t startHour = 0, uint8_t startMinute = 0, uint8_t endHour = 0,
+                                              uint8_t endMinute = 0);
+
     bool sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
                                   chip::NodeId nodeId, chip::FabricIndex fabricIndex, uint16_t userIndex = 0,
                                   uint16_t dataIndex = 0);
