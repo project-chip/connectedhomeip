@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 0;
-    CHAR_STRING value = 1;
+    CHAR_STRING<16> label = 0;
+    CHAR_STRING<16> value = 1;
 }
 
 server cluster FixedLabel = 64 {
@@ -70,7 +70,7 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
@@ -130,7 +130,7 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -280,11 +280,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     fabric_idx fabricIndex = 0;
-    OCTET_STRING rootPublicKey = 1;
+    OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
-    CHAR_STRING label = 5;
+    CHAR_STRING<32> label = 5;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
