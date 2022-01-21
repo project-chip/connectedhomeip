@@ -69,6 +69,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mpExchangeCtx->SetResponseTimeout(timeout.ValueOr(kImMessageTimeout));
 
@@ -80,6 +81,23 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
     }
 
     return SendInvokeRequest();
+}
+
+CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
+{
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+
+    // Create a new exchange context.
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    ReturnErrorOnFailure(SendInvokeRequest());
+
+    Close();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::SendInvokeRequest()
