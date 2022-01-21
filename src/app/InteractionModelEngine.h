@@ -116,7 +116,10 @@ public:
 
     uint32_t GetNumActiveWriteHandlers() const;
 
-    ReadHandler* GetActiveHandler(unsigned int aIndex);
+    /**
+     * Returns the handler at a particular index within the active handler list.
+     */
+    ReadHandler * ActiveHandlerAt(unsigned int aIndex);
 
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
@@ -183,18 +186,18 @@ public:
     auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
-    // Over-ride the maximal capacity of the underlying read handler pool to mimick
+    // Override the maximal capacity of the underlying read handler pool to mimic
     // out of memory scenarios in unit-tests.
     //
-    // If -1 is passed in, no over-ride is instituted and default behavior resumes.
+    // If -1 is passed in, no override is instituted and default behavior resumes.
     //
     void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
-    // they don't provide for the ability to shutdown those subscriptions after they've been established.
+    // they don't provide for the ability to shut down those subscriptions after they've been established.
     //
-    // So for the purposes of unit tests, add a helper here to shutdown and clean-up all active handlers.
+    // So for the purposes of unit tests, add a helper here to shut down and clean-up all active handlers.
     //
     void ShutdownActiveReads()
     {
