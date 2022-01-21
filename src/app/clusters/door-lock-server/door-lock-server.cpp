@@ -1273,6 +1273,38 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
 EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
                                         uint16_t userIndex, bool sendUserChangeEvent)
 {
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    return clearUser(endpointId, modifierFabricId, sourceNodeId, userIndex, user, sendUserChangeEvent);
+}
+
+EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
+                                        uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent)
+{
+    // appclusters, 5.2.4.37: all the credentials associated with user should be cleared when clearing the user
+    for (const auto & credential : user.credentials)
+    {
+        emberAfDoorLockClusterPrintln("[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%" PRIu8 ",credentialIndex=%d]",
+                                      endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
+
+        if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, DlCredentialStatus::kAvailable,
+                                                static_cast<DlCredentialType>(credential.CredentialType), chip::ByteSpan()))
+        {
+            ChipLogError(Zcl,
+                         "[ClearUser] Unable to remove credentials associated with user - internal error "
+                         "[endpointId=%d,userIndex=%d,credentialIndex=%d,credentialType=%" PRIu8 "]",
+                         endpointId, userIndex, credential.CredentialIndex, credential.CredentialType);
+            return EMBER_ZCL_STATUS_FAILURE;
+        }
+    }
+
+    // TODO: Remove all the user schedules
+
+    // Remove the user entry
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
                                       DlUserStatus::kAvailable, DlUserType::kUnrestrictedUser, DlCredentialRule::kSingle, nullptr,
                                       0))
@@ -1285,7 +1317,6 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Fabri
         sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kClear, sourceNodeId,
                                  modifierFabricId, userIndex, userIndex);
     }
-
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
@@ -1712,7 +1743,7 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
-    // 1. Clear the credential
+    // 1. Fetch the credential from storage, so we know what we're deleting
     EmberAfPluginDoorLockCredentialInfo credential;
     if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
     {
@@ -1740,17 +1771,8 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, DlCredentialStatus::kAvailable, credentialType,
-                                            chip::ByteSpan()))
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to clear credential - couldn't write new credential to database "
-                     "[endpointId=%d,credentialType=%" PRIu8 ",credentialIndex=%d,modifier=%d]",
-                     endpointId, to_underlying(credentialType), credentialIndex, modifier);
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    // 2. Clear the related user
+    // 2. Get the associated user and if it is the only attached credential -- delete the user. This operation will
+    // also remove the associated credential.
     uint16_t relatedUserIndex = 0;
     if (!findUserIndexByCredential(endpointId, credentialType, credentialIndex, relatedUserIndex))
     {
@@ -1760,7 +1782,6 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
                      endpointId, to_underlying(credentialType), credentialIndex, modifier);
         return EMBER_ZCL_STATUS_FAILURE;
     }
-
     EmberAfPluginDoorLockUserInfo relatedUser;
     if (!emberAfPluginDoorLockGetUser(endpointId, relatedUserIndex, relatedUser))
     {
@@ -1771,13 +1792,12 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
 
         return EMBER_ZCL_STATUS_FAILURE;
     }
-
     if (1 == relatedUser.credentials.size())
     {
         emberAfDoorLockClusterPrintln("[clearCredential] Clearing related user - no credentials left "
                                       "[endpointId=%d,credentialType=%" PRIu8 ",credentialIndex=%d,modifier=%d,userIndex=%d]",
                                       endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex);
-        auto clearStatus = clearUser(endpointId, modifier, sourceNodeId, relatedUserIndex, true);
+        auto clearStatus = clearUser(endpointId, modifier, sourceNodeId, relatedUserIndex, relatedUser, true);
         if (EMBER_ZCL_STATUS_SUCCESS != clearStatus)
         {
             ChipLogError(Zcl,
@@ -1791,6 +1811,17 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
                                       "[endpointId=%d,credentialType=%" PRIu8 ",credentialIndex=%d,modifier=%d,userIndex=%d]",
                                       endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex);
         return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    // 3. If the user wasn't deleted, delete the credential and adjust the list of credentials for related user in the storage
+    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, DlCredentialStatus::kAvailable, credentialType,
+                                            chip::ByteSpan()))
+    {
+        ChipLogError(Zcl,
+                     "[clearCredential] Unable to clear credential - couldn't write new credential to database "
+                     "[endpointId=%d,credentialType=%" PRIu8 ",credentialIndex=%d,modifier=%d]",
+                     endpointId, to_underlying(credentialType), credentialIndex, modifier);
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
     // Should never happen, only possible if the implementation of application is incorrect

@@ -103,7 +103,15 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     auto & userInStorage = mLockUsers[adjustedUserIndex];
 
+    if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
+    {
+        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16 "]", endpointId,
+                     userIndex, adjustedUserIndex);
+        return false;
+    }
+
     strncpy(userInStorage.userName, userName.data(), userName.size());
+    userInStorage.userName[userName.size()] = 0;
     userInStorage.userUniqueId   = uniqueId;
     userInStorage.userStatus     = userStatus;
     userInStorage.userType       = usertype;

@@ -55,6 +55,7 @@ static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
 static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5; /**< Maximum number of supported credentials by a single user. */
 
 struct EmberAfPluginDoorLockCredentialInfo;
+struct EmberAfPluginDoorLockUserInfo;
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -152,6 +153,8 @@ private:
                              const Nullable<DlCredentialRule> & credentialRule);
     EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
                             uint16_t userIndex, bool sendUserChangeEvent);
+    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
+                            uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
     DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
