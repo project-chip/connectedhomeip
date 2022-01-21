@@ -25,10 +25,13 @@
 
 #include "streamer.h"
 
+#include <cstdio>
+#include <cstring>
 #include <lib/core/CHIPError.h>
-
+#include <map>
 #include <stdarg.h>
 #include <stddef.h>
+#include <vector>
 
 #ifndef CHIP_SHELL_PROMPT
 #define CHIP_SHELL_PROMPT "> "
@@ -93,20 +96,45 @@ typedef const struct shell_command shell_command_t;
  */
 typedef CHIP_ERROR shell_command_iterator_t(shell_command_t * command, void * arg);
 
+struct char_key_matcher
+{
+    bool operator()(char const * a, char const * b) const { return strcmp(a, b) < 0; }
+};
+
 class Engine
 {
 protected:
     static Engine theEngineRoot;
-
-    shell_command_t * _commandSet[CHIP_SHELL_MAX_MODULES];
+    static std::map<const char *, std::vector<Engine *>, char_key_matcher> theShellMap;
+    std::vector<shell_command_t *> _commandSet;
     unsigned _commandSetSize[CHIP_SHELL_MAX_MODULES];
     unsigned _commandSetCount;
+
+    static void AddToShellMap(char const * prefix, Engine * shell);
 
 public:
     Engine() {}
 
     /** Return the root singleton for the Shell command hierarchy. */
     static Engine & Root() { return theEngineRoot; }
+
+    /** Rturn the singleton shell map that stores all command prefixs and
+     *  Engine instances they correspond to.
+     */
+    static std::map<const char *, std::vector<Engine *>, char_key_matcher> & ShellMap() { return theShellMap; };
+
+    /**
+     * Get command suggestions by command prefix.
+     *
+     * @param prefix                The command prefix. Use double quoted empty string `""`
+     *                              or nullptr for root commands.
+     *
+     * @return                      All completion candidates under the prefix
+     */
+    static std::vector<shell_command_t *> GetCommandSuggestions(const char * prefix);
+
+    /** Return vector of all the commands registered to the Engine instance. */
+    std::vector<shell_command_t *> & GetCommandSet() { return _commandSet; };
 
     /**
      * Registers a set of defaults commands (help) for all Shell and sub-Shell instances.
@@ -141,8 +169,11 @@ public:
      *
      * @param command_set           An array of commands to add to the shell.
      * @param count                 The number of commands in the command set array.
+     * @param prefix                The prefix of this command set in the full command path.
+     *                              e.g. "matter base64" is prefix for "endcode" and "decode".
+     *                              Use double quoted empty string `""` or nullptr for root commands.
      */
-    void RegisterCommands(shell_command_t * command_set, unsigned count);
+    void RegisterCommands(shell_command_t * command_set, unsigned count, const char * prefix);
 
     /**
      * Runs the shell mainloop. Will display the prompt and enable interaction.
@@ -164,6 +195,18 @@ public:
 private:
     static void ProcessShellLineTask(intptr_t context);
 };
+
+/**
+ * A map of the Engine instances and the command prefix that they correspond to.
+ *
+ * The key is the command prefix (until n-1th token of full command) e.g.
+ * "device", or "dns resolve"
+ *
+ * The value is a vector of the pointers to Engine instances that register and
+ * handle commands under that prefix, e.g. for key "dns", the map value should
+ * include Engine instance(s) that handle {"resolve", "browse"}.
+ */
+typedef std::map<const char *, std::vector<Engine *>, char_key_matcher> shell_map_t;
 
 } // namespace Shell
 } // namespace chip

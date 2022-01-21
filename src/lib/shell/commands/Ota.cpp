@@ -203,7 +203,7 @@ void RegisterOtaCommands()
     // Register the root `ota` command in the top-level shell.
     static const shell_command_t otaCommand = { &OtaHandler, "ota", "OTA commands" };
 
-    Engine::Root().RegisterCommands(&otaCommand, 1);
+    Engine::Root().RegisterCommands(&otaCommand, 1, nullptr);
 }
 
 } // namespace Shell

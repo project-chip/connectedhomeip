@@ -30,12 +30,14 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <algorithm>
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <map>
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
+#include <vector>
 
 using namespace chip::Logging;
 
@@ -43,6 +45,7 @@ namespace chip {
 namespace Shell {
 
 Engine Engine::theEngineRoot;
+shell_map_t Engine::theShellMap;
 
 int Engine::Init()
 {
@@ -56,47 +59,90 @@ int Engine::Init()
 
 void Engine::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
 {
-    for (unsigned i = 0; i < _commandSetCount; i++)
+    for (auto * _command : _commandSet)
     {
-        for (unsigned j = 0; j < _commandSetSize[i]; j++)
+        if (on_command(_command, arg) != CHIP_NO_ERROR)
         {
-            if (on_command(&_commandSet[i][j], arg) != CHIP_NO_ERROR)
-            {
-                return;
-            }
+            return;
         }
     }
 }
 
-void Engine::RegisterCommands(shell_command_t * command_set, unsigned count)
+void Engine::RegisterCommands(shell_command_t * command_set, unsigned count, const char * prefix)
 {
-    if (_commandSetCount >= CHIP_SHELL_MAX_MODULES)
+    if (this == &Engine::Root() || prefix == nullptr)
     {
-        ChipLogError(Shell, "Max number of modules reached\n");
+        prefix = "";
+    }
+
+    if (_commandSet.size() + count > CHIP_SHELL_MAX_MODULES)
+    {
+        ChipLogError(Shell, "Max number of commands reached\n");
         assert(0);
     }
 
-    _commandSet[_commandSetCount]     = command_set;
-    _commandSetSize[_commandSetCount] = count;
-    ++_commandSetCount;
+    for (unsigned i = 0; i < count; i++)
+    {
+        _commandSet.push_back(command_set + i);
+    }
+
+    Engine::AddToShellMap(prefix, this);
+}
+
+void Engine::AddToShellMap(char const * prefix, Engine * shell)
+{
+    shell_map_t::iterator it = Engine::ShellMap().find(prefix);
+    if (it == Engine::ShellMap().end())
+    {
+        Engine::ShellMap().insert(shell_map_t::value_type(prefix, { shell }));
+    }
+    else if (std::find(it->second.begin(), it->second.end(), shell) == it->second.end())
+    {
+        it->second.push_back(shell);
+    }
+}
+
+std::vector<shell_command_t *> Engine::GetCommandSuggestions(const char * prefix)
+{
+    if (prefix == nullptr)
+    {
+        prefix = "";
+    }
+
+    shell_map_t::iterator engine_map = Engine::ShellMap().find(prefix);
+    std::vector<shell_command_t *> next_commands;
+
+    if (engine_map == Engine::ShellMap().end())
+    {
+        return next_commands;
+    }
+
+    std::vector<Engine *> engines = engine_map->second;
+
+    for (auto engine : engines)
+    {
+        std::vector<shell_command_t *> engine_commands = engine->GetCommandSet();
+
+        for (auto engine_command : engine_commands)
+        {
+            next_commands.push_back(engine_command);
+        }
+    }
+    return next_commands;
 }
 
 CHIP_ERROR Engine::ExecCommand(int argc, char * argv[])
 {
     CHIP_ERROR retval = CHIP_ERROR_INVALID_ARGUMENT;
-
     VerifyOrReturnError(argc > 0, retval);
     // Find the command
-    for (unsigned i = 0; i < _commandSetCount; i++)
+    for (unsigned i = 0; i < _commandSet.size(); i++)
     {
-        for (unsigned j = 0; j < _commandSetSize[i]; j++)
+        if (strcmp(argv[0], _commandSet[i]->cmd_name) == 0)
         {
-            if (strcmp(argv[0], _commandSet[i][j].cmd_name) == 0)
-            {
-                // Execute the command!
-                retval = _commandSet[i][j].cmd_func(argc - 1, argv + 1);
-                break;
-            }
+            // Execute the command!
+            retval = _commandSet[i]->cmd_func(argc - 1, argv + 1);
+            break;
         }
     }
 
