@@ -1274,7 +1274,8 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
 }
 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
+                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk,
+                                                    Optional<NodeId> adminSubject)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

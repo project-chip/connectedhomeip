@@ -608,7 +608,7 @@ static void TestAES_CCM_128Containers(nlTestSuite * inSuite, void * inContext)
 
     // Test deep copy from array.
     deepCopy = AesCcm128Key(testVector);
-    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) ==  0);
+    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) == 0);
 
     // Test sanitization.
     deepCopy = AesCcm128Key();
@@ -620,8 +620,8 @@ static void TestAES_CCM_128Containers(nlTestSuite * inSuite, void * inContext)
 
     // Test deep copy from KeySpan.
     shallowCopy = AesCcm128KeySpan(testVector);
-    deepCopy = AesCcm128Key(shallowCopy);
-    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) ==  0);
+    deepCopy    = AesCcm128Key(shallowCopy);
+    NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) == 0);
 
     // Test Span getter.
     NL_TEST_ASSERT(inSuite, memcmp(testVector, deepCopy.Span().data(), deepCopy.Span().size()) == 0);
