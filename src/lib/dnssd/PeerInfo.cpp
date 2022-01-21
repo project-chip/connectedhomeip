@@ -35,4 +35,3 @@ CHIP_ERROR PeerInfo::ToPeerId(PeerId & result, const PeerInfo peerInfo, FabricTa
 }
 
 } // namespace chip
-
