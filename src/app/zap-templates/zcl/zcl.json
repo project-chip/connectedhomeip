@@ -88,5 +88,8 @@
             "commandDiscovery": true
         }
     },
+    "listsUseAttributeAccessInterface": true,
+    "attributeAccessInterfaceAttributes": {
+    },
     "defaultReportingPolicy": "mandatory"
 }
