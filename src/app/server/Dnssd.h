@@ -79,7 +79,7 @@ public:
     CHIP_ERROR AdvertiseOperational();
 
     /// (Re-)starts the Dnssd server
-    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
+    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1)
     /// - if device has been commissioned, then commissioning mode will be disabled.
     void StartServer();
 
