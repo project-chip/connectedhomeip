@@ -252,6 +252,7 @@ function getTests()
   const DoorLock = [
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
+    'DL_Schedules',
   ];
 
   const tests = [
