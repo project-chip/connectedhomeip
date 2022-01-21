@@ -282,7 +282,9 @@ CHIP_ERROR FabricInfo::SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, ValidationContext & context, NodeId & nodeId, CompressedFabricId & compressedFabricId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const
+CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, ValidationContext & context, NodeId & nodeId,
+                                         CompressedFabricId & compressedFabricId, FabricId & fabricId,
+                                         Crypto::P256PublicKey & nocPubkey) const
 {
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
@@ -323,7 +325,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     }
 
     ReturnErrorOnFailure(GetCompressedId(fabricId, tmpNodeId, compressedFabricId));
-    nodeId = tmpNodeId;
+    nodeId    = tmpNodeId;
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;
@@ -494,8 +496,8 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     SetRootCert(newFabric.mRootCert);
 
     ChipLogProgress(Discovery, "Verifying the received credentials");
-    ReturnErrorOnFailure(
-        VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, validContext, mNodeId, mCachedCompressidFabricId, mFabricId, pubkey));
+    ReturnErrorOnFailure(VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, validContext, mNodeId, mCachedCompressidFabricId,
+                                           mFabricId, pubkey));
 
     SetICACert(newFabric.mICACert);
     SetNOCCert(newFabric.mNOCCert);

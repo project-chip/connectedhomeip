@@ -67,7 +67,8 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerInfo * peerInfo)
     uint8_t bufCompressedFabricId[bufferSize];
     uint8_t bufNodeId[bufferSize];
 
-    ReturnErrorCodeIf(Encoding::HexToBytes(name, fabricIdStringLength, bufCompressedFabricId, bufferSize) == 0, CHIP_ERROR_WRONG_NODE_ID);
+    ReturnErrorCodeIf(Encoding::HexToBytes(name, fabricIdStringLength, bufCompressedFabricId, bufferSize) == 0,
+                      CHIP_ERROR_WRONG_NODE_ID);
     // Buf now stores the fabric id, as big-endian bytes.
     static_assert(fabricIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
 

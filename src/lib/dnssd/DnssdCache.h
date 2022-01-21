@@ -98,7 +98,7 @@ public:
     void DumpCache()
     {
         MdnsLogProgress(Discovery, "cache size = %d", mLookupTable.Allocated());
-        mLookupTable.ForEachActiveObject([] (ResolvedNodeData * e) {
+        mLookupTable.ForEachActiveObject([](ResolvedNodeData * e) {
             MdnsLogProgress(Discovery, "Entry: node %lx fabric %lx, port = %d", e->mNodeId, e->mCompressedFabricId, e->port);
             for (size_t j = 0; j < e->mNumIPs; ++j)
             {
@@ -110,7 +110,8 @@ public:
         });
     }
 
-    CHIP_ERROR Delete(PeerId peerId, FabricTable * fabricTable) {
+    CHIP_ERROR Delete(PeerId peerId, FabricTable * fabricTable)
+    {
         PeerInfo peerInfo;
         ReturnErrorOnFailure(PeerInfo::FromPeerId(peerInfo, peerId, fabricTable));
         return Delete(peerInfo);
@@ -130,7 +131,7 @@ private:
     {
         ResolvedNodeData * result = nullptr;
 
-        mLookupTable.ForEachActiveObject([&] (ResolvedNodeData * entry) {
+        mLookupTable.ForEachActiveObject([&](ResolvedNodeData * entry) {
             if (entry->mPeerInfo == peerInfo)
             {
                 if (entry->mExpiryTime < current_time)

@@ -29,7 +29,8 @@ CHIP_ERROR PeerInfo::FromPeerId(PeerInfo & result, const PeerId peerId, FabricTa
 CHIP_ERROR PeerInfo::ToPeerId(PeerId & result, const PeerInfo peerInfo, FabricTable * fabricTable)
 {
     FabricInfo * fabricInfo = fabricTable->FindFabricWithCompressedId(peerInfo.GetCompressedFabricId());
-    if (fabricInfo == nullptr) return CHIP_ERROR_INVALID_ARGUMENT;
+    if (fabricInfo == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
     result = PeerId(peerInfo.GetNodeId(), fabricInfo->GetFabricIndex());
     return CHIP_NO_ERROR;
 }

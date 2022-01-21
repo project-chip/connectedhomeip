@@ -31,7 +31,7 @@ constexpr chip::System::Clock::Timeout ActiveResolveAttempts::kMaxRetryDelay;
 ActiveResolveAttempts::RetryEntry * ActiveResolveAttempts::FindEntry(const chip::PeerInfo & peerInfo)
 {
     RetryEntry * result = nullptr;
-    mRetryQueue.ForEachActiveObject([&] (RetryEntry * item) {
+    mRetryQueue.ForEachActiveObject([&](RetryEntry * item) {
         if (item->peerInfo == peerInfo)
         {
             result = item;
@@ -88,7 +88,7 @@ void ActiveResolveAttempts::MarkPending(const PeerInfo & peerInfo)
     //    - on same delay, use queryDueTime to determine the oldest request
     //      (the one with the smallest  due time was issued the longest time
     //       ago)
-    mRetryQueue.ForEachActiveObject([&] (RetryEntry * entry) {
+    mRetryQueue.ForEachActiveObject([&](RetryEntry * entry) {
         if (entryToUse == nullptr)
         {
             entryToUse = entry;
@@ -136,7 +136,7 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
 
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
-    mRetryQueue.ForEachActiveObject([&] (const RetryEntry * entry) {
+    mRetryQueue.ForEachActiveObject([&](const RetryEntry * entry) {
         if (now >= entry->queryDueTime)
         {
             // found an entry that needs processing right now
@@ -161,7 +161,7 @@ Optional<PeerInfo> ActiveResolveAttempts::NextScheduledPeer()
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
     RetryEntry * result = nullptr;
-    mRetryQueue.ForEachActiveObject([&] (RetryEntry * entry) {
+    mRetryQueue.ForEachActiveObject([&](RetryEntry * entry) {
         if (entry->queryDueTime > now)
         {
             return Loop::Continue; // not yet due

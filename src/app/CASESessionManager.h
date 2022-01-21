@@ -84,7 +84,7 @@ public:
 
     // DEPRECATED, for backward competibility, the one takes a PeerId should be used instead.
     [[deprecated]] CHIP_ERROR FindOrEstablishSession(PeerInfo peerInfo, Callback::Callback<OnDeviceConnected> * onConnection,
-                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     OperationalDeviceProxy * FindExistingSession(PeerId peerId);
 

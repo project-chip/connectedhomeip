@@ -265,8 +265,8 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort)
 {
     Inet::IPAddress address;
-    ReturnErrorOnFailure(devCtrl->GetPeerAddressAndPort(PeerInfo(nodeId, devCtrl->GetCompressedFabricId()), address, *outPort)
-            .AsInteger());
+    ReturnErrorOnFailure(
+        devCtrl->GetPeerAddressAndPort(PeerInfo(nodeId, devCtrl->GetCompressedFabricId()), address, *outPort).AsInteger());
     VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();

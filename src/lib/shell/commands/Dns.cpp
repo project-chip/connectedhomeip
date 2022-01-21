@@ -44,7 +44,8 @@ public:
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
-                        ChipLogValueX64(nodeData.mPeerInfo.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerInfo.GetNodeId()));
+                        ChipLogValueX64(nodeData.mPeerInfo.GetCompressedFabricId()),
+                        ChipLogValueX64(nodeData.mPeerInfo.GetNodeId()));
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.mHostName);
         for (size_t i = 0; i < nodeData.mNumIPs; ++i)
         {

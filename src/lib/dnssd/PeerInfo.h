@@ -17,8 +17,8 @@
 #pragma once
 
 #include <credentials/FabricTable.h>
-#include <lib/core/NodeId.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/NodeId.h>
 #include <lib/core/PeerId.h>
 
 namespace chip {
@@ -49,10 +49,7 @@ public:
     {
         return (mNodeId == that.mNodeId) && (mCompressedFabricId == that.mCompressedFabricId);
     }
-    bool operator!=(const PeerInfo & that) const
-    {
-        return !(*this == that);
-    }
+    bool operator!=(const PeerInfo & that) const { return !(*this == that); }
 
     static CHIP_ERROR FromPeerId(PeerInfo & result, const PeerId peerId, FabricTable * fabricTable);
     static CHIP_ERROR ToPeerId(PeerId & result, const PeerInfo peerInfo, FabricTable * fabricTable);

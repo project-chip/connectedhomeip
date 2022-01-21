@@ -36,7 +36,8 @@ void TestMakeInstanceName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, sizeof(buffer), PeerInfo(0x5678, 0x1234)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "0000000000001234-0000000000005678") == 0);
 
-    NL_TEST_ASSERT(inSuite, MakeInstanceName(buffer, sizeof(buffer), PeerInfo(0x123456789abcdefULL, 0x1122334455667788ULL)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(
+        inSuite, MakeInstanceName(buffer, sizeof(buffer), PeerInfo(0x123456789abcdefULL, 0x1122334455667788ULL)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "1122334455667788-0123456789ABCDEF") == 0);
 
     // insufficient buffer size:

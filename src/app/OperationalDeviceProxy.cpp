@@ -57,7 +57,8 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
     case State::NeedsAddress:
         VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(mFabricInfo->GetFabricIndex() == mPeerId.GetFabricIndex(), CHIP_ERROR_INVALID_ARGUMENT);
-        err = resolver->ResolveNodeId(PeerInfo(mPeerId.GetNodeId(), mFabricInfo->GetCachedCompressidFabricId()), chip::Inet::IPAddressType::kAny);
+        err = resolver->ResolveNodeId(PeerInfo(mPeerId.GetNodeId(), mFabricInfo->GetCachedCompressidFabricId()),
+                                      chip::Inet::IPAddressType::kAny);
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 

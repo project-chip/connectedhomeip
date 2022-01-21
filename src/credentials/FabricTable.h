@@ -222,17 +222,19 @@ public:
         return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
-    CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context, NodeId & nodeId, CompressedFabricId & compressedFabricId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
+    CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
+                                 NodeId & nodeId, CompressedFabricId & compressedFabricId, FabricId & fabricId,
+                                 Crypto::P256PublicKey & nocPubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
      */
     void Reset()
     {
-        mNodeId = kUndefinedNodeId;
-        mFabric = kUndefinedFabricIndex;
-        mVendorId       = kUndefinedVendorId;
-        mFabricLabel[0] = '\0';
+        mNodeId                   = kUndefinedNodeId;
+        mFabric                   = kUndefinedFabricIndex;
+        mVendorId                 = kUndefinedVendorId;
+        mFabricLabel[0]           = '\0';
         mCachedCompressidFabricId = kUndefinedCompressedFabricId;
 
         if (mOperationalKey != nullptr)

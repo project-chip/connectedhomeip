@@ -236,11 +236,11 @@ void TestNextPeerOrdering(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestSinglePeerAddRemove", TestSinglePeerAddRemove),   //
+    NL_TEST_DEF("TestSinglePeerAddRemove", TestSinglePeerAddRemove),       //
     NL_TEST_DEF("TestRescheduleSamePeerInfo", TestRescheduleSamePeerInfo), //
-    NL_TEST_DEF("TestLRU", TestLRU),                                   //
-    NL_TEST_DEF("TestNextPeerOrdering", TestNextPeerOrdering),         //
-    NL_TEST_SENTINEL()                                                 //
+    NL_TEST_DEF("TestLRU", TestLRU),                                       //
+    NL_TEST_DEF("TestNextPeerOrdering", TestNextPeerOrdering),             //
+    NL_TEST_SENTINEL()                                                     //
 };
 
 } // namespace

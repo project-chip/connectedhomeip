@@ -258,13 +258,14 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             MutableByteSpan mac(macBuffer);
             chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
 
-            const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
-                                                 .SetPeerInfo(PeerInfo(fabricInfo.GetPeerId().GetNodeId(), fabricInfo.GetCachedCompressidFabricId()))
-                                                 .SetMac(mac)
-                                                 .SetPort(GetSecuredPort())
-                                                 .SetMRPConfig(gDefaultMRPConfig)
-                                                 .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                                                 .EnableIpV4(true);
+            const auto advertiseParameters =
+                chip::Dnssd::OperationalAdvertisingParameters()
+                    .SetPeerInfo(PeerInfo(fabricInfo.GetPeerId().GetNodeId(), fabricInfo.GetCachedCompressidFabricId()))
+                    .SetMac(mac)
+                    .SetPort(GetSecuredPort())
+                    .SetMRPConfig(gDefaultMRPConfig)
+                    .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                    .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 

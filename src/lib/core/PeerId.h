@@ -22,7 +22,7 @@
 
 namespace chip {
 
-using FabricId           = uint64_t;
+using FabricId = uint64_t;
 
 constexpr FabricId kUndefinedFabricId = 0ULL;
 constexpr uint16_t kUndefinedVendorId = 0U;
@@ -35,14 +35,15 @@ public:
     PeerId(NodeId nodeId, FabricIndex fabricIndex) : mNodeId(nodeId), mFabricIndex(fabricIndex) {}
 
     PeerId(const PeerId &) = default;
-    PeerId(PeerId &&) = default;
+    PeerId(PeerId &&)      = default;
     PeerId & operator=(const PeerId &) = default;
     PeerId & operator=(PeerId &&) = default;
 
     NodeId GetNodeId() const { return mNodeId; }
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
-    bool operator==(const PeerId & other) const {
+    bool operator==(const PeerId & other) const
+    {
         if (mFabricIndex == kUndefinedFabricIndex)
         {
             if (mNodeId == kUndefinedNodeId || other.mNodeId == kUndefinedNodeId)

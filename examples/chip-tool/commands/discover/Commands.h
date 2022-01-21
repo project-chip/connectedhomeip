@@ -35,8 +35,7 @@ public:
         ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
         chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
         ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerInfo(remoteId, fabricId),
-                                                               chip::Inet::IPAddressType::kAny,
+        return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerInfo(remoteId, fabricId), chip::Inet::IPAddressType::kAny,
                                                                chip::Dnssd::Resolver::CacheBypass::On);
     }
 

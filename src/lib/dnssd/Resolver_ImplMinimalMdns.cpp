@@ -505,7 +505,8 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     return SendQuery(qname, mdns::Minimal::QType::ANY);
 }
 
-CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerInfo & peerInfo, Inet::IPAddressType type,
+                                          Resolver::CacheBypass dnssdCacheBypass)
 {
     mDiscoveryType = DiscoveryType::kOperational;
     mActiveResolves.MarkPending(peerInfo);

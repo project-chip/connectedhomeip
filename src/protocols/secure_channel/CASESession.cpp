@@ -1267,8 +1267,8 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
     NodeId nodeId;
     CompressedFabricId compressedFabricId;
     FabricId rawFabricId;
-    ReturnErrorOnFailure(
-        mFabricInfo->VerifyCredentials(responderNOC, responderICAC, mValidContext, nodeId, compressedFabricId, rawFabricId, responderID));
+    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(responderNOC, responderICAC, mValidContext, nodeId, compressedFabricId,
+                                                        rawFabricId, responderID));
 
     SetPeerNodeId(nodeId);
 

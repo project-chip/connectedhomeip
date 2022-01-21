@@ -105,7 +105,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
     nodeData.mNumIPs      = 1;
-    nodeData.mPeerInfo      = peerInfo;
+    nodeData.mPeerInfo    = peerInfo;
     // TODO: Use seconds?
     const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 

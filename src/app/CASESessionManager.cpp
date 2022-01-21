@@ -34,7 +34,9 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData, mConfig.sessionInitParams.fabricTable) == CHIP_NO_ERROR);
+    bool nodeIDWasResolved =
+        (mConfig.dnsCache != nullptr &&
+         mConfig.dnsCache->Lookup(peerId, resolutionData, mConfig.sessionInitParams.fabricTable) == CHIP_NO_ERROR);
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
@@ -77,7 +79,8 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
 {
-    return mConfig.dnsResolver->ResolveNodeId(PeerInfo(nodeId, fabric->GetCachedCompressidFabricId()), Inet::IPAddressType::kAny, Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(PeerInfo(nodeId, fabric->GetCachedCompressidFabricId()), Inet::IPAddressType::kAny,
+                                              Dnssd::Resolver::CacheBypass::On);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)

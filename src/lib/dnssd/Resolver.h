@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <limits>
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
@@ -29,6 +28,7 @@
 #include <lib/dnssd/Constants.h>
 #include <lib/dnssd/PeerInfo.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
