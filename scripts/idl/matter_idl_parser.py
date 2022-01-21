@@ -46,6 +46,15 @@ class MatterIdlTransformer(Transformer):
             raise Error("Unexpected argument counts")
         return tokens[0].value
 
+    def data_type(self, tokens):
+        if len(tokens) == 1:
+            return DataType(name=tokens[0])
+            # Just a string for data type
+        elif len(tokens) == 2:
+            return DataType(name=tokens[0], max_length=tokens[1])
+        else:
+            raise Error("Unexpected size for data type")
+
     @v_args(inline=True)
     def enum_entry(self, id, number):
         return EnumEntry(name=id, code=number)

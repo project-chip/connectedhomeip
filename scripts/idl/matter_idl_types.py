@@ -1,7 +1,7 @@
 import enum
 
 from dataclasses import dataclass, field
-from typing import List, Set
+from typing import List, Set, Union
 
 
 class FieldAttribute(enum.Enum):
@@ -37,6 +37,14 @@ class EndpointContentType(enum.Enum):
 
 
 @dataclass
+class DataType:
+    name: str
+
+    # Applies for strings (char or binary)
+    max_length: Union[int, None] = None
+
+
+@dataclass
 class Field:
     data_type: str
     code: int
@@ -67,7 +75,7 @@ class Attribute:
 class Struct:
     name: str
     fields: List[Field]
-    tag: StructTag = None
+    tag: Union[StructTag, None] = None
 
 
 @dataclass

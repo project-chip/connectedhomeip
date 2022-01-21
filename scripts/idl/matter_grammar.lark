@@ -1,5 +1,5 @@
 struct: "struct"i id "{" struct_field* "}"
-enum: "enum"i id ":" type "{" enum_entry* "}"
+enum: "enum"i id ":" data_type "{" enum_entry* "}"
 
 event: event_priority "event"i id "=" number "{" struct_field* "}"
 
@@ -34,8 +34,10 @@ struct_field: member_attribute* field
 member_attribute: "optional"i -> optional
                 | "nullable"i -> nullable
 
-field: type id list_marker? "=" number ";"
+field: data_type id list_marker? "=" number ";"
 list_marker: "[" "]"
+
+data_type: type ("<" number ">")?
 
 id: ID
 type: ID

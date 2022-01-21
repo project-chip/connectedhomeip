@@ -56,7 +56,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(enums=[
-            Enum(name='GlobalEnum', base_type='ENUM8',
+            Enum(name='GlobalEnum', base_type=DataType(name='ENUM8'),
                  entries=[
                      EnumEntry(name="kValue1", code=1),
                      EnumEntry(name="kOther", code=0x12),
@@ -77,10 +77,10 @@ class TestParser(unittest.TestCase):
             Struct(name='Something',
                    fields=[
                         Field(
-                            data_type="CHAR_STRING", code=1, name="astring", ),
-                        Field(data_type="CLUSTER_ID", code=2, name="idlist", is_list=True, attributes=set(
+                            data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
+                        Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist", is_list=True, attributes=set(
                             [FieldAttribute.OPTIONAL])),
-                        Field(data_type="int", code=0x123, name="valueThatIsNullable", attributes=set(
+                        Field(data_type=DataType(name="int"), code=0x123, name="valueThatIsNullable", attributes=set(
                             [FieldAttribute.NULLABLE])),
                    ])]
         )
@@ -102,13 +102,34 @@ class TestParser(unittest.TestCase):
                     code=0x321,
                     attributes=[
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
-                            data_type="int8u", code=1, name="roAttr")),
+                            data_type=DataType(name="int8u"), code=1, name="roAttr")),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
-                            data_type="int32u", code=123, name="rwAttr", is_list=True)),
+                            data_type=DataType(name="int32u"), code=123, name="rwAttr", is_list=True)),
                         Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
-                            data_type="int32u", code=124, name="grwAttr", is_list=True)),
+                            data_type=DataType(name="int32u"), code=124, name="grwAttr", is_list=True)),
                         Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE]), definition=Field(
-                            data_type="int32u", code=125, name="groAttr", is_list=True)),
+                            data_type=DataType(name="int32u"), code=125, name="groAttr", is_list=True)),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_sized_attribute(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute char_string<11> attr1 = 1;
+                attribute octet_string<33> attr2[] = 2;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="char_string", max_length=11), code=1, name="attr1")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="octet_string", max_length=33), code=2, name="attr2", is_list=True)),
                     ]
                     )])
         self.assertEqual(actual, expected)
@@ -158,7 +179,7 @@ class TestParser(unittest.TestCase):
                     name="WithEnums",
                     code=0xab,
                     enums=[
-                        Enum(name="TestEnum", base_type="ENUM16",
+                        Enum(name="TestEnum", base_type=DataType(name="ENUM16"),
                              entries=[
                                  EnumEntry(name="A", code=0x123),
                                  EnumEntry(name="B", code=0x234),
@@ -182,7 +203,7 @@ class TestParser(unittest.TestCase):
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, fields=[
-                            Field(data_type="INT32U",
+                            Field(data_type=DataType(name="INT32U"),
                                             code=0, name="softwareVersion"),
                         ]),
                         Event(priority=EventPriority.INFO,
