@@ -85,25 +85,19 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
 
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
-    err = Finalize(mPendingInvokeData);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
 
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    // mpExchangeCtx->SetResponseTimeout(timeout);
-
-    err = SendInvokeRequest();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(SendInvokeRequest());
 
     Close();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::SendInvokeRequest()
