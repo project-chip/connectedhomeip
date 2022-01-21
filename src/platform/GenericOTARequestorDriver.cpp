@@ -44,7 +44,7 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
     return 1024;
 }
 
-void GenericOTARequestorDriver::HandleError(OTAUpdateStateEnum state, CHIP_ERROR error)
+void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
 {
     // TODO: Schedule the next QueryImage
 }
@@ -52,7 +52,7 @@ void GenericOTARequestorDriver::HandleError(OTAUpdateStateEnum state, CHIP_ERROR
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(OTAUpdateStateEnum::kDelayedOnQuery, delay,
+    ScheduleDelayedAction(UpdateFailureState::kDownloading, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); });
 }
 
@@ -70,14 +70,14 @@ void GenericOTARequestorDriver::UpdateDownloaded()
 void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    ScheduleDelayedAction(OTAUpdateStateEnum::kDelayedOnApply, delay,
+    ScheduleDelayedAction(UpdateFailureState::kApplying, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); });
 }
 
 void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(OTAUpdateStateEnum::kDelayedOnApply, delay,
+    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); });
 }
 
@@ -87,7 +87,7 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     mImageProcessor->Abort();
 }
 
-void GenericOTARequestorDriver::ScheduleDelayedAction(OTAUpdateStateEnum state, System::Clock::Seconds32 delay,
+void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay,
                                                       System::TimerCompleteCallback action)
 {
     CHIP_ERROR error = SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, this);

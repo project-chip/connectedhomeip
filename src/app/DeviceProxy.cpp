@@ -39,11 +39,11 @@ using namespace chip::Callback;
 
 namespace chip {
 
-CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj)
+CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(GetSecureSession().Value());
+    return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout);
 }
 
 void DeviceProxy::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
@@ -66,26 +66,6 @@ void DeviceProxy::CancelIMResponseHandler(void * commandObj)
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
     chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(commandObj);
     mCallbacksMgr.CancelResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */);
-}
-
-CHIP_ERROR DeviceProxy::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    app::WriteClient * writeClient = aHandle.Get();
-
-    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
-    {
-        AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
-    }
-    if ((err = aHandle.SendWriteRequest(GetSecureSession().Value())) != CHIP_NO_ERROR)
-    {
-        CancelIMResponseHandler(writeClient);
-    }
-    return err;
 }
 
 } // namespace chip

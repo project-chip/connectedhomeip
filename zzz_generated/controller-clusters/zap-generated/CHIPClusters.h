@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -800,6 +800,13 @@ public:
 
     // Cluster Commands
     CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
+class DLL_EXPORT TimeFormatLocalizationCluster : public ClusterBase
+{
+public:
+    TimeFormatLocalizationCluster() : ClusterBase(app::Clusters::TimeFormatLocalization::Id) {}
+    ~TimeFormatLocalizationCluster() {}
 };
 
 class DLL_EXPORT UserLabelCluster : public ClusterBase

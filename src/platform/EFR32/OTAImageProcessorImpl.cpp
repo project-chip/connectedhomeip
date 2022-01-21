@@ -30,7 +30,7 @@ namespace chip {
 
 // Define static memebers
 uint8_t OTAImageProcessorImpl::mSlotId;
-uint16_t OTAImageProcessorImpl::mWriteOffset;
+uint32_t OTAImageProcessorImpl::mWriteOffset;
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {

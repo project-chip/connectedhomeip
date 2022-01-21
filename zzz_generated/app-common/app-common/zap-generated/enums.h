@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -902,6 +902,12 @@ enum EmberAfWiFiVersionType : uint8_t
 #define EMBER_AF_KEYPAD_INPUT_FEATURE_NUMBER_KEYS_OFFSET (2)
 #define EMBER_AF_LAMP_ALARM_MODE_LAMP_BURN_HOURS (1)
 #define EMBER_AF_LAMP_ALARM_MODE_LAMP_BURN_HOURS_OFFSET (0)
+#define EMBER_AF_LEVEL_CONTROL_FEATURE_ON_OFF (1)
+#define EMBER_AF_LEVEL_CONTROL_FEATURE_ON_OFF_OFFSET (0)
+#define EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING (2)
+#define EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING_OFFSET (1)
+#define EMBER_AF_LEVEL_CONTROL_FEATURE_FREQUENCY (4)
+#define EMBER_AF_LEVEL_CONTROL_FEATURE_FREQUENCY_OFFSET (2)
 #define EMBER_AF_MAINS_ALARM_MASK_VOLTAGE_TOO_LOW (1)
 #define EMBER_AF_MAINS_ALARM_MASK_VOLTAGE_TOO_LOW_OFFSET (0)
 #define EMBER_AF_MAINS_ALARM_MASK_VOLTAGE_TOO_HIGH (2)

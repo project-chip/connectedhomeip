@@ -1,4 +1,4 @@
-#CHIP EFR32 OTA Requestor Example
+# CHIP EFR32 OTA Requestor Example
 
 An example showing the use of the Matter OTA Requestor functionality on the
 Silicon Labs EFR32 MG12.
@@ -9,7 +9,7 @@ Silicon Labs EFR32 MG12.
 
 The EFR32 OTA Requestor example provides a baseline demonstration the Matter OTA
 Requestor functionality built with the Silicon Labs gecko SDK. It can be
-controlled by a Chip controller over Openthread network..
+controlled by a Chip controller over OpenThread network.
 
 <a name="building"></a>
 
@@ -48,6 +48,8 @@ examples/lighting-app/efr32/README.md
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
 
+<a name="Flashing the Application"></a>
+
 ## Flashing the Application
 
 -   On the command line:
@@ -61,11 +63,13 @@ examples/lighting-app/efr32/README.md
 
 ## Viewing Logging Output
 
-See examples/lighting-app/efr32/README.md
+See `examples/lighting-app/efr32/README.md`
+
+<a name="Running the OTA Download scenario"></a>
 
 ## Running the OTA Download scenario
 
--   Bring up the Open Thread Border Router as discussed in
+-   Bring up the OpenThread Border Router as discussed in
     examples/lighting-app/efr32/README.md and get its operational dataset.
 
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
@@ -74,10 +78,19 @@ See examples/lighting-app/efr32/README.md
            scripts/examples/gn_build_example.sh examples/chip-tool out/
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 
--   In a terminal start the provider app passing to it the path to the image
-    file that the Requestor is supposed to download (for example /tmp/ota.out):
+-   Build or download the Gecko Bootloader binary. Bootloader should be built
+    with the Gecko SDK version 3.2.1 or earlier, type "external SPI" configured
+    with a single slot of at least 1000 KB. Using the commander tool upload the
+    bootloader to the device running the requestor application.
 
-                ./out/debug/chip-ota-provider-app -f /tmp/ota.out
+-   Create a bootable image file:
+
+           commander gbl create chip-efr32-ota-requestor-example.gbl --app chip-efr32-ota-requestor-example.s37
+
+-   In a terminal start the provider app passing to it the path to the bootable
+    image file created in the previous step:
+
+           ./out/debug/chip-ota-provider-app -f chip-efr32-ota-requestor-example.gbl
 
 -   In a separate terminal run the chip-tool commands to provision the Provider:
 
@@ -91,10 +104,12 @@ See examples/lighting-app/efr32/README.md
 
             ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 73141520   3840
 
-where operationalDataset is obtained from the Open Thread Border Router.
+where operationalDataset is obtained from the OpenThread Border Router.
 
 -   Once the commissioning process completes enter:
 
             ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
 -   The Requestor will connect to the Provider and start the image download.
+    Once the image is downloaded the Requestor will reboot into the downloaded
+    image.

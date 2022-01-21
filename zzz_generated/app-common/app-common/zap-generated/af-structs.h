@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ typedef struct _ExtensionEntry
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
 {
-    uint8_t FabricIndex;
+    chip::FabricIndex FabricIndex;
     chip::ByteSpan RootPublicKey;
     uint16_t VendorId;
     chip::FabricId FabricId;
@@ -326,8 +326,9 @@ typedef struct _ModeOptionStruct
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
-    uint8_t FabricIndex;
+    chip::FabricIndex FabricIndex;
     chip::ByteSpan NOC;
+    chip::ByteSpan ICAC;
 } NOCStruct;
 
 // Struct for NeighborTable

@@ -33,6 +33,7 @@
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
 #include <lib/core/Optional.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -58,6 +59,9 @@ public:
     CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
+    // Temporary function to set command timeout before we move over to InvokeCommand
+    // TODO: remove when we start using InvokeCommand everywhere
+    void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
 
     ClusterId GetClusterId() const { return mClusterId; }
 
@@ -84,7 +88,7 @@ public:
         };
 
         return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
-                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs);
+                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs, mTimeout);
     }
 
     template <typename RequestDataT>
@@ -331,12 +335,13 @@ public:
     }
 
 protected:
-    ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
+    ClusterBase(ClusterId cluster) : mClusterId(cluster) {}
 
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
     SessionHolder mGroupSession;
+    Optional<System::Clock::Timeout> mTimeout;
 };
 
 } // namespace Controller

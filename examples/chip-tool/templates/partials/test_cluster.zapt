@@ -13,6 +13,23 @@ class {{filename}}: public TestCommand
         {{/chip_tests_config}}
     }
 
+    ~{{filename}}()
+    {
+        {{#chip_tests_items}}
+        {{#chip_tests_item_response_parameters}}
+        {{#if saveAs}}
+        {{#if (isString type)}}
+        if ({{saveAs}}Buffer != nullptr)
+        {
+            chip::Platform::MemoryFree({{saveAs}}Buffer);
+            {{saveAs}}Buffer = nullptr;
+        }
+        {{/if}}
+        {{/if}}
+        {{/chip_tests_item_response_parameters}}
+        {{/chip_tests_items}}
+    }
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -75,6 +92,7 @@ class {{filename}}: public TestCommand
     {{#chip_tests_items}}
     {{#chip_tests_item_response_parameters}}
     {{#if saveAs}}
+    {{~#if (isString type)}}{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} * {{saveAs}}Buffer = nullptr;{{/if~}}
     {{chipType}} {{saveAs}};
     {{/if}}
     {{/chip_tests_item_response_parameters}}
@@ -233,7 +251,13 @@ class {{filename}}: public TestCommand
             (static_cast<{{filename}} *>(context))->{{>failureResponse}}(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure,
+        {{#if isGroupCommand}}
+        auto done = [](void * context) {
+            (static_cast<{{filename}} *>(context))->OnDoneResponse_{{index}}();
+        };
+        {{/if}}
+
+        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure, {{#if isGroupCommand}}done,{{/if}}
           {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}},
           request
           {{> maybeTimedInteractionTimeout }}
@@ -357,7 +381,17 @@ class {{filename}}: public TestCommand
             {{/if}}
 
             {{#if saveAs}}
+            {{#if (isString type)}}
+            if ({{saveAs}}Buffer != nullptr)
+            {
+                chip::Platform::MemoryFree({{saveAs}}Buffer);
+            }
+            {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{>item}}.size()));
+            memcpy({{saveAs}}Buffer, {{>item}}.data(), {{>item}}.size());
+            {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{>item}}.size());
+            {{else}}
             {{saveAs}} = {{>item}};
+            {{/if}}
             {{/if}}
           {{/chip_tests_item_response_parameters}}
         {{#unless async}}NextTest();{{/unless}}

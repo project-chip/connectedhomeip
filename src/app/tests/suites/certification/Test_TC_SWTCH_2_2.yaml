@@ -1,0 +1,514 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 74.2.2. [TC-SWTCH-2.2] Primary functionality with server as DUT
+
+config:
+    cluster: "Switch"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    #### 2: tests for Latching Switch
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Set up subscription to SwitchLatched event"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator sets switch to first position"
+
+    - label: "Read CurrentPosition attribute"
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 0
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator sets switch to second position"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "SwitchLatched event with NewPosition set to 1"
+      disabled: true
+
+    - label: "Read CurrentPosition attribute"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 1
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "SwitchLatched event with NewPosition set to 1 higher than in previous
+          event"
+      disabled: true
+
+    - label: "Read CurrentPosition attribute"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 2
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "SwitchLatched event with NewPosition set to 1 higher than in previous
+          event"
+      disabled: true
+
+    - label: "Read CurrentPosition attribute"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 3
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "SwitchLatched event with NewPosition set to 0"
+      disabled: true
+
+    - label: "Read CurrentPosition attribute"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 0
+
+    ### 3: tests for Momentary Switch
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Set up subscription to InitialPress event"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator does not operate switch"
+
+    - label: "Read CurrentPosition attribute"
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 0
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator sets switch to second position"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "Read CurrentPosition attribute"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 1
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator does not operate switch (release switch)"
+
+    - label: "Read CurrentPosition attribute"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current position"
+      response:
+          value: 0
+
+    ## 4: tests for Momentary Switch with release capability but not long press capabilities
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Set up subscription to InitialPress and ShortRelease events"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator does not operate switch"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch for 5 seconds"
+
+    - label: "Wait 3000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    ## 5: tests for Momentary Switch with release and long press capabilitie
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Set up subscription to InitialPress, LongPress,
+                    ShortRelease, LongRelease events"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator does not operate switch"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch for 5 seconds"
+
+    - label: "Wait 3000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "LongPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "LongRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    ## 6: tests for Momentary Switch with multi-press capabilities
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Set up subscription to InitialPress, ShortRelease,
+                    MultiPressOngoing, MultiPressComplete events"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator does not operate switch"
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "MultiPressComplete event with PreviousPosition set to 1 and
+          TotalNumberOfPressesCounted set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch again (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "MultiPressComplete event with PreviousPosition set to 1 and
+          TotalNumberOfPressesCounted set to 2"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "MultiPressComplete event with PreviousPosition set to 1 and
+          TotalNumberOfPressesCounted set to 1"
+      disabled: true
+
+    # 6i
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch again (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch again (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "MultiPressOngoing event with NewPosition set to 1 and
+          CurrentNumberOfPressesCounted set to 2"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator operates switch again (press briefly)"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "InitialPress event with NewPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "MultiPressOngoing event with NewPosition set to 1 and
+          CurrentNumberOfPressesCounted set to 3"
+      disabled: true
+
+    - label: "User interaction needed"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operator releases switch"
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label: "ShortRelease event with PreviousPosition set to 1"
+      disabled: true
+
+    #Disabled due to issue #11343 -- Event verification not implemented
+    - label:
+          "MultiPressComplete event with PreviousPosition set to 1 and
+          TotalNumberOfPressesCounted set to 3"
+      disabled: true

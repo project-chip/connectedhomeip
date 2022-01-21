@@ -270,6 +270,11 @@ void CommissioningWindowManager::CloseCommissioningWindow()
 
 CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 {
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // notify device layer that advertisement is beginning (to do work such as increment rotating id)
+    DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
+#endif
+
     if (mIsBLE)
     {
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));

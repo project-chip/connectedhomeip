@@ -54,7 +54,7 @@ constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 uint32_t gDelayedActionTimeSec                                 = 0;
 const char * gOtaFilepath                                      = nullptr;
 
@@ -91,7 +91,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         else if (strcmp(aValue, "UpdateNotAvailable") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+            gQueryImageBehavior = OTAProviderExample::kRespondWithNotAvailable;
         }
         else
         {
@@ -124,7 +124,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
                              "        Status value in the Query Image Response\n"
                              "  -d/--DelayedActionTimeSec <time>\n"
-                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n" };
+                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
+                             "        and Apply Update Response\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 

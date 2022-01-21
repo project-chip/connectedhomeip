@@ -121,7 +121,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
-    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateUpplied");
+    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateApplied");
 
     if (SendStatusIfDelegateNull(endpoint))
     {

@@ -42,7 +42,6 @@
 namespace chip {
 namespace app {
 
-class WriteClientHandle;
 class InteractionModelEngine;
 
 /**
@@ -106,39 +105,35 @@ public:
     };
 
     /**
-     *  Shutdown the WriteClient. This terminates this instance
-     *  of the object and releases all held resources.
+     *  Construct the client object. Within the lifetime
+     *  of this instance.
+     *
+     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
      */
-    void Shutdown();
-
-    CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
-    CHIP_ERROR FinishAttribute();
-    TLV::TLVWriter * GetAttributeDataIBTLVWriter();
-
-    NodeId GetSourceNodeId() const
-    {
-        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() : kUndefinedNodeId;
-    }
-
-private:
-    friend class TestWriteInteraction;
-    friend class InteractionModelEngine;
-    friend class WriteClientHandle;
-
-    enum class State
-    {
-        Uninitialized = 0,   // The client has not been initialized
-        Initialized,         // The client has been initialized
-        AddAttribute,        // The client has added attribute and ready for a SendWriteRequest
-        AwaitingTimedStatus, // Sent a Tiemd Request, waiting for response.
-        AwaitingResponse,    // The client has sent out the write request message
-        ResponseReceived,    // We have gotten a response after sending write request
-    };
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,
+                const Optional<uint16_t> & aTimedWriteTimeoutMs) :
+        mpExchangeMgr(apExchangeMgr),
+        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs)
+    {}
 
     /**
-     * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
+     *  Encode an attribute value that can be directly encoded using TLVWriter::Put
      */
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
+    template <class T>
+    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        ReturnErrorOnFailure(PrepareAttribute(attributePath));
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(
+            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(FinishAttribute());
+
+        return CHIP_NO_ERROR;
+    }
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
@@ -149,24 +144,50 @@ private:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout);
+    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
-     *  Initialize the client object. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
-     *
-     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
-     *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
-     *  @retval #CHIP_NO_ERROR On success.
+     *  Shutdown the WriteClient. This terminates this instance
+     *  of the object and releases all held resources.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate,
-                    const Optional<uint16_t> & aTimedWriteTimeoutMs);
+    void Shutdown();
 
-    virtual ~WriteClient() = default;
+    CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
+    CHIP_ERROR FinishAttribute();
+    TLV::TLVWriter * GetAttributeDataIBTLVWriter();
+
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
+     *
+     * See Abort() for details on when that might occur.
+     */
+    virtual ~WriteClient() { Abort(); }
+
+private:
+    friend class TestWriteInteraction;
+    friend class InteractionModelEngine;
+
+    enum class State
+    {
+        Uninitialized = 0,   // The client has not been initialized
+        Initialized,         // The client has been initialized
+        AddAttribute,        // The client has added attribute and ready for a SendWriteRequest
+        AwaitingTimedStatus, // Sent a Tiemd Request, waiting for response.
+        AwaitingResponse,    // The client has sent out the write request message
+        ResponseReceived,    // We have gotten a response after sending write request
+        AwaitingDestruction, // The object has completed its work and is awaiting destruction by the application.
+    };
+
+    /**
+     * The actual init function, called during encoding first attribute data.
+     */
+    CHIP_ERROR Init();
+
+    /**
+     * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
+     */
+    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -180,15 +201,23 @@ private:
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
-    void ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();
 
     /**
-     * Internal shutdown method that we use when we know what's going on with
-     * our exchange and don't need to manually close it.
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange (by calling into the base class) and finally, signal to the application that it's
+     * safe to release this object.
      */
-    void ShutdownInternal();
+    void Close();
+
+    /**
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
 
     // Handle a message received when we are expecting a status response to a
     // Timed Request.  The caller is assumed to have already checked that our
@@ -216,83 +245,6 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
-};
-
-class WriteClientHandle
-{
-public:
-    /**
-     * Construct an empty WriteClientHandle.
-     */
-    WriteClientHandle() : mpWriteClient(nullptr) {}
-    WriteClientHandle(decltype(nullptr)) : mpWriteClient(nullptr) {}
-
-    /**
-     * Construct a WriteClientHandle that takes ownership of a WriteClient from another.
-     */
-    WriteClientHandle(WriteClientHandle && aOther)
-    {
-        mpWriteClient        = aOther.mpWriteClient;
-        aOther.mpWriteClient = nullptr;
-    }
-
-    ~WriteClientHandle() { SetWriteClient(nullptr); }
-
-    /**
-     * Access a WriteClientHandle's public methods.
-     */
-    WriteClient * operator->() const { return mpWriteClient; }
-
-    WriteClient * Get() const { return mpWriteClient; }
-
-    /**
-     *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
-     * should not use this object after calling this function.
-     *
-     * Note: In failure cases this will _synchronously_ invoke OnDone on the
-     * WriteClient::Callback before returning.
-     */
-    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
-
-    /**
-     *  Encode an attribute value that can be directly encoded using TLVWriter::Put
-     */
-    template <class T>
-    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
-    {
-        chip::TLV::TLVWriter * writer = nullptr;
-
-        VerifyOrReturnError(mpWriteClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(mpWriteClient->PrepareAttribute(attributePath));
-        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(
-            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
-        ReturnErrorOnFailure(mpWriteClient->FinishAttribute());
-
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     *  Set the internal WriteClient of the Handler, expected to be called by InteractionModelEngline only since the user
-     * application does not have direct access to apWriteClient.
-     */
-    void SetWriteClient(WriteClient * apWriteClient)
-    {
-        if (mpWriteClient != nullptr)
-        {
-            mpWriteClient->Shutdown();
-        }
-        mpWriteClient = apWriteClient;
-    }
-
-private:
-    friend class TestWriteInteraction;
-
-    WriteClientHandle(const WriteClientHandle &) = delete;
-    WriteClientHandle & operator=(const WriteClientHandle &) = delete;
-    WriteClientHandle & operator=(const WriteClientHandle &&) = delete;
-
-    WriteClient * mpWriteClient = nullptr;
 };
 
 } // namespace app

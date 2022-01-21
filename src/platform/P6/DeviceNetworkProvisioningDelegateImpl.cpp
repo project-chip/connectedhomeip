@@ -27,7 +27,6 @@ namespace DeviceLayer {
 CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * passwd)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    cy_rslt_t rslt = CY_RSLT_SUCCESS;
 
     ChipLogProgress(NetworkProvisioning, "P6NetworkProvisioningDelegate: SSID: %s", ssid);
     err = ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);
@@ -36,14 +35,10 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
     // Set the wifi configuration
     wifi_config_t wifi_config;
     Internal::P6Utils::populate_wifi_config_t(&wifi_config, WIFI_IF_STA, (const cy_wcm_ssid_t *) ssid,
-                                              (const cy_wcm_passphrase_t *) passwd, CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY);
+                                              (const cy_wcm_passphrase_t *) passwd,
+                                              (strlen(passwd)) ? CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY : CY_WCM_SECURITY_OPEN);
 
-    rslt = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifi_config);
-    if (rslt != CY_RSLT_SUCCESS)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        ChipLogError(DeviceLayer, "p6_wifi_set_config() failed");
-    }
+    err = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifi_config);
     SuccessOrExit(err);
 
     err = ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);

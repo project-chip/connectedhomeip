@@ -28,10 +28,7 @@ qpg_project_dir = "${chip_root}/examples/lock-app/qpg"
 examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
-  sources = [
-    "${examples_plat_dir}/app/include/Service.h",
-    "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
-  ]
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
 
   include_dirs = [
     "${chip_root}/src/platform/qpg",
@@ -78,7 +75,7 @@ qpg_executable("lock_app") {
 
   cflags = [ "-Wconversion" ]
 
-  ldscript = "${qpg_sdk_root}/${qpg_target_ic}/ldscripts/chip-${qpg_target_ic}-example.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
 
   inputs = [ ldscript ]
 

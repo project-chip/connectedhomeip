@@ -15,6 +15,7 @@ control.
         -   [Flashing app using script](#flashing-app-using-script)
         -   [Note](#note)
     -   [Using the RPC console](#using-the-rpc-console)
+    -   [Device Tracing](#device-tracing)
 
 ---
 
@@ -195,7 +196,7 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ .out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
+    $ ./out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
 
 Parameters:
 
@@ -210,7 +211,7 @@ Parameters:
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name as well as an endpoint id.
 
-    $ .out/debug/chip-tool onoff on 12344321 1
+    $ ./out/debug/chip-tool onoff on 12344321 1
 
 The client will send a single command packet and then exit.
 
@@ -295,3 +296,16 @@ From within the console you can then invoke rpcs:
 
     rpcs.chip.rpc.Lighting.Get()
     rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See
+[Using the RPC console](#using-the-rpc-console).
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
+    -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```

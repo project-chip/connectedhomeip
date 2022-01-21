@@ -19,7 +19,7 @@ RUN apt-get update \
   avahi-utils=0.7-4ubuntu7.1 \
   ca-certificates=20210119~20.04.2 \
   dhcpcd5=7.1.0-2build1 \
-  gdb=9.2-0ubuntu1~20.04 \
+  gdb=9.2-0ubuntu1~20.04.1 \
   git=1:2.25.1-1ubuntu3.2 \
   iproute2=5.5.0-1ubuntu1 \
   libavahi-client3=0.7-4ubuntu7.1 \

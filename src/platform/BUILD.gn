@@ -217,6 +217,11 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET=Ameba",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "cyw30739") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_CYW30739=1",
+        "CHIP_DEVICE_LAYER_TARGET=CYW30739",
+      ]
     }
   }
 } else {
@@ -345,6 +350,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
+    } else if (chip_device_platform == "cyw30739") {
+      _platform_target = "CYW30739"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }

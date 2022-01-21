@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@
 #define EMBER_AF_POWER_SOURCE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
@@ -129,6 +130,11 @@
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
+
+// Use this macro to check if the server side of the Time Format Localization cluster is included
+#define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION_SERVER
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION
 
 // Use this macro to check if the server side of the User Label cluster is included
 #define ZCL_USING_USER_LABEL_CLUSTER_SERVER

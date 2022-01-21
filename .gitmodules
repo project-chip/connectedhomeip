@@ -79,6 +79,10 @@
 [submodule "third_party/openthread/ot-efr32"]
 	path = third_party/openthread/ot-efr32
 	url = https://github.com/openthread/ot-efr32.git
+[submodule "third_party/openthread/ot-ifx"]
+	path = third_party/openthread/ot-ifx
+	url = https://github.com/Infineon/ot-ifx-release.git
+	branch = cyw30739
 [submodule "third_party/mbed-os/repo"]
 	path = third_party/mbed-os/repo
 	url = https://github.com/ARMmbed/mbed-os.git
@@ -162,3 +166,18 @@
 [submodule "p6/lwip"]
 	path = third_party/p6/p6_sdk/libs/lwip
 	url = https://github.com/lwip-tcpip/lwip.git
+[submodule "third_party/jsoncpp/repo"]
+	path = third_party/jsoncpp/repo
+	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "cyw30739_sdk/30739A0"]
+	path = third_party/cyw30739_sdk/repos/30739A0
+	url = https://github.com/Infineon/30739A0.git
+[submodule "cyw30739_sdk/include"]
+	path = third_party/cyw30739_sdk/repos/btsdk-include
+	url = https://github.com/Infineon/btsdk-include.git
+[submodule "cyw30739_sdk/target"]
+	path = third_party/cyw30739_sdk/repos/CYW930739M2EVB-01
+	url = https://github.com/Infineon/TARGET_CYW930739M2EVB-01.git
+[submodule "cyw30739_sdk/tools"]
+	path = third_party/cyw30739_sdk/repos/btsdk-tools
+	url = https://github.com/Infineon/btsdk-tools.git

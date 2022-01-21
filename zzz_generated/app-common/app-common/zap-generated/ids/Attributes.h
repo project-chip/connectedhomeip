@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1124,9 +1124,9 @@ namespace HourFormat {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace HourFormat
 
-namespace CalendarType {
+namespace ActiveCalendarType {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CalendarType
+} // namespace ActiveCalendarType
 
 namespace SupportedCalendarTypes {
 static constexpr AttributeId Id = 0x00000002;
@@ -2049,6 +2049,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 namespace OperationalCredentials {
 namespace Attributes {
+
+namespace NOCs {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace NOCs
 
 namespace FabricsList {
 static constexpr AttributeId Id = 0x00000001;

@@ -110,13 +110,14 @@ public:
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetHourFormat(uint8_t & format) override;
-    CHIP_ERROR StoreHourFormat(uint8_t format) override;
-    CHIP_ERROR GetCalendarType(uint8_t & type) override;
-    CHIP_ERROR StoreCalendarType(uint8_t type) override;
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void NotifyOfAdvertisementStart() override;
+#else
+    void NotifyOfAdvertisementStart();
+#endif
     void LogDeviceConfig() override;
 
     virtual ~GenericConfigurationManagerImpl() = default;

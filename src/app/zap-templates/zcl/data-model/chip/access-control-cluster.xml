@@ -33,6 +33,13 @@ limitations under the License.
     <item name="Group" value="0x03"/>
   </enum>
 
+  <enum name="ChangeTypeEnum" type="ENUM8">
+    <cluster code="0x001F"/>
+    <item name="Changed" value="0x00"/>
+    <item name="Added" value="0x01"/>
+    <item name="Removed" value="0x02"/>
+  </enum>  
+
   <struct name="Target">
     <cluster code="0x001F"/>
     <item fieldId="0" name="Cluster" type="cluster_id" isNullable="true"/>
@@ -79,5 +86,21 @@ limitations under the License.
         <access op="write" privilege="administer"/>        
         <access modifier="fabric-scoped"/>
     </attribute>
+    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" optional="false">
+      <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
+      <field id="0" name="AdminFabricIndex" type="fabric_idx"/>
+      <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
+      <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
+      <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
+      <field id="4" name="LatestValue" type="AccessControlEntry" isNullable="true"/>
+    </event>
+    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" optional="false">
+      <description>The cluster SHALL send AccessControlExtensionChanged events whenever its extension attribute data is changed by an Administrator.</description>
+      <field id="0" name="AdminFabricIndex" type="fabric_idx"/>
+      <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
+      <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
+      <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
+      <field id="4" name="LatestValue" type="ExtensionEntry" isNullable="true"/>
+    </event>    
   </cluster>
 </configurator>

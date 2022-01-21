@@ -257,12 +257,7 @@ private:
 void BroadcastPacket(mdns::Minimal::ServerBase * server)
 {
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-    if (buffer.IsNull())
-    {
-        printf("Buffer allocation failure.");
-        abort();
-        return;
-    }
+    VerifyOrDie(!buffer.IsNull());
 
     QuerySplitter query;
     query.Split(gOptions.query);

@@ -59,6 +59,22 @@ CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR NotifyImageHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
+    const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
+    const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
+    const intptr_t version              = static_cast<intptr_t>(strtoul(argv[3], nullptr, 10));
+
+    GetRequestorInstance()->TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
+    PlatformMgr().ScheduleWork([](intptr_t arg) { GetRequestorInstance()->NotifyUpdateApplied(static_cast<uint32_t>(arg)); },
+                               version);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OtaHandler(int argc, char ** argv)
 {
     if (argc == 0)
@@ -85,6 +101,8 @@ void RegisterOtaCommands()
         { &QueryImageHandler, "query", "Query for a new image. Usage: ota query <fabric-index> <provider-node-id> <endpoint-id>" },
         { &ApplyImageHandler, "apply",
           "Apply the current update. Usage ota apply <fabric-index> <provider-node-id> <endpoint-id>" },
+        { &NotifyImageHandler, "notify",
+          "Notify the new image has been applied. Usage: ota notify <fabric-index> <provider-node-id> <endpoint-id>" },
     };
 
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));

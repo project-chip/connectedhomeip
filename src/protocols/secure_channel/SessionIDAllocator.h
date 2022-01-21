@@ -27,6 +27,9 @@
 // available keys (either session or group), and the particular encryption/message
 // integrity algorithm to use for the message.The Session ID field is always present.
 // A Session ID of 0 SHALL indicate an unsecured session with no encryption or message integrity checking.
+//
+// The Session ID is allocated from a global numerical space shared across all fabrics and nodes on the resident process instance.
+//
 
 namespace chip {
 
@@ -46,7 +49,7 @@ private:
     static constexpr uint16_t kMaxSessionID       = UINT16_MAX;
     static constexpr uint16_t kUnsecuredSessionId = 0;
 
-    uint16_t mNextAvailable = 1;
+    static uint16_t sNextAvailable;
 };
 
 } // namespace chip

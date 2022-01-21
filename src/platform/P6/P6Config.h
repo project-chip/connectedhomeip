@@ -76,8 +76,10 @@ public:
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
-    static const Key kConfigKey_HourFormat;
-    static const Key kConfigKey_CalendarType;
+    static const Key kConfigKey_WiFiSSID;
+    static const Key kConfigKey_WiFiPassword;
+    static const Key kConfigKey_WiFiSecurity;
+    static const Key kConfigKey_WiFiMode;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
