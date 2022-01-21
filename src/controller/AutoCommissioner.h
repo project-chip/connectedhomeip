@@ -36,6 +36,8 @@ public:
 
 private:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr);
+    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
+
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy   = nullptr;

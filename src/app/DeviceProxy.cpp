@@ -39,11 +39,11 @@ using namespace chip::Callback;
 
 namespace chip {
 
-CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj)
+CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(GetSecureSession().Value());
+    return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout);
 }
 
 void DeviceProxy::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
