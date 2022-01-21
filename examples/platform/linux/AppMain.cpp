@@ -397,6 +397,7 @@ DeviceCommissioner * GetDeviceCommissioner()
 void ChipLinuxAppMainLoop()
 {
 #if defined(ENABLE_CHIP_SHELL)
+    Engine::Root().Init();
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     chip::Shell::RegisterCommissioneeCommands();
 #endif

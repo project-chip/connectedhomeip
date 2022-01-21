@@ -136,6 +136,7 @@ ifeq ($(is_debug),false)
 endif
 	if [[ "$(CONFIG_ENABLE_PW_RPC)" = "y" ]]; then                        \
 	  echo "chip_build_pw_rpc_lib = true" >> $(OUTPUT_DIR)/args.gn       ;\
+	  echo "chip_build_pw_trace_lib = true" >> $(OUTPUT_DIR)/args.gn       ;\
 	  echo "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]" >> $(OUTPUT_DIR)/args.gn		;\
 	  echo "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"" >> $(OUTPUT_DIR)/args.gn     ;\
 	  echo "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"" >> $(OUTPUT_DIR)/args.gn ;\

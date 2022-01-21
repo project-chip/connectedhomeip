@@ -248,11 +248,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreManufacturingDate(
 
 template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
+{}
+
+template <class ImplClass>
+void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // Increment life time counter to protect against long-term tracking of rotating device ID.
     IncrementLifetimeCounter();
-#endif
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
+#endif
 }
 
 template <class ConfigClass>

@@ -49,4 +49,5 @@
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
     MatterUserLabelPluginServerInitCallback();

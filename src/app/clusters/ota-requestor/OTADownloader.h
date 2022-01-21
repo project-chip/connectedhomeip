@@ -75,7 +75,7 @@ public:
     virtual ~OTADownloader() = default;
 
 protected:
-    OTAImageProcessorInterface * mImageProcessor;
+    OTAImageProcessorInterface * mImageProcessor = nullptr;
     State mState;
 };
 

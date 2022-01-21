@@ -35,13 +35,21 @@
     readonly {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
   {{~!TODO: write only attributes should also be supported~}}
+  {{#if isGlobalAttribute~}}
+    global {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
   {{~#unless isReportableAttribute~}}
     nosubscribe {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
-  {{~!Removes spaces~}} attribute {{type}} {{asLowerCamelCase name~}}
-    {{~#if isList~}}
-      []
-    {{~/if}} = {{code}};
+  {{~!Removes spaces~}} attribute {{type}} 
+    {{~#unless isArray~}}
+      {{~#if (isString type)~}}
+        {{~#if maxLength~}} 
+          <{{maxLength}}> 
+        {{~/if~}}
+      {{~/if~}}
+    {{/unless}} {{asLowerCamelCase name~}}
+    {{~#if isList~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
   {{#chip_cluster_commands}}
   {{#if arguments}}

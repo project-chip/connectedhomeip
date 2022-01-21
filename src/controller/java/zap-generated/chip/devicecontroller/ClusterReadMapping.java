@@ -4147,6 +4147,21 @@ public class ClusterReadMapping {
         readOnOffSwitchConfigurationClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("onOffSwitchConfiguration", readOnOffSwitchConfigurationInteractionInfo);
     Map<String, InteractionInfo> readOperationalCredentialsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readOperationalCredentialsNOCsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalCredentialsNOCsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalCredentialsCluster) cluster)
+                  .readNOCsAttribute(
+                      (ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalCredentialsClusterNOCsAttributeCallback(),
+            readOperationalCredentialsNOCsCommandParams);
+    readOperationalCredentialsInteractionInfo.put(
+        "readNOCsAttribute", readOperationalCredentialsNOCsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOperationalCredentialsFabricsListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOperationalCredentialsFabricsListAttributeInteractionInfo =
@@ -7683,6 +7698,66 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute",
         readThreadNetworkDiagnosticsClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("threadNetworkDiagnostics", readThreadNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> readTimeFormatLocalizationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readTimeFormatLocalizationHourFormatCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTimeFormatLocalizationHourFormatAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .readHourFormatAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTimeFormatLocalizationHourFormatCommandParams);
+    readTimeFormatLocalizationInteractionInfo.put(
+        "readHourFormatAttribute", readTimeFormatLocalizationHourFormatAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTimeFormatLocalizationActiveCalendarTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .readActiveCalendarTypeAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTimeFormatLocalizationActiveCalendarTypeCommandParams);
+    readTimeFormatLocalizationInteractionInfo.put(
+        "readActiveCalendarTypeAttribute",
+        readTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readTimeFormatLocalizationSupportedCalendarTypesCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTimeFormatLocalizationSupportedCalendarTypesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .readSupportedCalendarTypesAttribute(
+                      (ChipClusters.TimeFormatLocalizationCluster
+                              .SupportedCalendarTypesAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallback(),
+            readTimeFormatLocalizationSupportedCalendarTypesCommandParams);
+    readTimeFormatLocalizationInteractionInfo.put(
+        "readSupportedCalendarTypesAttribute",
+        readTimeFormatLocalizationSupportedCalendarTypesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTimeFormatLocalizationClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTimeFormatLocalizationClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTimeFormatLocalizationClusterRevisionCommandParams);
+    readTimeFormatLocalizationInteractionInfo.put(
+        "readClusterRevisionAttribute",
+        readTimeFormatLocalizationClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("timeFormatLocalization", readTimeFormatLocalizationInteractionInfo);
     Map<String, InteractionInfo> readUserLabelInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readUserLabelLabelListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

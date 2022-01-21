@@ -9838,6 +9838,44 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public static class NOCsAttribute {
+      public Integer fabricIndex;
+      public byte[] noc;
+      public byte[] icac;
+
+      public NOCsAttribute(Integer fabricIndex, byte[] noc, byte[] icac) {
+        this.fabricIndex = fabricIndex;
+        this.noc = noc;
+        this.icac = icac;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("byte[] ");
+        output.append(Arrays.toString(noc));
+        output.append("\n");
+
+        output.append("byte[] ");
+        output.append(Arrays.toString(icac));
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface NOCsAttributeCallback {
+      void onSuccess(List<NOCsAttribute> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public static class FabricsListAttribute {
       public Integer fabricIndex;
       public byte[] rootPublicKey;
@@ -9924,6 +9962,10 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public void readNOCsAttribute(NOCsAttributeCallback callback) {
+      readNOCsAttribute(chipClusterPtr, callback);
+    }
+
     public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
       readFabricsListAttribute(chipClusterPtr, callback);
     }
@@ -9972,6 +10014,8 @@ public class ChipClusters {
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
+
+    private native void readNOCsAttribute(long chipClusterPtr, NOCsAttributeCallback callback);
 
     private native void readFabricsListAttribute(
         long chipClusterPtr, FabricsListAttributeCallback callback);
@@ -16950,6 +16994,84 @@ public class ChipClusters {
 
     private native void subscribeClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class TimeFormatLocalizationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 44L;
+
+    public TimeFormatLocalizationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface SupportedCalendarTypesAttributeCallback {
+      void onSuccess(List<Object> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public void readHourFormatAttribute(IntegerAttributeCallback callback) {
+      readHourFormatAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeHourFormatAttribute(DefaultClusterCallback callback, Integer value) {
+      writeHourFormatAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeHourFormatAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeHourFormatAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void readActiveCalendarTypeAttribute(IntegerAttributeCallback callback) {
+      readActiveCalendarTypeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeActiveCalendarTypeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeActiveCalendarTypeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeActiveCalendarTypeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeActiveCalendarTypeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void readSupportedCalendarTypesAttribute(
+        SupportedCalendarTypesAttributeCallback callback) {
+      readSupportedCalendarTypesAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readHourFormatAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeHourFormatAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void readActiveCalendarTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeActiveCalendarTypeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void readSupportedCalendarTypesAttribute(
+        long chipClusterPtr, SupportedCalendarTypesAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
   public static class UserLabelCluster extends BaseChipCluster {

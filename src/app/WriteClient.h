@@ -42,7 +42,6 @@
 namespace chip {
 namespace app {
 
-class WriteClientHandle;
 class InteractionModelEngine;
 
 /**
@@ -168,7 +167,6 @@ public:
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;
-    friend class WriteClientHandle;
 
     enum class State
     {

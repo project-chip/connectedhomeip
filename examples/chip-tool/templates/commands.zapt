@@ -531,9 +531,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
-        {{#unless isList}}
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
-        {{/unless}}
         {{/if}}
         {{/unless}}
         {{/chip_server_cluster_attributes}}

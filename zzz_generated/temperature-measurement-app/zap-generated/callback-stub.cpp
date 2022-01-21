@@ -68,6 +68,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
+    case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
+        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
+        break;
     case ZCL_USER_LABEL_CLUSTER_ID:
         emberAfUserLabelClusterInitCallback(endpoint);
         break;
@@ -141,6 +144,11 @@ void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(Endpoin
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

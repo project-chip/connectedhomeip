@@ -77,6 +77,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
+    case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
+        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
+        break;
     case ZCL_USER_LABEL_CLUSTER_ID:
         emberAfUserLabelClusterInitCallback(endpoint);
         break;
@@ -165,6 +168,11 @@ void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
