@@ -67208,6 +67208,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
             err = TestReadBackAttribute_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is true after on command\n");
+            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -67219,7 +67227,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -67260,6 +67268,16 @@ private:
     static void OnSuccessCallback_4(void * context, chip::CharSpan location)
     {
         (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, bool onOff)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(onOff);
     }
 
     //
@@ -67348,6 +67366,54 @@ private:
     void OnSuccessResponse_4(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    {
+        const chip::GroupId groupId = 1234;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(status);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(bool onOff)
+    {
+        VerifyOrReturn(CheckValue("onOff", onOff, 1));
 
         NextTest();
     }
