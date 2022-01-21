@@ -78,9 +78,14 @@ private:
 
     CHIP_ERROR StartAdvertisement();
 
-    CHIP_ERROR StopAdvertisement();
+    CHIP_ERROR StopAdvertisement(bool aShuttingDown);
 
     CHIP_ERROR OpenCommissioningWindow();
+
+    // Helper for Shutdown and Cleanup.  Does not do anything with
+    // advertisements, because Shutdown and Cleanup want to handle those
+    // differently.
+    void ResetState();
 
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
