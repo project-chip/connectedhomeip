@@ -28,6 +28,10 @@ function getTests()
     'Test_TC_BOOL_2_1',
   ];
 
+  const BridgedActions = [
+    'Test_TC_BRAC_1_1',
+  ];
+
   const ColorControl = [
     'Test_TC_CC_1_1',
     'Test_TC_CC_2_1',
@@ -70,6 +74,11 @@ function getTests()
 
   const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
+  ];
+
+  const EthernetNetworkDiagnostics = [
+    'Test_TC_ETHDIAG_1_1',
+    'Test_TC_ETHDIAG_2_1',
   ];
 
   const FlowMeasurement = [
@@ -132,6 +141,10 @@ function getTests()
     'Test_TC_OO_2_3',
   ];
 
+  const PowerSource = [
+    'Test_TC_PS_1_1',
+  ];
+
   const PressureMeasurement = [
     'Test_TC_PRS_1_1',
     'Test_TC_PRS_2_1',
@@ -148,6 +161,11 @@ function getTests()
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
     'Test_TC_RH_2_2',
+  ];
+
+  const Switch = [
+    'Test_TC_SWTCH_2_1',
+    'Test_TC_SWTCH_2_2',
   ];
 
   const TemperatureMeasurement = [
@@ -170,6 +188,11 @@ function getTests()
 
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAGTH_1_1',
+  ];
+
+  const WiFiNetworkDiagnostics = [
+    'Test_TC_WIFIDIAG_1_1',
+    'Test_TC_WIFIDIAG_3_1',
   ];
 
   const WindowCovering = [
@@ -229,23 +252,28 @@ function getTests()
   const tests = [
     BinaryInput, //
     BooleanState, //
+    BridgedActions, //
     ColorControl, //
     DeviceDiscovery, //
     DeviceManagement, //
     ElectricalMeasurement, //
+    EthernetNetworkDiagnostics, //
     FlowMeasurement, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
     OccupancySensing, //
     OnOff, //
+    PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
     RelativeHumidityMeasurement, //
+    Switch, //
     TemperatureMeasurement, //
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    WiFiNetworkDiagnostics, //
     WindowCovering, //
     TV, //
     Others, //

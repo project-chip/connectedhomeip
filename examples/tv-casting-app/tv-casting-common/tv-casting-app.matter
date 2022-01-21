@@ -7,7 +7,7 @@ struct LabelStruct {
 }
 
 client cluster AccountLogin = 1294 {
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct GetSetupPINRequestRequest {
     CHAR_STRING tempAccountIdentifier = 0;
@@ -39,7 +39,7 @@ server cluster AdministratorCommissioning = 60 {
   readonly attribute int8u windowStatus = 0;
   readonly attribute fabric_idx adminFabricIndex = 1;
   readonly attribute int16u adminVendorId = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct OpenBasicCommissioningWindowRequest {
     INT16U commissioningTimeout = 0;
@@ -73,7 +73,7 @@ client cluster ApplicationBasic = 1293 {
   readonly attribute int16u productId = 3;
   readonly attribute ApplicationStatusEnum applicationStatus = 5;
   readonly attribute char_string<32> applicationVersion = 6;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 client cluster ApplicationLauncher = 1292 {
@@ -89,7 +89,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute INT16U applicationLauncherList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
     ApplicationLauncherApplication application = 0;
@@ -126,7 +126,7 @@ client cluster AudioOutput = 1291 {
   }
 
   readonly attribute OutputInfo audioOutputList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct RenameOutputRequestRequest {
     INT8U index = 0;
@@ -146,7 +146,7 @@ server cluster BarrierControl = 259 {
   readonly attribute bitmap16 barrierSafetyStatus = 2;
   readonly attribute bitmap8 barrierCapabilities = 3;
   readonly attribute int8u barrierPosition = 10;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct BarrierControlGoToPercentRequest {
     INT8U percentOpen = 0;
@@ -190,7 +190,7 @@ server cluster Basic = 40 {
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
@@ -199,11 +199,11 @@ server cluster BinaryInputBasic = 15 {
   attribute boolean outOfService = 81;
   attribute boolean presentValue = 85;
   readonly attribute bitmap8 statusFlags = 111;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster Binding = 30 {
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct BindRequest {
     NODE_ID nodeId = 0;
@@ -238,7 +238,7 @@ server cluster BridgedDeviceBasic = 57 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   command Leave(): DefaultSuccess = 2;
   command ReachableChanged(): DefaultSuccess = 3;
@@ -274,7 +274,7 @@ client cluster Channel = 1284 {
   readonly attribute ChannelInfo channelList[] = 0;
   attribute LineupInfo channelLineup = 1;
   attribute ChannelInfo currentChannel = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelByNumberRequestRequest {
     INT16U majorNumber = 0;
@@ -391,7 +391,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u colorTempPhysicalMax = 16396;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
   attribute int16u startUpColorTemperatureMireds = 16400;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct MoveColorRequest {
     INT16S rateX = 0;
@@ -582,7 +582,7 @@ client cluster ContentLauncher = 1290 {
 
   readonly attribute CHAR_STRING acceptHeaderList[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequestRequest {
     BOOLEAN autoPlay = 0;
@@ -610,7 +610,7 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster DiagnosticLogs = 50 {
@@ -906,7 +906,7 @@ server cluster DoorLock = 257 {
   attribute int8u wrongCodeEntryLimit = 48;
   attribute int8u userCodeTemporaryDisableTime = 49;
   attribute boolean requirePINforRemoteOperation = 51;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ClearCredentialRequest {
     DlCredential credential = 0;
@@ -1008,20 +1008,20 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u overrunCount = 6;
   readonly attribute boolean carrierDetect = 7;
   readonly attribute int64u timeSinceReset = 8;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster FlowMeasurement = 1028 {
   readonly attribute int16s measuredValue = 0;
   readonly attribute int16s minMeasuredValue = 1;
   readonly attribute int16s maxMeasuredValue = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -1046,8 +1046,8 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -1168,7 +1168,7 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster GroupKeyManagement = 63 {
@@ -1192,12 +1192,12 @@ server cluster GroupKeyManagement = 63 {
 
   readonly attribute GroupKey groupKeyMap[] = 0;
   readonly attribute GroupInfo groupTable[] = 1;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster Groups = 4 {
   readonly attribute bitmap8 nameSupport = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
     INT16U groupId = 0;
@@ -1282,7 +1282,7 @@ server cluster IasZone = 1280 {
   readonly attribute bitmap16 zoneStatus = 2;
   attribute node_id iasCieAddress = 16;
   readonly attribute int8u zoneId = 17;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ZoneEnrollRequestRequest {
     IasZoneType zoneType = 0;
@@ -1329,7 +1329,7 @@ server cluster Identify = 3 {
   }
 
   attribute int16u identifyTime = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
     INT16U identifyTime = 0;
@@ -1439,7 +1439,7 @@ client cluster KeypadInput = 1289 {
     kInvalidKeyInCurrentState = 2;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequestRequest {
     CecKeyCode keyCode = 0;
@@ -1473,7 +1473,7 @@ server cluster LevelControl = 8 {
   attribute int16u offTransitionTime = 19;
   attribute int8u defaultMoveRate = 20;
   attribute int8u startUpCurrentLevel = 16384;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
@@ -1557,7 +1557,7 @@ client cluster MediaInput = 1287 {
   }
 
   readonly attribute InputInfo mediaInputList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct RenameInputRequestRequest {
     INT8U index = 0;
@@ -1591,7 +1591,7 @@ client cluster MediaPlayback = 1286 {
     kSeekOutOfRange = 5;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct SeekRequestRequest {
     INT64U position = 0;
@@ -1676,8 +1676,8 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
   readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -1758,7 +1758,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING updateToken = 0;
@@ -1806,7 +1806,7 @@ server cluster OccupancySensing = 1030 {
   readonly attribute bitmap8 occupancy = 0;
   readonly attribute enum8 occupancySensorType = 1;
   readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster OnOff = 6 {
@@ -1830,8 +1830,8 @@ server cluster OnOff = 6 {
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
   attribute enum8 startUpOnOff = 16387;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
@@ -1873,7 +1873,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute fabric_idx currentFabricIndex = 5;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
@@ -1951,14 +1951,14 @@ server cluster PressureMeasurement = 1027 {
   readonly attribute int16s measuredValue = 0;
   readonly attribute int16s minMeasuredValue = 1;
   readonly attribute int16s maxMeasuredValue = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u measuredValue = 0;
   readonly attribute int16u minMeasuredValue = 1;
   readonly attribute int16u maxMeasuredValue = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster Scenes = 5 {
@@ -1973,7 +1973,7 @@ server cluster Scenes = 5 {
   readonly attribute int16u currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
   readonly attribute bitmap8 nameSupport = 4;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     INT16U groupId = 0;
@@ -2078,8 +2078,8 @@ server cluster SoftwareDiagnostics = 52 {
   readonly attribute int64u currentHeapFree = 1;
   readonly attribute int64u currentHeapUsed = 2;
   readonly attribute int64u currentHeapHighWatermark = 3;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster Switch = 59 {
@@ -2115,7 +2115,7 @@ server cluster Switch = 59 {
 
   readonly attribute int8u numberOfPositions = 0;
   readonly attribute int8u currentPosition = 1;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 client cluster TargetNavigator = 1285 {
@@ -2131,7 +2131,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfo targetNavigatorList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequestRequest {
     INT8U target = 0;
@@ -2145,7 +2145,7 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute int16s measuredValue = 0;
   readonly attribute int16s minMeasuredValue = 1;
   readonly attribute int16s maxMeasuredValue = 2;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster TestCluster = 1295 {
@@ -2190,7 +2190,7 @@ server cluster TestCluster = 1295 {
   attribute OCTET_STRING listOctetString[] = 27;
   attribute TestListStructOctet listStructOctetString[] = 28;
   attribute long_octet_string<1000> longOctetString = 29;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   response struct TestSpecificResponse {
     INT8U returnValue = 0;
@@ -2216,8 +2216,8 @@ server cluster Thermostat = 513 {
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;
   readonly attribute int8u numberOfDailyTransitions = 34;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 
   response struct GetWeeklyScheduleResponse {
     ENUM8 numberOfTransitionsForSequence = 0;
@@ -2367,18 +2367,18 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute octet_string<4> channelMask = 60;
   readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster WakeOnLan = 1283 {
   readonly attribute char_string<32> wakeOnLanMacAddress = 0;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster WiFiNetworkDiagnostics = 54 {
@@ -2438,8 +2438,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int32u packetUnicastTxCount = 10;
   readonly attribute int64u currentMaxRate = 11;
   readonly attribute int64u overrunCount = 12;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster WindowCovering = 258 {
@@ -2461,7 +2461,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedClosedLimitTilt = 19;
   attribute bitmap8 mode = 23;
   readonly attribute bitmap16 safetyStatus = 26;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 

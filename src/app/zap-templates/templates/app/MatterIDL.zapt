@@ -35,6 +35,9 @@
     readonly {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
   {{~!TODO: write only attributes should also be supported~}}
+  {{#if isGlobalAttribute~}}
+    global {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
   {{~#unless isReportableAttribute~}}
     nosubscribe {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}

@@ -200,7 +200,9 @@ void USART_IRQHandler(void)
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
-#ifndef PW_RPC_ENABLED
+#if defined(SL_WIFI)
+    /* TODO */
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }
@@ -224,7 +226,9 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
-#ifndef PW_RPC_ENABLED
+#if defined(SL_WIFI)
+    /* TODO */
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }
