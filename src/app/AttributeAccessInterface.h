@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -311,8 +312,8 @@ private:
 class AttributeValueDecoder
 {
 public:
-    AttributeValueDecoder(TLV::TLVReader & aReader, FabricIndex aAccessingFabricIndex) :
-        mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
+    AttributeValueDecoder(TLV::TLVReader & aReader, const Access::SubjectDescriptor & aSubjectDescriptor) :
+        mReader(aReader), mSubjectDescriptor(aSubjectDescriptor)
     {}
 
     template <typename T>
@@ -327,12 +328,17 @@ public:
     /**
      * The accessing fabric index for this write interaction.
      */
-    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+    FabricIndex AccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+
+    /**
+     * The accessing subject descriptor for this write interaction.
+     */
+    Access::SubjectDescriptor & GetSubjectDescriptor() { return mSubjectDescriptor; }
 
 private:
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
-    const FabricIndex mAccessingFabricIndex;
+    Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 class AttributeAccessInterface
