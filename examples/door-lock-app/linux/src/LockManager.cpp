@@ -105,19 +105,19 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
-        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16 "]", endpointId,
-                     userIndex, adjustedUserIndex);
+        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16 "]",
+                     endpointId, userIndex, adjustedUserIndex);
         return false;
     }
 
     strncpy(userInStorage.userName, userName.data(), userName.size());
     userInStorage.userName[userName.size()] = 0;
-    userInStorage.userUniqueId   = uniqueId;
-    userInStorage.userStatus     = userStatus;
-    userInStorage.userType       = usertype;
-    userInStorage.credentialRule = credentialRule;
-    userInStorage.lastModifiedBy = modifier;
-    userInStorage.createdBy      = creator;
+    userInStorage.userUniqueId              = uniqueId;
+    userInStorage.userStatus                = userStatus;
+    userInStorage.userType                  = usertype;
+    userInStorage.credentialRule            = credentialRule;
+    userInStorage.lastModifiedBy            = modifier;
+    userInStorage.createdBy                 = creator;
 
     userInStorage.totalCredentials = totalCredentials;
     for (size_t i = 0; i < totalCredentials; ++i)

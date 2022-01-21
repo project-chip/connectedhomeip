@@ -1288,8 +1288,9 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Fabri
     // appclusters, 5.2.4.37: all the credentials associated with user should be cleared when clearing the user
     for (const auto & credential : user.credentials)
     {
-        emberAfDoorLockClusterPrintln("[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%" PRIu8 ",credentialIndex=%d]",
-                                      endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
+        emberAfDoorLockClusterPrintln(
+            "[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%" PRIu8 ",credentialIndex=%d]",
+            endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
 
         if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, DlCredentialStatus::kAvailable,
                                                 static_cast<DlCredentialType>(credential.CredentialType), chip::ByteSpan()))
