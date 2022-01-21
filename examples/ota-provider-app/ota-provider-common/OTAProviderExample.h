@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
+#include <ota-provider-common/UserConsentDelegate.h>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -53,10 +54,15 @@ public:
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
+    // Sets user consent delegate and also sets userConsentCallback
+    // which should be called by application when it gets the user consent.
+    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate);
+
 private:
     BdxOtaSender mBdxOtaSender;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
     uint32_t mDelayedActionTimeSec;
+    chip::ota::UserConsentDelegate * mUserConsentDelegate;
 };

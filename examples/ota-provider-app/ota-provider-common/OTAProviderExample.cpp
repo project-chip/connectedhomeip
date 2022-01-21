@@ -42,8 +42,71 @@ using chip::Server;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
 using chip::bdx::TransferControlFlags;
+using namespace chip;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
+
+namespace {
+
+// If we track user consent for individual node, we may not need to track states
+enum UserConsentState
+{
+    // No pending user consent request or may have been rejected
+    // QueryImage will obtain user consent if needed
+    kIdle,
+    // User consent request is pending, QueryImage will be responded as busy till timeout
+    // No request for user consent will be raised
+    kInProgress,
+    // User consent is granted, Specific node will be responded with Image URL,
+    // rest of the nodes will receive Busy. This state will be moved to kIdle after
+    // responding with Image URL
+    kGranted,
+};
+
+static UserConsentState mUserConsentStatus = UserConsentState::kIdle;
+static EndpointId mUserConsentEndpoint     = kInvalidEndpointId;
+static NodeId mUserConsentNodeId           = kUndefinedNodeId;
+
+// Using 5 minutes as timeout for user consent expiration
+constexpr chip::System::Clock::Timeout kDefaultUserConsentTimeout = chip::System::Clock::Seconds16(5 * 60);
+
+static void OnUserConsentTimeout(System::Layer *, void * context)
+{
+    if (mUserConsentStatus != UserConsentState::kIdle)
+    {
+        ChipLogDetail(SoftwareUpdate, "User consent timeout expired");
+        mUserConsentStatus   = UserConsentState::kIdle;
+        mUserConsentEndpoint = kInvalidEndpointId;
+        mUserConsentNodeId   = kUndefinedNodeId;
+    }
+}
+
+static void ClearUserConsent()
+{
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnUserConsentTimeout, nullptr);
+    mUserConsentStatus   = UserConsentState::kIdle;
+    mUserConsentEndpoint = kInvalidEndpointId;
+    mUserConsentNodeId   = kUndefinedNodeId;
+}
+
+static void OnUserConsent(bool granted, EndpointId endpoint, NodeId nodeId)
+{
+    ChipLogDetail(SoftwareUpdate, "User consent %s for endpoint:%hu nodeid:%llu ", granted ? "granted" : "denied", endpoint,
+                  nodeId);
+
+    if (granted)
+    {
+        mUserConsentStatus   = UserConsentState::kGranted;
+        mUserConsentEndpoint = endpoint;
+        mUserConsentNodeId   = nodeId;
+    }
+    else
+    {
+        ClearUserConsent();
+    }
+}
+
+} // namespace
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
@@ -91,27 +154,83 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
 }
 
+void OTAProviderExample::SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate)
+{
+    VerifyOrReturn(delegate != nullptr, ChipLogError(SoftwareUpdate, "User consent delegate is null"));
+    mUserConsentDelegate                      = delegate;
+    mUserConsentDelegate->userConsentCallback = OnUserConsent;
+}
+
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
 {
-    // TODO: add confiuration for returning BUSY status
+    ChipLogDetail(SoftwareUpdate, "Requestor endpoint:%hu node-id:%llu", commandPath.mEndpointId,
+                  emberAfCurrentCommand()->SourceNodeId());
 
-    OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
     uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
                                                                    // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
-    bool userConsentNeeded                  = false;
     uint8_t updateToken[kUpdateTokenLen]    = { 0 };
     char strBuf[kUpdateTokenStrLen]         = { 0 };
     char uriBuf[kUriMaxLen]                 = { 0 };
+    QueryImageResponse::Type response;
 
-    GenerateUpdateToken(updateToken, kUpdateTokenLen);
-    GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "generated updateToken: %s", strBuf);
+    OTAQueryStatus queryStatus = (strlen(mOTAFilePath) != 0) ? OTAQueryStatus::kUpdateAvailable : OTAQueryStatus::kNotAvailable;
+    bool userConsentNeeded     = (commandData.requestorCanConsent.HasValue() && commandData.requestorCanConsent.Value() == true);
 
-    if (strlen(mOTAFilePath))
+    if (queryStatus == OTAQueryStatus::kUpdateAvailable)
     {
+        switch (mUserConsentStatus)
+        {
+        case UserConsentState::kIdle: {
+            if (userConsentNeeded == false)
+            {
+                if (mUserConsentDelegate == nullptr)
+                {
+                    // Not sure, should we return error or Busy/NotAvailable?
+                    ChipLogError(SoftwareUpdate, "User consent delegate is null");
+                    return EMBER_ZCL_STATUS_FAILURE;
+                }
+
+                queryStatus = OTAQueryStatus::kBusy;
+                ChipLogDetail(SoftwareUpdate, "Obtaining user consent...");
+                mUserConsentDelegate->ObtainUserConsentAsync(emberAfCurrentCommand()->SourceNodeId(), commandPath.mEndpointId,
+                                                             commandData.softwareVersion, newSoftwareVersion);
+                chip::DeviceLayer::SystemLayer().StartTimer(kDefaultUserConsentTimeout, OnUserConsentTimeout, nullptr);
+            }
+        }
+        break;
+
+        case UserConsentState::kInProgress: {
+            ChipLogDetail(SoftwareUpdate, "User consent is in progress, responding with busy");
+            queryStatus = OTAQueryStatus::kBusy;
+        }
+        break;
+
+        case UserConsentState::kGranted: {
+            if (mUserConsentEndpoint == commandPath.mEndpointId && mUserConsentNodeId == emberAfCurrentCommand()->SourceNodeId())
+            {
+                ChipLogDetail(SoftwareUpdate, "User consent has been granted");
+                queryStatus = OTAQueryStatus::kUpdateAvailable;
+                ClearUserConsent();
+            }
+            else
+            {
+                ChipLogDetail(SoftwareUpdate, "User consent has been granted, but not for this node");
+                queryStatus = OTAQueryStatus::kBusy;
+            }
+        }
+        break;
+        }
+    }
+
+    if (queryStatus == OTAQueryStatus::kUpdateAvailable)
+    {
+        GenerateUpdateToken(updateToken, kUpdateTokenLen);
+        GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
+        ChipLogDetail(SoftwareUpdate, "generated updateToken: %s", strBuf);
+
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
         // supplying the response is not the provider supplying the OTA image.
         FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
@@ -122,54 +241,27 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         MutableCharSpan uri(uriBuf, kUriMaxLen);
         chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
         ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
-    }
 
-    // Set Status for the Query Image Response
-    switch (mQueryImageBehavior)
-    {
-    case kRespondWithUpdateAvailable: {
-        if (strlen(mOTAFilePath) != 0)
+        // Initialize the transfer session in prepartion for a BDX transfer
+        mBdxOtaSender.SetFilepath(mOTAFilePath);
+        BitFlags<TransferControlFlags> bdxFlags;
+        bdxFlags.Set(TransferControlFlags::kReceiverDrive);
+        CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
+                                                          bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+        if (err != CHIP_NO_ERROR)
         {
-            queryStatus = OTAQueryStatus::kUpdateAvailable;
+            ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
+            return EMBER_ZCL_STATUS_FAILURE;
+        }
 
-            // Initialize the transfer session in prepartion for a BDX transfer
-            mBdxOtaSender.SetFilepath(mOTAFilePath);
-            BitFlags<TransferControlFlags> bdxFlags;
-            bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-            CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
-                                                              bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
-                return EMBER_ZCL_STATUS_FAILURE;
-            }
-        }
-        else
-        {
-            queryStatus = OTAQueryStatus::kNotAvailable;
-            ChipLogError(SoftwareUpdate, "No OTA file configured on the Provider");
-        }
-        break;
-    }
-    case kRespondWithBusy: {
-        queryStatus = OTAQueryStatus::kBusy;
-        break;
-    }
-    case kRespondWithNotAvailable: {
-        queryStatus = OTAQueryStatus::kNotAvailable;
-        break;
-    }
-    default:
-        queryStatus = OTAQueryStatus::kNotAvailable;
+        response.imageURI.Emplace(chip::CharSpan(uriBuf, strlen(uriBuf)));
+        response.softwareVersion.Emplace(newSoftwareVersion);
+        response.softwareVersionString.Emplace(chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString)));
+        response.updateToken.Emplace(chip::ByteSpan(updateToken));
     }
 
-    QueryImageResponse::Type response;
     response.status = queryStatus;
     response.delayedActionTime.Emplace(mDelayedActionTimeSec);
-    response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
-    response.softwareVersion.Emplace(newSoftwareVersion);
-    response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(kExampleSoftwareString));
-    response.updateToken.Emplace(chip::ByteSpan(updateToken));
     response.userConsentNeeded.Emplace(userConsentNeeded);
     // Could also just not send metadataForRequestor at all.
     response.metadataForRequestor.Emplace(chip::ByteSpan());
