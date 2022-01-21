@@ -32,6 +32,8 @@ GenericOTARequestorDriver * ToDriver(void * context)
     return static_cast<GenericOTARequestorDriver *>(context);
 }
 
+constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
+
 } // namespace
 
 bool GenericOTARequestorDriver::CanConsent()
@@ -60,13 +62,12 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
 {
     VerifyOrDie(mRequestor != nullptr);
 
-    System::Clock::Seconds32 delayedActionTime = System::Clock::Seconds32(120);
-    if (delay > delayedActionTime)
+    if (delay < kDefaultDelayedActionTime)
     {
-        delayedActionTime = delay;
+        delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, delayedActionTime,
+    ScheduleDelayedAction(UpdateFailureState::kQuerying, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->TriggerImmediateQuery(); });
 }
 
@@ -87,13 +88,12 @@ void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
 
-    System::Clock::Seconds32 delayedActionTime = System::Clock::Seconds32(120);
-    if (delay > delayedActionTime)
+    if (delay < kDefaultDelayedActionTime)
     {
-        delayedActionTime = delay;
+        delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delayedActionTime,
+    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); });
 }
 
