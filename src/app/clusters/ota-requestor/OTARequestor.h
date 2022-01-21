@@ -116,7 +116,7 @@ public:
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
-    void CancelImageUpdate();
+    void CancelImageUpdate() override;
 
     // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
