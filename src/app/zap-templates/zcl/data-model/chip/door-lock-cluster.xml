@@ -95,11 +95,11 @@ limitations under the License.
         <!-- Conformance feature RFID - for now optional -->
         <attribute side="server" code="19" define="NUM_RFID_USERS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfRFIDUsersSupported</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT16U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
+        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT16U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
+        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
+        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT8U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
         <!-- Conformance feature PIN - for now optional -->
         <attribute side="server" code="23" define="MAX_PIN_LENGTH" type="INT8U" writable="false" optional="true">MaxPINCodeLength</attribute>
         <!-- Conformance feature PIN - for now optional -->
