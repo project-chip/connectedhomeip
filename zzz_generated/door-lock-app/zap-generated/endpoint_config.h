@@ -298,6 +298,9 @@
                                                                                                                                    \
             /* 642 - AutoRelockTime, */                                                                                            \
             0x00, 0x00, 0x00, 0x60,                                                                                                \
+                                                                                                                                   \
+            /* 646 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x01, 0x03,                                                                                                \
     }
 
 #else // !BIGENDIAN_CPU
@@ -575,11 +578,14 @@
                                                                                                                                    \
             /* 642 - AutoRelockTime, */                                                                                            \
             0x60, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* 646 - FeatureMap, */                                                                                                \
+            0x03, 0x01, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (79)
+#define GENERATED_DEFAULTS_COUNT (80)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -618,7 +624,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 201
+#define GENERATED_ATTRIBUTE_COUNT 205
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -867,8 +873,11 @@
             { 0x00000003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() },   /* DoorState */               \
             { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfTotalUsersSupported */                      \
             { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfPINUsersSupported */                        \
-            { 0x00000017, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(6) },   /* MaxPINCodeLength */                                 \
+            { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfRFIDUsersSupported */                       \
+            { 0x00000017, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(8) },   /* MaxPINCodeLength */                                 \
             { 0x00000018, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(6) },   /* MinPINCodeLength */                                 \
+            { 0x00000019, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(20) },  /* MaxRFIDCodeLength */                                \
+            { 0x0000001A, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* MinRFIDCodeLength */                                \
             { 0x0000001B, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(1) }, /* CredentialRulesSupport */                           \
             { 0x00000021, ZAP_TYPE(CHAR_STRING), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(639) }, /* Language */   \
             { 0x00000023, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(642) }, /* AutoRelockTime */  \
@@ -884,8 +893,9 @@
             { 0x00000030, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(3) }, /* WrongCodeEntryLimit */                                                           \
             { 0x00000031, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
-              ZAP_MIN_MAX_DEFAULTS_INDEX(4) },                             /* UserCodeTemporaryDisableTime */                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                   \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(4) },                                      /* UserCodeTemporaryDisableTime */             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(646) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },          /* ClusterRevision */                          \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -977,8 +987,8 @@
             }, /* Endpoint: 1, Cluster: Power Source (server) */                                                                   \
             { 0x00000101,                                                                                                          \
               ZAP_ATTRIBUTE_INDEX(182),                                                                                            \
-              19,                                                                                                                  \
-              29,                                                                                                                  \
+              23,                                                                                                                  \
+              37,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) |                                            \
                   ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
@@ -989,7 +999,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 18, 1110 }, { ZAP_CLUSTER_INDEX(18), 3, 162 },                                                     \
+        { ZAP_CLUSTER_INDEX(0), 18, 1110 }, { ZAP_CLUSTER_INDEX(18), 3, 170 },                                                     \
     }
 
 // Largest attribute size is needed for various buffers
@@ -999,7 +1009,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (246)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1272)
+#define ATTRIBUTE_MAX_SIZE (1280)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

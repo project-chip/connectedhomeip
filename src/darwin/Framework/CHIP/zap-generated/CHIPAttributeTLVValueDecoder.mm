@@ -2389,6 +2389,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
+        case Attributes::NumberOfRFIDUsersSupported::Id: {
+            using TypeInfo = Attributes::NumberOfRFIDUsersSupported::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         case Attributes::MaxPINCodeLength::Id: {
             using TypeInfo = Attributes::MaxPINCodeLength::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -2402,6 +2413,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
         }
         case Attributes::MinPINCodeLength::Id: {
             using TypeInfo = Attributes::MinPINCodeLength::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::MaxRFIDCodeLength::Id: {
+            using TypeInfo = Attributes::MaxRFIDCodeLength::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::MinRFIDCodeLength::Id: {
+            using TypeInfo = Attributes::MinRFIDCodeLength::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

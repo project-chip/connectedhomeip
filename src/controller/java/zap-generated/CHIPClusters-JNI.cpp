@@ -7139,7 +7139,8 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)
 }
 JNI_METHOD(void, DoorLockCluster, setCredential)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject operationType, jobject credentialType,
- jobject credentialIndex, jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject timedInvokeTimeoutMs)
+ jobject credentialIndex, jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject userType,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7151,9 +7152,29 @@ JNI_METHOD(void, DoorLockCluster, setCredential)
         static_cast<decltype(request.operationType)>(chip::JniReferences::GetInstance().IntegerToPrimitive(operationType));
     request.credential     = chip::app::Clusters::DoorLock::Structs::DlCredential::Type();
     request.credentialData = chip::JniByteArray(env, static_cast<jbyteArray>(credentialData)).byteSpan();
-    request.userIndex = static_cast<decltype(request.userIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
-    request.userStatus =
-        static_cast<decltype(request.userStatus)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    uint16_t userIndexValue;
+    if (userIndex != nullptr)
+    {
+        userIndexValue = chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex);
+    }
+    request.userIndex = userIndex == nullptr ? chip::app::DataModel::Nullable<uint16_t>()
+                                             : chip::app::DataModel::Nullable<uint16_t>(userIndexValue);
+    decltype(request.userStatus)::UnderlyingType userStatusValue;
+    if (userStatus != nullptr)
+    {
+        userStatusValue = static_cast<decltype(userStatusValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    }
+    request.userStatus = userStatus == nullptr
+        ? chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus>()
+        : chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus>(userStatusValue);
+    decltype(request.userType)::UnderlyingType userTypeValue;
+    if (userType != nullptr)
+    {
+        userTypeValue = static_cast<decltype(userTypeValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
+    }
+    request.userType = userType == nullptr
+        ? chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType>()
+        : chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType>(userTypeValue);
 
     std::unique_ptr<CHIPDoorLockClusterSetCredentialResponseCallback, void (*)(CHIPDoorLockClusterSetCredentialResponseCallback *)>
         onSuccess(Platform::New<CHIPDoorLockClusterSetCredentialResponseCallback>(callback),
@@ -7219,11 +7240,31 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     }
     request.userUniqueId = userUniqueId == nullptr ? chip::app::DataModel::Nullable<uint32_t>()
                                                    : chip::app::DataModel::Nullable<uint32_t>(userUniqueIdValue);
-    request.userStatus =
-        static_cast<decltype(request.userStatus)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
-    request.userType = static_cast<decltype(request.userType)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
-    request.credentialRule =
-        static_cast<decltype(request.credentialRule)>(chip::JniReferences::GetInstance().IntegerToPrimitive(credentialRule));
+    decltype(request.userStatus)::UnderlyingType userStatusValue;
+    if (userStatus != nullptr)
+    {
+        userStatusValue = static_cast<decltype(userStatusValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    }
+    request.userStatus = userStatus == nullptr
+        ? chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus>()
+        : chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus>(userStatusValue);
+    decltype(request.userType)::UnderlyingType userTypeValue;
+    if (userType != nullptr)
+    {
+        userTypeValue = static_cast<decltype(userTypeValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
+    }
+    request.userType = userType == nullptr
+        ? chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType>()
+        : chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType>(userTypeValue);
+    decltype(request.credentialRule)::UnderlyingType credentialRuleValue;
+    if (credentialRule != nullptr)
+    {
+        credentialRuleValue =
+            static_cast<decltype(credentialRuleValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(credentialRule));
+    }
+    request.credentialRule = credentialRule == nullptr
+        ? chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule>()
+        : chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule>(credentialRuleValue);
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

@@ -1571,6 +1571,7 @@ class ChipClusters:
                         "credentialData": "bytes",
                         "userIndex": "int",
                         "userStatus": "int",
+                        "userType": "int",
                     },
                 },
             0x0000001A: {
@@ -1631,6 +1632,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000013: {
+                    "attributeName": "NumberOfRFIDUsersSupported",
+                    "attributeId": 0x00000013,
+                    "type": "int",
+                },
                 0x00000017: {
                     "attributeName": "MaxPINCodeLength",
                     "attributeId": 0x00000017,
@@ -1642,6 +1648,16 @@ class ChipClusters:
                     "attributeId": 0x00000018,
                     "type": "int",
                     "reportable": True,
+                },
+                0x00000019: {
+                    "attributeName": "MaxRFIDCodeLength",
+                    "attributeId": 0x00000019,
+                    "type": "int",
+                },
+                0x0000001A: {
+                    "attributeName": "MinRFIDCodeLength",
+                    "attributeId": 0x0000001A,
+                    "type": "int",
                 },
                 0x00000021: {
                     "attributeName": "Language",
