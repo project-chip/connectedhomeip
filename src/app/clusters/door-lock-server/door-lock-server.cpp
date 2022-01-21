@@ -38,6 +38,9 @@ using namespace chip;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::DoorLock;
 
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 23;
+
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
@@ -807,9 +810,99 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[SetWeekDaySchedule]: Incoming command [endpointId=%d]", commandPath.mEndpointId);
+    emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
-    // TODO: Implement setting weekday schedule
+    auto endpointId = commandPath.mEndpointId;
+
+    auto weekDayIndex     = commandData.weekDayIndex;
+    auto userIndex        = commandData.userIndex;
+    const auto & daysMask = commandData.daysMask;
+    auto startHour        = commandData.startHour;
+    auto startMinute      = commandData.endMinute;
+    auto endHour          = commandData.endHour;
+    auto endMinute        = commandData.endMinute;
+
+    if (!weekDayIndexValid(endpointId, weekDayIndex) || !userIndexValid(endpointId, userIndex))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetWeekDaySchedule] Unable to add weekday schedule - index out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
+            endpointId, weekDayIndex, userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    // Check if user actually exist
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        ChipLogError(Zcl,
+                     "[SetWeekDaySchedule] Unable to get the user - internal error [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
+                     endpointId, weekDayIndex, userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+    if (DlUserStatus::kAvailable == user.userStatus)
+    {
+        emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add weekday schedule - user does not exist "
+                                      "[endpointId=%d,weekDayIndex=%d,userIndex=%d]",
+                                      endpointId, weekDayIndex, userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    // appclusters, 5.2.4.14 - spec does not allow setting the schedule for multiple days in the bitmask
+    int setBitsInDaysMask = 0;
+    auto rawDaysMask      = daysMask.Raw();
+    for (size_t i = 0; i < sizeof(rawDaysMask) * 8; ++i)
+    {
+        setBitsInDaysMask += rawDaysMask & 0x1;
+        rawDaysMask >>= 1;
+    }
+
+    if (setBitsInDaysMask == 0 || setBitsInDaysMask > 1)
+    {
+        emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add weekday schedule - daysMask is out of range "
+                                      "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%x]",
+                                      endpointId, weekDayIndex, userIndex, daysMask.Raw());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    if (startHour > DOOR_LOCK_SCHEDULE_MAX_HOUR || startMinute > DOOR_LOCK_SCHEDULE_MAX_MINUTE ||
+        endHour > DOOR_LOCK_SCHEDULE_MAX_HOUR || endMinute > DOOR_LOCK_SCHEDULE_MAX_MINUTE)
+    {
+        emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add weekday schedule - start time out of range "
+                                      "[endpointId=%d,weekDayIndex=%d,userIndex=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
+                                      endpointId, weekDayIndex, userIndex, startHour, startMinute, endHour, endMinute);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    if (startHour > endHour || (startHour == endHour && startMinute >= endMinute))
+    {
+        emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add weekday schedule - invalid time "
+                                      "[endpointId=%d,weekDayIndex=%d,userIndex=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
+                                      endpointId, weekDayIndex, userIndex, startHour, startMinute, endHour, endMinute);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    auto status =
+        emberAfPluginDoorLockSetSchedule(endpointId, weekDayIndex, userIndex, daysMask, startHour, startMinute, endHour, endMinute);
+    if (DlStatus::kSuccess != status)
+    {
+        ChipLogError(Zcl,
+                     "[SetWeekDaySchedule] Unable to add weekday schedule - internal error "
+                     "[endpointId=%d,weekDayIndex=%d,userIndex=%d,status=%" PRIu8 "]",
+                     endpointId, weekDayIndex, userIndex, status);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Successfully created new weekday schedule "
+                                  "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
+                                  endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return;
 }
@@ -1756,6 +1849,29 @@ bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, DlCred
         return false;
     }
     return false;
+}
+
+bool DoorLockServer::weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex)
+{
+    uint8_t weekDaysSupported;
+    return weekDayIndexValid(endpointId, weekDayIndex, weekDaysSupported);
+}
+
+bool DoorLockServer::weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex, uint8_t & weekDaysSupported)
+{
+    EmberAfStatus status = Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Get(endpointId, &weekDaysSupported);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfWeekDaySchedulesSupportedPerUser' [status=%d]", status);
+        return false;
+    }
+
+    // appclusters, 5.2.4.14-17: weekday index changes from 1 to maxNumberOfUsers
+    if (0 == weekDayIndex || weekDayIndex > weekDaysSupported)
+    {
+        return false;
+    }
+    return true;
 }
 
 EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
