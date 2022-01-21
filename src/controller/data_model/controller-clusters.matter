@@ -3218,6 +3218,33 @@ client cluster ThreadNetworkDiagnostics = 53 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+client cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  nosubscribe attribute HourFormat hourFormat = 0;
+  nosubscribe attribute CalendarType activeCalendarType = 1;
+  readonly nosubscribe attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global nosubscribe attribute int16u clusterRevision = 65533;
+}
+
 client cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -3402,6 +3429,7 @@ endpoint 1 {
   binding cluster Thermostat;
   binding cluster ThermostatUserInterfaceConfiguration;
   binding cluster ThreadNetworkDiagnostics;
+  binding cluster TimeFormatLocalization;
   binding cluster UserLabel;
   binding cluster WakeOnLan;
   binding cluster WiFiNetworkDiagnostics;

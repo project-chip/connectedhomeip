@@ -1012,6 +1012,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Time Format Localization
+ *
+ */
+@interface CHIPTestTimeFormatLocalization : CHIPTimeFormatLocalization
+
+- (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster User Label
  *
  */

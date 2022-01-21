@@ -834,6 +834,33 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+server cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -915,6 +942,7 @@ endpoint 0 {
   server  cluster OperationalCredentials;
   server  cluster SoftwareDiagnostics;
   server  cluster ThreadNetworkDiagnostics;
+  server  cluster TimeFormatLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

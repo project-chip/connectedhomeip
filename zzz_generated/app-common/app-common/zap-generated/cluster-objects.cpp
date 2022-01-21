@@ -6509,8 +6509,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::HourFormat::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, hourFormat));
         break;
-    case Attributes::CalendarType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, calendarType));
+    case Attributes::ActiveCalendarType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeCalendarType));
         break;
     case Attributes::SupportedCalendarTypes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedCalendarTypes));
