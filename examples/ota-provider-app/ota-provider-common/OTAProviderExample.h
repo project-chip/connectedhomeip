@@ -22,6 +22,7 @@
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <vector>
+#include <ota-provider-common/UserConsentDelegate.h>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -69,6 +70,10 @@ public:
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
+    // Sets user consent delegate and also sets userConsentCallback
+    // which should be called by application when it gets the user consent.
+    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate);
+
 private:
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
@@ -79,4 +84,5 @@ private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
+    chip::ota::UserConsentDelegate * mUserConsentDelegate;
 };
