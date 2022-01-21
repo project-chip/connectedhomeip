@@ -60,7 +60,7 @@ class TestParser(unittest.TestCase):
                  entries=[
                      EnumEntry(name="kValue1", code=1),
                      EnumEntry(name="kOther", code=0x12),
-                 ])]
+            ])]
         )
         self.assertEqual(actual, expected)
 
@@ -83,7 +83,8 @@ class TestParser(unittest.TestCase):
                             [FieldAttribute.OPTIONAL])),
                         Field(data_type=DataType(name="int"), code=0x123, name="valueThatIsNullable", attributes=set(
                             [FieldAttribute.NULLABLE])),
-                        Field(data_type=DataType(name="char_string", max_length=123), code=222, name="sized_string", attributes=set()),
+                        Field(data_type=DataType(name="char_string", max_length=123),
+                              code=222, name="sized_string", attributes=set()),
                    ])]
         )
         self.assertEqual(actual, expected)
@@ -185,7 +186,7 @@ class TestParser(unittest.TestCase):
                              entries=[
                                  EnumEntry(name="A", code=0x123),
                                  EnumEntry(name="B", code=0x234),
-                             ])],
+                        ])],
                     )])
         self.assertEqual(actual, expected)
 
@@ -206,7 +207,7 @@ class TestParser(unittest.TestCase):
                     events=[
                         Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, fields=[
                             Field(data_type=DataType(name="INT32U"),
-                                            code=0, name="softwareVersion"),
+                                  code=0, name="softwareVersion"),
                         ]),
                         Event(priority=EventPriority.INFO,
                               name="Hello", code=1, fields=[]),
