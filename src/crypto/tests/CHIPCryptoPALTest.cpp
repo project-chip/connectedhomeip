@@ -611,7 +611,8 @@ static void TestAES_CCM_128Containers(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)) == 0);
 
     // Test sanitization.
-    deepCopy = AesCcm128Key();
+    deepCopy.~AesCcm128Key();
+    new (&deepCopy) AesCcm128Key();
     NL_TEST_ASSERT(inSuite, memcmp(deepCopy, testVector, sizeof(testVector)));
 
     // Give us different data.
