@@ -152,7 +152,7 @@ emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(EndpointId Endpoin
 }
 
 Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
-    const app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     Protocols::InteractionModel::Status res;
 
