@@ -33,6 +33,7 @@ using chip::Optional;
 using chip::app::Clusters::DoorLock::DlCredentialRule;
 using chip::app::Clusters::DoorLock::DlCredentialType;
 using chip::app::Clusters::DoorLock::DlDataOperationType;
+using chip::app::Clusters::DoorLock::DlDaysMaskMap;
 using chip::app::Clusters::DoorLock::DlDoorState;
 using chip::app::Clusters::DoorLock::DlLockDataType;
 using chip::app::Clusters::DoorLock::DlLockOperationType;
@@ -99,6 +100,16 @@ public:
 
     void LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                       DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode);
+
+    void SetWeekDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData);
+    void GetWeekDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData);
+    void ClearWeekDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData);
 
     bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
@@ -236,6 +247,23 @@ struct EmberAfPluginDoorLockUserInfo
     chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
+
+struct EmberAfPluginDoorLockWeekDaySchedule
+{
+    uint16_t userIndex;
+    DlDaysMaskMap daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+};
+
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockWeekDaySchedule & schedule);
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                          uint8_t endMinute);
 
 typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 
