@@ -507,6 +507,12 @@ typedef struct _TargetInfo
     chip::CharSpan name;
 } TargetInfo;
 
+// Struct for TestFabricScoped
+typedef struct _TestFabricScoped
+{
+    chip::FabricIndex fabricIndex;
+} TestFabricScoped;
+
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
