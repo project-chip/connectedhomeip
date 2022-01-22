@@ -1906,13 +1906,13 @@ CHIP_ERROR DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHand
     response.weekDayIndex = weekdayIndex;
     response.userIndex    = userIndex;
     response.status       = status;
-    if (DlStatus::kSuccess != status)
+    if (DlStatus::kSuccess == status)
     {
-        response.daysMask    = daysMask;
-        response.startHour   = startHour;
-        response.startMinute = startMinute;
-        response.endHour     = endHour;
-        response.endMinute   = endMinute;
+        response.daysMask    = Optional<chip::BitFlags<DlDaysMaskMap>>(daysMask);
+        response.startHour   = Optional<uint8_t>(startHour);
+        response.startMinute = Optional<uint8_t>(startMinute);
+        response.endHour     = Optional<uint8_t>(endHour);
+        response.endMinute   = Optional<uint8_t>(endMinute);
     }
 
     return commandObj->AddResponseData(commandPath, response);
