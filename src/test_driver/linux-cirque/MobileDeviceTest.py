@@ -43,7 +43,7 @@ DEVICE_CONFIG = {
     'device0': {
         'type': 'MobileDevice',
         'base_image': 'connectedhomeip/chip-cirque-device-base',
-        'capability': ['Interactive', 'TrafficControl', 'Mount'],
+        'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
@@ -52,7 +52,7 @@ DEVICE_CONFIG = {
     'device1': {
         'type': 'CHIPEndDevice',
         'base_image': 'connectedhomeip/chip-cirque-device-base',
-        'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
+        'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
@@ -81,7 +81,7 @@ class TestPythonController(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run {} --thread".format(
+            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread".format(
                 os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app")))
 
         self.reset_thread_devices(server_ids)

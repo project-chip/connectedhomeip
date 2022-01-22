@@ -37,7 +37,7 @@ public:
     {
     public:
         Iterator(const AttributeList<T, N> * AttributeList, int index);
-        T operator*() const;
+        const T & operator*() const;
         Iterator & operator++();
         bool operator!=(const Iterator & other) const;
 
@@ -114,7 +114,7 @@ inline AttributeList<T, N>::Iterator::Iterator(const AttributeList<T, N> * pAttr
 {}
 
 template <typename T, size_t N>
-inline T AttributeList<T, N>::Iterator::operator*() const
+inline const T & AttributeList<T, N>::Iterator::operator*() const
 {
     return mAttributeListPtr->operator[](mIndex);
 }
