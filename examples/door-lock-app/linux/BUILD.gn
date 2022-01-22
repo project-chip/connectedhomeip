@@ -19,6 +19,7 @@ executable("chip-door-lock-app") {
   sources = [
     "main.cpp",
     "src/LockManager.cpp",
+    "src/LockEndpoint.cpp",
   ]
 
   deps = [
