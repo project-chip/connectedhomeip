@@ -184,6 +184,54 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
     return true;
 }
 
+DlStatus LockEndpoint::GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
+{
+    if (0 == userIndex || userIndex > mWeekDaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    if (0 == weekDayIndex || weekDayIndex > mWeekDaySchedules.at(userIndex - 1).size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    const auto & scheduleInStorage = mWeekDaySchedules.at(userIndex - 1).at(weekDayIndex - 1);
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
+
+    schedule = scheduleInStorage.schedule;
+
+    return DlStatus::kSuccess;
+}
+
+DlStatus LockEndpoint::SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DlDaysMaskMap daysMask,
+                                   uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+{
+    if (0 == userIndex || userIndex > mWeekDaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    if (0 == weekDayIndex || weekDayIndex > mWeekDaySchedules.at(userIndex - 1).size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    auto & scheduleInStorage = mWeekDaySchedules.at(userIndex - 1).at(weekDayIndex - 1);
+
+    scheduleInStorage.schedule.daysMask    = daysMask;
+    scheduleInStorage.schedule.startHour   = startHour;
+    scheduleInStorage.schedule.startMinute = startMinute;
+    scheduleInStorage.schedule.endHour     = endHour;
+    scheduleInStorage.schedule.endMinute   = endMinute;
+    scheduleInStorage.status               = status;
+
+    return DlStatus::kSuccess;
+}
+
 bool LockEndpoint::setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin)
 {
     if (mLockState == lockState)
@@ -212,8 +260,10 @@ bool LockEndpoint::setLockState(DlLockState lockState, chip::Optional<chip::Byte
         chip::ByteSpan credentialData(pinCredential.credentialData, pinCredential.credentialDataSize);
         if (credentialData.data_equal(pin.Value()))
         {
-            ChipLogDetail(Zcl, "Door Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d]",
-                          lockStateToString(lockState), mEndpointId);
+            ChipLogDetail(
+                Zcl,
+                "Door Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d]",
+                lockStateToString(lockState), mEndpointId);
 
             mLockState = lockState;
             return true;
@@ -221,7 +271,8 @@ bool LockEndpoint::setLockState(DlLockState lockState, chip::Optional<chip::Byte
     }
 
     ChipLogDetail(Zcl,
-                  "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" [endpointId=%d]",
+                  "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
+                  "[endpointId=%d]",
                   lockStateToString(lockState), mEndpointId);
 
     return false;
