@@ -79,6 +79,9 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
+    bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
+    bool GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfWeekDaySchedulesPerUser);
+
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
 
