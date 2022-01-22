@@ -262,9 +262,14 @@ struct EmberAfPluginDoorLockUserInfo
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
 
+enum class DlScheduleStatus : uint8_t
+{
+    kAvailable = 0x00, /**< Indicates if credential slot is available. */
+    kOccupied  = 0x01, /**< Indicates if credential slot is already occupied. */
+};
+
 struct EmberAfPluginDoorLockWeekDaySchedule
 {
-    uint16_t userIndex;
     DlDaysMaskMap daysMask;
     uint8_t startHour;
     uint8_t startMinute;
@@ -276,8 +281,8 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t w
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule);
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-                                          uint8_t endMinute);
+                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          uint8_t endHour, uint8_t endMinute);
 
 typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 

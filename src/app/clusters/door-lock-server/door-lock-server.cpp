@@ -39,7 +39,7 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::DoorLock;
 
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 23;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
@@ -862,7 +862,7 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
     auto userIndex        = commandData.userIndex;
     const auto & daysMask = commandData.daysMask;
     auto startHour        = commandData.startHour;
-    auto startMinute      = commandData.endMinute;
+    auto startMinute      = commandData.startMinute;
     auto endHour          = commandData.endHour;
     auto endMinute        = commandData.endMinute;
 
@@ -931,8 +931,8 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         return;
     }
 
-    auto status =
-        emberAfPluginDoorLockSetSchedule(endpointId, weekDayIndex, userIndex, daysMask, startHour, startMinute, endHour, endMinute);
+    auto status = emberAfPluginDoorLockSetSchedule(endpointId, weekDayIndex, userIndex, DlScheduleStatus::kOccupied, daysMask,
+                                                   startHour, startMinute, endHour, endMinute);
     if (DlStatus::kSuccess != status)
     {
         ChipLogError(Zcl,
@@ -2655,8 +2655,8 @@ DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId
 }
 
 DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlDaysMaskMap daysMask,
-                                 uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                 DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     return DlStatus::kFailure;
 }

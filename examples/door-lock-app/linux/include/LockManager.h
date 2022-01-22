@@ -45,6 +45,11 @@ public:
     bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                        DlCredentialType credentialType, const chip::ByteSpan & credentialData);
 
+    DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex,
+                         EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                         DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+
     static LockManager & Instance();
 
 private:

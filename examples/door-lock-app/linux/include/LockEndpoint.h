@@ -23,15 +23,19 @@
 
 struct LockUserInfo;
 struct LockCredentialInfo;
+struct WeekDaysScheduleInfo;
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
 
 class LockEndpoint
 {
 public:
-    LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported) :
-        mEndpointId(endpointId), mLockState(DlLockState::kLocked), mLockUsers(numberOfLockUsersSupported),
-        mLockCredentials(numberOfCredentialsSupported + 1)
+    LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported,
+                 uint8_t weekDaySchedulesPerUser) :
+        mEndpointId(endpointId),
+        mLockState(DlLockState::kLocked), mLockUsers(numberOfLockUsersSupported),
+        mLockCredentials(numberOfCredentialsSupported + 1),
+        mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser))
     {}
 
     inline chip::EndpointId GetEndpointId() { return mEndpointId; }
@@ -50,6 +54,10 @@ public:
     bool SetCredential(uint16_t credentialIndex, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
                        const chip::ByteSpan & credentialData);
 
+    DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DlDaysMaskMap daysMask,
+                         uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+
 private:
     bool setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin);
     const char * lockStateToString(DlLockState lockState) const;
@@ -57,8 +65,11 @@ private:
     chip::EndpointId mEndpointId;
     DlLockState mLockState;
 
+    // This is very naive implementation of users/credentials/schedules database and by no means the best practice. Proper storage
+    // of those items is out of scope of this example.
     std::vector<LockUserInfo> mLockUsers;
     std::vector<LockCredentialInfo> mLockCredentials;
+    std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
 };
 
 struct LockUserInfo
@@ -80,4 +91,10 @@ struct LockCredentialInfo
     DlCredentialType credentialType;
     uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
     size_t credentialDataSize;
+};
+
+struct WeekDaysScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
 };
