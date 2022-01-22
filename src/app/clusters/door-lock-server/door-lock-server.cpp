@@ -182,6 +182,29 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return (EMBER_ZCL_STATUS_SUCCESS == status);
 }
 
+bool DoorLockServer::GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported)
+{
+    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &numberOfUsersSupported);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status=%d]", status);
+        return false;
+    }
+    return true;
+}
+
+bool DoorLockServer::GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId,
+                                                                 uint8_t & numberOfWeekDaySchedulesPerUser)
+{
+    EmberAfStatus status = Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Get(endpointId, &numberOfWeekDaySchedulesPerUser);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfWeekDaySchedulesSupportedPerUser' [status=%d]", status);
+        return false;
+    }
+    return true;
+}
+
 void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
@@ -998,10 +1021,8 @@ bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIn
 
 bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser)
 {
-    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUser);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    if (!GetNumberOfUserSupported(endpointId, maxNumberOfUser))
     {
-        ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
         return false;
     }
 
