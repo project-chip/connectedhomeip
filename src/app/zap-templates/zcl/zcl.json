@@ -89,7 +89,6 @@
         }
     },
     "listsUseAttributeAccessInterface": true,
-    "attributeAccessInterfaceAttributes": {
-    },
+    "attributeAccessInterfaceAttributes": {},
     "defaultReportingPolicy": "mandatory"
 }
