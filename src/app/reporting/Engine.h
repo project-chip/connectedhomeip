@@ -113,7 +113,7 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool * apHasMoreChunks, bool * apHasEncodedData);
-    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);

@@ -65379,36 +65379,38 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 7));
             VerifyOrReturn(CheckValue("serverList[7]", iter_0.GetValue(), 43UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 8));
-            VerifyOrReturn(CheckValue("serverList[8]", iter_0.GetValue(), 46UL));
+            VerifyOrReturn(CheckValue("serverList[8]", iter_0.GetValue(), 44UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 9));
-            VerifyOrReturn(CheckValue("serverList[9]", iter_0.GetValue(), 48UL));
+            VerifyOrReturn(CheckValue("serverList[9]", iter_0.GetValue(), 46UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 10));
-            VerifyOrReturn(CheckValue("serverList[10]", iter_0.GetValue(), 49UL));
+            VerifyOrReturn(CheckValue("serverList[10]", iter_0.GetValue(), 48UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 11));
-            VerifyOrReturn(CheckValue("serverList[11]", iter_0.GetValue(), 50UL));
+            VerifyOrReturn(CheckValue("serverList[11]", iter_0.GetValue(), 49UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 12));
-            VerifyOrReturn(CheckValue("serverList[12]", iter_0.GetValue(), 51UL));
+            VerifyOrReturn(CheckValue("serverList[12]", iter_0.GetValue(), 50UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 13));
-            VerifyOrReturn(CheckValue("serverList[13]", iter_0.GetValue(), 52UL));
+            VerifyOrReturn(CheckValue("serverList[13]", iter_0.GetValue(), 51UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 14));
-            VerifyOrReturn(CheckValue("serverList[14]", iter_0.GetValue(), 53UL));
+            VerifyOrReturn(CheckValue("serverList[14]", iter_0.GetValue(), 52UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 15));
-            VerifyOrReturn(CheckValue("serverList[15]", iter_0.GetValue(), 54UL));
+            VerifyOrReturn(CheckValue("serverList[15]", iter_0.GetValue(), 53UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 16));
-            VerifyOrReturn(CheckValue("serverList[16]", iter_0.GetValue(), 55UL));
+            VerifyOrReturn(CheckValue("serverList[16]", iter_0.GetValue(), 54UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 17));
-            VerifyOrReturn(CheckValue("serverList[17]", iter_0.GetValue(), 60UL));
+            VerifyOrReturn(CheckValue("serverList[17]", iter_0.GetValue(), 55UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 18));
-            VerifyOrReturn(CheckValue("serverList[18]", iter_0.GetValue(), 62UL));
+            VerifyOrReturn(CheckValue("serverList[18]", iter_0.GetValue(), 60UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 19));
-            VerifyOrReturn(CheckValue("serverList[19]", iter_0.GetValue(), 63UL));
+            VerifyOrReturn(CheckValue("serverList[19]", iter_0.GetValue(), 62UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 20));
-            VerifyOrReturn(CheckValue("serverList[20]", iter_0.GetValue(), 64UL));
+            VerifyOrReturn(CheckValue("serverList[20]", iter_0.GetValue(), 63UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 21));
-            VerifyOrReturn(CheckValue("serverList[21]", iter_0.GetValue(), 65UL));
+            VerifyOrReturn(CheckValue("serverList[21]", iter_0.GetValue(), 64UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 22));
-            VerifyOrReturn(CheckValue("serverList[22]", iter_0.GetValue(), 1029UL));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter_0, 23));
+            VerifyOrReturn(CheckValue("serverList[22]", iter_0.GetValue(), 65UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 23));
+            VerifyOrReturn(CheckValue("serverList[23]", iter_0.GetValue(), 1029UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter_0, 24));
         }
 
         NextTest();
@@ -67206,6 +67208,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
             err = TestReadBackAttribute_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is true after on command\n");
+            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -67217,7 +67227,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -67258,6 +67268,16 @@ private:
     static void OnSuccessCallback_4(void * context, chip::CharSpan location)
     {
         (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, bool onOff)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(onOff);
     }
 
     //
@@ -67346,6 +67366,54 @@ private:
     void OnSuccessResponse_4(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    {
+        const chip::GroupId groupId = 1234;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(status);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(bool onOff)
+    {
+        VerifyOrReturn(CheckValue("onOff", onOff, 1));
 
         NextTest();
     }

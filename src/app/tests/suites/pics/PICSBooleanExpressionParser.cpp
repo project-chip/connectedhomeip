@@ -124,7 +124,7 @@ bool PICSBooleanExpressionParser::EvaluateExpression(std::vector<std::string> & 
     else
     {
         ChipLogError(chipTool, "Unknown token: '%s'", token.c_str());
-        abort();
+        chipDie();
     }
 }
 
@@ -139,7 +139,7 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         if (tokens[index] != ")")
         {
             ChipLogError(chipTool, "Missing ')'");
-            abort();
+            chipDie();
         }
 
         index++;

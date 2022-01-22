@@ -147,6 +147,7 @@ public:
     bool IsChunkedReport() { return mIsChunkedReport; }
     bool IsPriming() { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
+    bool IsFabricFiltered() const { return mIsFabricFiltered; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }

@@ -9044,27 +9044,27 @@ namespace Attributes {
 namespace HourFormat {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::HourFormat;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::HourFormat;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::HourFormat;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HourFormat
-namespace CalendarType {
+namespace ActiveCalendarType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::CalendarType;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::CalendarType;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::CalendarType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarType::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCalendarType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CalendarType
+} // namespace ActiveCalendarType
 namespace SupportedCalendarTypes {
 struct TypeInfo
 {
@@ -9122,8 +9122,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::HourFormat::TypeInfo::DecodableType hourFormat     = static_cast<uint8_t>(0);
-        Attributes::CalendarType::TypeInfo::DecodableType calendarType = static_cast<uint8_t>(0);
+        Attributes::HourFormat::TypeInfo::DecodableType hourFormat =
+            static_cast<chip::app::Clusters::TimeFormatLocalization::HourFormat>(0);
+        Attributes::ActiveCalendarType::TypeInfo::DecodableType activeCalendarType =
+            static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarType>(0);
         Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
@@ -33620,6 +33622,25 @@ public:
 };
 
 } // namespace DoubleNestedStructList
+namespace TestFabricScoped {
+enum class Fields
+{
+    kFabricIndex = 0,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
+};
+
+using DecodableType = Type;
+
+} // namespace TestFabricScoped
 namespace TestListStructOctet {
 enum class Fields
 {
@@ -35504,6 +35525,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ListLongOctetString
+namespace ListFabricScoped {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListFabricScoped::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ListFabricScoped
 namespace TimedWriteBoolean {
 struct TypeInfo
 {
@@ -36013,6 +36048,7 @@ struct TypeInfo
         Attributes::RangeRestrictedInt16u::TypeInfo::DecodableType rangeRestrictedInt16u = static_cast<uint16_t>(0);
         Attributes::RangeRestrictedInt16s::TypeInfo::DecodableType rangeRestrictedInt16s = static_cast<int16_t>(0);
         Attributes::ListLongOctetString::TypeInfo::DecodableType listLongOctetString;
+        Attributes::ListFabricScoped::TypeInfo::DecodableType listFabricScoped;
         Attributes::TimedWriteBoolean::TypeInfo::DecodableType timedWriteBoolean = static_cast<bool>(0);
         Attributes::Unsupported::TypeInfo::DecodableType unsupported             = static_cast<bool>(0);
         Attributes::NullableBoolean::TypeInfo::DecodableType nullableBoolean;

@@ -17,24 +17,24 @@ server cluster Basic = 40 {
   }
 
   readonly attribute int16u interactionModelVersion = 0;
-  readonly attribute char_string vendorName = 1;
+  readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string productName = 3;
+  readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string nodeLabel = 5;
-  attribute char_string location = 6;
+  attribute char_string<32> nodeLabel = 5;
+  attribute char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string softwareVersionString = 10;
-  readonly attribute char_string manufacturingDate = 11;
-  readonly attribute char_string partNumber = 12;
-  readonly attribute long_char_string productURL = 13;
-  readonly attribute char_string productLabel = 14;
-  readonly attribute char_string serialNumber = 15;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
-  readonly attribute char_string uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -405,7 +405,7 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -492,6 +492,88 @@ server cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
 }
 
+client cluster OperationalCredentials = 62 {
+  enum NodeOperationalCertStatus : ENUM8 {
+    kSuccess = 0;
+    kInvalidPublicKey = 1;
+    kInvalidNodeOpId = 2;
+    kInvalidNOC = 3;
+    kMissingCsr = 4;
+    kTableFull = 5;
+    kInsufficientPrivilege = 8;
+    kFabricConflict = 9;
+    kLabelConflict = 10;
+    kInvalidFabricIndex = 11;
+  }
+
+  struct FabricDescriptor {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING<65> rootPublicKey = 1;
+    INT16U vendorId = 2;
+    FABRIC_ID fabricId = 3;
+    NODE_ID nodeId = 4;
+    CHAR_STRING<32> label = 5;
+  }
+
+  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute int8u supportedFabrics = 2;
+  readonly attribute int8u commissionedFabrics = 3;
+  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct AddNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+    OCTET_STRING IPKValue = 2;
+    NODE_ID caseAdminNode = 3;
+    INT16U adminVendorId = 4;
+  }
+
+  request struct AddTrustedRootCertificateRequest {
+    OCTET_STRING rootCertificate = 0;
+  }
+
+  request struct AttestationRequestRequest {
+    OCTET_STRING attestationNonce = 0;
+  }
+
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
+  }
+
+  request struct OpCSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
+  request struct RemoveFabricRequest {
+    INT8U fabricIndex = 0;
+  }
+
+  request struct RemoveTrustedRootCertificateRequest {
+    OCTET_STRING trustedRootIdentifier = 0;
+  }
+
+  request struct UpdateFabricLabelRequest {
+    CHAR_STRING label = 0;
+  }
+
+  request struct UpdateNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+  }
+
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
+  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+}
+
 server cluster OperationalCredentials = 62 {
   enum NodeOperationalCertStatus : ENUM8 {
     kSuccess = 0;
@@ -508,11 +590,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     fabric_idx fabricIndex = 0;
-    OCTET_STRING rootPublicKey = 1;
+    OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
-    CHAR_STRING label = 5;
+    CHAR_STRING<32> label = 5;
   }
 
   readonly attribute FabricDescriptor fabricsList[] = 1;
@@ -714,6 +796,7 @@ endpoint 0 {
   server  cluster Descriptor;
   server  cluster GeneralCommissioning;
   server  cluster NetworkCommissioning;
+  binding cluster OperationalCredentials;
   server  cluster OperationalCredentials;
   binding cluster TemperatureMeasurement;
   server  cluster TemperatureMeasurement;

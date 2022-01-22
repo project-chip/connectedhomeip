@@ -37,6 +37,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'DiagnosticLogs':
   case 'GeneralCommissioning':
   case 'GeneralDiagnostics':
+  case 'LocalizationConfiguration':
   case 'SoftwareDiagnostics':
   case 'ThreadNetworkDiagnostics':
   case 'EthernetNetworkDiagnostics':
@@ -44,6 +45,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
   case 'OperationalCredentials':
+  case 'TimeFormatLocalization':
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':

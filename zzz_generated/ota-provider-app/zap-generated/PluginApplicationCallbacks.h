@@ -28,4 +28,5 @@
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
     MatterUserLabelPluginServerInitCallback();

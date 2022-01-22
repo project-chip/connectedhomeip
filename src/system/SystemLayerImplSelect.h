@@ -75,6 +75,9 @@ public:
     void HandleTimerComplete(TimerList::Node * timer);
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
+    // Expose the result of WaitForEvents() for non-blocking socket implementations.
+    bool IsSelectResultValid() const { return mSelectResult >= 0; }
+
 protected:
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 

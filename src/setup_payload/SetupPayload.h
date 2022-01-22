@@ -119,6 +119,7 @@ struct PayloadContents
 
     bool isValidQRCodePayload() const;
     bool isValidManualCode() const;
+    bool isShortDiscriminator = false;
     bool operator==(PayloadContents & input) const;
 };
 

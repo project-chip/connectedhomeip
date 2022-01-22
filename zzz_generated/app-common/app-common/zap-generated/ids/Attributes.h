@@ -1124,9 +1124,9 @@ namespace HourFormat {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace HourFormat
 
-namespace CalendarType {
+namespace ActiveCalendarType {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CalendarType
+} // namespace ActiveCalendarType
 
 namespace SupportedCalendarTypes {
 static constexpr AttributeId Id = 0x00000002;
@@ -5271,6 +5271,10 @@ static constexpr AttributeId Id = 0x00000029;
 namespace ListLongOctetString {
 static constexpr AttributeId Id = 0x0000002A;
 } // namespace ListLongOctetString
+
+namespace ListFabricScoped {
+static constexpr AttributeId Id = 0x0000002B;
+} // namespace ListFabricScoped
 
 namespace TimedWriteBoolean {
 static constexpr AttributeId Id = 0x00000030;

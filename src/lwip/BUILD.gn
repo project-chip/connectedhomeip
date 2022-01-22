@@ -31,7 +31,8 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
            lwip_platform == "k32w0" || lwip_platform == "qpg" ||
-           lwip_platform == "mbed" || lwip_platform == "p6",
+           lwip_platform == "mbed" || lwip_platform == "p6" ||
+           lwip_platform == "cyw30739",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -52,6 +53,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/k32w0_sdk.gni")
 } else if (lwip_platform == "p6") {
   import("//build_overrides/p6.gni")
+} else if (lwip_platform == "cyw30739") {
+  import("//build_overrides/cyw30739_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -135,6 +138,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     if (lwip_platform == "standalone") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
+    } else if (lwip_platform == "cyw30739") {
     } else {
       public += [
         "${lwip_platform}/lwippools.h",
@@ -152,6 +156,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
       public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
+    } else if (lwip_platform == "cyw30739") {
+      public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
     }
 
     public_configs = [

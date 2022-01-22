@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <stddef.h>
@@ -78,9 +79,12 @@ public:
     CHIP_ERROR AdvertiseOperational();
 
     /// (Re-)starts the Dnssd server
-    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-    /// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
-    void StartServer(chip::Dnssd::CommissioningMode mode = chip::Dnssd::CommissioningMode::kDisabled);
+    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1)
+    /// - if device has been commissioned, then commissioning mode will be disabled.
+    void StartServer();
+
+    /// (Re-)starts the Dnssd server, using the provided commissioning mode.
+    void StartServer(Dnssd::CommissioningMode mode);
 
     CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
@@ -110,6 +114,9 @@ private:
         mExtendedDiscoveryExpiration = kTimeoutCleared;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
+
+    // Helper for StartServer.
+    void StartServer(Optional<Dnssd::CommissioningMode> mode);
 
     uint16_t mSecuredPort   = CHIP_PORT;
     uint16_t mUnsecuredPort = CHIP_UDC_PORT;
