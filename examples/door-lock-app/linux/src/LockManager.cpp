@@ -41,6 +41,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
                      endpointId);
         numberOfSupportedUsers = 10;
     }
+
     uint16_t numberOfSupportedCredentials = 0;
     // We're planning to use shared storage for PIN and RFID users so we will have the maximum of both sizes her to simplify logic
     uint16_t numberOfPINCredentialsSupported  = 0;
@@ -58,10 +59,21 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
         numberOfSupportedCredentials = std::max(numberOfPINCredentialsSupported, numberOfRFIDCredentialsSupported);
     }
 
-    mEndpoints.push_back(LockEndpoint(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials));
+    uint8_t numberOfWeekDaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekDaySchedulesPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported week day schedules per user when initializing lock endpoint, defaulting to "
+                     "10 [endpointId=%d]",
+                     endpointId);
+        numberOfWeekDaySchedulesPerUser = 10;
+    }
 
-    ChipLogProgress(Zcl, "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d]", endpointId, numberOfSupportedUsers,
-                    numberOfSupportedCredentials);
+    mEndpoints.push_back(
+        LockEndpoint(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser));
+
+    ChipLogProgress(Zcl, "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d]", endpointId, numberOfSupportedUsers,
+                    numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser);
 
     return true;
 }
@@ -135,6 +147,33 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
         return false;
     }
     return lockEndpoint->SetCredential(credentialIndex, credentialStatus, credentialType, credentialData);
+}
+
+DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex,
+                                  EmberAfPluginDoorLockWeekDaySchedule & schedule)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to get the week day schedule - endpoint does not exist or not initialized [endpointId=%d]",
+                     endpointId);
+        return DlStatus::kFailure;
+    }
+    return lockEndpoint->GetSchedule(weekDayIndex, userIndex, schedule);
+}
+
+DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                  DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                  uint8_t endMinute)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to set the week day schedule - endpoint does not exist or not initialized [endpointId=%d]",
+                     endpointId);
+        return DlStatus::kFailure;
+    }
+    return lockEndpoint->SetSchedule(weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
 }
 
 LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)
