@@ -193,6 +193,28 @@ bool DoorLockServer::GetNumberOfUserSupported(chip::EndpointId endpointId, uint1
     return true;
 }
 
+bool DoorLockServer::GetNumberOfPINCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfPINCredentials)
+{
+    EmberAfStatus status = Attributes::NumberOfPINUsersSupported::Get(endpointId, &numberOfPINCredentials);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfPINUsersSupported' [status=%d]", status);
+        return false;
+    }
+    return true;
+}
+
+bool DoorLockServer::GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials)
+{
+    EmberAfStatus status = Attributes::NumberOfRFIDUsersSupported::Get(endpointId, &numberOfRFIDCredentials);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfRFIDUsersSupported' [status=%d]", status);
+        return false;
+    }
+    return true;
+}
+
 bool DoorLockServer::GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId,
                                                                  uint8_t & numberOfWeekDaySchedulesPerUser)
 {
@@ -1099,32 +1121,23 @@ bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCr
                                                uint16_t & maxNumberOfCredentials)
 {
     maxNumberOfCredentials = 0;
-    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    bool status            = false;
     switch (credentialType)
     {
     case DlCredentialType::kProgrammingPIN:
         maxNumberOfCredentials = 1;
         return true;
     case DlCredentialType::kPin:
-        status = Attributes::NumberOfPINUsersSupported::Get(endpointId, &maxNumberOfCredentials);
+        status = GetNumberOfPINCredentialsSupported(endpointId, maxNumberOfCredentials);
         break;
     case DlCredentialType::kRfid:
-        status = Attributes::NumberOfRFIDUsersSupported::Get(endpointId, &maxNumberOfCredentials);
+        status = GetNumberOfRFIDCredentialsSupported(endpointId, maxNumberOfCredentials);
         break;
     default:
         return false;
     }
 
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        ChipLogError(Zcl,
-                     "Unable to read an attribute to get the max number of credentials [endpointId=%d,credentialType=%" PRIu8
-                     ",status=%d]",
-                     endpointId, to_underlying(credentialType), status);
-        return false;
-    }
-
-    return true;
+    return status;
 }
 
 bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex)

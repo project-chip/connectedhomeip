@@ -33,12 +33,12 @@ using namespace chip::app::Clusters::DoorLock;
 // callback.
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
 {
-    return LockManager::Instance().Lock(pinCode);
+    return LockManager::Instance().Lock(endpointId, pinCode);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
 {
-    return LockManager::Instance().Unlock(pinCode);
+    return LockManager::Instance().Unlock(endpointId, pinCode);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -81,6 +81,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     DoorLockServer::Instance().InitServer(endpoint);
+    LockManager::Instance().InitEndpoint(endpoint);
 }
 
 void ApplicationInit() {}
