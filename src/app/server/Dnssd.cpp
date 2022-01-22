@@ -402,9 +402,22 @@ CHIP_ERROR DnssdServer::AdvertiseCommissionableNode(chip::Dnssd::CommissioningMo
     return Advertise(true /* commissionableNode */, mode);
 }
 
-void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
+void DnssdServer::StartServer()
 {
-    ChipLogDetail(Discovery, "DNS-SD StartServer mode=%d", static_cast<int>(mode));
+    return StartServer(NullOptional);
+}
+
+void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
+{
+    return StartServer(MakeOptional(mode));
+}
+
+void DnssdServer::StartServer(Optional<Dnssd::CommissioningMode> mode)
+{
+    // Default to CommissioningMode::kDisabled if no value is provided.
+    Dnssd::CommissioningMode modeValue = mode.ValueOr(Dnssd::CommissioningMode::kDisabled);
+
+    ChipLogDetail(Discovery, "DNS-SD StartServer modeHasValue=%d modeValue=%d", mode.HasValue(), static_cast<int>(modeValue));
 
     ClearTimeouts();
 
@@ -431,9 +444,9 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
     if (HaveOperationalCredentials())
     {
         ChipLogProgress(Discovery, "Have operational credentials");
-        if (mode != chip::Dnssd::CommissioningMode::kDisabled)
+        if (modeValue != chip::Dnssd::CommissioningMode::kDisabled)
         {
-            err = AdvertiseCommissionableNode(mode);
+            err = AdvertiseCommissionableNode(modeValue);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
@@ -443,7 +456,7 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
         else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
         {
-            err = AdvertiseCommissionableNode(mode);
+            err = AdvertiseCommissionableNode(modeValue);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
@@ -457,7 +470,7 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
         ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
-        err = AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode::kEnabledBasic);
+        err = AdvertiseCommissionableNode(mode.ValueOr(chip::Dnssd::CommissioningMode::kEnabledBasic));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise unprovisioned commissionable node: %s", chip::ErrorStr(err));
