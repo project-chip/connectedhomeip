@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ namespace chip {
 class DLL_EXPORT PairingSession
 {
 public:
-    PairingSession() {}
+    PairingSession(Transport::SecureSession::Type secureSessionType) : mSecureSessionType(secureSessionType) {}
     virtual ~PairingSession() {}
 
     Transport::SecureSession::Type GetSecureSessionType() const { return mSecureSessionType; }
@@ -104,7 +104,7 @@ public:
                                           TLV::TLVWriter & tlvWriter);
 
 protected:
-    void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
+    // void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
@@ -177,7 +177,6 @@ protected:
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
     {
-        // NOTE: don't clear mSecureSessionType as it cannot change.
         mPeerNodeId  = kUndefinedNodeId;
         mPeerCATs    = kUndefinedCATs;
         mPeerAddress = Transport::PeerAddress::Uninitialized();
@@ -186,8 +185,8 @@ protected:
     }
 
 private:
-    Transport::SecureSession::Type mSecureSessionType = Transport::SecureSession::Type::kUndefined;
-    NodeId mPeerNodeId                                = kUndefinedNodeId;
+    const Transport::SecureSession::Type mSecureSessionType;
+    NodeId mPeerNodeId = kUndefinedNodeId;
     CATValues mPeerCATs;
 
     // TODO: the local key id should be allocateed at start
