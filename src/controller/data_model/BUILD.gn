@@ -34,7 +34,7 @@ if (current_os == "android") {
   pw_python_action("java-jni-generate") {
     script = "${chip_root}/scripts/codegen.py"
 
-    _idl_file = "../data_model/controller-clusters.matter"
+    _idl_file = "controller-clusters.matter"
 
     args = [
       "--generator",
