@@ -19,6 +19,7 @@
 #import <CHIP/CHIPCluster.h>
 #import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPCommandPayloadsObjc.h>
+#import <CHIP/CHIPCommissioningParameters.h>
 #import <CHIP/CHIPDevice.h>
 #import <CHIP/CHIPDeviceController.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>

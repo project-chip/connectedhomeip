@@ -32,9 +32,9 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
-        subjectDescriptor.authMode = Access::AuthMode::kPase;
-        subjectDescriptor.subject  = mPeerNodeId;
-        // TODO(#10242): PASE *can* have fabric in some situations
+        subjectDescriptor.authMode    = Access::AuthMode::kPase;
+        subjectDescriptor.subject     = mPeerNodeId;
+        subjectDescriptor.fabricIndex = mFabric;
     }
     else
     {

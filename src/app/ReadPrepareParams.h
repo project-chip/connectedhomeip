@@ -39,6 +39,7 @@ struct ReadPrepareParams
     uint16_t mMinIntervalFloorSeconds               = 0;
     uint16_t mMaxIntervalCeilingSeconds             = 0;
     bool mKeepSubscriptions                         = true;
+    bool mIsFabricFiltered                          = false;
 
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
     ReadPrepareParams(ReadPrepareParams && other) : mSessionHolder(other.mSessionHolder)
@@ -52,6 +53,7 @@ struct ReadPrepareParams
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
+        mIsFabricFiltered                  = other.mIsFabricFiltered;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
@@ -73,6 +75,7 @@ struct ReadPrepareParams
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
+        mIsFabricFiltered                  = other.mIsFabricFiltered;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;

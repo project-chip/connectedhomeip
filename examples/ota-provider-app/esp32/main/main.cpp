@@ -17,36 +17,25 @@
 
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "esp_heap_caps_init.h"
 #include "esp_log.h"
-#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_spiffs.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app-common/zap-generated/callback.h>
 #include <app/server/Server.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <cmath>
-#include <cstdio>
-#include <string>
-#include <vector>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
+#include <OTAProviderCommands.h>
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
+#include <shell_extension/launch.h>
 
 using chip::Callback::Callback;
 using namespace ::chip;
+using namespace ::chip::Shell;
 using namespace ::chip::System;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -130,17 +119,6 @@ extern "C" void app_main()
 {
     ESP_LOGI(TAG, "OTA Provider!");
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
-             (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)
@@ -216,4 +194,10 @@ extern "C" void app_main()
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
+
+    // Launch a chip shell and register OTA Provider Commands
+    chip::LaunchShell();
+    OTAProviderCommands & otaProviderCommands = OTAProviderCommands::GetInstance();
+    otaProviderCommands.SetExampleOTAProvider(&otaProvider);
+    otaProviderCommands.Register();
 }

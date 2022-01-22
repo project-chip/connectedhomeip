@@ -142,10 +142,10 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug c
 
 hello-world.bin can be obtained from compiling the hello-world ESP-IDF example.
 
--   Provision the Linux OTA Provider using chip-tool
+-   Commission the Linux OTA Provider using chip-tool
 
 ```
-./out/debug/chip-tool pairing onnetwork 12345 20202021
+./out/debug/chip-tool pairing onnetwork 12346 20202021
 ```
 
 ## Query for an OTA Image
@@ -154,10 +154,11 @@ After commissioning is successful, press Enter in requestor device console and
 type below query.
 
 ```
->matter ota query 1 12345 0
+>matter ota query 1 12346 0
 ```
 
 ## Apply update
 
-Once transfer is complete, reboot the device manually to boot from upgraded OTA
-image.
+Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
+OTA provider for applying the image. Device will restart on successful
+application of OTA image.

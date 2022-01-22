@@ -3113,6 +3113,37 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPOperationalCredentialsNOCsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsNOCsListAttributeCallback>
+{
+public:
+    CHIPOperationalCredentialsNOCsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsNOCsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value);
+};
+
+class CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge
+    : public CHIPOperationalCredentialsNOCsListAttributeCallbackBridge
+{
+public:
+    CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOperationalCredentialsNOCsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>
 {
@@ -4010,6 +4041,37 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value);
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge
+    : public CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

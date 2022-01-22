@@ -65,12 +65,12 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    CHIP_ERROR Connect(RendezvousInformationFlag rendezvousInformation, uint16_t discriminator, bool isShort);
-    CHIP_ERROR StartDiscoverOverBle(uint16_t discriminator, bool isShort);
+    CHIP_ERROR Connect(SetupPayload & paload);
+    CHIP_ERROR StartDiscoverOverBle(SetupPayload & payload);
     CHIP_ERROR StopConnectOverBle();
-    CHIP_ERROR StartDiscoverOverIP(uint16_t discriminator, bool isShort);
+    CHIP_ERROR StartDiscoverOverIP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverIP();
-    CHIP_ERROR StartDiscoverOverSoftAP(uint16_t discriminator, bool isShort);
+    CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverSoftAP();
 
     void OnDeviceDiscovered(RendezvousParameters & params);

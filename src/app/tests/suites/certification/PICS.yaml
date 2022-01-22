@@ -21,6 +21,9 @@ PICS:
     - label: "Does the device support discovery over WiFi?"
       id: WIFI
 
+    - label: "Does the device support discover over THREAD"
+      id: THREAD
+
     - label: "Does the device support manufacturing date"
       id: MANF_DATE
 

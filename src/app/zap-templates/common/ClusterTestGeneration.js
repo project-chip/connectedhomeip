@@ -288,19 +288,13 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  const name     = test.isAttribute ? test.attribute : test.event;
-  const response = test[kResponseName];
-  if (hasResponseValue) {
-    const value = { name, value : response.value, saveAs : response.saveAs };
-    response.values.push(value);
-  }
+  if (hasResponseValueOrConstraints) {
+    const name             = test.isAttribute ? test.attribute : test.event;
+    const response         = test[kResponseName];
+    const responseValue    = hasResponseValue ? { value : response.value } : null;
+    const constraintsValue = hasResponseConstraints ? { constraints : response.constraints } : null;
 
-  if (hasResponseConstraints) {
-    let constraints = { name : name, constraints : response.constraints };
-    if ('saveAs' in response && !hasResponseValue) {
-      constraints.saveAs = response.saveAs;
-    }
-    response.values.push(constraints);
+    response.values.push({ name, saveAs : response.saveAs, ...responseValue, ...constraintsValue });
   }
 
   delete test[kResponseName].value;

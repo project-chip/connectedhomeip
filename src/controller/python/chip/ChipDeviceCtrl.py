@@ -564,7 +564,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None):
+    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
         '''
         Read a list of attributes from a target node
 
@@ -625,7 +625,7 @@ class ChipDeviceController():
             attrs.append(ClusterAttribute.AttributePath(
                 EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
