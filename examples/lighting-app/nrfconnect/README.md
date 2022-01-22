@@ -42,6 +42,7 @@ into an existing Matter network and can be controlled by this network.
 -   [Testing the example](#testing-the-example)
     -   [Testing using CHIPTool](#testing-using-chiptool)
     -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 
@@ -528,3 +529,17 @@ From within the console you can then invoke rpcs:
         rpcs.chip.rpc.Lighting.Get()
 
         rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
+
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See
+[Using the RPC console](#building-with-pigweed-rpcs).
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
+    -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```

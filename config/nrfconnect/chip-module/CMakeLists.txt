@@ -74,6 +74,10 @@ macro(chip_gn_arg_cflags ARG CFLAGS)
     string(APPEND CHIP_GN_ARGS "--arg-cflags\n${ARG}\n${CFLAGS}\n")
 endmacro()
 
+macro(chip_gn_arg ARG VALUE)
+    string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\n${VALUE}\n")
+endmacro()
+
 # ==============================================================================
 # Prepare CHIP configuration based on the project Kconfig configuration
 # ==============================================================================
@@ -214,6 +218,15 @@ if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
 elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
+endif()
+
+if (CONFIG_CHIP_PW_RPC)
+    set(PIGWEED_DIR "//third_party/pigweed/repo")
+    chip_gn_arg_bool("chip_build_pw_trace_lib" "true")
+    chip_gn_arg_string("pw_trace_BACKEND" ${PIGWEED_DIR}/pw_trace_tokenized)
+    chip_gn_arg_string("pw_assert_BACKEND" ${PIGWEED_DIR}/pw_assert_log)
+    chip_gn_arg_string("pw_log_BACKEND" ${PIGWEED_DIR}/pw_log_basic)
+    chip_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
 endif()
 
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
