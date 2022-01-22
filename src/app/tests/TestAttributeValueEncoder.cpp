@@ -47,10 +47,10 @@ constexpr FabricIndex kTestFabricIndex   = 1;
 template <size_t N>
 struct LimitedTestSetup
 {
-    LimitedTestSetup(nlTestSuite * aSuite, const FabricIndex aFabricIndex = 0,
+    LimitedTestSetup(nlTestSuite * aSuite, const FabricIndex aFabricIndex = kUndefinedFabricIndex,
                      const AttributeValueEncoder::AttributeEncodeState & aState = AttributeValueEncoder::AttributeEncodeState()) :
         encoder(builder, aFabricIndex, ConcreteAttributePath(kRandomEndpointId, kRandomClusterId, kRandomAttributeId),
-                kRandomDataVersion, aState)
+                kRandomDataVersion, aFabricIndex != kUndefinedFabricIndex, aState)
     {
         writer.Init(buf);
         {
