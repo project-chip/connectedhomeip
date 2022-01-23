@@ -195,7 +195,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetProductName(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint16_t & softwareVer)
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 {
     CHIP_ERROR err;
     uint32_t u32SoftwareVer = 0;

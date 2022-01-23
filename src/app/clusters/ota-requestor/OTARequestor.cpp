@@ -36,6 +36,7 @@ using namespace app::Clusters::OtaSoftwareUpdateProvider;
 using namespace app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Commands;
+using namespace DeviceLayer;
 using app::DataModel::Nullable;
 using bdx::TransferSession;
 
@@ -402,12 +403,11 @@ void OTARequestor::ApplyUpdate()
 void OTARequestor::NotifyUpdateApplied(uint32_t version)
 {
     // New version is executing so update where applicable
-    VerifyOrReturn(Basic::Attributes::SoftwareVersion::Set(kRootEndpointId, version) == EMBER_ZCL_STATUS_SUCCESS);
     mCurrentVersion = version;
 
     // Log the VersionApplied event
     uint16_t productId;
-    VerifyOrReturn(Basic::Attributes::ProductID::Get(kRootEndpointId, &productId) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR);
     OtaRequestorServerOnVersionApplied(version, productId);
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -505,28 +505,39 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
-    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &args.vendorId) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    uint16_t vendorId;
+    VerifyOrReturnError(ConfigurationMgr().GetVendorId(vendorId) == CHIP_NO_ERROR, CHIP_ERROR_READ_FAILED);
+    args.vendorId = static_cast<VendorId>(vendorId);
 
-    VerifyOrReturnError(Basic::Attributes::ProductID::Get(kRootEndpointId, &args.productId) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    VerifyOrReturnError(ConfigurationMgr().GetProductId(args.productId) == CHIP_NO_ERROR, CHIP_ERROR_READ_FAILED);
 
-    VerifyOrReturnError(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &args.softwareVersion) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(args.softwareVersion) == CHIP_NO_ERROR, CHIP_ERROR_READ_FAILED);
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (Basic::Attributes::HardwareVersion::Get(kRootEndpointId, &hardwareVersion) == EMBER_ZCL_STATUS_SUCCESS)
+    if (ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
-    if (Basic::Attributes::Location::Get(kRootEndpointId, MutableCharSpan(location)) == EMBER_ZCL_STATUS_SUCCESS)
+    size_t codeLen = 0;
+    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
     {
-        args.location.SetValue(CharSpan(location));
+        if (codeLen == 0)
+        {
+            args.location.SetValue(CharSpan("XX", DeviceLayer::ConfigurationManager::kMaxLocationLength));
+        }
+        else
+        {
+            args.location.SetValue(CharSpan(location, DeviceLayer::ConfigurationManager::kMaxLocationLength));
+        }
+    }
+    else
+    {
+        args.location.SetValue(CharSpan("XX", DeviceLayer::ConfigurationManager::kMaxLocationLength));
     }
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
