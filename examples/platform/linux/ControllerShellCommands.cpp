@@ -36,6 +36,7 @@
 namespace chip {
 namespace Shell {
 
+using namespace chip;
 using namespace ::chip::Controller;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -116,7 +117,7 @@ static CHIP_ERROR display(bool printHeader)
 
     for (int i = 0; i < 10; i++)
     {
-        const chip::Dnssd::DiscoveredNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
+        const Dnssd::DiscoveredNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
         if (next == nullptr)
         {
             streamer_printf(sout, "  Entry %d null\r\n", i);
@@ -133,7 +134,7 @@ static CHIP_ERROR display(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR pairOnNetwork(bool printHeader, uint32_t pincode, uint16_t disc, chip::Transport::PeerAddress address)
+static CHIP_ERROR pairOnNetwork(bool printHeader, uint32_t pincode, uint16_t disc, Transport::PeerAddress address)
 {
     streamer_t * sout = streamer_get();
 
@@ -241,12 +242,12 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         uint32_t pincode = (uint32_t) strtol(argv[1], &eptr, 10);
         uint16_t disc    = (uint16_t) strtol(argv[2], &eptr, 10);
 
-        chip::Inet::IPAddress address;
-        chip::Inet::IPAddress::FromString(argv[3], address);
+        Inet::IPAddress address;
+        Inet::IPAddress::FromString(argv[3], address);
 
         uint16_t port = (uint16_t) strtol(argv[4], &eptr, 10);
 
-        return error = pairOnNetwork(true, pincode, disc, chip::Transport::PeerAddress::UDP(address, port));
+        return error = pairOnNetwork(true, pincode, disc, Transport::PeerAddress::UDP(address, port));
     }
     else if (strcmp(argv[0], "ux") == 0)
     {

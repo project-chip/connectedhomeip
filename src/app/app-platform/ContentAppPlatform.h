@@ -31,29 +31,39 @@
 #include <stdint.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
+
 namespace chip {
 namespace AppPlatform {
 
 class DLL_EXPORT ContentAppFactory
 {
 public:
-    virtual ~ContentAppFactory()                                                           = default;
-    virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId)                       = 0;
-    virtual ContentApp * LoadContentAppByAppId(ApplicationLauncherApplication application) = 0;
+    virtual ~ContentAppFactory() = default;
 
-    // Gets the vendor ID for this platform
+    // Lookup CatalogVendor App for this client (vendor id/product id client)
+    // and then write it to destinationApp
+    // return error if not found
+    virtual CHIP_ERROR LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp) = 0;
+
+    // Lookup ContentApp for this catalog id / app id and load it
+    virtual ContentApp * LoadContentApp(CatalogVendorApp vendorApp) = 0;
+
+    // Gets the catalog vendor ID used by this platform
     virtual uint16_t GetPlatformCatalogVendorId() = 0;
 
-    // Gets the Application ID for the given Application in the platform catalog
-    virtual CharSpan GetPlatformCatalogApplicationId(ApplicationLauncherApplication application) = 0;
+    // Converts application (any catalog) into the platform's catalog Vendor
+    // and then writes it to destinationApp
+    virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp) = 0;
 };
 
-class DLL_EXPORT AppPlatform
+class DLL_EXPORT ContentAppPlatform
 {
 public:
-    static AppPlatform & GetInstance()
+    static ContentAppPlatform & GetInstance()
     {
-        static AppPlatform instance;
+        static ContentAppPlatform instance;
         return instance;
     }
 
@@ -61,44 +71,56 @@ public:
 
     inline void SetContentAppFactory(ContentAppFactory * factory) { mContentAppFactory = factory; };
 
-    // add and remove apps from the platform.
-    // This will assign the app to an endpoint and make it accessible via Matter
-    int AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType);
-    int RemoveContentApp(ContentApp * app);
+    // add apps to the platform.
+    // This will assign the app to an endpoint (if it is not already added) and make it accessible via Matter
+    // returns the global endpoint for this app, or 0 if an error occurred
+    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType);
+
+    // remove app from the platform.
+    // returns the endpoint id where the app was, or 0 if app was not loaded
+    EndpointId RemoveContentApp(ContentApp * app);
 
     // load and unload by vendor id
-    void UnloadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * GetLoadContentAppByAppId(ApplicationLauncherApplication application);
+    // void UnloadContentAppByVendorId(uint16_t vendorId, uint16_t productId);
+
+    // Lookup ContentApp for this client (vendor id/product id client) and load it
+    ContentApp * LoadContentAppByClient(uint16_t vendorId, uint16_t productId);
+
+    // Lookup ContentApp described by this application and load it
+    ContentApp * LoadContentApp(CatalogVendorApp application);
 
     // helpful method to get a Content App by endpoint in order to perform attribute or command ops
-    ContentApp * GetContentAppByEndpointId(chip::EndpointId id);
-    ContentApp * GetContentAppByAppId(ApplicationLauncherApplication application);
+    ContentApp * GetContentApp(EndpointId id);
+
+    // helpful method to get a Content App by application, does not load if not found
+    ContentApp * GetContentApp(CatalogVendorApp application);
 
     // sets the current app for this platform
-    void SetCurrentApp(uint16_t catalogVendorId, CharSpan appId, chip::EndpointId endpoint);
+    void SetCurrentApp(ContentApp * app);
 
     // returns true if there is a current app for this platform
-    inline bool HasCurrentApp() { return !mNoCurrentApp; }
+    inline bool HasCurrentApp() { return mCurrentAppEndpointId != kNoCurrentEndpointId; }
 
     // returns true if the vendor/app arguments are the current app
-    bool IsCurrentApp(uint16_t catalogVendorId, CharSpan appId);
+    bool IsCurrentApp(ContentApp * app);
 
-    // returns the current app
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type * GetCurrentApp();
+    // returns the current app endpoint
+    inline EndpointId GetCurrentAppEndpointId() { return mCurrentAppEndpointId; };
 
     // unset this as current app, if it is current app
-    void UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId);
+    void UnsetIfCurrentApp(ContentApp * app);
 
-    // loads content app identified by vid/pid and calls HandleGetSetupPin.
+    // loads content app identified by vid/pid of client and calls HandleGetSetupPin.
     // Returns 0 if pin cannot be obtained.
     uint32_t GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId);
 
 protected:
-    bool mNoCurrentApp = true;
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type mCurrentApp;
-    static const int kEndpointStringSize = 6;
-    char mCurrentApplicationEndpoint[kEndpointStringSize];
+    // requires vendorApp to be in the catalog of the platform
+    ContentApp * LoadContentAppInternal(CatalogVendorApp vendorApp);
+    ContentApp * GetContentAppInternal(CatalogVendorApp vendorApp);
+
+    static const int kNoCurrentEndpointId = 0;
+    EndpointId mCurrentAppEndpointId      = kNoCurrentEndpointId;
 
     ContentAppFactory * mContentAppFactory = nullptr;
     EndpointId mCurrentEndpointId;

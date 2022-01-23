@@ -52,43 +52,36 @@
 namespace chip {
 namespace AppPlatform {
 
+using namespace app::Clusters;
+
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+
+// for this platform, appid is just vendor id
+#define BuildAppId(vid) std::to_string(vid).c_str()
 
 class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                    const char * szApplicationVersion, const char * setupPIN) :
-        mApplicationBasicDelegate(kCatalogVendorId, szApplicationName, szVendorName, vendorId, szApplicationName, productId,
+        mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
         mAccountLoginDelegate(setupPIN),
         mContentLauncherDelegate({ "image/*", "video/*" },
-                                 static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kDash) |
-                                     static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kHls)),
+                                 to_underlying(ContentLauncher::SupportedStreamingProtocol::kDash) |
+                                     to_underlying(ContentLauncher::SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
-    inline chip::app::Clusters::AccountLogin::Delegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
+    inline AccountLogin::Delegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
 
-    inline chip::app::Clusters::ApplicationBasic::Delegate * GetApplicationBasicDelegate() override
-    {
-        return &mApplicationBasicDelegate;
-    };
-    inline chip::app::Clusters::ApplicationLauncher::Delegate * GetApplicationLauncherDelegate() override
-    {
-        return &mApplicationLauncherDelegate;
-    };
-    inline chip::app::Clusters::Channel::Delegate * GetChannelDelegate() override { return &mChannelDelegate; };
-    inline chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate() override
-    {
-        return &mContentLauncherDelegate;
-    };
-    inline chip::app::Clusters::KeypadInput::Delegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
-    inline chip::app::Clusters::MediaPlayback::Delegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
-    inline chip::app::Clusters::TargetNavigator::Delegate * GetTargetNavigatorDelegate() override
-    {
-        return &mTargetNavigatorDelegate;
-    };
+    inline ApplicationBasic::Delegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
+    inline ApplicationLauncher::Delegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
+    inline Channel::Delegate * GetChannelDelegate() override { return &mChannelDelegate; };
+    inline ContentLauncher::Delegate * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
+    inline KeypadInput::Delegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
+    inline MediaPlayback::Delegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
+    inline TargetNavigator::Delegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;
@@ -108,14 +101,20 @@ public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
 
-    ContentApp * LoadContentAppByVendorId(uint16_t vendorId) override;
-    ContentApp * LoadContentAppByAppId(ApplicationLauncherApplication application) override;
+    // Lookup CatalogVendor App for this client (vendor id/product id client)
+    // and then write it to destinationApp
+    // return error if not found
+    CHIP_ERROR LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp) override;
 
-    // Returns the ContentApp platform's internal catalog vendor ID
+    // Lookup ContentApp for this catalog id / app id and load it
+    ContentApp * LoadContentApp(CatalogVendorApp vendorApp) override;
+
+    // Gets the catalog vendor ID used by this platform
     uint16_t GetPlatformCatalogVendorId() override;
 
-    // Gets the Application ID for the given Application in the platform catalog
-    chip::CharSpan GetPlatformCatalogApplicationId(ApplicationLauncherApplication application) override;
+    // Converts application (any catalog) into the platform's catalog Vendor
+    // and then writes it to destinationApp
+    CHIP_ERROR ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),

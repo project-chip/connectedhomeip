@@ -35,9 +35,9 @@ class Delegate
 {
 public:
     // TODO: refactor this method signature to address memory issue (see PR 13398)
-    virtual std::list<Structs::TargetInfo::Type> HandleGetTargetList()                                                        = 0;
-    virtual uint8_t HandleGetCurrentTarget()                                                                                  = 0;
-    virtual Commands::NavigateTargetResponse::Type HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) = 0;
+    virtual std::list<Structs::TargetInfo::Type> HandleGetTargetList()                                                  = 0;
+    virtual uint8_t HandleGetCurrentTarget()                                                                            = 0;
+    virtual Commands::NavigateTargetResponse::Type HandleNavigateTarget(const uint64_t & target, const CharSpan & data) = 0;
 
     virtual ~Delegate() = default;
 };

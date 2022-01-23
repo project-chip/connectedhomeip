@@ -20,31 +20,34 @@
 
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
-class ApplicationBasicManager : public chip::app::Clusters::ApplicationBasic::Delegate
+using namespace chip;
+using namespace chip::app::Clusters;
+
+class ApplicationBasicManager : public ApplicationBasic::Delegate
 {
 public:
     ApplicationBasicManager() :
         ApplicationBasicManager(123, "applicationId", "exampleVendorName1", 1, "exampleName1", 1, "exampleVersion"){};
     ApplicationBasicManager(uint16_t szCatalogVendorId, const char * szApplicationId, const char * szVendorName, uint16_t vendorId,
                             const char * szApplicationName, uint16_t productId, const char * szApplicationVersion) :
-        chip::app::Clusters::ApplicationBasic::Delegate(szCatalogVendorId, szApplicationId)
+        ApplicationBasic::Delegate(szCatalogVendorId, szApplicationId)
     {
 
         ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationId, szApplicationName);
 
-        strncpy(mApplicationName, szApplicationName, sizeof(mApplicationName));
-        strncpy(mVendorName, szVendorName, sizeof(mVendorName));
+        Platform::CopyString(mApplicationName, sizeof(mApplicationName), szApplicationName);
+        Platform::CopyString(mVendorName, sizeof(mVendorName), szVendorName);
         mVendorId = vendorId;
-        strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
+        Platform::CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
         mProductId = productId;
     };
     virtual ~ApplicationBasicManager(){};
 
-    chip::CharSpan HandleGetVendorName() override;
+    CharSpan HandleGetVendorName() override;
     uint16_t HandleGetVendorId() override;
-    chip::CharSpan HandleGetApplicationName() override;
+    CharSpan HandleGetApplicationName() override;
     uint16_t HandleGetProductId() override;
-    chip::CharSpan HandleGetApplicationVersion() override;
+    CharSpan HandleGetApplicationVersion() override;
     std::list<uint16_t> HandleGetAllowedVendorList() override;
 
 protected:

@@ -49,8 +49,9 @@ using namespace chip;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
+using namespace chip::app::Clusters;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -93,7 +94,7 @@ class MyPincodeService : public PincodeService
 {
     uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
     {
-        return chip::AppPlatform::AppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
     }
 };
 MyPincodeService gMyPincodeService;
@@ -103,20 +104,20 @@ int main(int argc, char * argv[])
 {
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    chip::AppPlatform::ContentAppFactoryImpl factory;
+    ContentAppFactoryImpl factory;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    chip::AppPlatform::AppPlatform::GetInstance().SetupAppPlatform();
-    chip::AppPlatform::AppPlatform::GetInstance().SetContentAppFactory(&factory);
+    ContentAppPlatform::GetInstance().SetupAppPlatform();
+    ContentAppPlatform::GetInstance().SetContentAppFactory(&factory);
     GetCommissionerDiscoveryController()->SetPincodeService(&gMyPincodeService);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #if defined(ENABLE_CHIP_SHELL)
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    chip::Shell::RegisterAppPlatformCommands();
+    Shell::RegisterAppPlatformCommands();
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #endif
     GetCommissionerDiscoveryController()->SetUserPrompter(&gMyUserPrompter);
@@ -129,71 +130,71 @@ int main(int argc, char * argv[])
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDefaultDelegate");
-    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
+    ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
 }
 
 void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AccountLogin::SetDefaultDelegate");
-    chip::app::Clusters::AccountLogin::SetDefaultDelegate(endpoint, &accountLoginManager);
+    AccountLogin::SetDefaultDelegate(endpoint, &accountLoginManager);
 }
 
 void emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
+    ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
 }
 
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
+    ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
 }
 
 void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
-    chip::app::Clusters::AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
+    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
 }
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, &channelManager);
+    Channel::SetDefaultDelegate(endpoint, &channelManager);
 }
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }
 
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
-    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
+    MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
 }
 
 void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+    MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
 }
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
 }
 
-void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
+void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: WakeOnLanManager::SetDefaultDelegate");
-    chip::app::Clusters::WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
+    WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }

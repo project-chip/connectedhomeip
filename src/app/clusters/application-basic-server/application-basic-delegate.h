@@ -29,6 +29,38 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 
+using namespace chip::app::Clusters;
+
+class DLL_EXPORT CatalogVendorApp
+{
+public:
+    CatalogVendorApp(){};
+    CatalogVendorApp(CatalogVendorApp * app)
+    {
+        catalogVendorId = app->catalogVendorId;
+        Platform::CopyString(applicationId, sizeof(applicationId), app->applicationId);
+    };
+    CatalogVendorApp(uint16_t vendorId, const char * appId) { Set(vendorId, appId); };
+
+    bool Matches(CatalogVendorApp app)
+    {
+        std::string appId1(applicationId);
+        std::string appId2(app.applicationId);
+
+        return catalogVendorId == app.catalogVendorId && appId1 == appId2;
+    }
+
+    void Set(uint16_t vendorId, const char * appId)
+    {
+        catalogVendorId = vendorId;
+        Platform::CopyString(applicationId, sizeof(applicationId), appId);
+    }
+
+    static const int kApplicationIdSize = 32;
+    char applicationId[kApplicationIdSize];
+    uint16_t catalogVendorId;
+};
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the Application Basic Cluster.
  */
@@ -36,30 +68,26 @@ class Delegate
 {
 public:
     Delegate() : Delegate(123, "applicationId"){};
-    Delegate(uint16_t szCatalogVendorId, const char * szApplicationId)
-    {
-        mCatalogVendorId = szCatalogVendorId;
-        strncpy(mApplicationId, szApplicationId, sizeof(mApplicationId));
-    };
+    Delegate(uint16_t szCatalogVendorId, const char * szApplicationId) : mCatalogVendorApp(szCatalogVendorId, szApplicationId){};
 
-    virtual chip::CharSpan HandleGetVendorName()      = 0;
-    virtual uint16_t HandleGetVendorId()              = 0;
-    virtual chip::CharSpan HandleGetApplicationName() = 0;
-    virtual uint16_t HandleGetProductId()             = 0;
-    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication();
+    virtual CharSpan HandleGetVendorName()      = 0;
+    virtual uint16_t HandleGetVendorId()        = 0;
+    virtual CharSpan HandleGetApplicationName() = 0;
+    virtual uint16_t HandleGetProductId()       = 0;
+    ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication();
     inline ApplicationStatusEnum HandleGetStatus() { return mApplicationStatus; }
-    virtual chip::CharSpan HandleGetApplicationVersion()     = 0;
+    virtual CharSpan HandleGetApplicationVersion()           = 0;
     virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;
 
     inline void SetApplicationStatus(ApplicationStatusEnum status) { mApplicationStatus = status; }
     bool Matches(ApplicationBasicApplication match);
 
+    inline CatalogVendorApp * GetCatalogVendorApp() { return &mCatalogVendorApp; }
+
     virtual ~Delegate() = default;
 
 protected:
-    static const int kApplicationIdSize = 32;
-    char mApplicationId[kApplicationIdSize];
-    uint16_t mCatalogVendorId;
+    CatalogVendorApp mCatalogVendorApp;
     ApplicationStatusEnum mApplicationStatus = ApplicationStatusEnum::kStopped;
 };
 

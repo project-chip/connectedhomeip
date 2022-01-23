@@ -48,8 +48,8 @@ Delegate * gDelegateTable[EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COU
 Delegate * GetDelegate(EndpointId endpoint)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL)
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
         ChipLogError(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetApplicationBasicDelegate();
@@ -58,7 +58,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT) ? NULL : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -79,7 +79,7 @@ namespace ApplicationBasic {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationBasic::Id);
     // if endpoint is found and is not a dynamic endpoint
     if (ep != 0xFFFF && ep < EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
@@ -95,20 +95,19 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
     return GetDelegate(endpoint);
 }
 
-chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type Delegate::HandleGetApplication()
+ApplicationBasic::Structs::ApplicationBasicApplication::Type Delegate::HandleGetApplication()
 {
-    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
-    application.catalogVendorId = mCatalogVendorId;
-    application.applicationId   = chip::CharSpan(mApplicationId, strlen(mApplicationId));
+    ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
+    application.catalogVendorId = mCatalogVendorApp.catalogVendorId;
+    application.applicationId   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
     return application;
 }
 
 bool Delegate::Matches(ApplicationBasicApplication match)
 {
-    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application = HandleGetApplication();
-    return (application.catalogVendorId == match.catalogVendorId &&
-            application.applicationId.size() == match.applicationId.size() &&
-            strncmp(application.applicationId.data(), match.applicationId.data(), match.applicationId.size()) == 0);
+    std::string appId(match.applicationId.data(), match.applicationId.size());
+    CatalogVendorApp matchApp(match.catalogVendorId, appId.c_str());
+    return mCatalogVendorApp.Matches(matchApp);
 }
 
 } // namespace ApplicationBasic
@@ -124,9 +123,7 @@ namespace {
 class ApplicationBasicAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    ApplicationBasicAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::ApplicationBasic::Id)
-    {}
+    ApplicationBasicAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), ApplicationBasic::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
@@ -189,7 +186,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadVendorNameAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    chip::CharSpan vendorName = delegate->HandleGetVendorName();
+    CharSpan vendorName = delegate->HandleGetVendorName();
     return aEncoder.Encode(vendorName);
 }
 
@@ -201,7 +198,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadVendorIdAttribute(app::AttributeValue
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationNameAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    chip::CharSpan applicationName = delegate->HandleGetApplicationName();
+    CharSpan applicationName = delegate->HandleGetApplicationName();
     return aEncoder.Encode(applicationName);
 }
 
@@ -225,7 +222,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadStatusAttribute(app::AttributeValueEn
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationVersionAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    chip::CharSpan applicationVersion = delegate->HandleGetApplicationVersion();
+    CharSpan applicationVersion = delegate->HandleGetApplicationVersion();
     return aEncoder.Encode(applicationVersion);
 }
 

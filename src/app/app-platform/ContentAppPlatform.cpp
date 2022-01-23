@@ -52,8 +52,8 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
-    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL)
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
         ret = app->HandleReadAttribute(clusterId, attributeMetadata->attributeId, buffer, maxReadLength);
     }
@@ -70,8 +70,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
-    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL)
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
         ret = app->HandleWriteAttribute(clusterId, attributeMetadata->attributeId, buffer);
     }
@@ -82,7 +82,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
 {
     CharSpan appNameCharSpan = app->GetApplicationBasicDelegate()->HandleGetApplicationName();
     std::string appName(appNameCharSpan.data(), appNameCharSpan.size());
@@ -95,7 +95,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
         if (mContentApps[index] == app)
         {
             ChipLogProgress(DeviceLayer, "Already added");
-            return index;
+            return app->GetEndpointId();
         }
         index++;
     }
@@ -103,7 +103,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
     index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (NULL == mContentApps[index])
+        if (nullptr == mContentApps[index])
         {
             mContentApps[index] = app;
             EmberAfStatus ret;
@@ -115,12 +115,12 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", appName.c_str(),
                                     mCurrentEndpointId, index);
                     app->SetEndpointId(mCurrentEndpointId);
-                    return index;
+                    return app->GetEndpointId();
                 }
                 else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
                 {
                     ChipLogProgress(DeviceLayer, "Adding device error=%d", ret);
-                    return -1;
+                    return kNoCurrentEndpointId;
                 }
                 // Handle wrap condition
                 if (++mCurrentEndpointId < mFirstDynamicEndpointId)
@@ -132,31 +132,36 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
         index++;
     }
     ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
-    return -1;
+    return kNoCurrentEndpointId;
 }
 
-int AppPlatform::RemoveContentApp(ContentApp * app)
+EndpointId ContentAppPlatform::RemoveContentApp(ContentApp * app)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (mContentApps[index] == app)
         {
-            EndpointId ep       = emberAfClearDynamicEndpoint(index);
-            mContentApps[index] = NULL;
+            EndpointId curEndpoint = app->GetEndpointId();
+            EndpointId ep          = emberAfClearDynamicEndpoint(index);
+            mContentApps[index]    = nullptr;
             ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
                             app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
             UNUSED_VAR(ep);
-            return index;
+            if (curEndpoint == mCurrentAppEndpointId)
+            {
+                mCurrentAppEndpointId = kNoCurrentEndpointId;
+            }
+            return curEndpoint;
         }
         index++;
     }
-    return -1;
+    return kNoCurrentEndpointId;
 }
 
-void AppPlatform::SetupAppPlatform()
+void ContentAppPlatform::SetupAppPlatform()
 {
     ChipLogProgress(DeviceLayer, "AppPlatform::SetupAppPlatform()");
 
@@ -164,13 +169,13 @@ void AppPlatform::SetupAppPlatform()
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        mContentApps[index] = NULL;
+        mContentApps[index] = nullptr;
         index++;
     }
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
-    mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
+    mFirstDynamicEndpointId = static_cast<EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     mCurrentEndpointId = mFirstDynamicEndpointId;
 
@@ -187,160 +192,166 @@ void AppPlatform::SetupAppPlatform()
     // emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 }
 
-void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
+ContentApp * ContentAppPlatform::GetContentAppInternal(CatalogVendorApp vendorApp)
 {
-    uint8_t index = 0;
-    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
-        ContentApp * app = mContentApps[index];
-        if (app != NULL && app->GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
-        {
-            EndpointId ep       = emberAfClearDynamicEndpoint(index);
-            mContentApps[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed vendor %d from dynamic endpoint %d (index=%d)", vendorId, ep, index);
-            // Silence complaints about unused ep when progress logging
-            // disabled.
-            UNUSED_VAR(ep);
-            return;
-        }
-        index++;
+        return nullptr;
     }
-    return;
-}
-
-ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
-{
-    ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - vendorId %d ", vendorId);
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
-        if (app != NULL && app->GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
+        if (app != nullptr && app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
             return app;
         }
         index++;
     }
-    if (mContentAppFactory != NULL)
-    {
-        return mContentAppFactory->LoadContentAppByVendorId(vendorId);
-    }
-    return NULL;
+    return nullptr;
 }
 
-ContentApp * AppPlatform::GetLoadContentAppByAppId(ApplicationLauncherApplication application)
+ContentApp * ContentAppPlatform::LoadContentAppInternal(CatalogVendorApp vendorApp)
 {
-    ChipLogProgress(DeviceLayer, "GetLoadContentAppByAppId()");
-    if (mContentAppFactory != NULL)
+    ContentApp * app = GetContentAppInternal(vendorApp);
+    if (app != nullptr)
     {
-        return mContentAppFactory->LoadContentAppByAppId(application);
+        return app;
     }
-    return NULL;
+    if (mContentAppFactory != nullptr)
+    {
+        return mContentAppFactory->LoadContentApp(vendorApp);
+    }
+    return nullptr;
 }
 
-ContentApp * AppPlatform::GetContentAppByAppId(ApplicationLauncherApplication application)
+ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint16_t productId)
 {
-    ChipLogProgress(DeviceLayer, "GetContentAppByAppId()");
-    ApplicationBasicApplication internalApplication;
-    internalApplication.catalogVendorId = mContentAppFactory->GetPlatformCatalogVendorId();
-    internalApplication.applicationId   = mContentAppFactory->GetPlatformCatalogApplicationId(application);
+    ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
 
+    CatalogVendorApp vendorApp;
+    CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d",
+                        vendorId, productId);
+        return nullptr;
+    }
+    return LoadContentAppInternal(vendorApp);
+}
+
+ContentApp * ContentAppPlatform::LoadContentApp(CatalogVendorApp vendorApp)
+{
+    if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
+    {
+        return LoadContentAppInternal(vendorApp);
+    }
+    CatalogVendorApp destinationApp;
+    CHIP_ERROR err = mContentAppFactory->ConvertToPlatformCatalogVendorApp(vendorApp, &destinationApp);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "GetLoadContentApp() - failed to find an app for catalog vendorId %d, appId %s",
+                        vendorApp.catalogVendorId, vendorApp.applicationId);
+        return nullptr;
+    }
+    return LoadContentAppInternal(destinationApp);
+}
+
+ContentApp * ContentAppPlatform::GetContentApp(CatalogVendorApp vendorApp)
+{
+    if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
+    {
+        return GetContentAppInternal(vendorApp);
+    }
+    CatalogVendorApp destinationApp;
+    CHIP_ERROR err = mContentAppFactory->ConvertToPlatformCatalogVendorApp(vendorApp, &destinationApp);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "GetContentApp() - failed to find an app for catalog vendorId %d, appId %s",
+                        vendorApp.catalogVendorId, vendorApp.applicationId);
+        return nullptr;
+    }
+    return GetContentAppInternal(destinationApp);
+}
+
+ContentApp * ContentAppPlatform::GetContentApp(EndpointId id)
+{
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
-        if (app != NULL && app->GetApplicationBasicDelegate()->Matches(internalApplication))
-        {
-            return app;
-        }
-        index++;
-    }
-    ChipLogProgress(DeviceLayer, "GetContentAppByAppId() - application not found ");
-    return NULL;
-}
-
-ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
-{
-    uint8_t index = 0;
-    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-    {
-        ContentApp * app = mContentApps[index];
-        if (app != NULL && app->GetEndpointId() == id)
+        if (app != nullptr && app->GetEndpointId() == id)
         {
             return app;
         }
         index++;
     }
     ChipLogProgress(DeviceLayer, "GetContentAppByEndpointId() - endpoint %d not found ", id);
-    return NULL;
+    return nullptr;
 }
 
-void AppPlatform::SetCurrentApp(uint16_t catalogVendorId, CharSpan appId, chip::EndpointId endpoint)
+void ContentAppPlatform::SetCurrentApp(ContentApp * app)
 {
-    ContentApp * previousApp = NULL;
+    if (!HasCurrentApp())
+    {
+        mCurrentAppEndpointId = app->GetEndpointId();
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+        return;
+    }
+
     // if this is the current app, then no action
-    if (IsCurrentApp(catalogVendorId, appId))
+    if (mCurrentAppEndpointId == app->GetEndpointId())
     {
         ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp already current app");
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
         return;
     }
     // if there is another current app, then need to hide it
-    if (HasCurrentApp())
+    ContentApp * previousApp = GetContentApp(mCurrentAppEndpointId);
+    if (previousApp == nullptr)
     {
-        ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp has a current app");
-        ApplicationLauncherApplication application;
-        application.catalogVendorId = mCurrentApp.application.catalogVendorId;
-        application.applicationId   = mCurrentApp.application.applicationId;
-
-        previousApp = GetContentAppByAppId(application);
-        if (previousApp == NULL)
-        {
-            ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp current app not found");
-        }
+        ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp current app not found");
+        mCurrentAppEndpointId = app->GetEndpointId();
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+        return;
     }
 
-    sprintf(mCurrentApplicationEndpoint, "%d", endpoint);
+    ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp has a current app");
+    // make sure to mark previousApp as hidden
+    previousApp->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
 
-    mCurrentApp.application.catalogVendorId = catalogVendorId;
-    mCurrentApp.application.applicationId   = chip::CharSpan(appId.data(), appId.size());
-    mCurrentApp.endpoint                    = chip::CharSpan(mCurrentApplicationEndpoint, strlen(mCurrentApplicationEndpoint));
-    mNoCurrentApp                           = false;
-
-    if (previousApp != NULL)
-    {
-        // make sure to mark previousApp as hidden
-        previousApp->GetApplicationBasicDelegate()->SetApplicationStatus(
-            chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
-    }
+    mCurrentAppEndpointId = app->GetEndpointId();
+    app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
     return;
-}
+} // namespace AppPlatform
 
-bool AppPlatform::IsCurrentApp(uint16_t catalogVendorId, CharSpan appId)
+bool ContentAppPlatform::IsCurrentApp(ContentApp * app)
 {
-    if (mNoCurrentApp)
+    if (HasCurrentApp())
     {
         return false;
     }
-    return (mCurrentApp.application.catalogVendorId == catalogVendorId &&
-            mCurrentApp.application.applicationId.size() == appId.size() &&
-            strncmp(mCurrentApp.application.applicationId.data(), appId.data(), mCurrentApp.application.applicationId.size()) == 0);
-}
-
-chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type * AppPlatform::GetCurrentApp()
-{
-    if (mNoCurrentApp)
+    if (mCurrentAppEndpointId != app->GetEndpointId())
     {
-        return NULL;
+        return false;
     }
-    return &mCurrentApp;
+    if (app != GetContentApp(mCurrentAppEndpointId))
+    {
+        // current app us not there, fix our state and exit
+        ChipLogProgress(DeviceLayer, "AppPlatform::IsCurrentApp current app not found");
+        mCurrentAppEndpointId = kNoCurrentEndpointId;
+        return false;
+    }
+    return true;
 }
 
-void AppPlatform::UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId)
+void ContentAppPlatform::UnsetIfCurrentApp(ContentApp * app)
 {
-    if (IsCurrentApp(catalogVendorId, appId))
+    if (IsCurrentApp(app))
     {
         ChipLogProgress(DeviceLayer, "UnsetIfCurrentApp setting to no current app");
-        mNoCurrentApp = true;
+        mCurrentAppEndpointId = kNoCurrentEndpointId;
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
     }
     else
     {
@@ -348,9 +359,9 @@ void AppPlatform::UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId)
     }
 }
 
-uint32_t AppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
+uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
 {
-    ContentApp * app = GetLoadContentAppByVendorId(vendorId);
+    ContentApp * app = LoadContentAppByClient(vendorId, productId);
     if (app == nullptr)
     {
         ChipLogProgress(DeviceLayer, "no app found for vendor id=%d \r\n", vendorId);
@@ -363,8 +374,7 @@ uint32_t AppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_t produ
         return 0;
     }
 
-    chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type responseType =
-        app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingId);
+    AccountLogin::Commands::GetSetupPINResponse::Type responseType = app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingId);
     std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
 
     char * eptr;

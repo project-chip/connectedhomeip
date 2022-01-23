@@ -154,48 +154,38 @@ uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
     return kCatalogVendorId;
 }
 
-CharSpan ContentAppFactoryImpl::GetPlatformCatalogApplicationId(ApplicationLauncherApplication application)
+CHIP_ERROR ContentAppFactoryImpl::LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp)
+{
+    std::string appId               = BuildAppId(vendorId);
+    destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
+    strncpy(destinationApp->applicationId, appId.c_str(), sizeof(destinationApp->applicationId));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp)
 {
     // for now, just return the applicationId passed in
-    return application.applicationId;
+    destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
+    strncpy(destinationApp->applicationId, sourceApp.applicationId, sizeof(destinationApp->applicationId));
+    return CHIP_NO_ERROR;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
+ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
 {
-    for (auto & app : mContentApps)
-    {
-        if (app.GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
-        {
-            AppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
-            return &app;
-        }
-    }
-    ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendor %d not found ", vendorId);
-
-    return nullptr;
-}
-
-ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApplication application)
-{
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    ChipLogProgress(DeviceLayer,
-                    "ContentAppFactoryImpl: LoadContentAppByAppId application.catalogVendorId=%d "
-                    "application.applicationIdSize=%ld application.applicationId=%s ",
-                    application.catalogVendorId, application.applicationId.size(), appId.c_str());
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
+                    vendorApp.catalogVendorId, vendorApp.applicationId);
 
     for (auto & app : mContentApps)
     {
-        CharSpan nextAppIdCharSpan = app.GetApplicationBasicDelegate()->HandleGetApplication().applicationId;
-        std::string nextAppId(nextAppIdCharSpan.data(), nextAppIdCharSpan.size());
-
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", nextAppId.c_str());
-        if (strcmp(nextAppId.c_str(), appId.c_str()) == 0)
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
+        if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            AppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
             return &app;
         }
     }
-    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId() - app id %s not found ", appId.c_str());
+    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
+                    vendorApp.applicationId);
 
     return nullptr;
 }

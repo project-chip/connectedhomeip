@@ -43,28 +43,30 @@
 namespace chip {
 namespace AppPlatform {
 
+using namespace app::Clusters;
+
 class DLL_EXPORT ContentApp
 {
 public:
     virtual ~ContentApp() = default;
 
-    inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
-    inline chip::EndpointId GetEndpointId() { return mEndpointId; };
+    inline void SetEndpointId(EndpointId id) { mEndpointId = id; };
+    inline EndpointId GetEndpointId() { return mEndpointId; };
 
-    virtual chip::app::Clusters::AccountLogin::Delegate * GetAccountLoginDelegate()               = 0;
-    virtual chip::app::Clusters::ApplicationBasic::Delegate * GetApplicationBasicDelegate()       = 0;
-    virtual chip::app::Clusters::ApplicationLauncher::Delegate * GetApplicationLauncherDelegate() = 0;
-    virtual chip::app::Clusters::Channel::Delegate * GetChannelDelegate()                         = 0;
-    virtual chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate()         = 0;
-    virtual chip::app::Clusters::KeypadInput::Delegate * GetKeypadInputDelegate()                 = 0;
-    virtual chip::app::Clusters::MediaPlayback::Delegate * GetMediaPlaybackDelegate()             = 0;
-    virtual chip::app::Clusters::TargetNavigator::Delegate * GetTargetNavigatorDelegate()         = 0;
+    virtual AccountLogin::Delegate * GetAccountLoginDelegate()               = 0;
+    virtual ApplicationBasic::Delegate * GetApplicationBasicDelegate()       = 0;
+    virtual ApplicationLauncher::Delegate * GetApplicationLauncherDelegate() = 0;
+    virtual Channel::Delegate * GetChannelDelegate()                         = 0;
+    virtual ContentLauncher::Delegate * GetContentLauncherDelegate()         = 0;
+    virtual KeypadInput::Delegate * GetKeypadInputDelegate()                 = 0;
+    virtual MediaPlayback::Delegate * GetMediaPlaybackDelegate()             = 0;
+    virtual TargetNavigator::Delegate * GetTargetNavigatorDelegate()         = 0;
 
-    EmberAfStatus HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
-    EmberAfStatus HandleWriteAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer);
+    EmberAfStatus HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
+    EmberAfStatus HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
 
 protected:
-    chip::EndpointId mEndpointId = 0;
+    EndpointId mEndpointId = 0;
 };
 
 } // namespace AppPlatform

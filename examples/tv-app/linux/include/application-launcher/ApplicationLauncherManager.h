@@ -21,20 +21,22 @@
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <list>
 
-class ApplicationLauncherManager : public chip::app::Clusters::ApplicationLauncher::Delegate
+using namespace chip;
+using namespace chip::app::Clusters;
+
+class ApplicationLauncherManager : public ApplicationLauncher::Delegate
 {
 public:
-    ApplicationLauncherManager() : chip::app::Clusters::ApplicationLauncher::Delegate(){};
-    ApplicationLauncherManager(bool featureMapContentPlatform) :
-        chip::app::Clusters::ApplicationLauncher::Delegate(featureMapContentPlatform){};
+    ApplicationLauncherManager() : ApplicationLauncher::Delegate(){};
+    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncher::Delegate(featureMapContentPlatform){};
 
     std::list<uint16_t> HandleGetCatalogList() override;
 
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleLaunchApp(
-        const chip::CharSpan & data,
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleStopApp(
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleHideApp(
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    ApplicationLauncher::Commands::LauncherResponse::Type
+    HandleLaunchApp(const CharSpan & data,
+                    const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    ApplicationLauncher::Commands::LauncherResponse::Type
+    HandleStopApp(const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    ApplicationLauncher::Commands::LauncherResponse::Type
+    HandleHideApp(const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
 };

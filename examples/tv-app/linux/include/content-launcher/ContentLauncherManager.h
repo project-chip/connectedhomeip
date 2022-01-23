@@ -20,21 +20,22 @@
 
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
-class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
+class ContentLauncherManager : public ContentLauncher::Delegate
 {
 public:
     ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};
     ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
 
-    void
-    HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
-                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
-                            responser) override;
-    void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+    void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
+                             CommandResponseHelper<ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
+    void HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
                          const std::list<BrandingInformation> & brandingInformation,
-                         chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
-                             responser) override;
-    CHIP_ERROR HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder) override;
+                         CommandResponseHelper<ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
+    CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
 protected:
@@ -42,5 +43,5 @@ protected:
     uint32_t mSupportedStreamingProtocols;
 
 private:
-    chip::EndpointId mEndpointId;
+    EndpointId mEndpointId;
 };

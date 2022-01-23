@@ -26,16 +26,17 @@ TargetNavigatorManager::TargetNavigatorManager(std::list<std::string> targets, u
     mCurrentTarget = currentTarget;
 }
 
-std::list<Structs::TargetInfo::Type> TargetNavigatorManager::HandleGetTargetList()
+list<Structs::TargetInfo::Type> TargetNavigatorManager::HandleGetTargetList()
 {
-    std::list<Structs::TargetInfo::Type> list;
+    list<Structs::TargetInfo::Type> list;
 
+    // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"
     int i = 0;
     for (std::string & entry : mTargets)
     {
         Structs::TargetInfo::Type outputInfo;
         outputInfo.identifier = static_cast<uint8_t>(i + 1);
-        outputInfo.name       = chip::CharSpan(entry.c_str(), entry.length());
+        outputInfo.name       = CharSpan(entry.c_str(), entry.length());
         list.push_back(outputInfo);
         i++;
     }
@@ -47,20 +48,19 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return mCurrentTarget;
 }
 
-Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target,
-                                                                                    const chip::CharSpan & data)
+Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target, const CharSpan & data)
 {
     Commands::NavigateTargetResponse::Type response;
-    if (target <= 0 || target > mTargets.size())
+    if (target == kNoCurrentTarget || target > mTargets.size())
     {
-        response.data = chip::CharSpan("error", strlen("error"));
+        response.data = CharSpan("error", strlen("error"));
         // TODO: should be TARGET_NOT_FOUND
-        response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable;
+        response.status = StatusEnum::kAppNotAvailable;
         return response;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
-    response.data   = chip::CharSpan("data response", strlen("data response"));
-    response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
+    response.data   = CharSpan("data response", strlen("data response"));
+    response.status = StatusEnum::kSuccess;
     return response;
 }

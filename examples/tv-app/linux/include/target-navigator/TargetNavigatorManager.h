@@ -19,18 +19,23 @@
 
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
-class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Delegate
+using namespace chip;
+using namespace chip::app::Clusters;
+
+class TargetNavigatorManager : public TargetNavigator::Delegate
 {
 public:
-    TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, 0){};
+    TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, kNoCurrentTarget){};
     TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget);
 
-    std::list<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type> HandleGetTargetList() override;
+    std::list<TargetNavigator::Structs::TargetInfo::Type> HandleGetTargetList() override;
     uint8_t HandleGetCurrentTarget() override;
-    chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type
-    HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) override;
+    TargetNavigator::Commands::NavigateTargetResponse::Type HandleNavigateTarget(const uint64_t & target,
+                                                                                 const CharSpan & data) override;
 
 protected:
+    // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"
+    static const uint8_t kNoCurrentTarget = 0;
     std::list<std::string> mTargets;
     uint8_t mCurrentTarget;
 };

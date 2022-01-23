@@ -37,10 +37,10 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+    virtual void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
                                      CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
 
-    virtual void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+    virtual void HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
                                  const std::list<BrandingInformation> & brandingInformation,
                                  CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
 

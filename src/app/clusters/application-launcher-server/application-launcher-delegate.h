@@ -28,6 +28,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ApplicationLauncher::Structs;
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the Application Launcher Cluster.
  */
@@ -37,9 +40,9 @@ public:
     Delegate() : Delegate(false){};
     Delegate(bool featureMapContentPlatform) { mFeatureMapContentPlatform = featureMapContentPlatform; };
 
-    inline bool HasFeature(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherFeature feature)
+    inline bool HasFeature(ApplicationLauncherFeature feature)
     {
-        if (feature == chip::app::Clusters::ApplicationLauncher::ApplicationLauncherFeature::kApplicationPlatform)
+        if (feature == ApplicationLauncherFeature::kApplicationPlatform)
         {
             return mFeatureMapContentPlatform;
         }
@@ -47,18 +50,15 @@ public:
     }
 
     // this attribute should only be enabled for app platform instance (endpoint 1)
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp();
+    Structs::ApplicationEP::Type HandleGetCurrentApp();
 
     // TODO: refactor this method signature to address memory issue (see PR 13398)
     virtual std::list<uint16_t> HandleGetCatalogList() = 0;
 
-    virtual Commands::LauncherResponse::Type HandleLaunchApp(
-        const chip::CharSpan & data,
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
-    virtual Commands::LauncherResponse::Type
-    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
-    virtual Commands::LauncherResponse::Type
-    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
+    virtual Commands::LauncherResponse::Type HandleLaunchApp(const CharSpan & data,
+                                                             const ApplicationLauncherApplication::Type & application) = 0;
+    virtual Commands::LauncherResponse::Type HandleStopApp(const ApplicationLauncherApplication::Type & application)   = 0;
+    virtual Commands::LauncherResponse::Type HandleHideApp(const ApplicationLauncherApplication::Type & application)   = 0;
 
     virtual ~Delegate() = default;
 

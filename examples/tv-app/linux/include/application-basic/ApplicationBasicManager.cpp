@@ -21,9 +21,9 @@
 using namespace std;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-chip::CharSpan ApplicationBasicManager::HandleGetVendorName()
+CharSpan ApplicationBasicManager::HandleGetVendorName()
 {
-    return chip::CharSpan(mVendorName, strlen(mVendorName));
+    return CharSpan(mVendorName, strlen(mVendorName));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
@@ -31,9 +31,9 @@ uint16_t ApplicationBasicManager::HandleGetVendorId()
     return mVendorId;
 }
 
-chip::CharSpan ApplicationBasicManager::HandleGetApplicationName()
+CharSpan ApplicationBasicManager::HandleGetApplicationName()
 {
-    return chip::CharSpan(mApplicationName, strlen(mApplicationName));
+    return CharSpan(mApplicationName, strlen(mApplicationName));
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
@@ -41,9 +41,9 @@ uint16_t ApplicationBasicManager::HandleGetProductId()
     return mProductId;
 }
 
-chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
+CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
 {
-    return chip::CharSpan(mApplicationVersion, strlen(mApplicationVersion));
+    return CharSpan(mApplicationVersion, strlen(mApplicationVersion));
 }
 
 std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList()
