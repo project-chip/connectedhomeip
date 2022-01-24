@@ -28,14 +28,18 @@ except:
 
 from idl.generators import FileSystemGeneratorStorage
 from idl.generators.java import JavaGenerator
+from idl.generators.gni import GniGenerator
 
 
 class CodeGeneratorTypes(enum.Enum):
     JAVA = enum.auto()
+    GNI = enum.auto()
 
     def CreateGenerator(self, *args, **kargs):
         if self == CodeGeneratorTypes.JAVA:
             return JavaGenerator(*args, **kargs)
+        elif self == CodeGeneratorTypes.GNI:
+            return GniGenerator(*args, **kargs)
         else:
             raise Error("Unknown code generator type")
 
@@ -50,7 +54,8 @@ __LOG_LEVELS__ = {
 }
 
 __GENERATORS__ = {
-    'java': CodeGeneratorTypes.JAVA
+    'java': CodeGeneratorTypes.JAVA,
+    'gni': CodeGeneratorTypes.GNI,
 }
 
 

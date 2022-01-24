@@ -12,7 +12,6 @@
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
-
 JNI_METHOD(void, DemoClusterCluster, readSomeLabelsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -35,5 +34,4 @@ JNI_METHOD(void, DemoClusterCluster, readSomeLabelsAttribute)(JNIEnv * env, jobj
     onSuccess.release();
     onFailure.release();
 }
-
 
