@@ -212,7 +212,7 @@ public:
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
     PeerId GetPeerId() const { return mPeerId; }
-    CHIP_ERROR SetPeerId(const Crypto::P256PublicKey & rootPublicKey, ByteSpan noc) override;
+    CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 

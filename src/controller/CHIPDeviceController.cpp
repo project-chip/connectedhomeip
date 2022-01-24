@@ -1707,17 +1707,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
-        Crypto::P256PublicKey rootPubKey;
-        Credentials::P256PublicKeySpan rootPubKeySpan;
-        err = Credentials::ExtractPublicKeyFromChipCert(params.GetRootCert().Value(), rootPubKeySpan);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Error extracting public key from chip cert: %s", err.AsString());
-            CommissioningStageComplete(err);
-            return;
-        }
-        rootPubKey = Crypto::P256PublicKey(rootPubKeySpan); // deep copy
-        err        = proxy->SetPeerId(rootPubKey, params.GetNoc().Value());
+        err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error setting peer id: %s", err.AsString());
