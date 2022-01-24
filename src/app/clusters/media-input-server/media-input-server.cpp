@@ -106,17 +106,22 @@ CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPa
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::MediaInput::Attributes::MediaInputList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadInputListAttribute(aEncoder, delegate);
     }
     case app::Clusters::MediaInput::Attributes::CurrentMediaInput::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentInputAttribute(aEncoder, delegate);
     }
     default: {
