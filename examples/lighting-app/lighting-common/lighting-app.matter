@@ -969,9 +969,12 @@ client cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
+  command Off(): DefaultSuccess = 0;
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command On(): DefaultSuccess = 1;
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+  command Toggle(): DefaultSuccess = 2;
 }
 
 server cluster OnOff = 6 {
@@ -997,10 +1000,6 @@ server cluster OnOff = 6 {
   attribute enum8 startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
 }
 
 server cluster OnOffSwitchConfiguration = 7 {
