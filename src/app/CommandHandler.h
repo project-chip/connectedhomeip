@@ -194,6 +194,8 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
+    NodeId SourceNodeId() const { return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId(); }
+
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;

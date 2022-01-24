@@ -30,7 +30,7 @@ public:
 
         // This is not an async operation, std::cin blocks the chip thread
         // TODO: Spawn a new thread for getting user consent
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), &HandleUserConsent, this);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(1), &HandleUserConsent, this);
     }
 
 private:

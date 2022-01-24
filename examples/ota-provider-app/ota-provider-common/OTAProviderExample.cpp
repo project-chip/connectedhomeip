@@ -91,8 +91,8 @@ static void ClearUserConsent()
 
 static void OnUserConsent(bool granted, EndpointId endpoint, NodeId nodeId)
 {
-    ChipLogDetail(SoftwareUpdate, "User consent %s for endpoint:%hu nodeid:%llu ", granted ? "granted" : "denied", endpoint,
-                  nodeId);
+    ChipLogDetail(SoftwareUpdate, "User consent %s for endpoint:%" PRIu16 " nodeid:0x" ChipLogFormatX64,
+                  granted ? "granted" : "denied", endpoint, ChipLogValueX64(nodeId));
 
     if (granted)
     {
@@ -165,8 +165,8 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
 {
-    ChipLogDetail(SoftwareUpdate, "Requestor endpoint:%hu node-id:%llu", commandPath.mEndpointId,
-                  emberAfCurrentCommand()->SourceNodeId());
+    ChipLogDetail(SoftwareUpdate, "Requestor endpoint:%" PRIu16 " node-id:0x" ChipLogFormatX64, commandPath.mEndpointId,
+                  ChipLogValueX64(commandObj->SourceNodeId()));
 
     uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
                                                                    // available (if the user provides a file).
@@ -177,7 +177,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     QueryImageResponse::Type response;
 
     OTAQueryStatus queryStatus = (strlen(mOTAFilePath) != 0) ? OTAQueryStatus::kUpdateAvailable : OTAQueryStatus::kNotAvailable;
-    bool userConsentNeeded     = (commandData.requestorCanConsent.HasValue() && commandData.requestorCanConsent.Value() == true);
+    bool userConsentNeeded     = commandData.requestorCanConsent.ValueOr(false);
 
     if (queryStatus == OTAQueryStatus::kUpdateAvailable)
     {
@@ -195,7 +195,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
                 queryStatus = OTAQueryStatus::kBusy;
                 ChipLogDetail(SoftwareUpdate, "Obtaining user consent...");
-                mUserConsentDelegate->ObtainUserConsentAsync(emberAfCurrentCommand()->SourceNodeId(), commandPath.mEndpointId,
+                mUserConsentDelegate->ObtainUserConsentAsync(commandObj->SourceNodeId(), commandPath.mEndpointId,
                                                              commandData.softwareVersion, newSoftwareVersion);
                 chip::DeviceLayer::SystemLayer().StartTimer(kDefaultUserConsentTimeout, OnUserConsentTimeout, nullptr);
             }
@@ -209,7 +209,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         break;
 
         case UserConsentState::kGranted: {
-            if (mUserConsentEndpoint == commandPath.mEndpointId && mUserConsentNodeId == emberAfCurrentCommand()->SourceNodeId())
+            if (mUserConsentEndpoint == commandPath.mEndpointId && mUserConsentNodeId == commandObj->SourceNodeId())
             {
                 ChipLogDetail(SoftwareUpdate, "User consent has been granted");
                 queryStatus = OTAQueryStatus::kUpdateAvailable;
