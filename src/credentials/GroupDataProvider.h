@@ -151,7 +151,10 @@ public:
         {
             if (this->num_keys_used > 0)
             {
-                return ByteSpan(epoch_keys[0].key, EpochKey::kLengthBytes);
+                // An epoch key update SHALL order the keys from oldest to newest,
+                // the current epoch key having the second newest time
+                size_t current_index = (this->num_keys_used > 2) ? 1 : 0;
+                return ByteSpan(epoch_keys[current_index].key, EpochKey::kLengthBytes);
             }
             else
             {

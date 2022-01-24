@@ -85,7 +85,7 @@ public:
     // Decryption
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
-private:
+protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator
     {
     public:
@@ -94,7 +94,7 @@ private:
         bool Next(GroupInfo & output) override;
         void Release() override;
 
-    private:
+    protected:
         GroupDataProviderImpl & mProvider;
         FabricIndex mFabric = kUndefinedFabricIndex;
         uint16_t mNextId    = 0;
@@ -110,7 +110,7 @@ private:
         bool Next(GroupKey & output) override;
         void Release() override;
 
-    private:
+    protected:
         GroupDataProviderImpl & mProvider;
         FabricIndex mFabric = kUndefinedFabricIndex;
         uint16_t mNextId    = 0;
@@ -126,7 +126,7 @@ private:
         bool Next(GroupEndpoint & output) override;
         void Release() override;
 
-    private:
+    protected:
         GroupDataProviderImpl & mProvider;
         FabricIndex mFabric   = kUndefinedFabricIndex;
         GroupId mFirstGroup   = kUndefinedGroupId;
@@ -150,8 +150,10 @@ private:
                                   MutableByteSpan & out_mic) const override;
         CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
                                   const ByteSpan & mic) const override;
-        CHIP_ERROR EncryptPrivacy(MutableByteSpan & plaintext, const ByteSpan & nonce) const override;
-        CHIP_ERROR DecryptPrivacy(MutableByteSpan & ciphertext, const ByteSpan & nonce) const override;
+        CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
+                                  const ByteSpan & mic) const override;
+        CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
+                                  const ByteSpan & mic) const override;
 
     protected:
         uint8_t mKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
@@ -165,7 +167,7 @@ private:
         bool Next(KeySet & output) override;
         void Release() override;
 
-    private:
+    protected:
         GroupDataProviderImpl & mProvider;
         FabricIndex mFabric = kUndefinedFabricIndex;
         uint16_t mNextId    = 0;
@@ -181,7 +183,7 @@ private:
         bool Next(GroupSession & output) override;
         void Release() override;
 
-    private:
+    protected:
         GroupDataProviderImpl & mProvider;
         uint16_t mSessionId      = 0;
         FabricIndex mFirstFabric = kUndefinedFabricIndex;
@@ -190,6 +192,8 @@ private:
         uint16_t mFabricTotal    = 0;
         uint16_t mMapping        = 0;
         uint16_t mMapCount       = 0;
+        uint16_t mKeyIndex       = 0;
+        uint16_t mKeyCount       = 0;
         bool mFirstMap           = true;
         GroupKeyContext mKey;
     };

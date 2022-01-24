@@ -1322,7 +1322,8 @@ public:
      * @param mic[in]       Outgoing Message Integrity Check
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & plaintext, const ByteSpan & nonce) const = 0;
+    virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
+                                      const ByteSpan & mic) const = 0;
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
@@ -1332,14 +1333,15 @@ public:
      * @param mic[in]           Outgoing Message Integrity Check
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & ciphertext, const ByteSpan & nonce) const = 0;
+    virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
+                                      const ByteSpan & mic) const = 0;
 };
 
 /**
  *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
- * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes lenght.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @param[out] out_key  Symmetric key used as the encryption key during message processing for group communication.
- The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes lenght.
+ The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
  **/
 CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
@@ -1347,7 +1349,7 @@ CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan
 /**
  *  @brief Derives the Group Session ID from a given operational group key using
  *         the Key Derivation Function (Group Key Hash)
- * @param[in] operational_key  The operational group key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes lenght.
+ * @param[in] operational_key  The operational group key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @param[out] session_id  Output of the Group Key Hash
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INVALID_ARGUMENT if the provided key is invalid.
  **/
