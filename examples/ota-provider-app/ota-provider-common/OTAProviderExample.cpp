@@ -43,70 +43,9 @@ using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
 using chip::bdx::TransferControlFlags;
 using namespace chip;
+using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
-
-namespace {
-
-// If we track user consent for individual node, we may not need to track states
-enum UserConsentState
-{
-    // No pending user consent request or may have been rejected
-    // QueryImage will obtain user consent if needed
-    kIdle,
-    // User consent request is pending, QueryImage will be responded as busy till timeout
-    // No request for user consent will be raised
-    kInProgress,
-    // User consent is granted, Specific node will be responded with Image URL,
-    // rest of the nodes will receive Busy. This state will be moved to kIdle after
-    // responding with Image URL
-    kGranted,
-};
-
-static UserConsentState mUserConsentStatus = UserConsentState::kIdle;
-static EndpointId mUserConsentEndpoint     = kInvalidEndpointId;
-static NodeId mUserConsentNodeId           = kUndefinedNodeId;
-
-// Using 5 minutes as timeout for user consent expiration
-constexpr chip::System::Clock::Timeout kDefaultUserConsentTimeout = chip::System::Clock::Seconds16(5 * 60);
-
-static void OnUserConsentTimeout(System::Layer *, void * context)
-{
-    if (mUserConsentStatus != UserConsentState::kIdle)
-    {
-        ChipLogDetail(SoftwareUpdate, "User consent timeout expired");
-        mUserConsentStatus   = UserConsentState::kIdle;
-        mUserConsentEndpoint = kInvalidEndpointId;
-        mUserConsentNodeId   = kUndefinedNodeId;
-    }
-}
-
-static void ClearUserConsent()
-{
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnUserConsentTimeout, nullptr);
-    mUserConsentStatus   = UserConsentState::kIdle;
-    mUserConsentEndpoint = kInvalidEndpointId;
-    mUserConsentNodeId   = kUndefinedNodeId;
-}
-
-static void OnUserConsent(bool granted, EndpointId endpoint, NodeId nodeId)
-{
-    ChipLogDetail(SoftwareUpdate, "User consent %s for endpoint:%" PRIu16 " nodeid:0x" ChipLogFormatX64,
-                  granted ? "granted" : "denied", endpoint, ChipLogValueX64(nodeId));
-
-    if (granted)
-    {
-        mUserConsentStatus   = UserConsentState::kGranted;
-        mUserConsentEndpoint = endpoint;
-        mUserConsentNodeId   = nodeId;
-    }
-    else
-    {
-        ClearUserConsent();
-    }
-}
-
-} // namespace
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
@@ -154,13 +93,6 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
 }
 
-void OTAProviderExample::SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate)
-{
-    VerifyOrReturn(delegate != nullptr, ChipLogError(SoftwareUpdate, "User consent delegate is null"));
-    mUserConsentDelegate                      = delegate;
-    mUserConsentDelegate->userConsentCallback = OnUserConsent;
-}
-
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
@@ -177,51 +109,25 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     QueryImageResponse::Type response;
 
     OTAQueryStatus queryStatus = (strlen(mOTAFilePath) != 0) ? OTAQueryStatus::kUpdateAvailable : OTAQueryStatus::kNotAvailable;
-    bool userConsentNeeded     = commandData.requestorCanConsent.ValueOr(false);
+    bool requestorCanConsent   = commandData.requestorCanConsent.ValueOr(false);
 
-    if (queryStatus == OTAQueryStatus::kUpdateAvailable)
+    if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
     {
-        switch (mUserConsentStatus)
+        UserConsentState state = mUserConsentDelegate->GetUserConsentState(commandObj->SourceNodeId(), commandPath.mEndpointId,
+                                                                           commandData.softwareVersion, newSoftwareVersion);
+        switch (state)
         {
-        case UserConsentState::kIdle: {
-            if (userConsentNeeded == false)
-            {
-                if (mUserConsentDelegate == nullptr)
-                {
-                    // Not sure, should we return error or Busy/NotAvailable?
-                    ChipLogError(SoftwareUpdate, "User consent delegate is null");
-                    return EMBER_ZCL_STATUS_FAILURE;
-                }
+        case UserConsentState::kGranted:
+            queryStatus = OTAQueryStatus::kUpdateAvailable;
+            break;
 
-                queryStatus = OTAQueryStatus::kBusy;
-                ChipLogDetail(SoftwareUpdate, "Obtaining user consent...");
-                mUserConsentDelegate->ObtainUserConsentAsync(commandObj->SourceNodeId(), commandPath.mEndpointId,
-                                                             commandData.softwareVersion, newSoftwareVersion);
-                chip::DeviceLayer::SystemLayer().StartTimer(kDefaultUserConsentTimeout, OnUserConsentTimeout, nullptr);
-            }
-        }
-        break;
-
-        case UserConsentState::kInProgress: {
-            ChipLogDetail(SoftwareUpdate, "User consent is in progress, responding with busy");
+        case chip::ota::UserConsentState::kObtaining:
             queryStatus = OTAQueryStatus::kBusy;
-        }
-        break;
+            break;
 
-        case UserConsentState::kGranted: {
-            if (mUserConsentEndpoint == commandPath.mEndpointId && mUserConsentNodeId == commandObj->SourceNodeId())
-            {
-                ChipLogDetail(SoftwareUpdate, "User consent has been granted");
-                queryStatus = OTAQueryStatus::kUpdateAvailable;
-                ClearUserConsent();
-            }
-            else
-            {
-                ChipLogDetail(SoftwareUpdate, "User consent has been granted, but not for this node");
-                queryStatus = OTAQueryStatus::kBusy;
-            }
-        }
-        break;
+        case chip::ota::UserConsentState::kDenied:
+            queryStatus = OTAQueryStatus::kNotAvailable;
+            break;
         }
     }
 
@@ -262,7 +168,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     response.status = queryStatus;
     response.delayedActionTime.Emplace(mDelayedActionTimeSec);
-    response.userConsentNeeded.Emplace(userConsentNeeded);
+    response.userConsentNeeded.Emplace(requestorCanConsent);
     // Could also just not send metadataForRequestor at all.
     response.metadataForRequestor.Emplace(chip::ByteSpan());
 

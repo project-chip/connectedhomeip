@@ -53,10 +53,7 @@ public:
     };
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
-
-    // Sets user consent delegate and also sets userConsentCallback
-    // which should be called by application when it gets the user consent.
-    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate);
+    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
 
 private:
     BdxOtaSender mBdxOtaSender;
@@ -64,5 +61,5 @@ private:
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
     uint32_t mDelayedActionTimeSec;
-    chip::ota::UserConsentDelegate * mUserConsentDelegate;
+    chip::ota::UserConsentDelegate * mUserConsentDelegate = nullptr;
 };

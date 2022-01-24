@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,25 +16,29 @@
  *    limitations under the License.
  */
 #pragma once
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/NodeId.h>
 
 namespace chip {
 namespace ota {
 
+enum UserConsentState
+{
+    // User consent is granted.
+    kGranted,
+    // Obtaining user consent is in progress, async implementations should return this state.
+    kObtaining,
+    // User consent is denied.
+    kDenied,
+};
+
 class UserConsentDelegate
 {
-
 public:
-    virtual ~UserConsentDelegate() {}
+    virtual ~UserConsentDelegate() = default;
 
-    // This function should be called when application has the user consent
-    typedef void (*UserConsentCallback)(bool userConsent, EndpointId endpoint, NodeId nodeId);
-    UserConsentCallback userConsentCallback;
-
-    // TODO: According to the spec, we should provide all the available information
-    // to the application related to the available OTA update.
-
-    // OTA provider should call this API for obtaining user consent
-    virtual void ObtainUserConsentAsync(NodeId nodeId, EndpointId endpoint, uint32_t currentVersion, uint32_t newVersion) = 0;
+    virtual UserConsentState GetUserConsentState(chip::NodeId nodeId, chip::EndpointId endpoint, uint32_t currentVersion,
+                                                 uint32_t newVersion) = 0;
 };
 
 } // namespace ota
