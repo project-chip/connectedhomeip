@@ -227,6 +227,18 @@ bool DoorLockServer::GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointI
     return true;
 }
 
+bool DoorLockServer::GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId,
+                                                                 uint8_t & numberOfYearDaySchedulesPerUser)
+{
+    EmberAfStatus status = Attributes::NumberOfYearDaySchedulesSupportedPerUser::Get(endpointId, &numberOfYearDaySchedulesPerUser);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfYearDaySchedulesSupportedPerUser' [status=%d]", status);
+        return false;
+    }
+    return true;
+}
+
 void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
@@ -898,7 +910,7 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
 
     // appclusters, 5.2.4.14 - spec does not allow setting the schedule for multiple days in the bitmask
     int setBitsInDaysMask = 0;
-    uint8_t rawDaysMask      = daysMask.Raw();
+    uint8_t rawDaysMask   = daysMask.Raw();
     for (size_t i = 0; i < sizeof(rawDaysMask) * 8; ++i)
     {
         setBitsInDaysMask += rawDaysMask & 0x1;
@@ -1080,6 +1092,39 @@ void DoorLockServer::ClearWeekDayScheduleCommandHandler(
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return;
+}
+
+void DoorLockServer::SetYearDayScheduleCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData)
+{
+    auto endpointId = commandPath.mEndpointId;
+    emberAfDoorLockClusterPrintln("[SetYearDaySchedule] incoming command [endpointId=%d]", endpointId);
+
+    // TODO: Implement setting year day schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+void DoorLockServer::GetYearDayScheduleCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData)
+{
+    auto endpointId = commandPath.mEndpointId;
+    emberAfDoorLockClusterPrintln("[GetYearDaySchedule] incoming command [endpointId=%d]", endpointId);
+
+    // TODO: Implement setting year day schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+void DoorLockServer::ClearYearDayScheduleCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData)
+{
+    auto endpointId = commandPath.mEndpointId;
+    emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] incoming command [endpointId=%d]", endpointId);
+
+    // TODO: Implement setting year day schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
 bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
@@ -2507,10 +2552,7 @@ bool emberAfDoorLockClusterSetYearDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("SetYearDaySchedule: command not implemented");
-
-    // TODO: Implement setting year day schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().SetYearDayScheduleCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -2518,10 +2560,7 @@ bool emberAfDoorLockClusterGetYearDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("GetYearDaySchedule: command not implemented");
-
-    // TODO: Implement getting year day schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().GetYearDayScheduleCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -2529,10 +2568,7 @@ bool emberAfDoorLockClusterClearYearDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("ClearYearDaySchedule: command not implemented");
-
-    // TODO: Implement clearing year day schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().ClearYearDayScheduleCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -2804,6 +2840,19 @@ DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId
 DlStatus __attribute__((weak))
 emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
                                  DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+{
+    return DlStatus::kFailure;
+}
+
+DlStatus __attribute__((weak)) emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, DlScheduleStatus status,
+                                                                uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime)
+{
+    return DlStatus::kFailure;
+}
+
+DlStatus __attribute__((weak))
+emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                 EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
     return DlStatus::kFailure;
 }
