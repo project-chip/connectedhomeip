@@ -676,7 +676,7 @@ static const uint8_t kGroupKeyHashSalt[0] = {};
 CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key)
 {
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == out_key.size(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INTERNAL);
 
     Crypto::HKDF_sha crypto;
     return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), kOperationalGroupKeySalt, sizeof(kOperationalGroupKeySalt),
@@ -693,6 +693,7 @@ CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan
 */
 CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id)
 {
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == operational_key.size(), CHIP_ERROR_INTERNAL);
     Crypto::HKDF_sha crypto;
     uint8_t out_key[2];
 

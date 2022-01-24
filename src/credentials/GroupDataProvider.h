@@ -24,7 +24,6 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-// #include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Credentials {
