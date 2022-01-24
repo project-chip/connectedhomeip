@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.49
+            image: connectedhomeip/chip-build-mbed-os:0.5.50
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
