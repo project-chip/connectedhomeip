@@ -1060,6 +1060,7 @@ VendorName
 vendorpayload
 venv
 Verifier
+Verifiers
 VID
 visualstudio
 vlatest
