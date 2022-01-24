@@ -32,6 +32,11 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/EFR32/OTAImageProcessorImpl.h"
+#include "platform/GenericOTARequestorDriver.h"
+
 #include <assert.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -86,9 +91,16 @@ StaticTask_t appTaskStruct;
 
 } // namespace
 
+using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+
+// Global OTA objects
+OTARequestor gRequestorCore;
+DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
 
 AppTask AppTask::sAppTask;
 
@@ -163,6 +175,9 @@ CHIP_ERROR AppTask::Init()
 #else
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 #endif
+
+    // Initialize OTA components
+    InitOTARequestor();
 
     return err;
 }
@@ -511,3 +526,24 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 void AppTask::UpdateClusterState(void) {}
+
+void AppTask::InitOTARequestor()
+{
+
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
+    SetRequestorInstance(&gRequestorCore);
+
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    OTAImageProcessorParams ipParams;
+    ipParams.imageFile = CharSpan("test.txt");
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Connect the Downloader and Image Processor objects
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
+
+}
