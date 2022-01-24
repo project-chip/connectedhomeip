@@ -127,13 +127,12 @@ extern "C" {
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
 #else
 #define configUSE_TICKLESS_IDLE 0
-#endif //SL_CATALOG_POWER_MANAGER_PRESENT
+#endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
 #define configTICK_RATE_HZ (1000)
 /* Definition used by Keil to replace default system clock source. */

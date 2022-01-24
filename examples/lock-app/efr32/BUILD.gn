@@ -43,7 +43,7 @@ declare_args() {
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
-  
+
   # Enable Sleepy end device
   sleepy_device = false
 

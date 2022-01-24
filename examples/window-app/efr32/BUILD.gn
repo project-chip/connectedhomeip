@@ -40,7 +40,7 @@ declare_args() {
 
   # Enable Sleepy end device
   sleepy_device = false
-  
+
   # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
