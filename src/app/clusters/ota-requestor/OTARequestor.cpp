@@ -283,6 +283,9 @@ void OTARequestor::CancelImageUpdate()
     mProviderEndpointId  = kRootEndpointId;
 
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+
+    // Notify the platform, it might choose to take additional actions
+    mOtaRequestorDriver->UpdateCancelled();
 }
 
 // Called whenever FindOrEstablishSession is successful
