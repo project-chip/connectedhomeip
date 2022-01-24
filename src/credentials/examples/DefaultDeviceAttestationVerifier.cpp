@@ -398,8 +398,6 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
                                                                    const ByteSpan & attestationSignatureBuffer,
                                                                    const P256PublicKey & dacPublicKey, const ByteSpan & csrNonce)
 {
-    ChipLogProgress(Controller, "veryfy %d %d %d %d", nocsrElementsBuffer.empty(), attestationChallengeBuffer.empty(),
-                    attestationSignatureBuffer.empty(), csrNonce.empty());
     VerifyOrReturnError(!nocsrElementsBuffer.empty() && !attestationChallengeBuffer.empty() &&
                             !attestationSignatureBuffer.empty() && !csrNonce.empty(),
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -411,25 +409,20 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     ByteSpan vendorReserved1Span;
     ByteSpan vendorReserved2Span;
     ByteSpan vendorReserved3Span;
-    ChipLogProgress(Controller, "1");
     ReturnErrorOnFailure(DeconstructNOCSRElements(nocsrElementsBuffer, csrSpan, csrNonceSpan, vendorReserved1Span,
                                                   vendorReserved2Span, vendorReserved3Span));
 
     // Verify that Nonce matches with what we sent
-    ChipLogProgress(Controller, "2");
     VerifyOrReturnError(csrNonceSpan.data_equal(csrNonce), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Validate overall attestation signature on attestation information
     P256ECDSASignature signature;
     // SetLength will fail if signature doesn't fit
-    ChipLogProgress(Controller, "3");
     ReturnErrorOnFailure(signature.SetLength(attestationSignatureBuffer.size()));
     memcpy(signature.Bytes(), attestationSignatureBuffer.data(), attestationSignatureBuffer.size());
 
-    ChipLogProgress(Controller, "4");
     ReturnErrorOnFailure(ValidateAttestationSignature(dacPublicKey, nocsrElementsBuffer, attestationChallengeBuffer, signature));
 
-    ChipLogProgress(Controller, "5");
     return CHIP_NO_ERROR;
 }
 
