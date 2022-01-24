@@ -52,15 +52,15 @@
 namespace chip {
 namespace AppPlatform {
 
-using AccountLogin               = app::Clusters::AccountLogin::Delegate;
-using ApplicationBasic           = app::Clusters::ApplicationBasic::Delegate;
-using ApplicationLauncher        = app::Clusters::ApplicationLauncher::Delegate;
-using Channel                    = app::Clusters::Channel::Delegate;
-using ContentLauncher            = app::Clusters::ContentLauncher::Delegate;
-using KeypadInput                = app::Clusters::KeypadInput::Delegate;
-using MediaPlayback              = app::Clusters::MediaPlayback::Delegate;
-using TargetNavigator            = app::Clusters::TargetNavigator::Delegate;
-using SupportedStreamingProtocol = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
+using AccountLoginDelegate        = app::Clusters::AccountLogin::Delegate;
+using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
+using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
+using ChannelDelegate             = app::Clusters::Channel::Delegate;
+using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
+using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
+using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
+using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
+using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -80,14 +80,14 @@ public:
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
-    AccountLogin * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
-    ApplicationBasic * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
-    ApplicationLauncher * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
-    Channel * GetChannelDelegate() override { return &mChannelDelegate; };
-    ContentLauncher * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
-    KeypadInput * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
-    MediaPlayback * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
-    TargetNavigator * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
+    AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
+    ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
+    ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
+    ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
+    ContentLauncherDelegate * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
+    KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
+    MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
+    TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;

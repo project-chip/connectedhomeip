@@ -43,14 +43,14 @@
 namespace chip {
 namespace AppPlatform {
 
-using AccountLogin        = app::Clusters::AccountLogin::Delegate;
-using ApplicationBasic    = app::Clusters::ApplicationBasic::Delegate;
-using ApplicationLauncher = app::Clusters::ApplicationLauncher::Delegate;
-using Channel             = app::Clusters::Channel::Delegate;
-using ContentLauncher     = app::Clusters::ContentLauncher::Delegate;
-using KeypadInput         = app::Clusters::KeypadInput::Delegate;
-using MediaPlayback       = app::Clusters::MediaPlayback::Delegate;
-using TargetNavigator     = app::Clusters::TargetNavigator::Delegate;
+using AccountLoginDelegate        = app::Clusters::AccountLogin::Delegate;
+using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
+using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
+using ChannelDelegate             = app::Clusters::Channel::Delegate;
+using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
+using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
+using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
+using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 
 class DLL_EXPORT ContentApp
 {
@@ -60,14 +60,14 @@ public:
     inline void SetEndpointId(EndpointId id) { mEndpointId = id; };
     inline EndpointId GetEndpointId() { return mEndpointId; };
 
-    virtual AccountLogin * GetAccountLoginDelegate()               = 0;
-    virtual ApplicationBasic * GetApplicationBasicDelegate()       = 0;
-    virtual ApplicationLauncher * GetApplicationLauncherDelegate() = 0;
-    virtual Channel * GetChannelDelegate()                         = 0;
-    virtual ContentLauncher * GetContentLauncherDelegate()         = 0;
-    virtual KeypadInput * GetKeypadInputDelegate()                 = 0;
-    virtual MediaPlayback * GetMediaPlaybackDelegate()             = 0;
-    virtual TargetNavigator * GetTargetNavigatorDelegate()         = 0;
+    virtual AccountLoginDelegate * GetAccountLoginDelegate()               = 0;
+    virtual ApplicationBasicDelegate * GetApplicationBasicDelegate()       = 0;
+    virtual ApplicationLauncherDelegate * GetApplicationLauncherDelegate() = 0;
+    virtual ChannelDelegate * GetChannelDelegate()                         = 0;
+    virtual ContentLauncherDelegate * GetContentLauncherDelegate()         = 0;
+    virtual KeypadInputDelegate * GetKeypadInputDelegate()                 = 0;
+    virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
+    virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;
 
     EmberAfStatus HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
     EmberAfStatus HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);

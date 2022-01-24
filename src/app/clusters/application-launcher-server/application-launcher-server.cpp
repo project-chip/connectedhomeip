@@ -42,6 +42,7 @@ using namespace chip::AppPlatform;
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
+using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::app::Clusters::ApplicationLauncher::Delegate;
 using ApplicationStatusEnum = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 
@@ -212,6 +213,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
     if (appId.length() == 0)
     {
         // chip-tool can't send structs from command line so treat data value as appid if appid is blank
+        // TODO: fix this once chip-tool support sending structs from command line
         ChipLogError(Zcl, "ApplicationLauncher blank content id, taking data as appid");
         appId = std::string(data.data(), data.size());
     }

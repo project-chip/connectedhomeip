@@ -76,7 +76,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
                                             sizeof(rotatingIdString));
 
-        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
+        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, state->GetRotatingIdLength());
         AccountLogin::Commands::GetSetupPINResponse::Type responseType =
             app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingIdSpan);
         std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
