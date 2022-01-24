@@ -17,6 +17,7 @@
 
 #include "BluetoothWidget.h"
 #include "Button.h"
+#include "CaseCommands.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
@@ -598,6 +599,7 @@ extern "C" void app_main()
     chip::LaunchShell();
     OnOffCommands & onOffCommands = OnOffCommands::GetInstance();
     onOffCommands.Register();
+    chip::Shell::RegisterCaseCommands();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
 #if CONFIG_OPENTHREAD_ENABLED
