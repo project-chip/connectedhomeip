@@ -125,18 +125,18 @@ CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, ap
 CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder)
 {
     // We only care about the number of attribute data.
-    if (!aPath.IsListOperation() || aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
         app::DataModel::DecodableList<ByteSpan> list;
         CHIP_ERROR err = aDecoder.Decode(list);
-        ChipLogError(Zcl, "failed to decode error: %s", err.AsString());
+        ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
     }
     else if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan listItem;
         CHIP_ERROR err = aDecoder.Decode(listItem);
-        ChipLogError(Zcl, "failed to decode error: %s", err.AsString());
+        ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
     }
     else
@@ -185,7 +185,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
         gIterationCount = (uint32_t) i;
 
         app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                     static_cast<uint16_t>(800 + i) /* reserved buffer size */);
+                                     static_cast<uint16_t>(850 + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength];
 
