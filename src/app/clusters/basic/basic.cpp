@@ -320,5 +320,6 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 
 void MatterBasicPluginServerInitCallback()
 {
+    registerAttributeAccessOverride(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 }
