@@ -213,6 +213,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetManufacturingDate(ui
     char * parseEnd;
 
     err = ReadConfigValueStr(ConfigClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
     SuccessOrExit(err);
 
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);

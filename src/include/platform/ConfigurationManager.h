@@ -64,7 +64,7 @@ public:
         kMaxNodeLabelLength             = 32,
         kMaxLocationLength              = 2,
         kMaxHardwareVersionStringLength = 64,
-        kMaxSoftwareVersionLength       = 64,
+        kMaxSoftwareVersionStringLength = 64,
         kMaxManufacturingDateLength     = 16,
         kMaxPartNumberLength            = 32,
         kMaxProductURLLength            = 256,
@@ -93,7 +93,7 @@ public:
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
     virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                         = 0;
-    virtual CHIP_ERROR GetSoftwareVersion(uint16_t & softwareVer)                                   = 0;
+    virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                                   = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset

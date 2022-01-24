@@ -61,7 +61,7 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer) override;
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetSoftwareVersion(uint16_t & softwareVer) override;
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
@@ -159,7 +159,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uin
 }
 
 template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint16_t & softwareVer)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint32_t & softwareVer)
 {
     softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     return CHIP_NO_ERROR;
