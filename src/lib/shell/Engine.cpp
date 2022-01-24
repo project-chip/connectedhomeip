@@ -127,6 +127,7 @@ void Engine::RegisterDefaultCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     RegisterOtaCommands();
 #endif
+    RegisterCaseCommands();
 }
 
 } // namespace Shell

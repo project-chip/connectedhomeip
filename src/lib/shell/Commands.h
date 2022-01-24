@@ -86,5 +86,11 @@ void RegisterNFCCommands();
  */
 void RegisterDnsCommands();
 
+/**
+ * This function registers the CaseSession commands.
+ *
+ */
+void RegisterCaseCommands();
+
 } // namespace Shell
 } // namespace chip
