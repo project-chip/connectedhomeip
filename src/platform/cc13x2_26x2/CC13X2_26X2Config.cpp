@@ -87,14 +87,12 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = 
                                                                              .itemID   = 0x001b } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                             .itemID   = 0x001c } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ActiveLocale       = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                              .itemID   = 0x001d } };
 
 /* Internal for the KVS interface. */
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_key   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                         .itemID   = 0x001e } };
+                                                                         .itemID   = 0x001d } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_value = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x001f } };
+                                                                           .itemID   = 0x001e } };
 
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
