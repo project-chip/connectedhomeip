@@ -18,6 +18,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
+#include <vector>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -37,8 +38,8 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {{>encode_value target="cppValue" source="value" cluster=(asUpperCamelCase parent.name) depth=0}}
 
@@ -65,9 +66,6 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     }
     {{/if}}
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(), [](chip::JniByteArray * jniByteArray){ chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(), [](chip::JniUtfString * jniString){ chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();

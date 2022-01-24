@@ -24,172 +24,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class ChipStructs {
-
-  public static class ScenesClusterSceneExtensionFieldSet {
-    public Long clusterId;
-    public Integer length;
-    public Integer value;
-
-    public ScenesClusterSceneExtensionFieldSet(Long clusterId, Integer length, Integer value) {
-      this.clusterId = clusterId;
-      this.length = length;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ScenesClusterSceneExtensionFieldSet {\n");
-      output.append("\tclusterId: ");
-      output.append(clusterId);
-      output.append("\n");
-      output.append("\tlength: ");
-      output.append(length);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class PowerProfileClusterPowerProfileRecord {
-    public Integer powerProfileId;
-    public Integer energyPhaseId;
-    public Boolean powerProfileRemoteControl;
-    public Integer powerProfileState;
-
-    public PowerProfileClusterPowerProfileRecord(
-        Integer powerProfileId,
-        Integer energyPhaseId,
-        Boolean powerProfileRemoteControl,
-        Integer powerProfileState) {
-      this.powerProfileId = powerProfileId;
-      this.energyPhaseId = energyPhaseId;
-      this.powerProfileRemoteControl = powerProfileRemoteControl;
-      this.powerProfileState = powerProfileState;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PowerProfileClusterPowerProfileRecord {\n");
-      output.append("\tpowerProfileId: ");
-      output.append(powerProfileId);
-      output.append("\n");
-      output.append("\tenergyPhaseId: ");
-      output.append(energyPhaseId);
-      output.append("\n");
-      output.append("\tpowerProfileRemoteControl: ");
-      output.append(powerProfileRemoteControl);
-      output.append("\n");
-      output.append("\tpowerProfileState: ");
-      output.append(powerProfileState);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class PowerProfileClusterScheduledPhase {
-    public Integer energyPhaseId;
-    public Integer scheduledTime;
-
-    public PowerProfileClusterScheduledPhase(Integer energyPhaseId, Integer scheduledTime) {
-      this.energyPhaseId = energyPhaseId;
-      this.scheduledTime = scheduledTime;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PowerProfileClusterScheduledPhase {\n");
-      output.append("\tenergyPhaseId: ");
-      output.append(energyPhaseId);
-      output.append("\n");
-      output.append("\tscheduledTime: ");
-      output.append(scheduledTime);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class PowerProfileClusterTransferredPhase {
-    public Integer energyPhaseId;
-    public Integer macroPhaseId;
-    public Integer expectedDuration;
-    public Integer peakPower;
-    public Integer energy;
-    public Integer maxActivationDelay;
-
-    public PowerProfileClusterTransferredPhase(
-        Integer energyPhaseId,
-        Integer macroPhaseId,
-        Integer expectedDuration,
-        Integer peakPower,
-        Integer energy,
-        Integer maxActivationDelay) {
-      this.energyPhaseId = energyPhaseId;
-      this.macroPhaseId = macroPhaseId;
-      this.expectedDuration = expectedDuration;
-      this.peakPower = peakPower;
-      this.energy = energy;
-      this.maxActivationDelay = maxActivationDelay;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PowerProfileClusterTransferredPhase {\n");
-      output.append("\tenergyPhaseId: ");
-      output.append(energyPhaseId);
-      output.append("\n");
-      output.append("\tmacroPhaseId: ");
-      output.append(macroPhaseId);
-      output.append("\n");
-      output.append("\texpectedDuration: ");
-      output.append(expectedDuration);
-      output.append("\n");
-      output.append("\tpeakPower: ");
-      output.append(peakPower);
-      output.append("\n");
-      output.append("\tenergy: ");
-      output.append(energy);
-      output.append("\n");
-      output.append("\tmaxActivationDelay: ");
-      output.append(maxActivationDelay);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class DescriptorClusterDeviceType {
-    public Long type;
-    public Integer revision;
-
-    public DescriptorClusterDeviceType(Long type, Integer revision) {
-      this.type = type;
-      this.revision = revision;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DescriptorClusterDeviceType {\n");
-      output.append("\ttype: ");
-      output.append(type);
-      output.append("\n");
-      output.append("\trevision: ");
-      output.append(revision);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class AccessControlClusterTarget {
     public @Nullable Long cluster;
     public @Nullable Integer endpoint;
@@ -288,6 +122,111 @@ public class ChipStructs {
     }
   }
 
+  public static class ApplicationBasicClusterApplicationBasicApplication {
+    public Integer catalogVendorId;
+    public String applicationId;
+
+    public ApplicationBasicClusterApplicationBasicApplication(
+        Integer catalogVendorId, String applicationId) {
+      this.catalogVendorId = catalogVendorId;
+      this.applicationId = applicationId;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ApplicationBasicClusterApplicationBasicApplication {\n");
+      output.append("\tcatalogVendorId: ");
+      output.append(catalogVendorId);
+      output.append("\n");
+      output.append("\tapplicationId: ");
+      output.append(applicationId);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ApplicationLauncherClusterApplicationLauncherApplication {
+    public Integer catalogVendorId;
+    public String applicationId;
+
+    public ApplicationLauncherClusterApplicationLauncherApplication(
+        Integer catalogVendorId, String applicationId) {
+      this.catalogVendorId = catalogVendorId;
+      this.applicationId = applicationId;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ApplicationLauncherClusterApplicationLauncherApplication {\n");
+      output.append("\tcatalogVendorId: ");
+      output.append(catalogVendorId);
+      output.append("\n");
+      output.append("\tapplicationId: ");
+      output.append(applicationId);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ApplicationLauncherClusterApplicationEP {
+    public ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application;
+    public String endpoint;
+
+    public ApplicationLauncherClusterApplicationEP(
+        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        String endpoint) {
+      this.application = application;
+      this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ApplicationLauncherClusterApplicationEP {\n");
+      output.append("\tapplication: ");
+      output.append(application);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class AudioOutputClusterOutputInfo {
+    public Integer index;
+    public Integer outputType;
+    public String name;
+
+    public AudioOutputClusterOutputInfo(Integer index, Integer outputType, String name) {
+      this.index = index;
+      this.outputType = outputType;
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("AudioOutputClusterOutputInfo {\n");
+      output.append("\tindex: ");
+      output.append(index);
+      output.append("\n");
+      output.append("\toutputType: ");
+      output.append(outputType);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedActionsClusterActionStruct {
     public Integer actionID;
     public String name;
@@ -373,947 +312,6 @@ public class ChipStructs {
     }
   }
 
-  public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
-    public Integer fabricIndex;
-    public Long providerNodeID;
-    public Integer endpoint;
-
-    public OtaSoftwareUpdateRequestorClusterProviderLocation(
-        Integer fabricIndex, Long providerNodeID, Integer endpoint) {
-      this.fabricIndex = fabricIndex;
-      this.providerNodeID = providerNodeID;
-      this.endpoint = endpoint;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tproviderNodeID: ");
-      output.append(providerNodeID);
-      output.append("\n");
-      output.append("\tendpoint: ");
-      output.append(endpoint);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class GeneralCommissioningClusterBasicCommissioningInfoType {
-    public Long failSafeExpiryLengthMs;
-
-    public GeneralCommissioningClusterBasicCommissioningInfoType(Long failSafeExpiryLengthMs) {
-      this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GeneralCommissioningClusterBasicCommissioningInfoType {\n");
-      output.append("\tfailSafeExpiryLengthMs: ");
-      output.append(failSafeExpiryLengthMs);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class NetworkCommissioningClusterNetworkInfo {
-    public byte[] networkID;
-    public Boolean connected;
-
-    public NetworkCommissioningClusterNetworkInfo(byte[] networkID, Boolean connected) {
-      this.networkID = networkID;
-      this.connected = connected;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("NetworkCommissioningClusterNetworkInfo {\n");
-      output.append("\tnetworkID: ");
-      output.append(Arrays.toString(networkID));
-      output.append("\n");
-      output.append("\tconnected: ");
-      output.append(connected);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class NetworkCommissioningClusterThreadInterfaceScanResult {
-    public Long panId;
-    public Long extendedPanId;
-    public String networkName;
-    public Integer channel;
-    public Integer version;
-    public Long extendedAddress;
-    public Integer rssi;
-    public Integer lqi;
-
-    public NetworkCommissioningClusterThreadInterfaceScanResult(
-        Long panId,
-        Long extendedPanId,
-        String networkName,
-        Integer channel,
-        Integer version,
-        Long extendedAddress,
-        Integer rssi,
-        Integer lqi) {
-      this.panId = panId;
-      this.extendedPanId = extendedPanId;
-      this.networkName = networkName;
-      this.channel = channel;
-      this.version = version;
-      this.extendedAddress = extendedAddress;
-      this.rssi = rssi;
-      this.lqi = lqi;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("NetworkCommissioningClusterThreadInterfaceScanResult {\n");
-      output.append("\tpanId: ");
-      output.append(panId);
-      output.append("\n");
-      output.append("\textendedPanId: ");
-      output.append(extendedPanId);
-      output.append("\n");
-      output.append("\tnetworkName: ");
-      output.append(networkName);
-      output.append("\n");
-      output.append("\tchannel: ");
-      output.append(channel);
-      output.append("\n");
-      output.append("\tversion: ");
-      output.append(version);
-      output.append("\n");
-      output.append("\textendedAddress: ");
-      output.append(extendedAddress);
-      output.append("\n");
-      output.append("\trssi: ");
-      output.append(rssi);
-      output.append("\n");
-      output.append("\tlqi: ");
-      output.append(lqi);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class NetworkCommissioningClusterWiFiInterfaceScanResult {
-    public Integer security;
-    public byte[] ssid;
-    public byte[] bssid;
-    public Integer channel;
-    public Integer wiFiBand;
-    public Integer rssi;
-
-    public NetworkCommissioningClusterWiFiInterfaceScanResult(
-        Integer security,
-        byte[] ssid,
-        byte[] bssid,
-        Integer channel,
-        Integer wiFiBand,
-        Integer rssi) {
-      this.security = security;
-      this.ssid = ssid;
-      this.bssid = bssid;
-      this.channel = channel;
-      this.wiFiBand = wiFiBand;
-      this.rssi = rssi;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("NetworkCommissioningClusterWiFiInterfaceScanResult {\n");
-      output.append("\tsecurity: ");
-      output.append(security);
-      output.append("\n");
-      output.append("\tssid: ");
-      output.append(Arrays.toString(ssid));
-      output.append("\n");
-      output.append("\tbssid: ");
-      output.append(Arrays.toString(bssid));
-      output.append("\n");
-      output.append("\tchannel: ");
-      output.append(channel);
-      output.append("\n");
-      output.append("\twiFiBand: ");
-      output.append(wiFiBand);
-      output.append("\n");
-      output.append("\trssi: ");
-      output.append(rssi);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class GeneralDiagnosticsClusterNetworkInterfaceType {
-    public String name;
-    public Boolean fabricConnected;
-    public Boolean offPremiseServicesReachableIPv4;
-    public Boolean offPremiseServicesReachableIPv6;
-    public byte[] hardwareAddress;
-    public Integer type;
-
-    public GeneralDiagnosticsClusterNetworkInterfaceType(
-        String name,
-        Boolean fabricConnected,
-        Boolean offPremiseServicesReachableIPv4,
-        Boolean offPremiseServicesReachableIPv6,
-        byte[] hardwareAddress,
-        Integer type) {
-      this.name = name;
-      this.fabricConnected = fabricConnected;
-      this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
-      this.offPremiseServicesReachableIPv6 = offPremiseServicesReachableIPv6;
-      this.hardwareAddress = hardwareAddress;
-      this.type = type;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterNetworkInterfaceType {\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("\tfabricConnected: ");
-      output.append(fabricConnected);
-      output.append("\n");
-      output.append("\toffPremiseServicesReachableIPv4: ");
-      output.append(offPremiseServicesReachableIPv4);
-      output.append("\n");
-      output.append("\toffPremiseServicesReachableIPv6: ");
-      output.append(offPremiseServicesReachableIPv6);
-      output.append("\n");
-      output.append("\thardwareAddress: ");
-      output.append(Arrays.toString(hardwareAddress));
-      output.append("\n");
-      output.append("\ttype: ");
-      output.append(type);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class SoftwareDiagnosticsClusterSoftwareFault {
-    public Long id;
-    public String name;
-    public byte[] faultRecording;
-
-    public SoftwareDiagnosticsClusterSoftwareFault(Long id, String name, byte[] faultRecording) {
-      this.id = id;
-      this.name = name;
-      this.faultRecording = faultRecording;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterSoftwareFault {\n");
-      output.append("\tid: ");
-      output.append(id);
-      output.append("\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("\tfaultRecording: ");
-      output.append(Arrays.toString(faultRecording));
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class SoftwareDiagnosticsClusterThreadMetrics {
-    public Long id;
-    public String name;
-    public Long stackFreeCurrent;
-    public Long stackFreeMinimum;
-    public Long stackSize;
-
-    public SoftwareDiagnosticsClusterThreadMetrics(
-        Long id, String name, Long stackFreeCurrent, Long stackFreeMinimum, Long stackSize) {
-      this.id = id;
-      this.name = name;
-      this.stackFreeCurrent = stackFreeCurrent;
-      this.stackFreeMinimum = stackFreeMinimum;
-      this.stackSize = stackSize;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterThreadMetrics {\n");
-      output.append("\tid: ");
-      output.append(id);
-      output.append("\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("\tstackFreeCurrent: ");
-      output.append(stackFreeCurrent);
-      output.append("\n");
-      output.append("\tstackFreeMinimum: ");
-      output.append(stackFreeMinimum);
-      output.append("\n");
-      output.append("\tstackSize: ");
-      output.append(stackSize);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class ThreadNetworkDiagnosticsClusterNeighborTable {
-    public Long extAddress;
-    public Long age;
-    public Integer rloc16;
-    public Long linkFrameCounter;
-    public Long mleFrameCounter;
-    public Integer lqi;
-    public Integer averageRssi;
-    public Integer lastRssi;
-    public Integer frameErrorRate;
-    public Integer messageErrorRate;
-    public Boolean rxOnWhenIdle;
-    public Boolean fullThreadDevice;
-    public Boolean fullNetworkData;
-    public Boolean isChild;
-
-    public ThreadNetworkDiagnosticsClusterNeighborTable(
-        Long extAddress,
-        Long age,
-        Integer rloc16,
-        Long linkFrameCounter,
-        Long mleFrameCounter,
-        Integer lqi,
-        Integer averageRssi,
-        Integer lastRssi,
-        Integer frameErrorRate,
-        Integer messageErrorRate,
-        Boolean rxOnWhenIdle,
-        Boolean fullThreadDevice,
-        Boolean fullNetworkData,
-        Boolean isChild) {
-      this.extAddress = extAddress;
-      this.age = age;
-      this.rloc16 = rloc16;
-      this.linkFrameCounter = linkFrameCounter;
-      this.mleFrameCounter = mleFrameCounter;
-      this.lqi = lqi;
-      this.averageRssi = averageRssi;
-      this.lastRssi = lastRssi;
-      this.frameErrorRate = frameErrorRate;
-      this.messageErrorRate = messageErrorRate;
-      this.rxOnWhenIdle = rxOnWhenIdle;
-      this.fullThreadDevice = fullThreadDevice;
-      this.fullNetworkData = fullNetworkData;
-      this.isChild = isChild;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterNeighborTable {\n");
-      output.append("\textAddress: ");
-      output.append(extAddress);
-      output.append("\n");
-      output.append("\tage: ");
-      output.append(age);
-      output.append("\n");
-      output.append("\trloc16: ");
-      output.append(rloc16);
-      output.append("\n");
-      output.append("\tlinkFrameCounter: ");
-      output.append(linkFrameCounter);
-      output.append("\n");
-      output.append("\tmleFrameCounter: ");
-      output.append(mleFrameCounter);
-      output.append("\n");
-      output.append("\tlqi: ");
-      output.append(lqi);
-      output.append("\n");
-      output.append("\taverageRssi: ");
-      output.append(averageRssi);
-      output.append("\n");
-      output.append("\tlastRssi: ");
-      output.append(lastRssi);
-      output.append("\n");
-      output.append("\tframeErrorRate: ");
-      output.append(frameErrorRate);
-      output.append("\n");
-      output.append("\tmessageErrorRate: ");
-      output.append(messageErrorRate);
-      output.append("\n");
-      output.append("\trxOnWhenIdle: ");
-      output.append(rxOnWhenIdle);
-      output.append("\n");
-      output.append("\tfullThreadDevice: ");
-      output.append(fullThreadDevice);
-      output.append("\n");
-      output.append("\tfullNetworkData: ");
-      output.append(fullNetworkData);
-      output.append("\n");
-      output.append("\tisChild: ");
-      output.append(isChild);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
-    public Boolean activeTimestampPresent;
-    public Boolean pendingTimestampPresent;
-    public Boolean masterKeyPresent;
-    public Boolean networkNamePresent;
-    public Boolean extendedPanIdPresent;
-    public Boolean meshLocalPrefixPresent;
-    public Boolean delayPresent;
-    public Boolean panIdPresent;
-    public Boolean channelPresent;
-    public Boolean pskcPresent;
-    public Boolean securityPolicyPresent;
-    public Boolean channelMaskPresent;
-
-    public ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
-        Boolean activeTimestampPresent,
-        Boolean pendingTimestampPresent,
-        Boolean masterKeyPresent,
-        Boolean networkNamePresent,
-        Boolean extendedPanIdPresent,
-        Boolean meshLocalPrefixPresent,
-        Boolean delayPresent,
-        Boolean panIdPresent,
-        Boolean channelPresent,
-        Boolean pskcPresent,
-        Boolean securityPolicyPresent,
-        Boolean channelMaskPresent) {
-      this.activeTimestampPresent = activeTimestampPresent;
-      this.pendingTimestampPresent = pendingTimestampPresent;
-      this.masterKeyPresent = masterKeyPresent;
-      this.networkNamePresent = networkNamePresent;
-      this.extendedPanIdPresent = extendedPanIdPresent;
-      this.meshLocalPrefixPresent = meshLocalPrefixPresent;
-      this.delayPresent = delayPresent;
-      this.panIdPresent = panIdPresent;
-      this.channelPresent = channelPresent;
-      this.pskcPresent = pskcPresent;
-      this.securityPolicyPresent = securityPolicyPresent;
-      this.channelMaskPresent = channelMaskPresent;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {\n");
-      output.append("\tactiveTimestampPresent: ");
-      output.append(activeTimestampPresent);
-      output.append("\n");
-      output.append("\tpendingTimestampPresent: ");
-      output.append(pendingTimestampPresent);
-      output.append("\n");
-      output.append("\tmasterKeyPresent: ");
-      output.append(masterKeyPresent);
-      output.append("\n");
-      output.append("\tnetworkNamePresent: ");
-      output.append(networkNamePresent);
-      output.append("\n");
-      output.append("\textendedPanIdPresent: ");
-      output.append(extendedPanIdPresent);
-      output.append("\n");
-      output.append("\tmeshLocalPrefixPresent: ");
-      output.append(meshLocalPrefixPresent);
-      output.append("\n");
-      output.append("\tdelayPresent: ");
-      output.append(delayPresent);
-      output.append("\n");
-      output.append("\tpanIdPresent: ");
-      output.append(panIdPresent);
-      output.append("\n");
-      output.append("\tchannelPresent: ");
-      output.append(channelPresent);
-      output.append("\n");
-      output.append("\tpskcPresent: ");
-      output.append(pskcPresent);
-      output.append("\n");
-      output.append("\tsecurityPolicyPresent: ");
-      output.append(securityPolicyPresent);
-      output.append("\n");
-      output.append("\tchannelMaskPresent: ");
-      output.append(channelMaskPresent);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class ThreadNetworkDiagnosticsClusterRouteTable {
-    public Long extAddress;
-    public Integer rloc16;
-    public Integer routerId;
-    public Integer nextHop;
-    public Integer pathCost;
-    public Integer LQIIn;
-    public Integer LQIOut;
-    public Integer age;
-    public Boolean allocated;
-    public Boolean linkEstablished;
-
-    public ThreadNetworkDiagnosticsClusterRouteTable(
-        Long extAddress,
-        Integer rloc16,
-        Integer routerId,
-        Integer nextHop,
-        Integer pathCost,
-        Integer LQIIn,
-        Integer LQIOut,
-        Integer age,
-        Boolean allocated,
-        Boolean linkEstablished) {
-      this.extAddress = extAddress;
-      this.rloc16 = rloc16;
-      this.routerId = routerId;
-      this.nextHop = nextHop;
-      this.pathCost = pathCost;
-      this.LQIIn = LQIIn;
-      this.LQIOut = LQIOut;
-      this.age = age;
-      this.allocated = allocated;
-      this.linkEstablished = linkEstablished;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterRouteTable {\n");
-      output.append("\textAddress: ");
-      output.append(extAddress);
-      output.append("\n");
-      output.append("\trloc16: ");
-      output.append(rloc16);
-      output.append("\n");
-      output.append("\trouterId: ");
-      output.append(routerId);
-      output.append("\n");
-      output.append("\tnextHop: ");
-      output.append(nextHop);
-      output.append("\n");
-      output.append("\tpathCost: ");
-      output.append(pathCost);
-      output.append("\n");
-      output.append("\tLQIIn: ");
-      output.append(LQIIn);
-      output.append("\n");
-      output.append("\tLQIOut: ");
-      output.append(LQIOut);
-      output.append("\n");
-      output.append("\tage: ");
-      output.append(age);
-      output.append("\n");
-      output.append("\tallocated: ");
-      output.append(allocated);
-      output.append("\n");
-      output.append("\tlinkEstablished: ");
-      output.append(linkEstablished);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class ThreadNetworkDiagnosticsClusterSecurityPolicy {
-    public Integer rotationTime;
-    public Integer flags;
-
-    public ThreadNetworkDiagnosticsClusterSecurityPolicy(Integer rotationTime, Integer flags) {
-      this.rotationTime = rotationTime;
-      this.flags = flags;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n");
-      output.append("\trotationTime: ");
-      output.append(rotationTime);
-      output.append("\n");
-      output.append("\tflags: ");
-      output.append(flags);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class OperationalCredentialsClusterFabricDescriptor {
-    public Integer fabricIndex;
-    public byte[] rootPublicKey;
-    public Integer vendorId;
-    public Long fabricId;
-    public Long nodeId;
-    public String label;
-
-    public OperationalCredentialsClusterFabricDescriptor(
-        Integer fabricIndex,
-        byte[] rootPublicKey,
-        Integer vendorId,
-        Long fabricId,
-        Long nodeId,
-        String label) {
-      this.fabricIndex = fabricIndex;
-      this.rootPublicKey = rootPublicKey;
-      this.vendorId = vendorId;
-      this.fabricId = fabricId;
-      this.nodeId = nodeId;
-      this.label = label;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("OperationalCredentialsClusterFabricDescriptor {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\trootPublicKey: ");
-      output.append(Arrays.toString(rootPublicKey));
-      output.append("\n");
-      output.append("\tvendorId: ");
-      output.append(vendorId);
-      output.append("\n");
-      output.append("\tfabricId: ");
-      output.append(fabricId);
-      output.append("\n");
-      output.append("\tnodeId: ");
-      output.append(nodeId);
-      output.append("\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class OperationalCredentialsClusterNOCStruct {
-    public Integer fabricIndex;
-    public byte[] noc;
-    public byte[] icac;
-
-    public OperationalCredentialsClusterNOCStruct(Integer fabricIndex, byte[] noc, byte[] icac) {
-      this.fabricIndex = fabricIndex;
-      this.noc = noc;
-      this.icac = icac;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("OperationalCredentialsClusterNOCStruct {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tnoc: ");
-      output.append(Arrays.toString(noc));
-      output.append("\n");
-      output.append("\ticac: ");
-      output.append(Arrays.toString(icac));
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class GroupKeyManagementClusterGroupInfo {
-    public Integer fabricIndex;
-    public Integer groupId;
-    public ArrayList<Object> endpoints;
-    public String groupName;
-
-    public GroupKeyManagementClusterGroupInfo(
-        Integer fabricIndex, Integer groupId, ArrayList<Object> endpoints, String groupName) {
-      this.fabricIndex = fabricIndex;
-      this.groupId = groupId;
-      this.endpoints = endpoints;
-      this.groupName = groupName;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupInfo {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tgroupId: ");
-      output.append(groupId);
-      output.append("\n");
-      output.append("\tendpoints: ");
-      output.append(endpoints);
-      output.append("\n");
-      output.append("\tgroupName: ");
-      output.append(groupName);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class GroupKeyManagementClusterGroupKey {
-    public Integer fabricIndex;
-    public Integer groupId;
-    public Integer groupKeySetID;
-
-    public GroupKeyManagementClusterGroupKey(
-        Integer fabricIndex, Integer groupId, Integer groupKeySetID) {
-      this.fabricIndex = fabricIndex;
-      this.groupId = groupId;
-      this.groupKeySetID = groupKeySetID;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupKey {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tgroupId: ");
-      output.append(groupId);
-      output.append("\n");
-      output.append("\tgroupKeySetID: ");
-      output.append(groupKeySetID);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class GroupKeyManagementClusterGroupKeySet {
-    public Integer groupKeySetID;
-    public Integer securityPolicy;
-    public byte[] epochKey0;
-    public Long epochStartTime0;
-    public byte[] epochKey1;
-    public Long epochStartTime1;
-    public byte[] epochKey2;
-    public Long epochStartTime2;
-
-    public GroupKeyManagementClusterGroupKeySet(
-        Integer groupKeySetID,
-        Integer securityPolicy,
-        byte[] epochKey0,
-        Long epochStartTime0,
-        byte[] epochKey1,
-        Long epochStartTime1,
-        byte[] epochKey2,
-        Long epochStartTime2) {
-      this.groupKeySetID = groupKeySetID;
-      this.securityPolicy = securityPolicy;
-      this.epochKey0 = epochKey0;
-      this.epochStartTime0 = epochStartTime0;
-      this.epochKey1 = epochKey1;
-      this.epochStartTime1 = epochStartTime1;
-      this.epochKey2 = epochKey2;
-      this.epochStartTime2 = epochStartTime2;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupKeySet {\n");
-      output.append("\tgroupKeySetID: ");
-      output.append(groupKeySetID);
-      output.append("\n");
-      output.append("\tsecurityPolicy: ");
-      output.append(securityPolicy);
-      output.append("\n");
-      output.append("\tepochKey0: ");
-      output.append(Arrays.toString(epochKey0));
-      output.append("\n");
-      output.append("\tepochStartTime0: ");
-      output.append(epochStartTime0);
-      output.append("\n");
-      output.append("\tepochKey1: ");
-      output.append(Arrays.toString(epochKey1));
-      output.append("\n");
-      output.append("\tepochStartTime1: ");
-      output.append(epochStartTime1);
-      output.append("\n");
-      output.append("\tepochKey2: ");
-      output.append(Arrays.toString(epochKey2));
-      output.append("\n");
-      output.append("\tepochStartTime2: ");
-      output.append(epochStartTime2);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class FixedLabelClusterLabelStruct {
-    public String label;
-    public String value;
-
-    public FixedLabelClusterLabelStruct(String label, String value) {
-      this.label = label;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("FixedLabelClusterLabelStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class UserLabelClusterLabelStruct {
-    public String label;
-    public String value;
-
-    public UserLabelClusterLabelStruct(String label, String value) {
-      this.label = label;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("UserLabelClusterLabelStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class ModeSelectClusterModeOptionStruct {
-    public String label;
-    public Integer mode;
-    public Long semanticTag;
-
-    public ModeSelectClusterModeOptionStruct(String label, Integer mode, Long semanticTag) {
-      this.label = label;
-      this.mode = mode;
-      this.semanticTag = semanticTag;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterModeOptionStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTag: ");
-      output.append(semanticTag);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class ModeSelectClusterSemanticTag {
-    public Integer mfgCode;
-    public Integer value;
-
-    public ModeSelectClusterSemanticTag(Integer mfgCode, Integer value) {
-      this.mfgCode = mfgCode;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterSemanticTag {\n");
-      output.append("\tmfgCode: ");
-      output.append(mfgCode);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class DoorLockClusterDlCredential {
-    public Integer credentialType;
-    public Integer credentialIndex;
-
-    public DoorLockClusterDlCredential(Integer credentialType, Integer credentialIndex) {
-      this.credentialType = credentialType;
-      this.credentialIndex = credentialIndex;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterDlCredential {\n");
-      output.append("\tcredentialType: ");
-      output.append(credentialType);
-      output.append("\n");
-      output.append("\tcredentialIndex: ");
-      output.append(credentialIndex);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class IasAceClusterIasAceZoneStatusResult {
-    public Integer zoneId;
-    public Integer zoneStatus;
-
-    public IasAceClusterIasAceZoneStatusResult(Integer zoneId, Integer zoneStatus) {
-      this.zoneId = zoneId;
-      this.zoneStatus = zoneStatus;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("IasAceClusterIasAceZoneStatusResult {\n");
-      output.append("\tzoneId: ");
-      output.append(zoneId);
-      output.append("\n");
-      output.append("\tzoneStatus: ");
-      output.append(zoneStatus);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class ChannelClusterChannelInfo {
     public Integer majorNumber;
     public Integer minorNumber;
@@ -1387,89 +385,6 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tlineupInfoType: ");
       output.append(lineupInfoType);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class TargetNavigatorClusterTargetInfo {
-    public Integer identifier;
-    public String name;
-
-    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
-      this.identifier = identifier;
-      this.name = name;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("TargetNavigatorClusterTargetInfo {\n");
-      output.append("\tidentifier: ");
-      output.append(identifier);
-      output.append("\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class MediaPlaybackClusterPlaybackPosition {
-    public Long updatedAt;
-    public Long position;
-
-    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, Long position) {
-      this.updatedAt = updatedAt;
-      this.position = position;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("MediaPlaybackClusterPlaybackPosition {\n");
-      output.append("\tupdatedAt: ");
-      output.append(updatedAt);
-      output.append("\n");
-      output.append("\tposition: ");
-      output.append(position);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class MediaInputClusterInputInfo {
-    public Integer index;
-    public Integer inputType;
-    public String name;
-    public String description;
-
-    public MediaInputClusterInputInfo(
-        Integer index, Integer inputType, String name, String description) {
-      this.index = index;
-      this.inputType = inputType;
-      this.name = name;
-      this.description = description;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("MediaInputClusterInputInfo {\n");
-      output.append("\tindex: ");
-      output.append(index);
-      output.append("\n");
-      output.append("\tinputType: ");
-      output.append(inputType);
-      output.append("\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("\tdescription: ");
-      output.append(description);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1661,77 +576,543 @@ public class ChipStructs {
     }
   }
 
-  public static class AudioOutputClusterOutputInfo {
-    public Integer index;
-    public Integer outputType;
-    public String name;
+  public static class DescriptorClusterDeviceType {
+    public Long type;
+    public Integer revision;
 
-    public AudioOutputClusterOutputInfo(Integer index, Integer outputType, String name) {
-      this.index = index;
-      this.outputType = outputType;
-      this.name = name;
+    public DescriptorClusterDeviceType(Long type, Integer revision) {
+      this.type = type;
+      this.revision = revision;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AudioOutputClusterOutputInfo {\n");
+      output.append("DescriptorClusterDeviceType {\n");
+      output.append("\ttype: ");
+      output.append(type);
+      output.append("\n");
+      output.append("\trevision: ");
+      output.append(revision);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class DoorLockClusterDlCredential {
+    public Integer credentialType;
+    public Integer credentialIndex;
+
+    public DoorLockClusterDlCredential(Integer credentialType, Integer credentialIndex) {
+      this.credentialType = credentialType;
+      this.credentialIndex = credentialIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("DoorLockClusterDlCredential {\n");
+      output.append("\tcredentialType: ");
+      output.append(credentialType);
+      output.append("\n");
+      output.append("\tcredentialIndex: ");
+      output.append(credentialIndex);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class FixedLabelClusterLabelStruct {
+    public String label;
+    public String value;
+
+    public FixedLabelClusterLabelStruct(String label, String value) {
+      this.label = label;
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("FixedLabelClusterLabelStruct {\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("\tvalue: ");
+      output.append(value);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class GeneralCommissioningClusterBasicCommissioningInfoType {
+    public Long failSafeExpiryLengthMs;
+
+    public GeneralCommissioningClusterBasicCommissioningInfoType(Long failSafeExpiryLengthMs) {
+      this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("GeneralCommissioningClusterBasicCommissioningInfoType {\n");
+      output.append("\tfailSafeExpiryLengthMs: ");
+      output.append(failSafeExpiryLengthMs);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class GeneralDiagnosticsClusterNetworkInterfaceType {
+    public String name;
+    public Boolean fabricConnected;
+    public Boolean offPremiseServicesReachableIPv4;
+    public Boolean offPremiseServicesReachableIPv6;
+    public byte[] hardwareAddress;
+    public Integer type;
+
+    public GeneralDiagnosticsClusterNetworkInterfaceType(
+        String name,
+        Boolean fabricConnected,
+        Boolean offPremiseServicesReachableIPv4,
+        Boolean offPremiseServicesReachableIPv6,
+        byte[] hardwareAddress,
+        Integer type) {
+      this.name = name;
+      this.fabricConnected = fabricConnected;
+      this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
+      this.offPremiseServicesReachableIPv6 = offPremiseServicesReachableIPv6;
+      this.hardwareAddress = hardwareAddress;
+      this.type = type;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("GeneralDiagnosticsClusterNetworkInterfaceType {\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("\tfabricConnected: ");
+      output.append(fabricConnected);
+      output.append("\n");
+      output.append("\toffPremiseServicesReachableIPv4: ");
+      output.append(offPremiseServicesReachableIPv4);
+      output.append("\n");
+      output.append("\toffPremiseServicesReachableIPv6: ");
+      output.append(offPremiseServicesReachableIPv6);
+      output.append("\n");
+      output.append("\thardwareAddress: ");
+      output.append(Arrays.toString(hardwareAddress));
+      output.append("\n");
+      output.append("\ttype: ");
+      output.append(type);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class GroupKeyManagementClusterGroupInfo {
+    public Integer fabricIndex;
+    public Integer groupId;
+    public ArrayList<Object> endpoints;
+    public String groupName;
+
+    public GroupKeyManagementClusterGroupInfo(
+        Integer fabricIndex, Integer groupId, ArrayList<Object> endpoints, String groupName) {
+      this.fabricIndex = fabricIndex;
+      this.groupId = groupId;
+      this.endpoints = endpoints;
+      this.groupName = groupName;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("GroupKeyManagementClusterGroupInfo {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tgroupId: ");
+      output.append(groupId);
+      output.append("\n");
+      output.append("\tendpoints: ");
+      output.append(endpoints);
+      output.append("\n");
+      output.append("\tgroupName: ");
+      output.append(groupName);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class GroupKeyManagementClusterGroupKey {
+    public Integer fabricIndex;
+    public Integer groupId;
+    public Integer groupKeySetID;
+
+    public GroupKeyManagementClusterGroupKey(
+        Integer fabricIndex, Integer groupId, Integer groupKeySetID) {
+      this.fabricIndex = fabricIndex;
+      this.groupId = groupId;
+      this.groupKeySetID = groupKeySetID;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("GroupKeyManagementClusterGroupKey {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tgroupId: ");
+      output.append(groupId);
+      output.append("\n");
+      output.append("\tgroupKeySetID: ");
+      output.append(groupKeySetID);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class GroupKeyManagementClusterGroupKeySet {
+    public Integer groupKeySetID;
+    public Integer securityPolicy;
+    public byte[] epochKey0;
+    public Long epochStartTime0;
+    public byte[] epochKey1;
+    public Long epochStartTime1;
+    public byte[] epochKey2;
+    public Long epochStartTime2;
+
+    public GroupKeyManagementClusterGroupKeySet(
+        Integer groupKeySetID,
+        Integer securityPolicy,
+        byte[] epochKey0,
+        Long epochStartTime0,
+        byte[] epochKey1,
+        Long epochStartTime1,
+        byte[] epochKey2,
+        Long epochStartTime2) {
+      this.groupKeySetID = groupKeySetID;
+      this.securityPolicy = securityPolicy;
+      this.epochKey0 = epochKey0;
+      this.epochStartTime0 = epochStartTime0;
+      this.epochKey1 = epochKey1;
+      this.epochStartTime1 = epochStartTime1;
+      this.epochKey2 = epochKey2;
+      this.epochStartTime2 = epochStartTime2;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("GroupKeyManagementClusterGroupKeySet {\n");
+      output.append("\tgroupKeySetID: ");
+      output.append(groupKeySetID);
+      output.append("\n");
+      output.append("\tsecurityPolicy: ");
+      output.append(securityPolicy);
+      output.append("\n");
+      output.append("\tepochKey0: ");
+      output.append(Arrays.toString(epochKey0));
+      output.append("\n");
+      output.append("\tepochStartTime0: ");
+      output.append(epochStartTime0);
+      output.append("\n");
+      output.append("\tepochKey1: ");
+      output.append(Arrays.toString(epochKey1));
+      output.append("\n");
+      output.append("\tepochStartTime1: ");
+      output.append(epochStartTime1);
+      output.append("\n");
+      output.append("\tepochKey2: ");
+      output.append(Arrays.toString(epochKey2));
+      output.append("\n");
+      output.append("\tepochStartTime2: ");
+      output.append(epochStartTime2);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class MediaInputClusterInputInfo {
+    public Integer index;
+    public Integer inputType;
+    public String name;
+    public String description;
+
+    public MediaInputClusterInputInfo(
+        Integer index, Integer inputType, String name, String description) {
+      this.index = index;
+      this.inputType = inputType;
+      this.name = name;
+      this.description = description;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("MediaInputClusterInputInfo {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");
-      output.append("\toutputType: ");
-      output.append(outputType);
+      output.append("\tinputType: ");
+      output.append(inputType);
       output.append("\n");
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
+      output.append("\tdescription: ");
+      output.append(description);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationLauncherApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class MediaPlaybackClusterPlaybackPosition {
+    public Long updatedAt;
+    public Long position;
 
-    public ApplicationLauncherClusterApplicationLauncherApplication(
-        Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, Long position) {
+      this.updatedAt = updatedAt;
+      this.position = position;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationLauncherApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("MediaPlaybackClusterPlaybackPosition {\n");
+      output.append("\tupdatedAt: ");
+      output.append(updatedAt);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\tposition: ");
+      output.append(position);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationEP {
-    public ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application;
-    public String endpoint;
+  public static class ModeSelectClusterModeOptionStruct {
+    public String label;
+    public Integer mode;
+    public Long semanticTag;
 
-    public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
-        String endpoint) {
-      this.application = application;
+    public ModeSelectClusterModeOptionStruct(String label, Integer mode, Long semanticTag) {
+      this.label = label;
+      this.mode = mode;
+      this.semanticTag = semanticTag;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ModeSelectClusterModeOptionStruct {\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("\tmode: ");
+      output.append(mode);
+      output.append("\n");
+      output.append("\tsemanticTag: ");
+      output.append(semanticTag);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ModeSelectClusterSemanticTag {
+    public Integer mfgCode;
+    public Integer value;
+
+    public ModeSelectClusterSemanticTag(Integer mfgCode, Integer value) {
+      this.mfgCode = mfgCode;
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ModeSelectClusterSemanticTag {\n");
+      output.append("\tmfgCode: ");
+      output.append(mfgCode);
+      output.append("\n");
+      output.append("\tvalue: ");
+      output.append(value);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class NetworkCommissioningClusterNetworkInfo {
+    public byte[] networkID;
+    public Boolean connected;
+
+    public NetworkCommissioningClusterNetworkInfo(byte[] networkID, Boolean connected) {
+      this.networkID = networkID;
+      this.connected = connected;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("NetworkCommissioningClusterNetworkInfo {\n");
+      output.append("\tnetworkID: ");
+      output.append(Arrays.toString(networkID));
+      output.append("\n");
+      output.append("\tconnected: ");
+      output.append(connected);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class NetworkCommissioningClusterThreadInterfaceScanResult {
+    public Long panId;
+    public Long extendedPanId;
+    public String networkName;
+    public Integer channel;
+    public Integer version;
+    public Long extendedAddress;
+    public Integer rssi;
+    public Integer lqi;
+
+    public NetworkCommissioningClusterThreadInterfaceScanResult(
+        Long panId,
+        Long extendedPanId,
+        String networkName,
+        Integer channel,
+        Integer version,
+        Long extendedAddress,
+        Integer rssi,
+        Integer lqi) {
+      this.panId = panId;
+      this.extendedPanId = extendedPanId;
+      this.networkName = networkName;
+      this.channel = channel;
+      this.version = version;
+      this.extendedAddress = extendedAddress;
+      this.rssi = rssi;
+      this.lqi = lqi;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("NetworkCommissioningClusterThreadInterfaceScanResult {\n");
+      output.append("\tpanId: ");
+      output.append(panId);
+      output.append("\n");
+      output.append("\textendedPanId: ");
+      output.append(extendedPanId);
+      output.append("\n");
+      output.append("\tnetworkName: ");
+      output.append(networkName);
+      output.append("\n");
+      output.append("\tchannel: ");
+      output.append(channel);
+      output.append("\n");
+      output.append("\tversion: ");
+      output.append(version);
+      output.append("\n");
+      output.append("\textendedAddress: ");
+      output.append(extendedAddress);
+      output.append("\n");
+      output.append("\trssi: ");
+      output.append(rssi);
+      output.append("\n");
+      output.append("\tlqi: ");
+      output.append(lqi);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class NetworkCommissioningClusterWiFiInterfaceScanResult {
+    public Integer security;
+    public byte[] ssid;
+    public byte[] bssid;
+    public Integer channel;
+    public Integer wiFiBand;
+    public Integer rssi;
+
+    public NetworkCommissioningClusterWiFiInterfaceScanResult(
+        Integer security,
+        byte[] ssid,
+        byte[] bssid,
+        Integer channel,
+        Integer wiFiBand,
+        Integer rssi) {
+      this.security = security;
+      this.ssid = ssid;
+      this.bssid = bssid;
+      this.channel = channel;
+      this.wiFiBand = wiFiBand;
+      this.rssi = rssi;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("NetworkCommissioningClusterWiFiInterfaceScanResult {\n");
+      output.append("\tsecurity: ");
+      output.append(security);
+      output.append("\n");
+      output.append("\tssid: ");
+      output.append(Arrays.toString(ssid));
+      output.append("\n");
+      output.append("\tbssid: ");
+      output.append(Arrays.toString(bssid));
+      output.append("\n");
+      output.append("\tchannel: ");
+      output.append(channel);
+      output.append("\n");
+      output.append("\twiFiBand: ");
+      output.append(wiFiBand);
+      output.append("\n");
+      output.append("\trssi: ");
+      output.append(rssi);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
+    public Integer fabricIndex;
+    public Long providerNodeID;
+    public Integer endpoint;
+
+    public OtaSoftwareUpdateRequestorClusterProviderLocation(
+        Integer fabricIndex, Long providerNodeID, Integer endpoint) {
+      this.fabricIndex = fabricIndex;
+      this.providerNodeID = providerNodeID;
       this.endpoint = endpoint;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationEP {\n");
-      output.append("\tapplication: ");
-      output.append(application);
+      output.append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tproviderNodeID: ");
+      output.append(providerNodeID);
       output.append("\n");
       output.append("\tendpoint: ");
       output.append(endpoint);
@@ -1741,25 +1122,201 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationBasicClusterApplicationBasicApplication {
-    public Integer catalogVendorId;
-    public String applicationId;
+  public static class OperationalCredentialsClusterFabricDescriptor {
+    public Integer fabricIndex;
+    public byte[] rootPublicKey;
+    public Integer vendorId;
+    public Long fabricId;
+    public Long nodeId;
+    public String label;
 
-    public ApplicationBasicClusterApplicationBasicApplication(
-        Integer catalogVendorId, String applicationId) {
-      this.catalogVendorId = catalogVendorId;
-      this.applicationId = applicationId;
+    public OperationalCredentialsClusterFabricDescriptor(
+        Integer fabricIndex,
+        byte[] rootPublicKey,
+        Integer vendorId,
+        Long fabricId,
+        Long nodeId,
+        String label) {
+      this.fabricIndex = fabricIndex;
+      this.rootPublicKey = rootPublicKey;
+      this.vendorId = vendorId;
+      this.fabricId = fabricId;
+      this.nodeId = nodeId;
+      this.label = label;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationBasicClusterApplicationBasicApplication {\n");
-      output.append("\tcatalogVendorId: ");
-      output.append(catalogVendorId);
+      output.append("OperationalCredentialsClusterFabricDescriptor {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
-      output.append("\tapplicationId: ");
-      output.append(applicationId);
+      output.append("\trootPublicKey: ");
+      output.append(Arrays.toString(rootPublicKey));
+      output.append("\n");
+      output.append("\tvendorId: ");
+      output.append(vendorId);
+      output.append("\n");
+      output.append("\tfabricId: ");
+      output.append(fabricId);
+      output.append("\n");
+      output.append("\tnodeId: ");
+      output.append(nodeId);
+      output.append("\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class OperationalCredentialsClusterNOCStruct {
+    public Integer fabricIndex;
+    public byte[] noc;
+    public byte[] icac;
+
+    public OperationalCredentialsClusterNOCStruct(Integer fabricIndex, byte[] noc, byte[] icac) {
+      this.fabricIndex = fabricIndex;
+      this.noc = noc;
+      this.icac = icac;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalCredentialsClusterNOCStruct {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tnoc: ");
+      output.append(Arrays.toString(noc));
+      output.append("\n");
+      output.append("\ticac: ");
+      output.append(Arrays.toString(icac));
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ScenesClusterSceneExtensionFieldSet {
+    public Long clusterId;
+    public Integer length;
+    public Integer value;
+
+    public ScenesClusterSceneExtensionFieldSet(Long clusterId, Integer length, Integer value) {
+      this.clusterId = clusterId;
+      this.length = length;
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ScenesClusterSceneExtensionFieldSet {\n");
+      output.append("\tclusterId: ");
+      output.append(clusterId);
+      output.append("\n");
+      output.append("\tlength: ");
+      output.append(length);
+      output.append("\n");
+      output.append("\tvalue: ");
+      output.append(value);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SoftwareDiagnosticsClusterSoftwareFault {
+    public Long id;
+    public String name;
+    public byte[] faultRecording;
+
+    public SoftwareDiagnosticsClusterSoftwareFault(Long id, String name, byte[] faultRecording) {
+      this.id = id;
+      this.name = name;
+      this.faultRecording = faultRecording;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SoftwareDiagnosticsClusterSoftwareFault {\n");
+      output.append("\tid: ");
+      output.append(id);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("\tfaultRecording: ");
+      output.append(Arrays.toString(faultRecording));
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SoftwareDiagnosticsClusterThreadMetrics {
+    public Long id;
+    public String name;
+    public Long stackFreeCurrent;
+    public Long stackFreeMinimum;
+    public Long stackSize;
+
+    public SoftwareDiagnosticsClusterThreadMetrics(
+        Long id, String name, Long stackFreeCurrent, Long stackFreeMinimum, Long stackSize) {
+      this.id = id;
+      this.name = name;
+      this.stackFreeCurrent = stackFreeCurrent;
+      this.stackFreeMinimum = stackFreeMinimum;
+      this.stackSize = stackSize;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SoftwareDiagnosticsClusterThreadMetrics {\n");
+      output.append("\tid: ");
+      output.append(id);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("\tstackFreeCurrent: ");
+      output.append(stackFreeCurrent);
+      output.append("\n");
+      output.append("\tstackFreeMinimum: ");
+      output.append(stackFreeMinimum);
+      output.append("\n");
+      output.append("\tstackSize: ");
+      output.append(stackSize);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TargetNavigatorClusterTargetInfo {
+    public Integer identifier;
+    public String name;
+
+    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
+      this.identifier = identifier;
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TargetNavigatorClusterTargetInfo {\n");
+      output.append("\tidentifier: ");
+      output.append(identifier);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -2050,6 +1607,312 @@ public class ChipStructs {
       output.append("\n");
       output.append("\toperationalCert: ");
       output.append(Arrays.toString(operationalCert));
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ThreadNetworkDiagnosticsClusterNeighborTable {
+    public Long extAddress;
+    public Long age;
+    public Integer rloc16;
+    public Long linkFrameCounter;
+    public Long mleFrameCounter;
+    public Integer lqi;
+    public Integer averageRssi;
+    public Integer lastRssi;
+    public Integer frameErrorRate;
+    public Integer messageErrorRate;
+    public Boolean rxOnWhenIdle;
+    public Boolean fullThreadDevice;
+    public Boolean fullNetworkData;
+    public Boolean isChild;
+
+    public ThreadNetworkDiagnosticsClusterNeighborTable(
+        Long extAddress,
+        Long age,
+        Integer rloc16,
+        Long linkFrameCounter,
+        Long mleFrameCounter,
+        Integer lqi,
+        Integer averageRssi,
+        Integer lastRssi,
+        Integer frameErrorRate,
+        Integer messageErrorRate,
+        Boolean rxOnWhenIdle,
+        Boolean fullThreadDevice,
+        Boolean fullNetworkData,
+        Boolean isChild) {
+      this.extAddress = extAddress;
+      this.age = age;
+      this.rloc16 = rloc16;
+      this.linkFrameCounter = linkFrameCounter;
+      this.mleFrameCounter = mleFrameCounter;
+      this.lqi = lqi;
+      this.averageRssi = averageRssi;
+      this.lastRssi = lastRssi;
+      this.frameErrorRate = frameErrorRate;
+      this.messageErrorRate = messageErrorRate;
+      this.rxOnWhenIdle = rxOnWhenIdle;
+      this.fullThreadDevice = fullThreadDevice;
+      this.fullNetworkData = fullNetworkData;
+      this.isChild = isChild;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThreadNetworkDiagnosticsClusterNeighborTable {\n");
+      output.append("\textAddress: ");
+      output.append(extAddress);
+      output.append("\n");
+      output.append("\tage: ");
+      output.append(age);
+      output.append("\n");
+      output.append("\trloc16: ");
+      output.append(rloc16);
+      output.append("\n");
+      output.append("\tlinkFrameCounter: ");
+      output.append(linkFrameCounter);
+      output.append("\n");
+      output.append("\tmleFrameCounter: ");
+      output.append(mleFrameCounter);
+      output.append("\n");
+      output.append("\tlqi: ");
+      output.append(lqi);
+      output.append("\n");
+      output.append("\taverageRssi: ");
+      output.append(averageRssi);
+      output.append("\n");
+      output.append("\tlastRssi: ");
+      output.append(lastRssi);
+      output.append("\n");
+      output.append("\tframeErrorRate: ");
+      output.append(frameErrorRate);
+      output.append("\n");
+      output.append("\tmessageErrorRate: ");
+      output.append(messageErrorRate);
+      output.append("\n");
+      output.append("\trxOnWhenIdle: ");
+      output.append(rxOnWhenIdle);
+      output.append("\n");
+      output.append("\tfullThreadDevice: ");
+      output.append(fullThreadDevice);
+      output.append("\n");
+      output.append("\tfullNetworkData: ");
+      output.append(fullNetworkData);
+      output.append("\n");
+      output.append("\tisChild: ");
+      output.append(isChild);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
+    public Boolean activeTimestampPresent;
+    public Boolean pendingTimestampPresent;
+    public Boolean masterKeyPresent;
+    public Boolean networkNamePresent;
+    public Boolean extendedPanIdPresent;
+    public Boolean meshLocalPrefixPresent;
+    public Boolean delayPresent;
+    public Boolean panIdPresent;
+    public Boolean channelPresent;
+    public Boolean pskcPresent;
+    public Boolean securityPolicyPresent;
+    public Boolean channelMaskPresent;
+
+    public ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
+        Boolean activeTimestampPresent,
+        Boolean pendingTimestampPresent,
+        Boolean masterKeyPresent,
+        Boolean networkNamePresent,
+        Boolean extendedPanIdPresent,
+        Boolean meshLocalPrefixPresent,
+        Boolean delayPresent,
+        Boolean panIdPresent,
+        Boolean channelPresent,
+        Boolean pskcPresent,
+        Boolean securityPolicyPresent,
+        Boolean channelMaskPresent) {
+      this.activeTimestampPresent = activeTimestampPresent;
+      this.pendingTimestampPresent = pendingTimestampPresent;
+      this.masterKeyPresent = masterKeyPresent;
+      this.networkNamePresent = networkNamePresent;
+      this.extendedPanIdPresent = extendedPanIdPresent;
+      this.meshLocalPrefixPresent = meshLocalPrefixPresent;
+      this.delayPresent = delayPresent;
+      this.panIdPresent = panIdPresent;
+      this.channelPresent = channelPresent;
+      this.pskcPresent = pskcPresent;
+      this.securityPolicyPresent = securityPolicyPresent;
+      this.channelMaskPresent = channelMaskPresent;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {\n");
+      output.append("\tactiveTimestampPresent: ");
+      output.append(activeTimestampPresent);
+      output.append("\n");
+      output.append("\tpendingTimestampPresent: ");
+      output.append(pendingTimestampPresent);
+      output.append("\n");
+      output.append("\tmasterKeyPresent: ");
+      output.append(masterKeyPresent);
+      output.append("\n");
+      output.append("\tnetworkNamePresent: ");
+      output.append(networkNamePresent);
+      output.append("\n");
+      output.append("\textendedPanIdPresent: ");
+      output.append(extendedPanIdPresent);
+      output.append("\n");
+      output.append("\tmeshLocalPrefixPresent: ");
+      output.append(meshLocalPrefixPresent);
+      output.append("\n");
+      output.append("\tdelayPresent: ");
+      output.append(delayPresent);
+      output.append("\n");
+      output.append("\tpanIdPresent: ");
+      output.append(panIdPresent);
+      output.append("\n");
+      output.append("\tchannelPresent: ");
+      output.append(channelPresent);
+      output.append("\n");
+      output.append("\tpskcPresent: ");
+      output.append(pskcPresent);
+      output.append("\n");
+      output.append("\tsecurityPolicyPresent: ");
+      output.append(securityPolicyPresent);
+      output.append("\n");
+      output.append("\tchannelMaskPresent: ");
+      output.append(channelMaskPresent);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ThreadNetworkDiagnosticsClusterRouteTable {
+    public Long extAddress;
+    public Integer rloc16;
+    public Integer routerId;
+    public Integer nextHop;
+    public Integer pathCost;
+    public Integer LQIIn;
+    public Integer LQIOut;
+    public Integer age;
+    public Boolean allocated;
+    public Boolean linkEstablished;
+
+    public ThreadNetworkDiagnosticsClusterRouteTable(
+        Long extAddress,
+        Integer rloc16,
+        Integer routerId,
+        Integer nextHop,
+        Integer pathCost,
+        Integer LQIIn,
+        Integer LQIOut,
+        Integer age,
+        Boolean allocated,
+        Boolean linkEstablished) {
+      this.extAddress = extAddress;
+      this.rloc16 = rloc16;
+      this.routerId = routerId;
+      this.nextHop = nextHop;
+      this.pathCost = pathCost;
+      this.LQIIn = LQIIn;
+      this.LQIOut = LQIOut;
+      this.age = age;
+      this.allocated = allocated;
+      this.linkEstablished = linkEstablished;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThreadNetworkDiagnosticsClusterRouteTable {\n");
+      output.append("\textAddress: ");
+      output.append(extAddress);
+      output.append("\n");
+      output.append("\trloc16: ");
+      output.append(rloc16);
+      output.append("\n");
+      output.append("\trouterId: ");
+      output.append(routerId);
+      output.append("\n");
+      output.append("\tnextHop: ");
+      output.append(nextHop);
+      output.append("\n");
+      output.append("\tpathCost: ");
+      output.append(pathCost);
+      output.append("\n");
+      output.append("\tLQIIn: ");
+      output.append(LQIIn);
+      output.append("\n");
+      output.append("\tLQIOut: ");
+      output.append(LQIOut);
+      output.append("\n");
+      output.append("\tage: ");
+      output.append(age);
+      output.append("\n");
+      output.append("\tallocated: ");
+      output.append(allocated);
+      output.append("\n");
+      output.append("\tlinkEstablished: ");
+      output.append(linkEstablished);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ThreadNetworkDiagnosticsClusterSecurityPolicy {
+    public Integer rotationTime;
+    public Integer flags;
+
+    public ThreadNetworkDiagnosticsClusterSecurityPolicy(Integer rotationTime, Integer flags) {
+      this.rotationTime = rotationTime;
+      this.flags = flags;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n");
+      output.append("\trotationTime: ");
+      output.append(rotationTime);
+      output.append("\n");
+      output.append("\tflags: ");
+      output.append(flags);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class UserLabelClusterLabelStruct {
+    public String label;
+    public String value;
+
+    public UserLabelClusterLabelStruct(String label, String value) {
+      this.label = label;
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("UserLabelClusterLabelStruct {\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("\tvalue: ");
+      output.append(value);
       output.append("\n");
       output.append("}\n");
       return output.toString();

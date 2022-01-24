@@ -13,12 +13,12 @@
 #include <controller/java/CHIPDefaultCallbacks.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <list>
 #include <jni.h>
 #include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
+#include <vector>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -55,8 +55,8 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     ListFreer listFreer;
     chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
 
-    std::list<JniByteArray *> cleanupByteArrays;
-    std::list<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
     {{#chip_cluster_command_arguments}}
     {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=(asUpperCamelCase parent.parent.name) depth=0}}
     {{/chip_cluster_command_arguments}}
@@ -85,9 +85,6 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     }
     {{/if}}
     VerifyOrReturn(err == CHIP_NO_ERROR, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command", CHIP_ERROR_INCORRECT_STATE));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(), [](chip::JniByteArray * jniByteArray){ chip::Platform::Delete(jniByteArray);});
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(), [](chip::JniUtfString * jniString){ chip::Platform::Delete(jniString);});
 
     onSuccess.release();
     onFailure.release();

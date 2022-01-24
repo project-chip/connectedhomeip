@@ -34,6 +34,7 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
+#include <vector>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -49,8 +50,8 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
     using TypeInfo = chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -234,11 +235,6 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -251,8 +247,8 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
     using TypeInfo = chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -276,10 +272,9 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
                         chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricIndexItem_1));
                 jobject element_0_dataItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "data", "[B", element_0_dataItem_1);
-                auto element_0_dataItem_1Jni =
-                    chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_dataItem_1));
-                cleanupByteArrays.push_back(element_0_dataItem_1Jni);
-                listHolder_0->mList[i_0].data = element_0_dataItem_1Jni->byteSpan();
+                cleanupByteArrays.push_back(
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_dataItem_1)));
+                listHolder_0->mList[i_0].data = cleanupByteArrays.back()->byteSpan();
             }
             cppValue = ListType_0(listHolder_0->mList, valueSize);
         }
@@ -323,11 +318,6 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -340,12 +330,11 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
     using TypeInfo = chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-    cleanupStrings.push_back(valueJni);
-    cppValue = valueJni->charSpan();
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -380,11 +369,6 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -398,12 +382,11 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
     using TypeInfo = chip::app::Clusters::Basic::Attributes::Location::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-    cleanupStrings.push_back(valueJni);
-    cppValue = valueJni->charSpan();
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -438,11 +421,6 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -456,8 +434,8 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
     using TypeInfo = chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -496,11 +474,6 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -513,8 +486,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
     using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -552,11 +525,6 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -570,8 +538,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
     using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -610,11 +578,6 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -627,8 +590,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -666,11 +629,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -684,8 +642,8 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -723,11 +681,6 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -741,8 +694,8 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -780,11 +733,6 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -798,8 +746,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -837,11 +785,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -855,8 +798,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -894,11 +837,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -912,8 +850,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -951,11 +889,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -969,8 +902,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1008,11 +941,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1026,8 +954,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1065,11 +993,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1083,8 +1006,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1122,11 +1045,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1140,8 +1058,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1179,11 +1097,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1197,8 +1110,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1236,11 +1149,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1254,8 +1162,8 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1293,11 +1201,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1311,8 +1214,8 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1351,11 +1254,6 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1368,8 +1266,8 @@ JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribu
     using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -1407,11 +1305,6 @@ JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribu
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1424,12 +1317,11 @@ JNI_METHOD(void, DoorLockCluster, writeLanguageAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-    cleanupStrings.push_back(valueJni);
-    cppValue = valueJni->charSpan();
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1465,11 +1357,6 @@ JNI_METHOD(void, DoorLockCluster, writeLanguageAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1482,8 +1369,8 @@ JNI_METHOD(void, DoorLockCluster, writeAutoRelockTimeAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -1521,11 +1408,6 @@ JNI_METHOD(void, DoorLockCluster, writeAutoRelockTimeAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1538,8 +1420,8 @@ JNI_METHOD(void, DoorLockCluster, writeSoundVolumeAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1577,11 +1459,6 @@ JNI_METHOD(void, DoorLockCluster, writeSoundVolumeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1595,8 +1472,8 @@ JNI_METHOD(void, DoorLockCluster, writeOperatingModeAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1634,11 +1511,6 @@ JNI_METHOD(void, DoorLockCluster, writeOperatingModeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1652,8 +1524,8 @@ JNI_METHOD(void, DoorLockCluster, writeEnableOneTouchLockingAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -1691,11 +1563,6 @@ JNI_METHOD(void, DoorLockCluster, writeEnableOneTouchLockingAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1709,8 +1576,8 @@ JNI_METHOD(void, DoorLockCluster, writeEnablePrivacyModeButtonAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -1749,11 +1616,6 @@ JNI_METHOD(void, DoorLockCluster, writeEnablePrivacyModeButtonAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1766,8 +1628,8 @@ JNI_METHOD(void, DoorLockCluster, writeWrongCodeEntryLimitAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1806,11 +1668,6 @@ JNI_METHOD(void, DoorLockCluster, writeWrongCodeEntryLimitAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1823,8 +1680,8 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
     using TypeInfo = chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -1862,11 +1719,6 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1879,8 +1731,8 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
     using TypeInfo = chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1919,11 +1771,6 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -1936,8 +1783,8 @@ JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -1975,11 +1822,6 @@ JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1993,8 +1835,8 @@ JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -2033,11 +1875,6 @@ JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2050,8 +1887,8 @@ JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2097,11 +1934,6 @@ JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2115,8 +1947,8 @@ JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2162,11 +1994,6 @@ JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2180,8 +2007,8 @@ JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2227,11 +2054,6 @@ JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2245,8 +2067,8 @@ JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2292,11 +2114,6 @@ JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2310,8 +2127,8 @@ JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2358,11 +2175,6 @@ JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2375,12 +2187,11 @@ JNI_METHOD(void, LocalizationConfigurationCluster, writeActiveLocaleAttribute)
     using TypeInfo = chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-    cleanupStrings.push_back(valueJni);
-    cppValue = valueJni->charSpan();
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2416,11 +2227,6 @@ JNI_METHOD(void, LocalizationConfigurationCluster, writeActiveLocaleAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2433,8 +2239,8 @@ JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
     using TypeInfo = chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -2473,11 +2279,6 @@ JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2490,8 +2291,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
     using TypeInfo = chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -2530,11 +2331,6 @@ JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2547,8 +2343,8 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProvidersAttr
     using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -2625,11 +2421,6 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProvidersAttr
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2642,8 +2433,8 @@ JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -2681,11 +2472,6 @@ JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2699,8 +2485,8 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -2738,11 +2524,6 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2756,8 +2537,8 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -2796,11 +2577,6 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2813,8 +2589,8 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
     using TypeInfo = chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -2853,11 +2629,6 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -2870,8 +2641,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeRunningHoursAt
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2917,11 +2688,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeRunningHoursAt
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2935,8 +2701,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeEnergyConsumed
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -2983,11 +2749,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeEnergyConsumed
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -3000,8 +2761,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3039,11 +2800,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3057,8 +2813,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3097,11 +2853,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -3114,8 +2865,8 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -3154,11 +2905,6 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -3171,8 +2917,8 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3210,11 +2956,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3228,8 +2969,8 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3267,11 +3008,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3285,8 +3021,8 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3323,11 +3059,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3341,8 +3072,8 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3379,11 +3110,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3397,8 +3123,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3436,11 +3162,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3454,8 +3175,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3493,11 +3214,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3511,8 +3227,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt24uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3549,11 +3265,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt24uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3567,8 +3278,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3605,11 +3316,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3623,8 +3329,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt40uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3661,11 +3367,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt40uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3679,8 +3380,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt48uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3717,11 +3418,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt48uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3735,8 +3431,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt56uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3773,11 +3469,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt56uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3791,8 +3482,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3829,11 +3520,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3847,8 +3533,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3886,11 +3572,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3904,8 +3585,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -3943,11 +3624,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3961,8 +3637,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt24sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -3999,11 +3675,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt24sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4017,8 +3688,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -4055,11 +3726,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4073,8 +3739,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt40sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -4111,11 +3777,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt40sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4129,8 +3790,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt48sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -4167,11 +3828,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt48sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4185,8 +3841,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt56sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -4223,11 +3879,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt56sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4241,8 +3892,8 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -4280,11 +3931,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4297,8 +3943,8 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -4336,11 +3982,6 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4354,8 +3995,8 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -4394,11 +4035,6 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4411,8 +4047,8 @@ JNI_METHOD(void, TestClusterCluster, writeFloatSingleAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().FloatToPrimitive(value));
 
@@ -4450,11 +4086,6 @@ JNI_METHOD(void, TestClusterCluster, writeFloatSingleAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4467,8 +4098,8 @@ JNI_METHOD(void, TestClusterCluster, writeFloatDoubleAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().DoubleToPrimitive(value));
@@ -4507,11 +4138,6 @@ JNI_METHOD(void, TestClusterCluster, writeFloatDoubleAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4524,12 +4150,11 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(value));
-    cleanupByteArrays.push_back(valueJni);
-    cppValue = valueJni->byteSpan();
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(value)));
+    cppValue = cleanupByteArrays.back()->byteSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4565,11 +4190,6 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4582,8 +4202,8 @@ JNI_METHOD(void, TestClusterCluster, writeListInt8uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -4644,11 +4264,6 @@ JNI_METHOD(void, TestClusterCluster, writeListInt8uAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4661,8 +4276,8 @@ JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -4678,9 +4293,9 @@ JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)
             {
                 jobject element_0;
                 chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
-                auto element_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0));
-                cleanupByteArrays.push_back(element_0Jni);
-                listHolder_0->mList[i_0] = element_0Jni->byteSpan();
+                cleanupByteArrays.push_back(
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0)));
+                listHolder_0->mList[i_0] = cleanupByteArrays.back()->byteSpan();
             }
             cppValue = ListType_0(listHolder_0->mList, valueSize);
         }
@@ -4724,11 +4339,6 @@ JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4741,8 +4351,8 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -4767,10 +4377,9 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
                 jobject element_0_operationalCertItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "operationalCert", "[B",
                                                                   element_0_operationalCertItem_1);
-                auto element_0_operationalCertItem_1Jni =
-                    chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_operationalCertItem_1));
-                cleanupByteArrays.push_back(element_0_operationalCertItem_1Jni);
-                listHolder_0->mList[i_0].operationalCert = element_0_operationalCertItem_1Jni->byteSpan();
+                cleanupByteArrays.push_back(
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_operationalCertItem_1)));
+                listHolder_0->mList[i_0].operationalCert = cleanupByteArrays.back()->byteSpan();
             }
             cppValue = ListType_0(listHolder_0->mList, valueSize);
         }
@@ -4814,11 +4423,6 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -4831,12 +4435,11 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(value));
-    cleanupByteArrays.push_back(valueJni);
-    cppValue = valueJni->byteSpan();
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(value)));
+    cppValue = cleanupByteArrays.back()->byteSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4871,11 +4474,6 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4889,12 +4487,11 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-    cleanupStrings.push_back(valueJni);
-    cppValue = valueJni->charSpan();
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4929,11 +4526,6 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4947,12 +4539,11 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    auto valueJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-    cleanupStrings.push_back(valueJni);
-    cppValue = valueJni->charSpan();
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4987,11 +4578,6 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -5005,8 +4591,8 @@ JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -5043,11 +4629,6 @@ JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -5061,8 +4642,8 @@ JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
@@ -5100,11 +4681,6 @@ JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -5117,8 +4693,8 @@ JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -5157,11 +4733,6 @@ JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -5174,8 +4745,8 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -5244,10 +4815,9 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                 else
                 {
                     auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableString.SetNonNull();
-                    auto element_0_nullableStringItem_1Jni =
-                        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_0_nullableStringItem_1));
-                    cleanupStrings.push_back(element_0_nullableStringItem_1Jni);
-                    nonNullValue_2 = element_0_nullableStringItem_1Jni->charSpan();
+                    cleanupStrings.push_back(
+                        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_0_nullableStringItem_1)));
+                    nonNullValue_2 = cleanupStrings.back()->charSpan();
                 }
                 jobject element_0_optionalStringItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "optionalString", "Ljava/util/Optional;",
@@ -5256,10 +4826,10 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                 {
                     jobject optionalValue_2;
                     chip::JniReferences::GetInstance().GetOptionalValue(element_0_optionalStringItem_1, optionalValue_2);
-                    auto & definedValue_2   = listHolder_0->mList[i_0].optionalString.Emplace();
-                    auto optionalValue_2Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2));
-                    cleanupStrings.push_back(optionalValue_2Jni);
-                    definedValue_2 = optionalValue_2Jni->charSpan();
+                    auto & definedValue_2 = listHolder_0->mList[i_0].optionalString.Emplace();
+                    cleanupStrings.push_back(
+                        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2)));
+                    definedValue_2 = cleanupStrings.back()->charSpan();
                 }
                 jobject element_0_nullableOptionalStringItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableOptionalString", "Ljava/util/Optional;",
@@ -5276,10 +4846,9 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                     else
                     {
                         auto & nonNullValue_3 = definedValue_2.SetNonNull();
-                        auto optionalValue_2Jni =
-                            chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2));
-                        cleanupStrings.push_back(optionalValue_2Jni);
-                        nonNullValue_3 = optionalValue_2Jni->charSpan();
+                        cleanupStrings.push_back(
+                            chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2)));
+                        nonNullValue_3 = cleanupStrings.back()->charSpan();
                     }
                 }
                 jobject element_0_nullableStructItem_1;
@@ -5311,17 +4880,15 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                     jobject element_0_nullableStructItem_1_dItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "d", "[B",
                                                                       element_0_nullableStructItem_1_dItem_3);
-                    auto element_0_nullableStructItem_1_dItem_3Jni = chip::Platform::New<chip::JniByteArray>(
-                        env, static_cast<jbyteArray>(element_0_nullableStructItem_1_dItem_3));
-                    cleanupByteArrays.push_back(element_0_nullableStructItem_1_dItem_3Jni);
-                    nonNullValue_2.d = element_0_nullableStructItem_1_dItem_3Jni->byteSpan();
+                    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(
+                        env, static_cast<jbyteArray>(element_0_nullableStructItem_1_dItem_3)));
+                    nonNullValue_2.d = cleanupByteArrays.back()->byteSpan();
                     jobject element_0_nullableStructItem_1_eItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "e", "Ljava/lang/String;",
                                                                       element_0_nullableStructItem_1_eItem_3);
-                    auto element_0_nullableStructItem_1_eItem_3Jni =
-                        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_0_nullableStructItem_1_eItem_3));
-                    cleanupStrings.push_back(element_0_nullableStructItem_1_eItem_3Jni);
-                    nonNullValue_2.e = element_0_nullableStructItem_1_eItem_3Jni->charSpan();
+                    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
+                        env, static_cast<jstring>(element_0_nullableStructItem_1_eItem_3)));
+                    nonNullValue_2.e = cleanupStrings.back()->charSpan();
                     jobject element_0_nullableStructItem_1_fItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "f", "Ljava/lang/Integer;",
                                                                       element_0_nullableStructItem_1_fItem_3);
@@ -5363,17 +4930,15 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                         chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_cItem_3));
                     jobject optionalValue_2_dItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "d", "[B", optionalValue_2_dItem_3);
-                    auto optionalValue_2_dItem_3Jni =
-                        chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2_dItem_3));
-                    cleanupByteArrays.push_back(optionalValue_2_dItem_3Jni);
-                    definedValue_2.d = optionalValue_2_dItem_3Jni->byteSpan();
+                    cleanupByteArrays.push_back(
+                        chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2_dItem_3)));
+                    definedValue_2.d = cleanupByteArrays.back()->byteSpan();
                     jobject optionalValue_2_eItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "e", "Ljava/lang/String;",
                                                                       optionalValue_2_eItem_3);
-                    auto optionalValue_2_eItem_3Jni =
-                        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2_eItem_3));
-                    cleanupStrings.push_back(optionalValue_2_eItem_3Jni);
-                    definedValue_2.e = optionalValue_2_eItem_3Jni->charSpan();
+                    cleanupStrings.push_back(
+                        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2_eItem_3)));
+                    definedValue_2.e = cleanupStrings.back()->charSpan();
                     jobject optionalValue_2_fItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "f", "Ljava/lang/Integer;",
                                                                       optionalValue_2_fItem_3);
@@ -5422,17 +4987,15 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                             chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_cItem_4));
                         jobject optionalValue_2_dItem_4;
                         chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "d", "[B", optionalValue_2_dItem_4);
-                        auto optionalValue_2_dItem_4Jni =
-                            chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2_dItem_4));
-                        cleanupByteArrays.push_back(optionalValue_2_dItem_4Jni);
-                        nonNullValue_3.d = optionalValue_2_dItem_4Jni->byteSpan();
+                        cleanupByteArrays.push_back(
+                            chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2_dItem_4)));
+                        nonNullValue_3.d = cleanupByteArrays.back()->byteSpan();
                         jobject optionalValue_2_eItem_4;
                         chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "e", "Ljava/lang/String;",
                                                                           optionalValue_2_eItem_4);
-                        auto optionalValue_2_eItem_4Jni =
-                            chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2_eItem_4));
-                        cleanupStrings.push_back(optionalValue_2_eItem_4Jni);
-                        nonNullValue_3.e = optionalValue_2_eItem_4Jni->charSpan();
+                        cleanupStrings.push_back(
+                            chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2_eItem_4)));
+                        nonNullValue_3.e = cleanupStrings.back()->charSpan();
                         jobject optionalValue_2_fItem_4;
                         chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "f", "Ljava/lang/Integer;",
                                                                           optionalValue_2_fItem_4);
@@ -5604,11 +5167,6 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -5621,8 +5179,8 @@ JNI_METHOD(void, TestClusterCluster, writeEnumAttrAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -5660,11 +5218,6 @@ JNI_METHOD(void, TestClusterCluster, writeEnumAttrAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -5678,8 +5231,8 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -5717,11 +5270,6 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -5735,8 +5283,8 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -5774,11 +5322,6 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -5792,8 +5335,8 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -5831,11 +5374,6 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -5849,8 +5387,8 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -5889,11 +5427,6 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16sAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -5906,8 +5439,8 @@ JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -5939,11 +5472,6 @@ JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -5956,8 +5484,8 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
@@ -5996,11 +5524,6 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -6013,8 +5536,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6061,11 +5584,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -6078,8 +5596,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6125,11 +5643,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6143,8 +5656,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6190,11 +5703,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6208,8 +5716,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6255,11 +5763,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6273,8 +5776,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6320,11 +5823,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6338,8 +5836,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6385,11 +5883,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6403,8 +5896,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6450,11 +5943,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6468,8 +5956,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6515,11 +6003,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6533,8 +6016,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6580,11 +6063,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6598,8 +6076,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6645,11 +6123,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6663,8 +6136,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6710,11 +6183,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6728,8 +6196,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6775,11 +6243,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6793,8 +6256,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6840,11 +6303,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6858,8 +6316,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6905,11 +6363,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6923,8 +6376,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -6970,11 +6423,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6988,8 +6436,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7035,11 +6483,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7053,8 +6496,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7100,11 +6543,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7118,8 +6556,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7165,11 +6603,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7183,8 +6616,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7230,11 +6663,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7248,8 +6676,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7295,11 +6723,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7313,8 +6736,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7361,11 +6784,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -7378,8 +6796,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7425,11 +6843,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7443,8 +6856,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7491,11 +6904,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -7508,8 +6916,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatSingleAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7556,11 +6964,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatSingleAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -7573,8 +6976,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatDoubleAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7621,11 +7024,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatDoubleAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -7638,8 +7036,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7648,9 +7046,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
     else
     {
         auto & nonNullValue_0 = cppValue.SetNonNull();
-        auto valueJni         = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(value));
-        cleanupByteArrays.push_back(valueJni);
-        nonNullValue_0 = valueJni->byteSpan();
+        cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(value)));
+        nonNullValue_0 = cleanupByteArrays.back()->byteSpan();
     }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -7686,11 +7083,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7704,8 +7096,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7714,9 +7106,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
     else
     {
         auto & nonNullValue_0 = cppValue.SetNonNull();
-        auto valueJni         = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(value));
-        cleanupStrings.push_back(valueJni);
-        nonNullValue_0 = valueJni->charSpan();
+        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+        nonNullValue_0 = cleanupStrings.back()->charSpan();
     }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -7752,11 +7143,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7770,8 +7156,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnumAttrAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7817,11 +7203,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnumAttrAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7835,8 +7216,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8uAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7882,11 +7263,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8uAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7900,8 +7276,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8sAttribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -7947,11 +7323,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8sAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7965,8 +7336,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16uAttribute
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -8012,11 +7383,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16uAttribute
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8030,8 +7396,8 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16sAttribute
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     if (value == nullptr)
     {
@@ -8078,11 +7444,6 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16sAttribute
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -8095,8 +7456,8 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8134,11 +7495,6 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8152,8 +7508,8 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8191,11 +7547,6 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8209,8 +7560,8 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8248,11 +7599,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8266,8 +7612,8 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8305,11 +7651,6 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8323,8 +7664,8 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8362,11 +7703,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8380,8 +7716,8 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8419,11 +7755,6 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8437,8 +7768,8 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8476,11 +7807,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8494,8 +7820,8 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8533,11 +7859,6 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8551,8 +7872,8 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8591,11 +7912,6 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -8608,8 +7924,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8648,11 +7964,6 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8666,8 +7977,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8706,11 +8017,6 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8724,8 +8030,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8765,11 +8071,6 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -8782,8 +8083,8 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeHourFormatAttribute)
     using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8821,11 +8122,6 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeHourFormatAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8839,8 +8135,8 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeActiveCalendarTypeAttribute
     using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -8879,11 +8175,6 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeActiveCalendarTypeAttribute
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -8896,8 +8187,8 @@ JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)
     using TypeInfo = chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     {
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
@@ -8915,16 +8206,14 @@ JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)
                 chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
                 jobject element_0_labelItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "label", "Ljava/lang/String;", element_0_labelItem_1);
-                auto element_0_labelItem_1Jni =
-                    chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_0_labelItem_1));
-                cleanupStrings.push_back(element_0_labelItem_1Jni);
-                listHolder_0->mList[i_0].label = element_0_labelItem_1Jni->charSpan();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_0_labelItem_1)));
+                listHolder_0->mList[i_0].label = cleanupStrings.back()->charSpan();
                 jobject element_0_valueItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "value", "Ljava/lang/String;", element_0_valueItem_1);
-                auto element_0_valueItem_1Jni =
-                    chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_0_valueItem_1));
-                cleanupStrings.push_back(element_0_valueItem_1Jni);
-                listHolder_0->mList[i_0].value = element_0_valueItem_1Jni->charSpan();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_0_valueItem_1)));
+                listHolder_0->mList[i_0].value = cleanupStrings.back()->charSpan();
             }
             cppValue = ListType_0(listHolder_0->mList, valueSize);
         }
@@ -8968,11 +8257,6 @@ JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
-
     onSuccess.release();
     onFailure.release();
 }
@@ -8985,8 +8269,8 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
     using TypeInfo = chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    std::vector<JniByteArray *> cleanupByteArrays;
-    std::vector<JniUtfString *> cleanupStrings;
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
     cppValue =
         static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
@@ -9024,11 +8308,6 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
-                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
-    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
-                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();

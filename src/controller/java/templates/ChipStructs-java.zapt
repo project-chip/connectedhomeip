@@ -1,19 +1,22 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
 package chip.devicecontroller;
 
+{{#if (chip_has_client_clusters)}}
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+{{/if}}
 
+{{! TODO: Use AutoValue for inner classes. }}
 public class ChipStructs {
-
-{{#zcl_clusters}}
+{{#if (chip_has_client_clusters)}}
+{{#chip_client_clusters}}
 {{#zcl_structs}}
 {{#if itemCnt}}
 public static class {{asUpperCamelCase parent.name}}Cluster{{asUnderlyingType name}} {
 {{#zcl_struct_items}}
+{{! TODO: This uses the vague type List<Object> for some list types. }}
 public {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase (asSymbol label)}};
 {{/zcl_struct_items}}
 
@@ -51,8 +54,6 @@ public {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asL
 {{/if}}
 
 {{/zcl_structs}}
-{{/zcl_clusters}}
-
-}
-
+{{/chip_client_clusters}}
 {{/if}}
+}
