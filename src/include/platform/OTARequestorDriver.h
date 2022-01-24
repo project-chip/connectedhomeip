@@ -92,7 +92,6 @@ public:
 
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
-
 };
 
 } // namespace chip
