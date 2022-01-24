@@ -72,7 +72,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case VendorName::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxVendorNameLength;
-        char vendorName[kMaxLen + 1];
+        char vendorName[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName));
         if (status == CHIP_NO_ERROR)
         {
@@ -93,7 +93,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case ProductName::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
-        char productName[kMaxLen + 1];
+        char productName[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetProductName(productName, sizeof(productName));
         if (status == CHIP_NO_ERROR)
         {
@@ -124,7 +124,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case HardwareVersionString::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength;
-        char hardwareVersionString[kMaxLen + 1];
+        char hardwareVersionString[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString));
         if (status == CHIP_NO_ERROR)
         {
@@ -145,7 +145,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case SoftwareVersionString::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
-        char softwareVersionString[kMaxLen + 1];
+        char softwareVersionString[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
         if (status == CHIP_NO_ERROR)
         {
@@ -156,11 +156,21 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case ManufacturingDate::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
-        char manufacturingDateString[kMaxLen + 1];
-        uint16_t manufacturingYear      = 2020;
-        uint8_t manufacturingMonth      = 1;
-        uint8_t manufacturingDayOfMonth = 1;
+        char manufacturingDateString[kMaxLen + 1] = {0};
+        uint16_t manufacturingYear;
+        uint8_t manufacturingMonth;
+        uint8_t manufacturingDayOfMonth;
         status = ConfigurationMgr().GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            manufacturingYear = 2020;
+            manufacturingMonth = 1;
+            manufacturingDayOfMonth = 1;
+            status = CHIP_NO_ERROR;
+        }
+
         if (status == CHIP_NO_ERROR)
         {
             // Format is YYYYMMDD
@@ -168,84 +178,101 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
                      manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
             status = aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
         }
-        else if (status == CHIP_ERROR_NOT_IMPLEMENTED || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            status = CHIP_ERROR_NOT_FOUND;
-        }
+        ChipLogError(Zcl, "MAAAAANNNNUFFF: %s, err: %" CHIP_ERROR_FORMAT, manufacturingDateString, status.Format());
         break;
     }
 
     case PartNumber::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxPartNumberLength;
-        char partNumber[kMaxLen + 1];
+        char partNumber[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetPartNumber(partNumber, sizeof(partNumber));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            partNumber[0] = '\0';
+            status = CHIP_NO_ERROR;
+        }
+
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(chip::CharSpan(partNumber, strnlen(partNumber, kMaxLen)));
-        }
-        else if (status == CHIP_ERROR_NOT_IMPLEMENTED || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            status = CHIP_ERROR_NOT_FOUND;
         }
         break;
     }
 
     case ProductURL::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxProductURLLength;
-        char productUrl[kMaxLen + 1];
+        char productUrl[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetProductURL(productUrl, sizeof(productUrl));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            productUrl[0] = '\0';
+            status = CHIP_NO_ERROR;
+        }
+
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(chip::CharSpan(productUrl, strnlen(productUrl, kMaxLen)));
-        }
-        else if (status == CHIP_ERROR_NOT_IMPLEMENTED || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            status = CHIP_ERROR_NOT_FOUND;
         }
         break;
     }
 
     case ProductLabel::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxProductLabelLength;
-        char productLabel[kMaxLen + 1];
+        char productLabel[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetProductLabel(productLabel, sizeof(productLabel));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            productLabel[0] = '\0';
+            status = CHIP_NO_ERROR;
+        }
+
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(chip::CharSpan(productLabel, strnlen(productLabel, kMaxLen)));
-        }
-        else if (status == CHIP_ERROR_NOT_IMPLEMENTED || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            status = CHIP_ERROR_NOT_FOUND;
         }
         break;
     }
 
     case SerialNumber::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxSerialNumberLength;
-        char serialNumberString[kMaxLen + 1];
+        char serialNumberString[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetSerialNumber(serialNumberString, sizeof(serialNumberString));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            serialNumberString[0] = '\0';
+            status = CHIP_NO_ERROR;
+        }
+
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(chip::CharSpan(serialNumberString, strnlen(serialNumberString, kMaxLen)));
-        }
-        else if (status == CHIP_ERROR_NOT_IMPLEMENTED || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            status = CHIP_ERROR_NOT_FOUND;
         }
         break;
     }
 
     case UniqueID::Id: {
         constexpr size_t kMaxLen = DeviceLayer::ConfigurationManager::kMaxUniqueIDLength;
-        char uniqueId[kMaxLen + 1];
+        char uniqueId[kMaxLen + 1] = {0};
         status = ConfigurationMgr().GetUniqueId(uniqueId, sizeof(uniqueId));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            uniqueId[0] = '\0';
+            status = CHIP_NO_ERROR;
+        }
+
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(chip::CharSpan(uniqueId, strnlen(uniqueId, kMaxLen)));
-        }
-        else if (status == CHIP_ERROR_NOT_IMPLEMENTED || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            status = CHIP_ERROR_NOT_FOUND;
         }
         break;
     }
