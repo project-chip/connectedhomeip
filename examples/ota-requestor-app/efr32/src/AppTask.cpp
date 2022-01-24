@@ -545,5 +545,4 @@ void AppTask::InitOTARequestor()
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
-
 }
