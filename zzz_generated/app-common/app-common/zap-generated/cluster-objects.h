@@ -10096,6 +10096,14 @@ enum class WiFiBand : uint8_t
     k60g  = 0x04,
 };
 
+// Bitmap for NetworkCommissioningFeature
+enum class NetworkCommissioningFeature : uint32_t
+{
+    kWiFiNetworkInterface     = 0x1,
+    kThreadNetworkInterface   = 0x2,
+    kEthernetNetworkInterface = 0x4,
+};
+
 namespace Structs {
 namespace NetworkInfo {
 enum class Fields
