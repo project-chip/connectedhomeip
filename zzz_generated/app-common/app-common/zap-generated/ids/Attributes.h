@@ -5272,6 +5272,10 @@ namespace ListLongOctetString {
 static constexpr AttributeId Id = 0x0000002A;
 } // namespace ListLongOctetString
 
+namespace ListFabricScoped {
+static constexpr AttributeId Id = 0x0000002B;
+} // namespace ListFabricScoped
+
 namespace TimedWriteBoolean {
 static constexpr AttributeId Id = 0x00000030;
 } // namespace TimedWriteBoolean

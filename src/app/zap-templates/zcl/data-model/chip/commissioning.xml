@@ -143,6 +143,7 @@ limitations under the License.
         </command>
     </cluster>
     <bitmap name="NetworkCommissioningFeature" type="BITMAP32">
+        <cluster code="0x0031"/>
         <field name="WiFiNetworkInterface" mask="0x1"/>
         <field name="ThreadNetworkInterface" mask="0x2"/>
         <field name="EthernetNetworkInterface" mask="0x4"/>

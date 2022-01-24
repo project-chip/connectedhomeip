@@ -2013,6 +2013,25 @@ public class ChipStructs {
     }
   }
 
+  public static class TestClusterClusterTestFabricScoped {
+    public Integer fabricIndex;
+
+    public TestClusterClusterTestFabricScoped(Integer fabricIndex) {
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TestClusterClusterTestFabricScoped {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class TestClusterClusterTestListStructOctet {
     public Long fabricIndex;
     public byte[] operationalCert;
