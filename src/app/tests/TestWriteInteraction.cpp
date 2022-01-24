@@ -19,11 +19,13 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
@@ -419,6 +421,12 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
 namespace {
 
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+static chip::TestPersistentStorageDelegate sDelegate;
+static chip::Credentials::GroupDataProviderImpl sProvider(sDelegate, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -436,12 +444,47 @@ const nlTest sTests[] =
 // clang-format on
 
 // clang-format off
+
+/**
+ *  Set up the test suite.
+ */
+int Test_Setup(void * inContext)
+{
+    SetGroupDataProvider(&sProvider);
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
+
+
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int Test_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
+    if (nullptr != provider)
+    {
+        provider->Finish();
+    }
+
+
+    VerifyOrReturnError(TestContext::Finalize(inContext) == SUCCESS, FAILURE);
+
+
+    return SUCCESS;
+}
+
 nlTestSuite sSuite =
 {
     "TestWriteInteraction",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    &Test_Setup,
+    &Test_Teardown
 };
 // clang-format on
 

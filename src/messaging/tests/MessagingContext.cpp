@@ -113,7 +113,7 @@ void MessagingContext::ExpireSessionAliceToBob()
 
 void MessagingContext::ExpireSessionBobToFriends()
 {
-    // TODO: expire the group session
+    mSessionManager.RemoveGroupSession(mSessionBobToFriends.Get()->AsGroupSession());
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
