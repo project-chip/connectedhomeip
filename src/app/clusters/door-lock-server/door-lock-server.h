@@ -225,7 +225,6 @@ private:
     bool credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type);
 
     bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex);
-    bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex, uint8_t & weekDaysSupported);
 
     DlStatus clearWeekDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex);
     DlStatus clearWeekDaySchedules(chip::EndpointId endpointId, uint16_t userIndex);
@@ -236,6 +235,16 @@ private:
                                               uint16_t userIndex, DlStatus status, DlDaysMaskMap daysMask = DlDaysMaskMap(0),
                                               uint8_t startHour = 0, uint8_t startMinute = 0, uint8_t endHour = 0,
                                               uint8_t endMinute = 0);
+
+    bool yearDayIndexValid(chip::EndpointId endpointId, uint8_t yearDayIndex);
+
+    DlStatus clearYearDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex);
+    DlStatus clearYearDaySchedules(chip::EndpointId endpointId, uint16_t userIndex);
+
+    CHIP_ERROR sendGetYearDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                              uint16_t userIndex, DlStatus status, uint32_t localStartTime = 0,
+                                              uint32_t localEndTime = 0);
 
     bool sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
                                   chip::NodeId nodeId, chip::FabricIndex fabricIndex, uint16_t userIndex = 0,
