@@ -41,12 +41,12 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return 0;
 }
 
-Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target,
-                                                                                    const chip::CharSpan & data)
+void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & helper,
+                                                  const uint64_t & target, const CharSpan & data)
 {
     // TODO: Insert code here
     Commands::NavigateTargetResponse::Type response;
     response.data   = chip::CharSpan("data response", strlen("data response"));
     response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }

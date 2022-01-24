@@ -77,9 +77,12 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
                                             sizeof(rotatingIdString));
 
         CharSpan rotatingIdSpan = CharSpan(rotatingIdString, state->GetRotatingIdLength());
-        AccountLogin::Commands::GetSetupPINResponse::Type responseType =
-            app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingIdSpan);
-        std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
+
+        static const int kSetupPINSize = 12;
+        char mSetupPIN[kSetupPINSize];
+
+        app->GetAccountLoginDelegate()->GetSetupPin(mSetupPIN, kSetupPINSize, rotatingIdSpan);
+        std::string pinString(mSetupPIN);
 
         char * eptr;
         uint32_t pincode = (uint32_t) strtol(pinString.c_str(), &eptr, 10);

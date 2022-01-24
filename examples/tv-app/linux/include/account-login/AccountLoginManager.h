@@ -23,6 +23,7 @@
 #include <app/util/af-types.h>
 
 using chip::CharSpan;
+using chip::app::CommandResponseHelper;
 using chip::Platform::CopyString;
 using AccountLoginDelegate = chip::app::Clusters::AccountLogin::Delegate;
 using GetSetupPINResponse  = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
@@ -37,7 +38,12 @@ public:
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
     bool HandleLogout() override;
-    GetSetupPINResponse HandleGetSetupPin(const CharSpan & tempAccountIdentifierString) override;
+    void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
+                           const CharSpan & tempAccountIdentifierString) override;
+    inline void GetSetupPin(char * setupPIN, int setupPINSize, const CharSpan & tempAccountIdentifierString) override
+    {
+        CopyString(setupPIN, setupPINSize, mSetupPIN);
+    };
 
 protected:
     static const int kSetupPINSize = 12;

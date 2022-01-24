@@ -102,13 +102,12 @@ bool emberAfKeypadInputClusterSendKeyRequestCallback(app::CommandHandler * comma
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
     auto & keyCode      = commandData.keyCode;
+    app::CommandResponseHelper<Commands::SendKeyResponse::Type> responder(command, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        Commands::SendKeyResponse::Type response = delegate->HandleSendKey(keyCode);
-        err                                      = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleSendKey(responder, keyCode);
     }
 
 exit:

@@ -53,7 +53,8 @@ bool AccountLoginManager::HandleLogout()
     return true;
 }
 
-GetSetupPINResponse AccountLoginManager::HandleGetSetupPin(const CharSpan & tempAccountIdentifier)
+void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
+                                            const CharSpan & tempAccountIdentifier)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
@@ -61,5 +62,5 @@ GetSetupPINResponse AccountLoginManager::HandleGetSetupPin(const CharSpan & temp
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPIN);
 
     response.setupPIN = CharSpan(mSetupPIN, strlen(mSetupPIN));
-    return response;
+    helper.Success(response);
 }

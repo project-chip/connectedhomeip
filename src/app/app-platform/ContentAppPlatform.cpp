@@ -377,8 +377,11 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
         return 0;
     }
 
-    GetSetupPINResponseType responseType = app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingId);
-    std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
+    static const int kSetupPINSize = 12;
+    char mSetupPIN[kSetupPINSize];
+
+    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPIN, kSetupPINSize, rotatingId);
+    std::string pinString(mSetupPIN);
 
     char * eptr;
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);

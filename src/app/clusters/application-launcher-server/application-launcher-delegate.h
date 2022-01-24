@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/CommandResponseHelper.h>
 #include <app/util/af.h>
 #include <list>
 
@@ -56,9 +57,12 @@ public:
     // TODO: refactor this method signature to address memory issue (see PR 13398)
     virtual std::list<uint16_t> HandleGetCatalogList() = 0;
 
-    virtual LauncherResponseType HandleLaunchApp(const CharSpan & data, const ApplicationLauncherApplicationType & application) = 0;
-    virtual LauncherResponseType HandleStopApp(const ApplicationLauncherApplicationType & application)                          = 0;
-    virtual LauncherResponseType HandleHideApp(const ApplicationLauncherApplicationType & application)                          = 0;
+    virtual void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
+                                 const ApplicationLauncherApplicationType & application) = 0;
+    virtual void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+                               const ApplicationLauncherApplicationType & application)   = 0;
+    virtual void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
+                               const ApplicationLauncherApplicationType & application)   = 0;
 
     virtual ~Delegate() = default;
 

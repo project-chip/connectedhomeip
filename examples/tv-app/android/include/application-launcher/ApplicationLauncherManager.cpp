@@ -26,33 +26,32 @@ std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
     return { 123, 456 };
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
-    const chip::CharSpan & data,
-    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
+                                                 const ApplicationLauncherApplicationType & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
     response.data   = chip::CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(
-    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationLauncherApplicationType & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
     response.data   = chip::CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(
-    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationLauncherApplicationType & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
     response.data   = chip::CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }

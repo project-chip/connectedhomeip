@@ -103,14 +103,13 @@ bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * 
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EndpointId endpoint          = commandPath.mEndpointId;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+    app::CommandResponseHelper<Commands::GetSetupPINResponse::Type> responder(command, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Commands::GetSetupPINResponse::Type response = delegate->HandleGetSetupPin(tempAccountIdentifier);
-        err                                          = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleGetSetupPin(responder, tempAccountIdentifier);
     }
 
 exit:

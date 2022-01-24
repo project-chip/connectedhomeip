@@ -208,6 +208,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
     EndpointId endpoint = commandPath.mEndpointId;
     auto & data         = commandData.data;
     auto & application  = commandData.application;
+    app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
     std::string appId(application.applicationId.data(), application.applicationId.size());
     if (appId.length() == 0)
@@ -239,17 +240,14 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
                 LauncherResponseType response;
                 response.data   = CharSpan("data", strlen("data"));
                 response.status = StatusEnum::kAppNotAvailable;
-                err             = command->AddResponseData(commandPath, response);
-                SuccessOrExit(err);
-                return false;
+                responder.Success(response);
+                return true;
             }
 
             ContentAppPlatform::GetInstance().SetCurrentApp(app);
 
             ChipLogError(Zcl, "ApplicationLauncher handling launch on ContentApp");
-            LauncherResponseType response = app->GetApplicationLauncherDelegate()->HandleLaunchApp(data, application);
-            err                           = command->AddResponseData(commandPath, response);
-            SuccessOrExit(err);
+            app->GetApplicationLauncherDelegate()->HandleLaunchApp(responder, data, application);
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -274,9 +272,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
         ChipLogError(Zcl, "ApplicationLauncher handling launch");
-        LauncherResponseType response = delegate->HandleLaunchApp(data, application);
-        err                           = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleLaunchApp(responder, data, application);
     }
 
 exit:
@@ -299,6 +295,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
     auto & application  = commandData.application;
+    app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
     std::string appId(application.applicationId.data(), application.applicationId.size());
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
@@ -323,9 +320,8 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
                 LauncherResponseType response;
                 response.data   = CharSpan("data", strlen("data"));
                 response.status = StatusEnum::kAppNotAvailable;
-                err             = command->AddResponseData(commandPath, response);
-                SuccessOrExit(err);
-                return false;
+                responder.Success(response);
+                return true;
             }
 
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
@@ -334,9 +330,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
             app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kStopped);
 
             ChipLogError(Zcl, "ApplicationLauncher handling stop on ContentApp");
-            LauncherResponseType response = app->GetApplicationLauncherDelegate()->HandleStopApp(application);
-            err                           = command->AddResponseData(commandPath, response);
-            SuccessOrExit(err);
+            app->GetApplicationLauncherDelegate()->HandleStopApp(responder, application);
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -361,9 +355,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
             appBasic->SetApplicationStatus(ApplicationStatusEnum::kStopped);
         }
 
-        LauncherResponseType response = delegate->HandleStopApp(application);
-        err                           = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleStopApp(responder, application);
     }
 
 exit:
@@ -386,6 +378,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
     auto & application  = commandData.application;
+    app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
     std::string appId(application.applicationId.data(), application.applicationId.size());
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
@@ -410,17 +403,14 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
                 LauncherResponseType response;
                 response.data   = CharSpan("data", strlen("data"));
                 response.status = StatusEnum::kAppNotAvailable;
-                err             = command->AddResponseData(commandPath, response);
-                SuccessOrExit(err);
-                return false;
+                responder.Success(response);
+                return true;
             }
 
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
 
             ChipLogError(Zcl, "ApplicationLauncher handling stop on ContentApp");
-            LauncherResponseType response = app->GetApplicationLauncherDelegate()->HandleHideApp(application);
-            err                           = command->AddResponseData(commandPath, response);
-            SuccessOrExit(err);
+            app->GetApplicationLauncherDelegate()->HandleHideApp(responder, application);
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -445,9 +435,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
             appBasic->SetApplicationStatus(ApplicationStatusEnum::kActiveHidden);
         }
 
-        LauncherResponseType response = delegate->HandleHideApp(application);
-        err                           = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleHideApp(responder, application);
     }
 
 exit:

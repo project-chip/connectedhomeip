@@ -27,8 +27,8 @@ std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
     return { 123, 456 };
 }
 
-LauncherResponseType ApplicationLauncherManager::HandleLaunchApp(const CharSpan & data,
-                                                                 const ApplicationLauncherApplicationType & application)
+void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
+                                                 const ApplicationLauncherApplicationType & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
 
@@ -36,10 +36,11 @@ LauncherResponseType ApplicationLauncherManager::HandleLaunchApp(const CharSpan 
     LauncherResponseType response;
     response.data   = CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-LauncherResponseType ApplicationLauncherManager::HandleStopApp(const ApplicationLauncherApplicationType & application)
+void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationLauncherApplicationType & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleStopApp");
 
@@ -47,10 +48,11 @@ LauncherResponseType ApplicationLauncherManager::HandleStopApp(const Application
     LauncherResponseType response;
     response.data   = CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-LauncherResponseType ApplicationLauncherManager::HandleHideApp(const ApplicationLauncherApplicationType & application)
+void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationLauncherApplicationType & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleHideApp");
 
@@ -58,5 +60,5 @@ LauncherResponseType ApplicationLauncherManager::HandleHideApp(const Application
     LauncherResponseType response;
     response.data   = CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
