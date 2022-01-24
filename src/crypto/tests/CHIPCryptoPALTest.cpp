@@ -2143,7 +2143,7 @@ static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inC
     MutableByteSpan operational_key(key_buffer, sizeof(key_buffer));
 
     // Invalid Epoch Key
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INTERNAL == DeriveGroupOperationalKey(ByteSpan(), operational_key));
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == DeriveGroupOperationalKey(ByteSpan(), operational_key));
 
     // Epoch Key 1
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, operational_key));

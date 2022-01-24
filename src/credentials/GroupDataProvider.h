@@ -149,12 +149,16 @@ public:
 
         ByteSpan GetCurrentKey()
         {
-            if (this->num_keys_used > 0)
+            // An epoch key update SHALL order the keys from oldest to newest,
+            // the current epoch key having the second newest time
+            switch (this->num_keys_used)
             {
+            case 1:
+            case 2:
                 return ByteSpan(epoch_keys[0].key, EpochKey::kLengthBytes);
-            }
-            else
-            {
+            case 3:
+                return ByteSpan(epoch_keys[1].key, EpochKey::kLengthBytes);
+            default:
                 return ByteSpan(nullptr, 0);
             }
         }
