@@ -510,7 +510,8 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength] = { 'X', 'X' };
     char countryCode[DeviceLayer::ConfigurationManager::kMaxLocationLength];
     size_t codeLen = 0;
-    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(countryCode, sizeof(countryCode), codeLen) == CHIP_NO_ERROR) && (codeLen > 0))
+    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(countryCode, sizeof(countryCode), codeLen) == CHIP_NO_ERROR) &&
+        (codeLen > 0))
     {
         strncpy(location, countryCode, codeLen);
     }
