@@ -1725,7 +1725,7 @@ typedef struct
 /**
  * @brief The broadcast endpoint, as defined in the ZigBee spec.
  */
-#define EMBER_BROADCAST_ENDPOINT 0xFF
+#define EMBER_BROADCAST_ENDPOINT (chip::kInvalidEndpointId)
 
 /**
  * @brief Useful to reference a single bit of a byte.
