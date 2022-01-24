@@ -845,7 +845,30 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
     const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
 {
     auto endpointId = commandPath.mEndpointId;
+    if (!SupportsSchedules(endpointId))
+    {
+        emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
     emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Incoming command [endpointId=%d]", endpointId);
+
+    auto fabricIdx = getFabricIndex(commandObj);
+    if (kUndefinedFabricIndex == fabricIdx)
+    {
+        ChipLogError(Zcl, "[ClearWeekDaySchedule] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    auto sourceNodeId = getNodeId(commandObj);
+    if (chip::kUndefinedNodeId == sourceNodeId)
+    {
+        ChipLogError(Zcl, "[ClearWeekDaySchedule] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
 
     auto weekDayIndex     = commandData.weekDayIndex;
     auto userIndex        = commandData.userIndex;
@@ -864,32 +887,22 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         return;
     }
 
-    // Check if user actually exist
-    EmberAfPluginDoorLockUserInfo user;
-    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
-    {
-        ChipLogError(Zcl,
-                     "[SetWeekDaySchedule] Unable to get the user - internal error [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
-                     endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-        return;
-    }
-    if (DlUserStatus::kAvailable == user.userStatus)
+    if (!userExists(endpointId, userIndex))
     {
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add weekday schedule - user does not exist "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                                       endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
         return;
     }
 
     // appclusters, 5.2.4.14 - spec does not allow setting the schedule for multiple days in the bitmask
     int setBitsInDaysMask = 0;
-    auto rawDaysMask      = daysMask.Raw();
+    uint8_t rawDaysMask      = daysMask.Raw();
     for (size_t i = 0; i < sizeof(rawDaysMask) * 8; ++i)
     {
         setBitsInDaysMask += rawDaysMask & 0x1;
-        rawDaysMask >>= 1;
+        rawDaysMask = static_cast<uint8_t>(rawDaysMask >> 1);
     }
 
     if (setBitsInDaysMask == 0 || setBitsInDaysMask > 1)
@@ -927,7 +940,7 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         ChipLogError(Zcl,
                      "[SetWeekDaySchedule] Unable to add weekday schedule - internal error "
                      "[endpointId=%d,weekDayIndex=%d,userIndex=%d,status=%" PRIu8 "]",
-                     endpointId, weekDayIndex, userIndex, status);
+                     endpointId, weekDayIndex, userIndex, to_underlying(status));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return;
     }
@@ -936,7 +949,8 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
                                   "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                   endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
 
-    // TODO: Send lockUserChange event
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kWeekDaySchedule, DlDataOperationType::kClear, sourceNodeId, fabricIdx,
+                             userIndex, static_cast<uint16_t>(weekDayIndex));
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -946,6 +960,13 @@ void DoorLockServer::GetWeekDayScheduleCommandHandler(
     const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
 {
     auto endpointId = commandPath.mEndpointId;
+    if (!SupportsSchedules(endpointId))
+    {
+        emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
     emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Incoming command [endpointId=%d]", endpointId);
 
     auto weekDayIndex = commandData.weekDayIndex;
@@ -957,6 +978,14 @@ void DoorLockServer::GetWeekDayScheduleCommandHandler(
             "[GetWeekDaySchedule] Unable to get weekday schedule - index out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
             endpointId, weekDayIndex, userIndex);
         sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kInvalidField);
+        return;
+    }
+
+    if (!userExists(endpointId, userIndex))
+    {
+        emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
+                                      endpointId, weekDayIndex, userIndex);
+        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kNotFound);
         return;
     }
 
@@ -976,9 +1005,79 @@ void DoorLockServer::ClearWeekDayScheduleCommandHandler(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+    auto endpointId = commandPath.mEndpointId;
+    if (!SupportsSchedules(endpointId))
+    {
+        emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
 
-    // TODO: Implement clearing weekday schedule
+    emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Incoming command [endpointId=%d]", endpointId);
+
+    auto fabricIdx = getFabricIndex(commandObj);
+    if (kUndefinedFabricIndex == fabricIdx)
+    {
+        ChipLogError(Zcl, "[ClearWeekDaySchedule] Unable to get the fabric IDX [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    auto sourceNodeId = getNodeId(commandObj);
+    if (chip::kUndefinedNodeId == sourceNodeId)
+    {
+        ChipLogError(Zcl, "[ClearWeekDaySchedule] Unable to get the source node index [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    auto weekDayIndex = commandData.weekDayIndex;
+    auto userIndex    = commandData.userIndex;
+
+    if (!userIndexValid(endpointId, userIndex) || (!weekDayIndexValid(endpointId, weekDayIndex) && 0xFE != weekDayIndex))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[ClearWeekDaySchedule] User or WeekDay index is out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]", endpointId,
+            weekDayIndex, userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    if (!userExists(endpointId, userIndex))
+    {
+        emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
+                                      endpointId, weekDayIndex, userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        return;
+    }
+
+    DlStatus clearStatus = DlStatus::kSuccess;
+    if (0xFE == weekDayIndex)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[ClearWeekDaySchedule] Clearing all schedules for a single user [endpointId=%d,userIndex=%d]", endpointId, userIndex);
+        clearStatus = clearWeekDaySchedules(endpointId, userIndex);
+    }
+    else
+    {
+        emberAfDoorLockClusterPrintln(
+            "[ClearWeekDaySchedule] Clearing a single schedule [endpointId=%d,weekDayIndex=%d,userIndex=%d]", endpointId,
+            weekDayIndex, userIndex);
+        clearStatus = clearWeekDaySchedule(endpointId, userIndex, weekDayIndex);
+    }
+
+    if (DlStatus::kSuccess != clearStatus)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[ClearWeekDaySchedule] Unable to clear the user - app error [endpointId=%d,userIndex=%d,status=%" PRIu8 "]",
+            endpointId, userIndex, to_underlying(clearStatus));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kWeekDaySchedule, DlDataOperationType::kClear, sourceNodeId, fabricIdx,
+                             userIndex, static_cast<uint16_t>(weekDayIndex));
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return;
 }
@@ -1043,6 +1142,19 @@ bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIn
         return false;
     }
     return true;
+}
+
+bool DoorLockServer::userExists(chip::EndpointId endpointId, uint16_t userIndex)
+{
+    // Check if user actually exist
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        ChipLogError(Zcl, "[UserExists] Unable to get the user - internal error [endpointId=%d,userIndex=%d]", endpointId,
+                     userIndex);
+        return false;
+    }
+    return DlUserStatus::kAvailable != user.userStatus;
 }
 
 bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex)
@@ -1472,7 +1584,13 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Fabri
         }
     }
 
-    // TODO: Remove all the user schedules
+    // Clear all the user schedules
+    auto status = clearSchedules(endpointId, userIndex);
+    if (DlStatus::kSuccess != status)
+    {
+        ChipLogError(Zcl, "[ClearUser] Unable to delete schedules - internal error [endpointId=%d,userIndex=%d]", endpointId,
+                     userIndex);
+    }
 
     // Remove the user entry
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
@@ -1915,6 +2033,46 @@ bool DoorLockServer::weekDayIndexValid(chip::EndpointId endpointId, uint8_t week
         return false;
     }
     return true;
+}
+
+DlStatus DoorLockServer::clearWeekDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex)
+{
+    auto status = emberAfPluginDoorLockSetSchedule(endpointId, weekDayIndex, userIndex, DlScheduleStatus::kAvailable,
+                                                   DlDaysMaskMap(0), 0, 0, 0, 0);
+    if (DlStatus::kSuccess != status && DlStatus::kNotFound != status)
+    {
+        ChipLogError(Zcl,
+                     "[ClearWeekDaySchedule] Unable to clear the schedule - internal error "
+                     "[endpointId=%d,userIndex=%d,scheduleIndex=%d,status=%" PRIu8 "]",
+                     endpointId, userIndex, weekDayIndex, to_underlying(status));
+        return status;
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockServer::clearWeekDaySchedules(chip::EndpointId endpointId, uint16_t userIndex)
+{
+    uint8_t weekDaySchedulesPerUser = 0;
+    if (!GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, weekDaySchedulesPerUser))
+    {
+        return DlStatus::kFailure;
+    }
+
+    for (uint8_t i = 1; i <= weekDaySchedulesPerUser; ++i)
+    {
+        auto status = clearWeekDaySchedule(endpointId, userIndex, i);
+        if (DlStatus::kSuccess != status)
+        {
+            return status;
+        }
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockServer::clearSchedules(chip::EndpointId endpointId, uint16_t userIndex)
+{
+    // TODO: Clear Year Day and Holiday schedules when they're implemented
+    return clearWeekDaySchedules(endpointId, userIndex);
 }
 
 CHIP_ERROR DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,

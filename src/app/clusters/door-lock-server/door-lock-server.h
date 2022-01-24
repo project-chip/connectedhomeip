@@ -126,6 +126,8 @@ public:
 
     inline bool SupportsFace(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFaceCredentials); }
 
+    inline bool SupportsSchedules(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kAccessSchedules); }
+
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
@@ -139,6 +141,7 @@ private:
 
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
+    bool userExists(chip::EndpointId endpointId, uint16_t userIndex);
 
     bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex);
     bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex,
@@ -212,6 +215,10 @@ private:
 
     bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex);
     bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex, uint8_t & weekDaysSupported);
+
+    DlStatus clearWeekDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex);
+    DlStatus clearWeekDaySchedules(chip::EndpointId endpointId, uint16_t userIndex);
+    DlStatus clearSchedules(chip::EndpointId endpointId, uint16_t userIndex);
 
     CHIP_ERROR sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,
                                               const chip::app::ConcreteCommandPath & commandPath, uint8_t weekdayIndex,
