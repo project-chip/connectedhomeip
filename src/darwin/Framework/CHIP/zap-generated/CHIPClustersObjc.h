@@ -1473,6 +1473,15 @@ NS_ASSUME_NONNULL_BEGIN
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeNumberOfRFIDUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxPINCodeLengthWithMinInterval:(uint16_t)minInterval
@@ -1488,6 +1497,22 @@ NS_ASSUME_NONNULL_BEGIN
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeMaxRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeMaxRFIDCodeLengthWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeMinRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeMinRFIDCodeLengthWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLanguageWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;

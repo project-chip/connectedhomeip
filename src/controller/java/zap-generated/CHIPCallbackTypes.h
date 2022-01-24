@@ -349,10 +349,16 @@ typedef void (*CHIPDoorLockClusterNumberOfTotalUsersSupportedAttributeCallbackTy
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterNumberOfPINUsersSupportedAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfRFIDUsersSupportedAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMaxPINCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MinPINCodeLength::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterMaxRFIDCodeLengthAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterMinRFIDCodeLengthAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::MinRFIDCodeLength::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterLanguageAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterAutoRelockTimeAttributeCallbackType)(

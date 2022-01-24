@@ -17312,8 +17312,11 @@ private:
 | * DoorState                                                         | 0x0003 |
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
+| * NumberOfRFIDUsersSupported                                        | 0x0013 |
 | * MaxPINCodeLength                                                  | 0x0017 |
 | * MinPINCodeLength                                                  | 0x0018 |
+| * MaxRFIDCodeLength                                                 | 0x0019 |
+| * MinRFIDCodeLength                                                 | 0x001A |
 | * Language                                                          | 0x0021 |
 | * AutoRelockTime                                                    | 0x0023 |
 | * SoundVolume                                                       | 0x0024 |
@@ -17466,8 +17469,8 @@ public:
         // credential Struct parsing is not supported yet
         AddArgument("CredentialData", &mRequest.credentialData);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
         ModelCommand::AddArguments();
     }
 
@@ -17496,12 +17499,9 @@ public:
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserName", &mRequest.userName);
         AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("CredentialRule", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.credentialRule)> *>(&mRequest.credentialRule));
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
+        AddArgument("CredentialRule", 0, UINT8_MAX, &mRequest.credentialRule);
         ModelCommand::AddArguments();
     }
 
@@ -18325,6 +18325,75 @@ private:
 };
 
 /*
+ * Attribute NumberOfRFIDUsersSupported
+ */
+class ReadDoorLockNumberOfRFIDUsersSupported : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfRFIDUsersSupported() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-rfidusers-supported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfRFIDUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "DoorLock.NumberOfRFIDUsersSupported response", value);
+    }
+};
+
+class ReportDoorLockNumberOfRFIDUsersSupported : public ModelCommand
+{
+public:
+    ReportDoorLockNumberOfRFIDUsersSupported() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "number-of-rfidusers-supported");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockNumberOfRFIDUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfRFIDUsersSupported report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute MaxPINCodeLength
  */
 class ReadDoorLockMaxPINCodeLength : public ModelCommand
@@ -18455,6 +18524,144 @@ public:
     }
 
     static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MinPINCodeLength report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute MaxRFIDCodeLength
+ */
+class ReadDoorLockMaxRFIDCodeLength : public ModelCommand
+{
+public:
+    ReadDoorLockMaxRFIDCodeLength() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-rfidcode-length");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockMaxRFIDCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "DoorLock.MaxRFIDCodeLength response", value);
+    }
+};
+
+class ReportDoorLockMaxRFIDCodeLength : public ModelCommand
+{
+public:
+    ReportDoorLockMaxRFIDCodeLength() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "max-rfidcode-length");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockMaxRFIDCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MaxRFIDCodeLength report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute MinRFIDCodeLength
+ */
+class ReadDoorLockMinRFIDCodeLength : public ModelCommand
+{
+public:
+    ReadDoorLockMinRFIDCodeLength() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-rfidcode-length");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockMinRFIDCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::MinRFIDCodeLength::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "DoorLock.MinRFIDCodeLength response", value);
+    }
+};
+
+class ReportDoorLockMinRFIDCodeLength : public ModelCommand
+{
+public:
+    ReportDoorLockMinRFIDCodeLength() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "min-rfidcode-length");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockMinRFIDCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::MinRFIDCodeLength::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MinRFIDCodeLength report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -61230,10 +61437,16 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<ReportDoorLockNumberOfTotalUsersSupported>(), //
         make_unique<ReadDoorLockNumberOfPINUsersSupported>(),     //
         make_unique<ReportDoorLockNumberOfPINUsersSupported>(),   //
+        make_unique<ReadDoorLockNumberOfRFIDUsersSupported>(),    //
+        make_unique<ReportDoorLockNumberOfRFIDUsersSupported>(),  //
         make_unique<ReadDoorLockMaxPINCodeLength>(),              //
         make_unique<ReportDoorLockMaxPINCodeLength>(),            //
         make_unique<ReadDoorLockMinPINCodeLength>(),              //
         make_unique<ReportDoorLockMinPINCodeLength>(),            //
+        make_unique<ReadDoorLockMaxRFIDCodeLength>(),             //
+        make_unique<ReportDoorLockMaxRFIDCodeLength>(),           //
+        make_unique<ReadDoorLockMinRFIDCodeLength>(),             //
+        make_unique<ReportDoorLockMinRFIDCodeLength>(),           //
         make_unique<ReadDoorLockLanguage>(),                      //
         make_unique<WriteDoorLockLanguage>(),                     //
         make_unique<ReportDoorLockLanguage>(),                    //

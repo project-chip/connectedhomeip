@@ -676,11 +676,6 @@ server cluster DoorLock = 257 {
     kModify = 2;
   }
 
-  enum DlDoorLockStatus : ENUM8 {
-    kDuplicate = 2;
-    kOccupied = 3;
-  }
-
   enum DlDoorState : ENUM8 {
     kDoorOpen = 0;
     kDoorClosed = 1;
@@ -932,8 +927,9 @@ server cluster DoorLock = 257 {
     DlDataOperationType operationType = 0;
     DlCredential credential = 1;
     LONG_OCTET_STRING credentialData = 2;
-    INT16U userIndex = 3;
-    DlUserStatus userStatus = 4;
+    nullable INT16U userIndex = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
   }
 
   request struct SetUserRequest {
@@ -941,9 +937,9 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 1;
     nullable CHAR_STRING userName = 2;
     nullable INT32U userUniqueId = 3;
-    DlUserStatus userStatus = 4;
-    DlUserType userType = 5;
-    DlCredentialRule credentialRule = 6;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+    nullable DlCredentialRule credentialRule = 6;
   }
 
   request struct UnlockDoorRequest {
@@ -966,7 +962,7 @@ server cluster DoorLock = 257 {
     nullable DlCredential credentials[] = 6;
     nullable fabric_idx creatorFabricIndex = 7;
     nullable fabric_idx lastModifiedFabricIndex = 8;
-    INT16U nextUserIndex = 9;
+    nullable INT16U nextUserIndex = 9;
   }
 
   response struct SetCredentialResponse {

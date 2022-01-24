@@ -6072,8 +6072,24 @@ using namespace chip::app::Clusters;
         params.credential.credentialType.unsignedCharValue);
     request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
     request.credentialData = [self asByteSpan:params.credentialData];
-    request.userIndex = params.userIndex.unsignedShortValue;
-    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
+    if (params.userIndex == nil) {
+        request.userIndex.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userIndex.SetNonNull();
+        nonNullValue_0 = params.userIndex.unsignedShortValue;
+    }
+    if (params.userStatus == nil) {
+        request.userStatus.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userStatus.SetNonNull();
+        nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userStatus.unsignedCharValue);
+    }
+    if (params.userType == nil) {
+        request.userType.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userType.SetNonNull();
+        nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
+    }
 
     new CHIPDoorLockClusterSetCredentialResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6102,10 +6118,24 @@ using namespace chip::app::Clusters;
         auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
         nonNullValue_0 = params.userUniqueId.unsignedIntValue;
     }
-    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
-    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-    request.credentialRule
-        = static_cast<std::remove_reference_t<decltype(request.credentialRule)>>(params.credentialRule.unsignedCharValue);
+    if (params.userStatus == nil) {
+        request.userStatus.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userStatus.SetNonNull();
+        nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userStatus.unsignedCharValue);
+    }
+    if (params.userType == nil) {
+        request.userType.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userType.SetNonNull();
+        nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
+    }
+    if (params.credentialRule == nil) {
+        request.credentialRule.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.credentialRule.SetNonNull();
+        nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.credentialRule.unsignedCharValue);
+    }
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -6322,6 +6352,36 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
+- (void)readAttributeNumberOfRFIDUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler
+{
+    new CHIPInt16uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
 - (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
@@ -6372,6 +6432,64 @@ using namespace chip::app::Clusters;
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = DoorLock::Attributes::MinPINCodeLength::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeMaxRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeMaxRFIDCodeLengthWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeMinRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::MinRFIDCodeLength::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeMinRFIDCodeLengthWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::MinRFIDCodeLength::TypeInfo;
             auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
