@@ -6101,6 +6101,30 @@
               "outgoing": 0
             },
             {
+              "name": "SetYearDaySchedule",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetYearDaySchedule",
+              "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "ClearYearDaySchedule",
+              "code": 16,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "SetUser",
               "code": 26,
               "mfgCode": null,
@@ -6178,6 +6202,14 @@
             {
               "name": "GetWeekDayScheduleResponse",
               "code": 12,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "GetYearDayScheduleResponse",
+              "code": 15,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
@@ -6394,7 +6426,7 @@
               "code": 21,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -6908,7 +6940,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x103",
+              "defaultValue": "0x113",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
