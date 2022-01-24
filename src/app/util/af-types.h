@@ -1555,12 +1555,6 @@ typedef struct
     uint32_t timeStamp;
 } EmberAfJoiningDevice;
 
-#define EMBER_AF_INVALID_CLUSTER_ID 0xFFFF
-
-#define EMBER_AF_INVALID_ENDPOINT 0xFF
-
-#define EMBER_AF_INVALID_PAN_ID 0xFFFF
-
 /**
  * @brief Permit join times
  */
