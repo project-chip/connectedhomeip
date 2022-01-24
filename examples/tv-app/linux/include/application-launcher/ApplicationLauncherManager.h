@@ -21,22 +21,20 @@
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <list>
 
-using namespace chip;
-using namespace chip::app::Clusters;
+using chip::CharSpan;
+using ApplicationLauncher                = chip::app::Clusters::ApplicationLauncher::Delegate;
+using ApplicationLauncherApplicationType = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type;
+using LauncherResponseType               = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
-class ApplicationLauncherManager : public ApplicationLauncher::Delegate
+class ApplicationLauncherManager : public ApplicationLauncher
 {
 public:
-    ApplicationLauncherManager() : ApplicationLauncher::Delegate(){};
-    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncher::Delegate(featureMapContentPlatform){};
+    ApplicationLauncherManager() : ApplicationLauncher(){};
+    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncher(featureMapContentPlatform){};
 
     std::list<uint16_t> HandleGetCatalogList() override;
 
-    ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleLaunchApp(const CharSpan & data,
-                    const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleStopApp(const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleHideApp(const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    LauncherResponseType HandleLaunchApp(const CharSpan & data, const ApplicationLauncherApplicationType & application) override;
+    LauncherResponseType HandleStopApp(const ApplicationLauncherApplicationType & application) override;
+    LauncherResponseType HandleHideApp(const ApplicationLauncherApplicationType & application) override;
 };

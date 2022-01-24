@@ -32,6 +32,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClientState state)
 {

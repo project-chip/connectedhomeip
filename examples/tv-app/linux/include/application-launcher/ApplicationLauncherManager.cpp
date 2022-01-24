@@ -27,38 +27,35 @@ std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
     return { 123, 456 };
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleLaunchApp(const CharSpan & data,
-                                            const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+LauncherResponseType ApplicationLauncherManager::HandleLaunchApp(const CharSpan & data,
+                                                                 const ApplicationLauncherApplicationType & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
 
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
+    LauncherResponseType response;
     response.data   = CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
     return response;
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleStopApp(const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+LauncherResponseType ApplicationLauncherManager::HandleStopApp(const ApplicationLauncherApplicationType & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleStopApp");
 
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
+    LauncherResponseType response;
     response.data   = CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
     return response;
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleHideApp(const ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+LauncherResponseType ApplicationLauncherManager::HandleHideApp(const ApplicationLauncherApplicationType & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleHideApp");
 
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
+    LauncherResponseType response;
     response.data   = CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
     return response;

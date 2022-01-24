@@ -20,21 +20,24 @@
 
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
+using chip::CharSpan;
+using chip::EndpointId;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using ContentLauncher    = chip::app::Clusters::ContentLauncher::Delegate;
+using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
-class ContentLauncherManager : public ContentLauncher::Delegate
+class ContentLauncherManager : public ContentLauncher
 {
 public:
     ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};
     ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
-                             CommandResponseHelper<ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
+                             CommandResponseHelper<LaunchResponseType> & responser) override;
     void HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
                          const std::list<BrandingInformation> & brandingInformation,
-                         CommandResponseHelper<ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
+                         CommandResponseHelper<LaunchResponseType> & responser) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 

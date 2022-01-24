@@ -30,12 +30,12 @@ ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderLis
 }
 
 void ContentLauncherManager::HandleLaunchContent(const list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
-                                                 CommandResponseHelper<ContentLauncher::Commands::LaunchResponse::Type> & responser)
+                                                 CommandResponseHelper<LaunchResponseType> & responser)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
 
-    Commands::LaunchResponse::Type response;
+    LaunchResponseType response;
     // TODO: Insert code here
     response.data   = CharSpan("exampleData", strlen("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
@@ -44,7 +44,7 @@ void ContentLauncherManager::HandleLaunchContent(const list<Parameter> & paramet
 
 void ContentLauncherManager::HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
                                              const list<BrandingInformation> & brandingInformation,
-                                             CommandResponseHelper<ContentLauncher::Commands::LaunchResponse::Type> & responser)
+                                             CommandResponseHelper<LaunchResponseType> & responser)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -52,7 +52,7 @@ void ContentLauncherManager::HandleLaunchUrl(const CharSpan & contentUrl, const 
     string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
-    Commands::LaunchResponse::Type response;
+    LaunchResponseType response;
     response.data   = CharSpan("exampleData", strlen("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
     responser.Success(response);

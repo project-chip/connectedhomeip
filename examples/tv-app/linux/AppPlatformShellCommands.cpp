@@ -73,7 +73,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         }
 
         char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
                                             sizeof(rotatingIdString));
 
         CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));

@@ -36,6 +36,9 @@
 
 using namespace chip;
 using namespace chip::AppPlatform;
+using namespace chip::app::Clusters;
+using ApplicationStatusEnum   = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
+using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -295,7 +298,7 @@ void ContentAppPlatform::SetCurrentApp(ContentApp * app)
     if (!HasCurrentApp())
     {
         mCurrentAppEndpointId = app->GetEndpointId();
-        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kActiveVisibleFocus);
         return;
     }
 
@@ -303,7 +306,7 @@ void ContentAppPlatform::SetCurrentApp(ContentApp * app)
     if (mCurrentAppEndpointId == app->GetEndpointId())
     {
         ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp already current app");
-        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kActiveVisibleFocus);
         return;
     }
     // if there is another current app, then need to hide it
@@ -312,16 +315,16 @@ void ContentAppPlatform::SetCurrentApp(ContentApp * app)
     {
         ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp current app not found");
         mCurrentAppEndpointId = app->GetEndpointId();
-        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kActiveVisibleFocus);
         return;
     }
 
     ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp has a current app");
     // make sure to mark previousApp as hidden
-    previousApp->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
+    previousApp->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kActiveHidden);
 
     mCurrentAppEndpointId = app->GetEndpointId();
-    app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+    app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kActiveVisibleFocus);
     return;
 } // namespace AppPlatform
 
@@ -351,7 +354,7 @@ void ContentAppPlatform::UnsetIfCurrentApp(ContentApp * app)
     {
         ChipLogProgress(DeviceLayer, "UnsetIfCurrentApp setting to no current app");
         mCurrentAppEndpointId = kNoCurrentEndpointId;
-        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
+        app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kActiveHidden);
     }
     else
     {
@@ -374,7 +377,7 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
         return 0;
     }
 
-    AccountLogin::Commands::GetSetupPINResponse::Type responseType = app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingId);
+    GetSetupPINResponseType responseType = app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingId);
     std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
 
     char * eptr;

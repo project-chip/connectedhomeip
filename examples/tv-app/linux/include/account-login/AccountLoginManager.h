@@ -22,20 +22,22 @@
 
 #include <app/util/af-types.h>
 
-using namespace chip;
-using namespace chip::app::Clusters;
+using chip::CharSpan;
+using chip::Platform::CopyString;
+using AccountLogin        = chip::app::Clusters::AccountLogin::Delegate;
+using GetSetupPINResponse = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 
-class AccountLoginManager : public AccountLogin::Delegate
+class AccountLoginManager : public AccountLogin
 {
 public:
     AccountLoginManager() : AccountLoginManager("tempPin123"){};
     AccountLoginManager(const char * setupPIN);
 
-    inline void SetSetupPIN(char * setupPIN) override { Platform::CopyString(mSetupPIN, sizeof(mSetupPIN), setupPIN); };
+    inline void SetSetupPIN(char * setupPIN) override { CopyString(mSetupPIN, sizeof(mSetupPIN), setupPIN); };
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
     bool HandleLogout() override;
-    AccountLogin::Commands::GetSetupPINResponse::Type HandleGetSetupPin(const CharSpan & tempAccountIdentifierString) override;
+    GetSetupPINResponse HandleGetSetupPin(const CharSpan & tempAccountIdentifierString) override;
 
 protected:
     static const int kSetupPINSize = 12;

@@ -48,9 +48,9 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return mCurrentTarget;
 }
 
-Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target, const CharSpan & data)
+NavigateTargetResponseType TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target, const CharSpan & data)
 {
-    Commands::NavigateTargetResponse::Type response;
+    NavigateTargetResponseType response;
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
         response.data = CharSpan("error", strlen("error"));

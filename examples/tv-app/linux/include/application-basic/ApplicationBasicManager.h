@@ -20,25 +20,26 @@
 
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
-using namespace chip;
-using namespace chip::app::Clusters;
+using chip::CharSpan;
+using chip::Platform::CopyString;
+using ApplicationBasic = chip::app::Clusters::ApplicationBasic::Delegate;
 
-class ApplicationBasicManager : public ApplicationBasic::Delegate
+class ApplicationBasicManager : public ApplicationBasic
 {
 public:
     ApplicationBasicManager() :
         ApplicationBasicManager(123, "applicationId", "exampleVendorName1", 1, "exampleName1", 1, "exampleVersion"){};
     ApplicationBasicManager(uint16_t szCatalogVendorId, const char * szApplicationId, const char * szVendorName, uint16_t vendorId,
                             const char * szApplicationName, uint16_t productId, const char * szApplicationVersion) :
-        ApplicationBasic::Delegate(szCatalogVendorId, szApplicationId)
+        ApplicationBasic(szCatalogVendorId, szApplicationId)
     {
 
         ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationId, szApplicationName);
 
-        Platform::CopyString(mApplicationName, sizeof(mApplicationName), szApplicationName);
-        Platform::CopyString(mVendorName, sizeof(mVendorName), szVendorName);
+        CopyString(mApplicationName, sizeof(mApplicationName), szApplicationName);
+        CopyString(mVendorName, sizeof(mVendorName), szVendorName);
         mVendorId = vendorId;
-        Platform::CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
+        CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
         mProductId = productId;
     };
     virtual ~ApplicationBasicManager(){};

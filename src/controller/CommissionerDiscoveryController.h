@@ -35,7 +35,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
-using namespace chip::Protocols::UserDirectedCommissioning;
+using chip::Protocols::UserDirectedCommissioning::UDCClientState;
+using chip::Protocols::UserDirectedCommissioning::UserConfirmationProvider;
+using chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer;
+using chip::Transport::PeerAddress;
 
 class DLL_EXPORT UserPrompter
 {

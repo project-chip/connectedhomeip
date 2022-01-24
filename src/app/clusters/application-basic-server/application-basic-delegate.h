@@ -29,7 +29,7 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 
-using namespace chip::app::Clusters;
+using ApplicationBasicApplicationType = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
 
 class DLL_EXPORT CatalogVendorApp
 {
@@ -74,7 +74,7 @@ public:
     virtual uint16_t HandleGetVendorId()        = 0;
     virtual CharSpan HandleGetApplicationName() = 0;
     virtual uint16_t HandleGetProductId()       = 0;
-    ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication();
+    ApplicationBasicApplicationType HandleGetApplication();
     inline ApplicationStatusEnum HandleGetStatus() { return mApplicationStatus; }
     virtual CharSpan HandleGetApplicationVersion()           = 0;
     virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;

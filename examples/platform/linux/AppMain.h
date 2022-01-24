@@ -33,11 +33,10 @@ void ChipLinuxAppMainLoop();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-using namespace chip;
-using namespace chip::Transport;
-using namespace ::chip::Controller;
+using chip::Controller::DeviceCommissioner;
+using chip::Transport::PeerAddress;
 
-CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport::PeerAddress address);
+CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, PeerAddress address);
 CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
 
 DeviceCommissioner * GetDeviceCommissioner();

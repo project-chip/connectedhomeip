@@ -28,8 +28,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ApplicationLauncher::Structs;
+using ApplicationLauncherApplicationType = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type;
+using ApplicationEPType                  = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
+using LauncherResponseType               = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Application Launcher Cluster.
@@ -50,15 +51,14 @@ public:
     }
 
     // this attribute should only be enabled for app platform instance (endpoint 1)
-    Structs::ApplicationEP::Type HandleGetCurrentApp();
+    ApplicationEPType HandleGetCurrentApp();
 
     // TODO: refactor this method signature to address memory issue (see PR 13398)
     virtual std::list<uint16_t> HandleGetCatalogList() = 0;
 
-    virtual Commands::LauncherResponse::Type HandleLaunchApp(const CharSpan & data,
-                                                             const ApplicationLauncherApplication::Type & application) = 0;
-    virtual Commands::LauncherResponse::Type HandleStopApp(const ApplicationLauncherApplication::Type & application)   = 0;
-    virtual Commands::LauncherResponse::Type HandleHideApp(const ApplicationLauncherApplication::Type & application)   = 0;
+    virtual LauncherResponseType HandleLaunchApp(const CharSpan & data, const ApplicationLauncherApplicationType & application) = 0;
+    virtual LauncherResponseType HandleStopApp(const ApplicationLauncherApplicationType & application)                          = 0;
+    virtual LauncherResponseType HandleHideApp(const ApplicationLauncherApplicationType & application)                          = 0;
 
     virtual ~Delegate() = default;
 

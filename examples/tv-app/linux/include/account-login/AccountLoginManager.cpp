@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::AccountLogin;
 
 AccountLoginManager::AccountLoginManager(const char * setupPIN)
 {
-    Platform::CopyString(mSetupPIN, sizeof(mSetupPIN), setupPIN);
+    CopyString(mSetupPIN, sizeof(mSetupPIN), setupPIN);
 }
 
 bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
@@ -53,11 +53,11 @@ bool AccountLoginManager::HandleLogout()
     return true;
 }
 
-Commands::GetSetupPINResponse::Type AccountLoginManager::HandleGetSetupPin(const CharSpan & tempAccountIdentifier)
+GetSetupPINResponse AccountLoginManager::HandleGetSetupPin(const CharSpan & tempAccountIdentifier)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
-    Commands::GetSetupPINResponse::Type response;
+    GetSetupPINResponse response;
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPIN);
 
     response.setupPIN = CharSpan(mSetupPIN, strlen(mSetupPIN));

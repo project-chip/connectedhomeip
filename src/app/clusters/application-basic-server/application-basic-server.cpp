@@ -34,6 +34,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationBasic;
+using namespace chip::app::Clusters::ApplicationBasic::Attributes;
 using namespace chip::AppPlatform;
 
 // -----------------------------------------------------------------------------
@@ -95,9 +96,9 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
     return GetDelegate(endpoint);
 }
 
-ApplicationBasic::Structs::ApplicationBasicApplication::Type Delegate::HandleGetApplication()
+ApplicationBasicApplicationType Delegate::HandleGetApplication()
 {
-    ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
+    ApplicationBasicApplicationType application;
     application.catalogVendorId = mCatalogVendorApp.catalogVendorId;
     application.applicationId   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
     return application;
@@ -152,28 +153,28 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
+    case VendorName::Id: {
         return ReadVendorNameAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::VendorId::Id: {
+    case VendorId::Id: {
         return ReadVendorIdAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
+    case ApplicationName::Id: {
         return ReadApplicationNameAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::ProductId::Id: {
+    case ProductId::Id: {
         return ReadProductIdAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::ApplicationApp::Id: {
+    case ApplicationApp::Id: {
         return ReadApplicationAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::Id: {
+    case ApplicationStatus::Id: {
         return ReadStatusAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
+    case ApplicationVersion::Id: {
         return ReadApplicationVersionAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id: {
+    case AllowedVendorList::Id: {
         return ReadAllowedVendorListAttribute(aEncoder, delegate);
     }
     default: {
