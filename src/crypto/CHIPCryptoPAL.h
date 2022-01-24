@@ -1200,6 +1200,19 @@ private:
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
                                       MutableByteSpan & out_compressed_fabric_id);
 
+/**
+ * @brief Compute the compressed fabric identifier used for operational discovery service
+ *        records from a Node's root public key and Fabric ID.  This is a conveniance
+ *        overload that writes to a uint64_t (CompressedFabricId) type.
+ *
+ * @param[in] root_public_key The root public key associated with the node's fabric
+ * @param[in] fabric_id The fabric ID associated with the node's fabric
+ * @param[out] compressedFabricId output location for compressed fabric ID
+ * @returns a CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKey, uint64_t fabricId,
+                                      uint64_t & compressedFabricId);
+
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
 CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);

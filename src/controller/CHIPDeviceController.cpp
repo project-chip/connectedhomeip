@@ -772,7 +772,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
 
-    VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingCommissioned == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -1011,7 +1010,6 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
     Callback::Cancelable * failureCallback = mOnCertificateChainFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.CertificateChainRequest(successCallback, failureCallback, certificateType));
-    ChipLogDetail(Controller, "Sent Certificate Chain request");
     return CHIP_NO_ERROR;
 }
 
@@ -1208,7 +1206,6 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan 
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
-    ChipLogProgress(Controller, "about to verify node operational csr info");
     ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
                                                                           dacPubkey, csrNonce));
 
@@ -1217,7 +1214,6 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan 
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
     mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
 
-    ChipLogProgress(Controller, "about to generate noc chain");
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, dac, ByteSpan(), ByteSpan(),
                                                              &mDeviceNOCChainCallback);
 }
@@ -1697,24 +1693,54 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kSendTrustedRootCert:
-        if (!params.HasRootCert())
+    case CommissioningStage::kSendTrustedRootCert: {
+        if (!params.HasRootCert() || !params.HasNoc())
         {
-            ChipLogError(Controller, "No trusted root cert specified");
+            ChipLogError(Controller, "No trusted root cert or NOC specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendTrustedRootCertificate(proxy, params.GetRootCert().Value());
-        break;
+        CHIP_ERROR err = SendTrustedRootCertificate(proxy, params.GetRootCert().Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Error sending trusted root certificate: %s", err.AsString());
+            CommissioningStageComplete(err);
+            return;
+        }
+        Crypto::P256PublicKey rootPubKey;
+        Credentials::P256PublicKeySpan rootPubKeySpan;
+        err = Credentials::ExtractPublicKeyFromChipCert(params.GetRootCert().Value(), rootPubKeySpan);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Error extracting public key from chip cert: %s", err.AsString());
+            CommissioningStageComplete(err);
+            return;
+        }
+        rootPubKey = Crypto::P256PublicKey(rootPubKeySpan); // deep copy
+        err        = proxy->SetPeerId(rootPubKey, params.GetNoc().Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Error setting peer id: %s", err.AsString());
+            CommissioningStageComplete(err);
+            return;
+        }
+        if (!IsOperationalNodeId(proxy->GetDeviceId()))
+        {
+            ChipLogError(Controller, "Given node ID is not an operational node ID");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+    }
+    break;
     case CommissioningStage::kSendNOC:
-        if (!params.HasNOCerts())
+        if (!params.HasNoc() || !params.HasIcac())
         {
             ChipLogError(Controller, "No node operational certs specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Sending operational certificate chain to the device");
-        SendOperationalCertificate(proxy, params.GetNOCerts().Value().noc, params.GetNOCerts().Value().icac);
+        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value());
         break;
     case CommissioningStage::kConfigACL:
         // TODO: Implement

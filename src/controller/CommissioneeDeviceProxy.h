@@ -150,8 +150,8 @@ public:
     void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress, FabricIndex fabric)
     {
         Init(params, fabric);
-        mDeviceId = deviceId;
-        mState    = ConnectionState::Connecting;
+        mPeerId = PeerId().SetNodeId(deviceId);
+        mState  = ConnectionState::Connecting;
 
         mDeviceAddress = peerAddress;
     }
@@ -210,7 +210,9 @@ public:
 
     void Reset();
 
-    NodeId GetDeviceId() const override { return mDeviceId; }
+    NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
+    PeerId GetPeerId() const { return mPeerId; }
+    CHIP_ERROR SetPeerId(const Crypto::P256PublicKey & rootPublicKey, ByteSpan noc) override;
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
@@ -246,8 +248,9 @@ private:
         kYes,
         kNo,
     };
-    /* Node ID assigned to the CHIP device */
-    NodeId mDeviceId;
+
+    /* Compressed fabric ID and node ID assigned to the device. */
+    PeerId mPeerId;
 
     /** Address used to communicate with the device.
      */

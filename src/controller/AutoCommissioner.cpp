@@ -39,7 +39,6 @@ void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsD
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
-    ChipLogProgress(Controller, "Setting Commissioning parameters");
     if (params.HasThreadOperationalDataset())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
@@ -214,29 +213,30 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
 
 CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac)
 {
-    {
-        // Reuse NOC Cert buffer for temporary store Root Cert.
-        MutableByteSpan rootCert = MutableByteSpan(mNOCCertBuffer);
-        ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(rcac, rootCert));
-        mParams.SetRootCert(rootCert);
-        CommissioningStage nextStage = CommissioningStage::kSendTrustedRootCert;
-        mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, 0,
-                                                GetCommandTimeout(nextStage));
-    }
+    // Reuse ICA Cert buffer for temporary store Root Cert.
+    MutableByteSpan rootCert = MutableByteSpan(mICACertBuffer);
+    ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(rcac, rootCert));
+    mParams.SetRootCert(rootCert);
 
-    NOCerts certs;
+    MutableByteSpan noCert = MutableByteSpan(mNOCertBuffer);
+    ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(noc, noCert));
+    mParams.SetNoc(noCert);
+
+    CommissioningStage nextStage = CommissioningStage::kSendTrustedRootCert;
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
+
+    // Trusted root cert has been sent, so we can re-use the icac buffer for the icac.
     if (!icac.empty())
     {
         MutableByteSpan icaCert = MutableByteSpan(mICACertBuffer);
         ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(icac, icaCert));
-        certs.icac = icaCert;
+        mParams.SetIcac(icaCert);
     }
+    else
     {
-        MutableByteSpan nocCert = MutableByteSpan(mNOCCertBuffer);
-        ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(noc, nocCert));
-        certs.noc = nocCert;
+        mParams.SetIcac(ByteSpan());
     }
-    mParams.SetNOCerts(certs);
+
     return CHIP_NO_ERROR;
 }
 

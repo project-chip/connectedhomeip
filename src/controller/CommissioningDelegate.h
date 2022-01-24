@@ -66,8 +66,6 @@ struct NOCChainGenerationParameters
 };
 struct NOCerts
 {
-    ByteSpan noc;
-    ByteSpan icac;
 };
 class CommissioningParameters
 {
@@ -81,7 +79,8 @@ public:
     bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
     bool HasNOCChainGenerationaParameters() const { return mNOCChainGenerationParameters.HasValue(); }
     bool HasRootCert() const { return mRootCert.HasValue(); }
-    bool HasNOCerts() const { return mNOCerts.HasValue(); }
+    bool HasNoc() const { return mNoc.HasValue(); }
+    bool HasIcac() const { return mIcac.HasValue(); }
     bool HasAttestationElements() const { return mAttestationElements.HasValue(); }
     bool HasAttestationSignature() const { return mAttestationSignature.HasValue(); }
     bool HasPAI() const { return mPAI.HasValue(); }
@@ -93,7 +92,8 @@ public:
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
     const Optional<NOCChainGenerationParameters> GetNOCChainGenerationParameters() const { return mNOCChainGenerationParameters; }
     const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
-    const Optional<NOCerts> GetNOCerts() const { return mNOCerts; }
+    const Optional<ByteSpan> GetNoc() const { return mNoc; }
+    const Optional<ByteSpan> GetIcac() const { return mIcac; }
     const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
     const Optional<ByteSpan> GetPAI() const { return mPAI; }
@@ -144,10 +144,16 @@ public:
         mRootCert.SetValue(rcac);
         return *this;
     }
-    // NOC and intermediate cert can be generated from the kGenerateNOCChain step. This must be set before calling kSendNOC
-    CommissioningParameters & SetNOCerts(const NOCerts & certs)
+    // NOC and intermediate cert can be generated from the kGenerateNOCChain step. NOC must be set before calling
+    // kSendTrustedRootCert. ICAC and NOC must be set before calling kSendNOC
+    CommissioningParameters & SetNoc(const ByteSpan & noc)
     {
-        mNOCerts.SetValue(certs);
+        mNoc.SetValue(noc);
+        return *this;
+    }
+    CommissioningParameters & SetIcac(const ByteSpan & icac)
+    {
+        mIcac.SetValue(icac);
         return *this;
     }
     CommissioningParameters & SetAttestationElements(const ByteSpan & attestationElements)
@@ -180,7 +186,8 @@ private:
     Optional<ByteSpan> mThreadOperationalDataset;
     Optional<NOCChainGenerationParameters> mNOCChainGenerationParameters;
     Optional<ByteSpan> mRootCert;
-    Optional<NOCerts> mNOCerts;
+    Optional<ByteSpan> mNoc;
+    Optional<ByteSpan> mIcac;
     Optional<ByteSpan> mAttestationElements;
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
