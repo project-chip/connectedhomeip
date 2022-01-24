@@ -834,16 +834,14 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
 
-    AttributePathParams attributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     if (attributeMetadata == nullptr)
     {
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAttribute);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
     if (attributeMetadata->IsReadOnly())
     {
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedWrite);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedWrite);
     }
 
     {
@@ -855,13 +853,13 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAccess);
+            return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
     {
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
@@ -872,7 +870,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         if (valueDecoder.TriedDecode())
         {
             MatterReportingAttributeChangeCallback(aPath);
-            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+            return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
         }
     }
 
@@ -881,19 +879,19 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
     if (dataLen > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
     auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                                                          CLUSTER_MASK_SERVER, attributeData,
                                                                          attributeMetadata->attributeType));
-    return apWriteHandler->AddStatus(attributePathParams, status);
+    return apWriteHandler->AddStatus(aPath, status);
 }
 
 } // namespace app

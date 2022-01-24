@@ -35,15 +35,6 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
     IgnoreUnusedVariable(apDelegate);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-    mMessageWriter.Init(std::move(packet));
-    ReturnErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
-
-    mWriteResponseBuilder.CreateWriteResponses();
-    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
-
     MoveToState(State::Initialized);
 
     return CHIP_NO_ERROR;
@@ -62,11 +53,20 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
 {
     mpExchangeCtx = apExchangeContext;
 
+    System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    VerifyOrReturnError(!packet.IsNull(), Status::Failure);
+
+    mMessageWriter.Init(std::move(packet));
+    VerifyOrReturnError(mWriteResponseBuilder.Init(&mMessageWriter) == CHIP_NO_ERROR, Status::Failure);
+
+    mWriteResponseBuilder.CreateWriteResponses();
+    VerifyOrReturnError(mWriteResponseBuilder.GetError() == CHIP_NO_ERROR, Status::Failure);
+
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
     // Do not send response on Group Write
     // Also, hold the response until finished processing the last chunk.
-    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext() && !mHasMoreChunks)
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         CHIP_ERROR err = SendWriteResponse();
         if (err != CHIP_NO_ERROR)
@@ -75,15 +75,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
         }
     }
 
-    if (mHasMoreChunks && status == Status::Success)
-    {
-        CHIP_ERROR err = StatusResponse::Send(status, mpExchangeCtx, status == Status::Success);
-        if (err != CHIP_NO_ERROR)
-        {
-            status = Status::Failure;
-        }
-    }
-    else
+    if (!(status == Status::Success && mHasMoreChunks))
     {
         Shutdown();
     }
@@ -112,7 +104,9 @@ CHIP_ERROR WriteHandler::SendWriteResponse()
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
+                                     mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
+                                                    : Messaging::SendMessageFlags::kNone);
     SuccessOrExit(err);
 
     MoveToState(State::Sending);
@@ -169,6 +163,11 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
+
+        if (!dataAttributePath.IsListOperation() && dataReader.GetType() == TLV::TLVType::kTLVType_Array)
+        {
+            dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
+        }
 
         // TODO: We should check if there is another write transaction writing the same attribute, we should reject such request
         // since it will cause unexpected behavior.
@@ -261,7 +260,7 @@ exit:
     return status;
 }
 
-CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aAttributePathParams,
                                    const Protocols::InteractionModel::Status aStatus)
 {
     AttributeStatusIBs::Builder & writeResponses   = mWriteResponseBuilder.GetWriteResponses();

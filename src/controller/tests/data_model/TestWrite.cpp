@@ -94,8 +94,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
                 // VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
-                AttributePathParams attributePathParams(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
-                aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
             }
             else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
             {
@@ -104,8 +103,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
                 VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                 listStructOctetStringElementCount++;
 
-                AttributePathParams attributePathParams(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
-                aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
             }
             else
             {
@@ -114,8 +112,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
         }
         else
         {
-            AttributePathParams attributePathParams(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
-            aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
+            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Failure);
         }
 
         return CHIP_NO_ERROR;

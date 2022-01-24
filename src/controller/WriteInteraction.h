@@ -57,7 +57,8 @@ public:
 
     app::WriteClient::Callback * GetChunkedCallback() { return &mCallback; }
 
-    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath, app::StatusIB status) override
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
+                    app::StatusIB status) override
     {
         if (status.mStatus == Protocols::InteractionModel::Status::Success)
         {

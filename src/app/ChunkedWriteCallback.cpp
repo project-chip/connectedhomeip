@@ -21,14 +21,14 @@
 namespace chip {
 namespace app {
 
-void ChunkedWriteCallback::OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath,
+void ChunkedWriteCallback::OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
                                       app::StatusIB status)
 {
     // We may send a chunked list, to make the behavior consistent, we merge the write response here.
     if (mLastAttributePath.HasValue())
     {
         // This is not the first write response.
-        if (!(mLastAttributePath.Value() == aPath))
+        if (!IsAppendingToLastItem(aPath))
         {
             // This is a response to another attribute write. Report the final result of last attribute write.
             callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
@@ -68,6 +68,20 @@ void ChunkedWriteCallback::OnDone(app::WriteClient * apWriteClient)
     }
 
     callback->OnDone(apWriteClient);
+}
+
+bool ChunkedWriteCallback::IsAppendingToLastItem(const app::ConcreteDataAttributePath & path)
+{
+    if (!path.IsListItemOperation())
+    {
+        return false;
+    }
+    if (!mLastAttributePath.HasValue() ||
+        !(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId) == mLastAttributePath.Value()))
+    {
+        return false;
+    }
+    return path.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem;
 }
 
 } // namespace app

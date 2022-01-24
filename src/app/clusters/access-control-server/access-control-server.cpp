@@ -346,7 +346,7 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
         DataModel::DecodableList<AccessControlEntryCodec> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));

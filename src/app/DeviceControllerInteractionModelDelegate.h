@@ -57,7 +57,7 @@ public:
 
     void OnDone(app::CommandSender * apCommandSender) override { return chip::Platform::Delete(apCommandSender); }
 
-    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath,
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
                     app::StatusIB attributeStatus) override
     {
         IMWriteResponseCallback(apWriteClient, attributeStatus.mStatus);

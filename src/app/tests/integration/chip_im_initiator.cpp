@@ -188,7 +188,7 @@ public:
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { delete apCommandSender; }
 
-    void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
+    void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteDataAttributePath & path,
                     chip::app::StatusIB status) override
     {
         auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
@@ -343,24 +343,13 @@ exit:
 
 CHIP_ERROR SendWriteRequest(chip::app::WriteClient & apWriteClient)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVWriter * writer;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
-    chip::app::ConcreteDataAttributePath attributePathParams;
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
-
-    SuccessOrExit(err = apWriteClient.PrepareAttribute(attributePathParams));
-
-    writer = apWriteClient.GetAttributeDataIBTLVWriter();
-
-    SuccessOrExit(err =
-                      writer->PutBoolean(chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)), true));
-    SuccessOrExit(err = apWriteClient.FinishAttribute());
+    SuccessOrExit(err = apWriteClient.EncodeAttributeWritePayload(
+                      chip::app::AttributePathParams(2 /* endpoint */, 3 /* cluster */, 4 /* attribute */), true));
     SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
 
     gWriteCount++;

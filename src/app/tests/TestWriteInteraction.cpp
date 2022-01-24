@@ -72,7 +72,7 @@ class TestWriteClientCallback : public chip::app::WriteClient::Callback
 {
 public:
     void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
-    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path, StatusIB status) override
+    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteDataAttributePath & path, StatusIB status) override
     {
         mOnSuccessCalled++;
     }
@@ -92,7 +92,7 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    err = aWriteClient.PrepareAttribute(attributePathParams);
+    err = aWriteClient.PrepareAttributeIB(attributePathParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataIBTLVWriter();
@@ -100,14 +100,14 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
     err = writer->PutBoolean(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = aWriteClient.FinishAttribute();
+    err = aWriteClient.FinishAttributeIB();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
 void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributePathParams attributePathParams;
+    ConcreteDataAttributePath attributePathParams;
     attributePathParams.mEndpointId  = 2;
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
@@ -151,7 +151,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
         chip::TLV::TLVWriter * pWriter = attributeDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
         err                            = pWriter->StartContainer(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
-                                      chip::TLV::kTLVType_Structure, dummyType);
+                                                                 chip::TLV::kTLVType_Structure, dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -319,8 +319,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     writer.Init(attributeDataTLV);
     writer.CopyElement(TLV::AnonymousTag(), aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
-    return aWriteHandler->AddStatus(AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                                    Protocols::InteractionModel::Status::Success);
+    return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
 }
 
 void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext)

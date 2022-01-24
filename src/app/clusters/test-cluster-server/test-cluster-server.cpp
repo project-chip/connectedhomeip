@@ -210,7 +210,7 @@ CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncod
 
 CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
 
         ListInt8u::TypeInfo::DecodableType list;
@@ -263,7 +263,7 @@ CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & 
 
 CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
         ListOctetString::TypeInfo::DecodableType list;
 
@@ -322,7 +322,7 @@ CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncode
 CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataAttributePath & aPath,
                                                              AttributeValueDecoder & aDecoder)
 {
-    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
         ListLongOctetString::TypeInfo::DecodableType list;
 
@@ -374,7 +374,7 @@ CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEnco
 CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDataAttributePath & aPath,
                                                                AttributeValueDecoder & aDecoder)
 {
-    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
         ListStructOctetString::TypeInfo::DecodableType list;
 
@@ -442,7 +442,7 @@ CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(Attribut
 CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const ConcreteDataAttributePath & aPath,
                                                                          AttributeValueDecoder & aDecoder)
 {
-    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aPath.IsListItemOperation())
     {
         DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
