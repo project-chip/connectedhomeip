@@ -34,7 +34,6 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationBasic;
-using namespace chip::app::Clusters::ApplicationBasic::Attributes;
 using namespace chip::AppPlatform;
 
 // -----------------------------------------------------------------------------
@@ -153,28 +152,28 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
     switch (aPath.mAttributeId)
     {
-    case VendorName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
         return ReadVendorNameAttribute(aEncoder, delegate);
     }
-    case VendorId::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorId::Id: {
         return ReadVendorIdAttribute(aEncoder, delegate);
     }
-    case ApplicationName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
         return ReadApplicationNameAttribute(aEncoder, delegate);
     }
-    case ProductId::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ProductId::Id: {
         return ReadProductIdAttribute(aEncoder, delegate);
     }
-    case ApplicationApp::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationApp::Id: {
         return ReadApplicationAttribute(aEncoder, delegate);
     }
-    case ApplicationStatus::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::Id: {
         return ReadStatusAttribute(aEncoder, delegate);
     }
-    case ApplicationVersion::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
         return ReadApplicationVersionAttribute(aEncoder, delegate);
     }
-    case AllowedVendorList::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id: {
         return ReadAllowedVendorListAttribute(aEncoder, delegate);
     }
     default: {
