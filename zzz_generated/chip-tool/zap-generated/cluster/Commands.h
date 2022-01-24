@@ -146,6 +146,8 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
 
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -2519,6 +2521,21 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'A'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -27239,6 +27256,48 @@ public:
     }
 };
 
+class ReportLocalizationConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReportLocalizationConfigurationClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLocalizationConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("LocalizationConfiguration.ClusterRevision report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster LowPower                                                    | 0x0508 |
 |------------------------------------------------------------------------------|
@@ -32817,6 +32876,51 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OperationalCredentials.NOCs response", value);
     }
+};
+
+class ReportOperationalCredentialsNOCs : public ModelCommand
+{
+public:
+    ReportOperationalCredentialsNOCs() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nocs");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOperationalCredentialsNOCs() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value)
+    {
+        LogValue("OperationalCredentials.NOCs report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -56785,6 +56889,48 @@ private:
     chip::app::Clusters::TimeFormatLocalization::HourFormat mValue;
 };
 
+class ReportTimeFormatLocalizationHourFormat : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationHourFormat() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "hour-format");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+    {
+        LogValue("TimeFormatLocalization.HourFormat report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ActiveCalendarType
  */
@@ -56841,6 +56987,48 @@ private:
     chip::app::Clusters::TimeFormatLocalization::CalendarType mValue;
 };
 
+class ReportTimeFormatLocalizationActiveCalendarType : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationActiveCalendarType() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+    {
+        LogValue("TimeFormatLocalization.ActiveCalendarType report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute SupportedCalendarTypes
  */
@@ -56873,6 +57061,51 @@ public:
     }
 };
 
+class ReportTimeFormatLocalizationSupportedCalendarTypes : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationSupportedCalendarTypes() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "supported-calendar-types");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationSupportedCalendarTypes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster
+            .SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo>(
+                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void
+    OnValueReport(void * context,
+                  const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    {
+        LogValue("TimeFormatLocalization.SupportedCalendarTypes report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -56901,6 +57134,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.ClusterRevision response", value);
     }
+};
+
+class ReportTimeFormatLocalizationClusterRevision : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("TimeFormatLocalization.ClusterRevision report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -61340,6 +61615,7 @@ void registerClusterLocalizationConfiguration(Commands & commands)
         make_unique<ReadLocalizationConfigurationSupportedLocales>(),   //
         make_unique<ReportLocalizationConfigurationSupportedLocales>(), //
         make_unique<ReadLocalizationConfigurationClusterRevision>(),    //
+        make_unique<ReportLocalizationConfigurationClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -61606,6 +61882,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<OperationalCredentialsUpdateFabricLabel>(),             //
         make_unique<OperationalCredentialsUpdateNOC>(),                     //
         make_unique<ReadOperationalCredentialsNOCs>(),                      //
+        make_unique<ReportOperationalCredentialsNOCs>(),                    //
         make_unique<ReadOperationalCredentialsFabricsList>(),               //
         make_unique<ReportOperationalCredentialsFabricsList>(),             //
         make_unique<ReadOperationalCredentialsSupportedFabrics>(),          //
@@ -62433,12 +62710,16 @@ void registerClusterTimeFormatLocalization(Commands & commands)
     const char * clusterName = "TimeFormatLocalization";
 
     commands_list clusterCommands = {
-        make_unique<ReadTimeFormatLocalizationHourFormat>(),             //
-        make_unique<WriteTimeFormatLocalizationHourFormat>(),            //
-        make_unique<ReadTimeFormatLocalizationActiveCalendarType>(),     //
-        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(),    //
-        make_unique<ReadTimeFormatLocalizationSupportedCalendarTypes>(), //
-        make_unique<ReadTimeFormatLocalizationClusterRevision>(),        //
+        make_unique<ReadTimeFormatLocalizationHourFormat>(),               //
+        make_unique<WriteTimeFormatLocalizationHourFormat>(),              //
+        make_unique<ReportTimeFormatLocalizationHourFormat>(),             //
+        make_unique<ReadTimeFormatLocalizationActiveCalendarType>(),       //
+        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(),      //
+        make_unique<ReportTimeFormatLocalizationActiveCalendarType>(),     //
+        make_unique<ReadTimeFormatLocalizationSupportedCalendarTypes>(),   //
+        make_unique<ReportTimeFormatLocalizationSupportedCalendarTypes>(), //
+        make_unique<ReadTimeFormatLocalizationClusterRevision>(),          //
+        make_unique<ReportTimeFormatLocalizationClusterRevision>(),        //
     };
 
     commands.Register(clusterName, clusterCommands);

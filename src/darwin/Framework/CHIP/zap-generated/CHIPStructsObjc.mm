@@ -940,6 +940,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestFabricScoped
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestListStructOctet
 - (instancetype)init
 {
