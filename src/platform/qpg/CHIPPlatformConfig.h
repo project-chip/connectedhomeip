@@ -25,7 +25,7 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define ChipDie() abort()
+#define CHIP_CONFIG_ABORT() abort()
 
 #define CHIP_CONFIG_ENABLE_TUNNELING 0
 #define CHIP_CONFIG_MAX_TUNNELS 0

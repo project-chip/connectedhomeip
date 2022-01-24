@@ -103,6 +103,7 @@ server cluster GeneralCommissioning = 48 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {

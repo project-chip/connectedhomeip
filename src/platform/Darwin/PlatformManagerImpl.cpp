@@ -137,6 +137,7 @@ CHIP_ERROR
 PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    supportedLocales.add(CharSpan("Test", strlen("Test")));
     supportedLocales.add(CharSpan("en-US", strlen("en-US")));
     supportedLocales.add(CharSpan("de-DE", strlen("de-DE")));
     supportedLocales.add(CharSpan("fr-FR", strlen("fr-FR")));

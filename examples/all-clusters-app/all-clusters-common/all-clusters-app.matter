@@ -1689,6 +1689,7 @@ server cluster LevelControl = 8 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster LowPower = 1288 {
@@ -2534,6 +2535,10 @@ server cluster TestCluster = 1295 {
     double h = 7;
   }
 
+  struct TestFabricScoped {
+    fabric_idx fabricIndex = 0;
+  }
+
   struct NestedStructList {
     INT8U a = 0;
     BOOLEAN b = 1;
@@ -2602,6 +2607,7 @@ server cluster TestCluster = 1295 {
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
   readonly attribute LONG_OCTET_STRING listLongOctetString[] = 42;
+  readonly attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean nullableBoolean = 32768;
   attribute bitmap8 nullableBitmap8 = 32769;
@@ -3107,7 +3113,6 @@ endpoint 1 {
   server  cluster IlluminanceMeasurement;
   server  cluster KeypadInput;
   server  cluster LevelControl;
-  server  cluster LocalizationConfiguration;
   server  cluster LowPower;
   server  cluster MediaInput;
   server  cluster MediaPlayback;

@@ -67,13 +67,12 @@ tests:
       cluster: "On/Off"
       command: "On"
       groupId: "1234"
-      disabled: true
 
       # Test Pair 3 : Validates previous group command with a unicast to read
     - label: "Check on/off attribute value is true after on command"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
-      disabled: true
+      endpoint: 1
       response:
           value: 1

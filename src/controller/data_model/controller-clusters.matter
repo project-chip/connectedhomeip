@@ -1847,6 +1847,7 @@ client cluster LevelControl = 8 {
 client cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 client cluster LowPower = 1288 {
@@ -2319,7 +2320,7 @@ client cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 5;
   }
 
-  readonly nosubscribe attribute NOCStruct NOCs[] = 0;
+  readonly attribute NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptor fabricsList[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
@@ -3239,10 +3240,10 @@ client cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
-  nosubscribe attribute HourFormat hourFormat = 0;
-  nosubscribe attribute CalendarType activeCalendarType = 1;
-  readonly nosubscribe attribute CalendarType supportedCalendarTypes[] = 2;
-  readonly global nosubscribe attribute int16u clusterRevision = 65533;
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 client cluster UserLabel = 65 {

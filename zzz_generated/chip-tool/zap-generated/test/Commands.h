@@ -59859,6 +59859,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 20 : Write attribute that does not need timed write reset to default\n");
             err = TestWriteAttributeThatDoesNotNeedTimedWriteResetToDefault_20();
             break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Write struct-typed attribute\n");
+            err = TestWriteStructTypedAttribute_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Read struct-typed attribute\n");
+            err = TestReadStructTypedAttribute_22();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -59870,7 +59878,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 21;
+    const uint16_t mTestCount = 23;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -59993,6 +60001,24 @@ private:
     }
 
     static void OnSuccessCallback_20(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_20(); }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_21(); }
+
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_22(status);
+    }
+
+    static void OnSuccessCallback_22(void * context,
+                                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & structAttr)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_22(structAttr);
+    }
 
     //
     // Tests methods
@@ -60483,6 +60509,59 @@ private:
     void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_20() { NextTest(); }
+
+    CHIP_ERROR TestWriteStructTypedAttribute_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type structAttrArgument;
+
+        structAttrArgument.a = 5;
+        structAttrArgument.b = true;
+        structAttrArgument.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
+        structAttrArgument.d = chip::ByteSpan(chip::Uint8::from_const_char("abcgarbage: not in length on purpose"), 3);
+        structAttrArgument.e = chip::Span<const char>("garbage: not in length on purpose", 0);
+        structAttrArgument.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(17);
+        structAttrArgument.g = 1.5f;
+        structAttrArgument.h = 3.14159265358979;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(
+            structAttrArgument, this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21() { NextTest(); }
+
+    CHIP_ERROR TestReadStructTypedAttribute_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(
+            this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_22(const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & structAttr)
+    {
+        VerifyOrReturn(CheckValue("structAttr.a", structAttr.a, 5));
+        VerifyOrReturn(CheckValue("structAttr.b", structAttr.b, true));
+        VerifyOrReturn(CheckValue("structAttr.c", structAttr.c, 2));
+        VerifyOrReturn(CheckValueAsString("structAttr.d", structAttr.d, chip::ByteSpan(chip::Uint8::from_const_char("abc"), 3)));
+        VerifyOrReturn(CheckValueAsString("structAttr.e", structAttr.e, chip::CharSpan("", 0)));
+        VerifyOrReturn(CheckValue("structAttr.f", structAttr.f, 17));
+        VerifyOrReturn(CheckValue("structAttr.g", structAttr.g, 1.5f));
+        VerifyOrReturn(CheckValue("structAttr.h", structAttr.h, 3.14159265358979));
+
+        NextTest();
+    }
 };
 
 class TestConstraints : public TestCommand
@@ -67208,6 +67287,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
             err = TestReadBackAttribute_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is true after on command\n");
+            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -67219,7 +67306,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -67260,6 +67347,16 @@ private:
     static void OnSuccessCallback_4(void * context, chip::CharSpan location)
     {
         (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, bool onOff)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(onOff);
     }
 
     //
@@ -67348,6 +67445,54 @@ private:
     void OnSuccessResponse_4(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    {
+        const chip::GroupId groupId = 1234;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(status);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(bool onOff)
+    {
+        VerifyOrReturn(CheckValue("onOff", onOff, 1));
 
         NextTest();
     }

@@ -48,7 +48,8 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
-                     const Optional<uint16_t> & timedInvokeTimeoutMs)
+                     const Optional<uint16_t> & timedInvokeTimeoutMs,
+                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
     app::CommandPathParams commandPath = { endpointId, 0, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            (app::CommandPathFlags::kEndpointIdValid) };
@@ -75,7 +76,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
-    ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle));
+    ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle, responseTimeout));
 
     //
     // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
@@ -95,10 +96,10 @@ InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHand
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
-                     uint16_t timedInvokeTimeoutMs)
+                     uint16_t timedInvokeTimeoutMs, const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
     return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb,
-                                MakeOptional(timedInvokeTimeoutMs));
+                                MakeOptional(timedInvokeTimeoutMs), responseTimeout);
 }
 
 template <typename RequestObjectT, typename std::enable_if_t<!RequestObjectT::MustUseTimedInvoke(), int> = 0>
@@ -106,9 +107,11 @@ CHIP_ERROR
 InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
-                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb)
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
+                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
-    return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb, NullOptional);
+    return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb, NullOptional,
+                                responseTimeout);
 }
 
 } // namespace Controller
