@@ -24,10 +24,10 @@
 
 using chip::CharSpan;
 using chip::Platform::CopyString;
-using AccountLogin        = chip::app::Clusters::AccountLogin::Delegate;
-using GetSetupPINResponse = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+using AccountLoginDelegate = chip::app::Clusters::AccountLogin::Delegate;
+using GetSetupPINResponse  = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 
-class AccountLoginManager : public AccountLogin
+class AccountLoginManager : public AccountLoginDelegate
 {
 public:
     AccountLoginManager() : AccountLoginManager("tempPin123"){};

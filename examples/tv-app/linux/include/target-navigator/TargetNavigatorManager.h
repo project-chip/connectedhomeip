@@ -20,11 +20,11 @@
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
 using chip::CharSpan;
-using TargetNavigator            = chip::app::Clusters::TargetNavigator::Delegate;
+using TargetNavigatorDelegate    = chip::app::Clusters::TargetNavigator::Delegate;
 using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type;
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 
-class TargetNavigatorManager : public TargetNavigator
+class TargetNavigatorManager : public TargetNavigatorDelegate
 {
 public:
     TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, kNoCurrentTarget){};

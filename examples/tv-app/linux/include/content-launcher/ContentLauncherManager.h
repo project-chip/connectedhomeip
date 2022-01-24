@@ -24,10 +24,10 @@ using chip::CharSpan;
 using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using ContentLauncher    = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
+using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
-class ContentLauncherManager : public ContentLauncher
+class ContentLauncherManager : public ContentLauncherDelegate
 {
 public:
     ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};

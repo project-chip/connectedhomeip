@@ -22,15 +22,15 @@
 #include <list>
 
 using chip::CharSpan;
-using ApplicationLauncher                = chip::app::Clusters::ApplicationLauncher::Delegate;
+using ApplicationLauncherDelegate        = chip::app::Clusters::ApplicationLauncher::Delegate;
 using ApplicationLauncherApplicationType = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type;
 using LauncherResponseType               = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
-class ApplicationLauncherManager : public ApplicationLauncher
+class ApplicationLauncherManager : public ApplicationLauncherDelegate
 {
 public:
-    ApplicationLauncherManager() : ApplicationLauncher(){};
-    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncher(featureMapContentPlatform){};
+    ApplicationLauncherManager() : ApplicationLauncherDelegate(){};
+    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncherDelegate(featureMapContentPlatform){};
 
     std::list<uint16_t> HandleGetCatalogList() override;
 

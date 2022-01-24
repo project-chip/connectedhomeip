@@ -22,16 +22,16 @@
 
 using chip::CharSpan;
 using chip::Platform::CopyString;
-using ApplicationBasic = chip::app::Clusters::ApplicationBasic::Delegate;
+using ApplicationBasicDelegate = chip::app::Clusters::ApplicationBasic::Delegate;
 
-class ApplicationBasicManager : public ApplicationBasic
+class ApplicationBasicManager : public ApplicationBasicDelegate
 {
 public:
     ApplicationBasicManager() :
         ApplicationBasicManager(123, "applicationId", "exampleVendorName1", 1, "exampleName1", 1, "exampleVersion"){};
     ApplicationBasicManager(uint16_t szCatalogVendorId, const char * szApplicationId, const char * szVendorName, uint16_t vendorId,
                             const char * szApplicationName, uint16_t productId, const char * szApplicationVersion) :
-        ApplicationBasic(szCatalogVendorId, szApplicationId)
+        ApplicationBasicDelegate(szCatalogVendorId, szApplicationId)
     {
 
         ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationId, szApplicationName);
