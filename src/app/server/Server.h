@@ -140,7 +140,7 @@ private:
     public:
         GroupDataProviderListener() {}
 
-        CHIP_ERROR init(ServerTransportMgr * transports)
+        CHIP_ERROR Init(ServerTransportMgr * transports)
         {
             VerifyOrReturnError(transports != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
