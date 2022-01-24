@@ -36,6 +36,13 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 
+#if CONFIG_ENABLE_OTA_REQUESTOR
+#include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/Ameba/AmebaOTAImageProcessor.h"
+#include "platform/GenericOTARequestorDriver.h"
+#endif
+
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
 #endif
@@ -44,6 +51,7 @@ using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
 
 Identify gIdentify0 = {
     chip::EndpointId{ 0 },
@@ -71,6 +79,13 @@ Identify gIdentify1 = {
 #endif
 
 static DeviceCallbacks EchoCallbacks;
+
+#if CONFIG_ENABLE_OTA_REQUESTOR
+OTARequestor gRequestorCore;
+GenericOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+AmebaOTAImageProcessor gImageProcessor;
+#endif
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)
 {
@@ -185,6 +200,47 @@ std::string createSetupPayload()
     return result;
 };
 
+#if CONFIG_ENABLE_OTA_REQUESTOR
+extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+{
+    ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
+    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
+    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
+
+    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+}
+
+extern "C" void amebaApplyUpdateCmdHandler()
+{
+    ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
+
+    static_cast<OTARequestor *>(GetRequestorInstance())->ApplyUpdate();
+}
+
+static void InitOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
+    SetRequestorInstance(&gRequestorCore);
+
+    // Set server instance used for session establishment
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+
+    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
+    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
+    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
+    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
+    OTAImageProcessorParams ipParams;
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Connect the Downloader and Image Processor objects
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
+}
+#endif // CONFIG_ENABLE_OTA_REQUESTOR
+
 extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "All Clusters Demo!");
@@ -229,8 +285,9 @@ extern "C" void ChipTest(void)
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
 
-    while (true)
-        vTaskDelay(pdMS_TO_TICKS(50));
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    InitOTARequestor();
+#endif
 }
 
 bool lowPowerClusterSleep()
