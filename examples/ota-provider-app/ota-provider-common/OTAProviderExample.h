@@ -52,8 +52,9 @@ public:
         kRespondWithNotAvailable
     };
     static constexpr uint16_t SW_VER_STR_MAX_LEN = 32;
-    static constexpr uint16_t OTA_URL_MAX_LEN = 512;
-    typedef struct DeviceSoftwareVersionModel {
+    static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
+    typedef struct DeviceSoftwareVersionModel
+    {
         uint16_t vendorId;
         uint16_t productId;
         uint32_t softwareVersion;
@@ -76,8 +77,7 @@ private:
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
     uint32_t mDelayedActionTimeSec;
-    bool SelectOTACandidate(const uint16_t requestorVendorID,
-                            const uint16_t requestorProductID,
+    bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
-                            OTAProviderExample::DeviceSoftwareVersionModel &finalCandidate);
+                            OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
 };

@@ -103,19 +103,19 @@ void OTAProviderExample::SetOTACandidates(OTAProviderExample::DeviceSoftwareVers
     mCandidates.push_back(entry);
 }
 
-static bool compareSoftwareVersions(const OTAProviderExample::DeviceSoftwareVersionModel& a, const OTAProviderExample::DeviceSoftwareVersionModel& b)
+static bool compareSoftwareVersions(const OTAProviderExample::DeviceSoftwareVersionModel & a,
+                                    const OTAProviderExample::DeviceSoftwareVersionModel & b)
 {
     return (a.softwareVersion < b.softwareVersion);
 }
 
-bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID,
-                                            const uint16_t requestorProductID,
+bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                                             const uint32_t requestorSoftwareVersion,
-                                            OTAProviderExample::DeviceSoftwareVersionModel &finalCandidate)
+                                            OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate)
 {
     bool candidateFound = false;
     std::sort(mCandidates.begin(), mCandidates.end(), compareSoftwareVersions);
-    for (auto candidate: mCandidates)
+    for (auto candidate : mCandidates)
     {
         // VendorID and ProductID will be the primary key when querying
         // the DCL servers. If not we can add the vendor/product ID checks here.
@@ -136,36 +136,36 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 {
     // TODO: add confiuration for returning BUSY status
 
-    OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
+    OTAQueryStatus queryStatus = OTAQueryStatus::kNotAvailable;
     OTAProviderExample::DeviceSoftwareVersionModel candidate;
-    bool otaAvailable = false;
-    uint32_t newSoftwareVersion = 0;
-    const char* newSoftwareVersionString = nullptr;
-    const char* otaFilePath = nullptr;
-    bool userConsentNeeded                  = false;
-    uint8_t updateToken[kUpdateTokenLen]    = { 0 };
-    char strBuf[kUpdateTokenStrLen]         = { 0 };
-    char uriBuf[kUriMaxLen]                 = { 0 };
+    bool otaAvailable                     = false;
+    uint32_t newSoftwareVersion           = 0;
+    const char * newSoftwareVersionString = nullptr;
+    const char * otaFilePath              = nullptr;
+    bool userConsentNeeded                = false;
+    uint8_t updateToken[kUpdateTokenLen]  = { 0 };
+    char strBuf[kUpdateTokenStrLen]       = { 0 };
+    char uriBuf[kUriMaxLen]               = { 0 };
 
     // This use-case is a subset of the ota-candidates-file option.
     // Can be removed once all other platforms (ESP, etc.)
     // start using the ota-candidates-file method.
     if (strlen(mOTAFilePath)) // If OTA file is directly provided
     {
-        otaAvailable = true;
+        otaAvailable       = true;
         newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
                                                               // available (if the user provides a file).
         newSoftwareVersionString = "Example-Image-V0.1";
-        otaFilePath = mOTAFilePath;
+        otaFilePath              = mOTAFilePath;
     }
     else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
     {
         otaAvailable = SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate);
         if (otaAvailable)
         {
-            newSoftwareVersion = candidate.softwareVersion;
+            newSoftwareVersion       = candidate.softwareVersion;
             newSoftwareVersionString = candidate.softwareVersionString;
-            otaFilePath = candidate.otaURL;
+            otaFilePath              = candidate.otaURL;
         }
     }
 

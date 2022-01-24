@@ -67,48 +67,50 @@ static const char * gOtaImageListFilepath                             = nullptr;
 // 1,1,20,Version_2,45,false,4,123,/tmp/ota2.txt
 // TODO: Replace with a JSON file for simpler parsing. The idea is that the contents of the
 // response from the DCL server will be populated into this file appropriately.
-static bool parse_csv_file_and_populate_candidates(const char* filepath, std::vector<OTAProviderExample::DeviceSoftwareVersionModel>& candidates)
+static bool parse_csv_file_and_populate_candidates(const char * filepath,
+                                                   std::vector<OTAProviderExample::DeviceSoftwareVersionModel> & candidates)
 {
     std::ifstream fpStream(filepath);
     std::string line;
-    while(std::getline(fpStream, line))
+    while (std::getline(fpStream, line))
     {
         OTAProviderExample::DeviceSoftwareVersionModel candidate;
-        if (line.find("#") == 0) continue; // Ignore lines starting with #
+        if (line.find("#") == 0)
+            continue; // Ignore lines starting with #
         std::istringstream s(line);
         std::string field;
         uint8_t pos = 0;
-        while (getline(s, field,','))
+        while (getline(s, field, ','))
         {
-            switch(pos)
+            switch (pos)
             {
-                case 0:
-                    candidate.vendorId = static_cast<uint16_t>(std::stoul(field));
-                    break;
-                case 1:
-                    candidate.productId = static_cast<uint16_t>(std::stoul(field));
-                    break;
-                case 2:
-                    candidate.softwareVersion = static_cast<uint32_t>(std::stoul(field));
-                    break;
-                case 3:
-                    strncpy(candidate.softwareVersionString, field.c_str(), OTAProviderExample::SW_VER_STR_MAX_LEN);
-                    break;
-                case 4:
-                    candidate.CDVersionNumber = static_cast<uint16_t>(std::stoul(field));
-                    break;
-                case 5:
-                    candidate.softwareVersionValid = (strcmp(field.c_str(), "true") == 0) ? true : false;
-                    break;
-                case 6:
-                    candidate.minApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
-                    break;
-                case 7:
-                    candidate.maxApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
-                    break;
-                case 8:
-                    strncpy(candidate.otaURL, field.c_str(), OTAProviderExample::OTA_URL_MAX_LEN);
-                    break;
+            case 0:
+                candidate.vendorId = static_cast<uint16_t>(std::stoul(field));
+                break;
+            case 1:
+                candidate.productId = static_cast<uint16_t>(std::stoul(field));
+                break;
+            case 2:
+                candidate.softwareVersion = static_cast<uint32_t>(std::stoul(field));
+                break;
+            case 3:
+                strncpy(candidate.softwareVersionString, field.c_str(), OTAProviderExample::SW_VER_STR_MAX_LEN);
+                break;
+            case 4:
+                candidate.CDVersionNumber = static_cast<uint16_t>(std::stoul(field));
+                break;
+            case 5:
+                candidate.softwareVersionValid = (strcmp(field.c_str(), "true") == 0) ? true : false;
+                break;
+            case 6:
+                candidate.minApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
+                break;
+            case 7:
+                candidate.maxApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
+                break;
+            case 8:
+                strncpy(candidate.otaURL, field.c_str(), OTAProviderExample::OTA_URL_MAX_LEN);
+                break;
             }
             pos++;
         }
