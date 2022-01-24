@@ -208,7 +208,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         SuccessOrExit(err);
 
         // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
-        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
+        // cluster info will be invalid / wildcard, it is safe to ignore CHIP_END_OF_TLV.
 
         err = attributePath.GetNode(&(clusterInfo.mNodeId));
         if (CHIP_END_OF_TLV == err)
@@ -254,7 +254,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             if (!clusterInfo.IsValidAttributePath() || clusterInfo.HasAttributeWildcard())
             {
                 ChipLogDetail(DataManagement,
-                              "Invalid goup attribute wirte for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                              "Invalid group attribute write for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
                               " attribute=" ChipLogFormatMEI,
                               mapping.endpoint_id, ChipLogValueMEI(clusterInfo.mClusterId),
                               ChipLogValueMEI(clusterInfo.mAttributeId));
@@ -263,14 +263,13 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             ChipLogDetail(DataManagement,
-                          "Processing goup attribute wirte for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                          "Processing group attribute write for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
                           " attribute=" ChipLogFormatMEI,
                           mapping.endpoint_id, ChipLogValueMEI(clusterInfo.mClusterId), ChipLogValueMEI(clusterInfo.mAttributeId));
 
             chip::TLV::TLVReader tmpDataReader(dataReader);
 
-            const ConcreteAttributePath concretePath =
-                ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
+            const ConcreteAttributePath concretePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
 
             MatterPreAttributeWriteCallback(concretePath);
             err = WriteSingleClusterData(subjectDescriptor, clusterInfo, tmpDataReader, this);
