@@ -158,7 +158,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         newSoftwareVersionString = "Example-Image-V0.1";
         otaFilePath = mOTAFilePath;
     }
-    else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead 
+    else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
     {
         otaAvailable = SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate);
         if (otaAvailable)
