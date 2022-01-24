@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
+#include <vector>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -50,13 +51,33 @@ public:
         kRespondWithBusy,
         kRespondWithNotAvailable
     };
+    static constexpr uint16_t SW_VER_STR_MAX_LEN = 32;
+    static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
+    typedef struct DeviceSoftwareVersionModel
+    {
+        uint16_t vendorId;
+        uint16_t productId;
+        uint32_t softwareVersion;
+        char softwareVersionString[SW_VER_STR_MAX_LEN];
+        uint16_t CDVersionNumber;
+        bool softwareVersionValid;
+        uint32_t minApplicableSoftwareVersion;
+        uint32_t maxApplicableSoftwareVersion;
+        char otaURL[OTA_URL_MAX_LEN];
+    } DeviceSoftwareVersionModel;
+    void SetOTACandidates(OTAProviderExample::DeviceSoftwareVersionModel entry);
+    void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
 private:
     BdxOtaSender mBdxOtaSender;
+    std::vector<DeviceSoftwareVersionModel> mCandidates;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
     uint32_t mDelayedActionTimeSec;
+    bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
+                            const uint32_t requestorSoftwareVersion,
+                            OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
 };
