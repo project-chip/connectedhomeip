@@ -146,6 +146,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDVersionNumber
 ced
 cfg
 CFLAGS
@@ -267,6 +268,7 @@ DBUILD
 dbus
 dcc
 DCHIP
+DCL
 DCMAKE
 DCONFIG
 debianutils
@@ -605,6 +607,7 @@ MatterLock
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
+maxApplicableSoftwareVersion
 MaxInterval
 MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
@@ -640,6 +643,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+minApplicableSoftwareVersion
 Minicom
 MinInterval
 MinIntervalFloorSeconds
@@ -729,6 +733,7 @@ optionsOverride
 orgs
 OTA
 OTADownloader
+otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorInterface
 OTAProvider
@@ -740,6 +745,7 @@ OTARequestor
 OTARequestorDriver
 OTARequestorSerialPort
 otasoftwareupdaterequestor
+otaURL
 OTBR
 otcli
 PAA
@@ -929,6 +935,7 @@ softmmu
 SoftwareDiagnostics
 SoftwareVersion
 SoftwareVersionString
+softwareVersionValid
 SPI
 spinel
 src
