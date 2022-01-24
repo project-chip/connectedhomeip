@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <access/AccessControl.h>
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
