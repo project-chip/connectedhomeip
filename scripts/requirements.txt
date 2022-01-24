@@ -49,3 +49,4 @@ click
 
 # scripts/idl
 lark
+stringcase

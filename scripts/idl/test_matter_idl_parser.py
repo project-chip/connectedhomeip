@@ -56,11 +56,11 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(enums=[
-            Enum(name='GlobalEnum', base_type=DataType(name='ENUM8'),
+            Enum(name='GlobalEnum', base_type='ENUM8',
                  entries=[
                      EnumEntry(name="kValue1", code=1),
                      EnumEntry(name="kOther", code=0x12),
-            ])]
+                 ])]
         )
         self.assertEqual(actual, expected)
 
@@ -96,6 +96,8 @@ class TestParser(unittest.TestCase):
                 attribute int32u rwAttr[] = 123;
                 global attribute int32u grwAttr[] = 124;
                 readonly global attribute int32u groAttr[] = 125;
+                readonly nosubscribe attribute int8s nosub[] = 0xaa;
+                readonly attribute nullable int8s isNullable = 0xab;
             }
         """)
 
@@ -112,6 +114,10 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int32u"), code=124, name="grwAttr", is_list=True)),
                         Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE]), definition=Field(
                             data_type=DataType(name="int32u"), code=125, name="groAttr", is_list=True)),
+                        Attribute(tags=set([AttributeTag.NOSUBSCRIBE, AttributeTag.READABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=0xAA, name="nosub", is_list=True)),
+                        Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=0xAB, name="isNullable", attributes=set([FieldAttribute.NULLABLE]))),
                     ]
                     )])
         self.assertEqual(actual, expected)
@@ -182,11 +188,11 @@ class TestParser(unittest.TestCase):
                     name="WithEnums",
                     code=0xab,
                     enums=[
-                        Enum(name="TestEnum", base_type=DataType(name="ENUM16"),
+                        Enum(name="TestEnum", base_type="ENUM16",
                              entries=[
                                  EnumEntry(name="A", code=0x123),
                                  EnumEntry(name="B", code=0x234),
-                        ])],
+                             ])],
                     )])
         self.assertEqual(actual, expected)
 
