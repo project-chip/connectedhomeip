@@ -36,7 +36,6 @@ using namespace app::Clusters::OtaSoftwareUpdateProvider;
 using namespace app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Commands;
-using namespace DeviceLayer;
 using app::DataModel::Nullable;
 using bdx::TransferSession;
 
@@ -407,7 +406,7 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
 
     // Log the VersionApplied event
     uint16_t productId;
-    VerifyOrReturn(ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR);
+    VerifyOrReturn(DeviceLayer::ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR);
     OtaRequestorServerOnVersionApplied(version, productId);
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -506,38 +505,31 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     QueryImage::Type args;
 
     uint16_t vendorId;
-    VerifyOrReturnError(ConfigurationMgr().GetVendorId(vendorId) == CHIP_NO_ERROR, CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(vendorId));
     args.vendorId = static_cast<VendorId>(vendorId);
 
-    VerifyOrReturnError(ConfigurationMgr().GetProductId(args.productId) == CHIP_NO_ERROR, CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(args.productId));
 
-    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(args.softwareVersion) == CHIP_NO_ERROR, CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
+    if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
     size_t codeLen = 0;
-    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
+    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen > 0))
     {
-        if (codeLen == 0)
-        {
-            args.location.SetValue(CharSpan("XX", DeviceLayer::ConfigurationManager::kMaxLocationLength));
-        }
-        else
-        {
-            args.location.SetValue(CharSpan(location, DeviceLayer::ConfigurationManager::kMaxLocationLength));
-        }
+        args.location.SetValue(CharSpan(location, codeLen));
     }
     else
     {
-        args.location.SetValue(CharSpan("XX", DeviceLayer::ConfigurationManager::kMaxLocationLength));
+        args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
