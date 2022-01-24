@@ -436,12 +436,19 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
-      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
     ]
+
+    if (defined(invoker.sleepy_device)) {
+      if (invoker.sleepy_device) {
+        sources += [
+          "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
+        ]
+      }
+    }
 
     if (defined(enable_fem)) {
       sources += [

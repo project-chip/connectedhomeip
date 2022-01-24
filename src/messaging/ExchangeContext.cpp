@@ -91,7 +91,7 @@ void ExchangeContext::UpdateSEDPollingMode()
     Transport::Session::SessionType sessType = sessionHandle->GetSessionType();
 
     // During PASE session, which happen on BLE, the session is kUnauthenticated
-    // So AsSecureSession() ends up faulting the sytem
+    // So AsSecureSession() ends up faulting the system
     if (sessType != Transport::Session::SessionType::kUnauthenticated)
     {
         if (sessionHandle->AsSecureSession()->GetPeerAddress().GetTransportType() != Transport::Type::kBle)
