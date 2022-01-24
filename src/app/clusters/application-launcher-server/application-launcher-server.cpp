@@ -109,17 +109,22 @@ CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributeP
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadCatalogListAttribute(aEncoder, delegate);
     }
     case app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherApp::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentAppAttribute(aEncoder, delegate);
     }
     default: {
