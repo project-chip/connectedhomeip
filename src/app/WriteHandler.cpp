@@ -273,15 +273,24 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             MatterPreAttributeWriteCallback(concretePath);
             err = WriteSingleClusterData(subjectDescriptor, clusterInfo, tmpDataReader, this);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement,
+                             "Error when calling WriteSingleClusterData for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                             " Attribute =" ChipLogFormatMEI " : %" CHIP_ERROR_FORMAT,
+                             mapping.endpoint_id, ChipLogValueMEI(clusterInfo.mClusterId),
+                             ChipLogValueMEI(clusterInfo.mAttributeId), err.Format());
+            }
             MatterPostAttributeWriteCallback(concretePath);
         }
 
         iterator->Release();
+    }
 
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
     }
 exit:
     return err;
@@ -343,7 +352,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
 
-    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
+    if (mpExchangeCtx->IsGroupExchangeContext())
     {
         err = ProcessGroupAttributeDataIBs(AttributeDataIBsReader);
     }

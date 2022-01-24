@@ -129,7 +129,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
 
-        if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
+        if (mpExchangeCtx->IsGroupExchangeContext())
         {
             ReturnErrorOnFailure(ProcessGroupCommandDataIB(commandData));
         }
@@ -190,26 +190,24 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!mpExchangeCtx->IsGroupExchangeContext())
-    {
-        err = SendCommandResponse();
-    }
-
-    if (mpExchangeCtx && mpExchangeCtx->IsGroupExchangeContext())
+    if (mpExchangeCtx->IsGroupExchangeContext())
     {
         mpExchangeCtx->Close();
     }
-
-    if (err != CHIP_NO_ERROR)
+    else
     {
-        ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
-        // We marked the exchange as "WillSendMessage", need to shutdown the exchange manually to avoid leaking exchanges.
-        if (mpExchangeCtx != nullptr)
+        CHIP_ERROR err = SendCommandResponse();
+        if (err != CHIP_NO_ERROR)
         {
-            mpExchangeCtx->Close();
+            ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+            // We marked the exchange as "WillSendMessage", need to shutdown the exchange manually to avoid leaking exchanges.
+            if (mpExchangeCtx != nullptr)
+            {
+                mpExchangeCtx->Close();
+            }
         }
     }
+
     Close();
 }
 
@@ -378,6 +376,19 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             continue;
         }
 
+        // TODO: Once ACL supports groups, add correct ACL calls before the command porcessing
+        {
+            Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+            Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+            Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+            err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+            err                                = CHIP_NO_ERROR; // TODO: remove override
+            if (err != CHIP_NO_ERROR)
+            {
+                continue;
+            }
+        }
+
         if ((err = MatterPreCommandReceivedCallback(concretePath)) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
@@ -388,8 +399,8 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         {
             ChipLogError(DataManagement,
                          "Error when calling MatterPreCommandReceivedCallback for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                         " Command=" ChipLogFormatMEI " : %s",
-                         mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId), err.AsString());
+                         " Command=" ChipLogFormatMEI " : %" CHIP_ERROR_FORMAT,
+                         mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId), err.Format());
             continue;
         }
     }
