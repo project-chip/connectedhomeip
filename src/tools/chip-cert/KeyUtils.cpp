@@ -240,10 +240,10 @@ exit:
 
 bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 {
-    bool res                  = true;
-    FILE * file               = nullptr;
-    uint8_t * keyToWrite      = nullptr;
-    uint32_t keyToWriteLen    = 0;
+    bool res               = true;
+    FILE * file            = nullptr;
+    uint8_t * keyToWrite   = nullptr;
+    uint32_t keyToWriteLen = 0;
     P256SerializedKeypair serializedKeypair;
     uint32_t chipKeyLen       = sizeof(serializedKeypair);
     uint32_t chipKeyBase64Len = BASE64_ENCODED_LEN(chipKeyLen);
