@@ -466,6 +466,8 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _noc = [NSData data];
+
+        _icac = [NSData data];
     }
     return self;
 }
@@ -933,6 +935,17 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _a = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestFabricScoped
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
     }
     return self;
 }

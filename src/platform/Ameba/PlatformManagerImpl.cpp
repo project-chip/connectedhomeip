@@ -26,6 +26,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
+#include <platform/Ameba/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -76,6 +77,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+
+    SuccessOrExit(err);
+
+    err = System::Clock::InitClock_RealTime();
+
     SuccessOrExit(err);
 
 exit:

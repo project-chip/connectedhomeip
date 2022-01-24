@@ -70,11 +70,39 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
+    CHIP_ERROR ReadNOCs(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadCommissionedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    auto accessingFabricIndex = aEncoder.AccessingFabricIndex();
+
+    return aEncoder.EncodeList([accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
+        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        {
+            Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
+
+            if (!fabricInfo.IsInitialized())
+                continue;
+
+            noc.fabricIndex = fabricInfo.GetFabricIndex();
+
+            if (accessingFabricIndex == fabricInfo.GetFabricIndex())
+            {
+                ReturnErrorOnFailure(fabricInfo.GetNOCCert(noc.noc));
+                ReturnErrorOnFailure(fabricInfo.GetICACert(noc.icac));
+            }
+
+            ReturnErrorOnFailure(encoder.Encode(noc));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -142,6 +170,9 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
 
     switch (aPath.mAttributeId)
     {
+    case Attributes::NOCs::Id: {
+        return ReadNOCs(aPath.mEndpointId, aEncoder);
+    }
     case Attributes::SupportedFabrics::Id: {
         return ReadSupportedFabrics(aPath.mEndpointId, aEncoder);
     }

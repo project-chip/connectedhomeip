@@ -249,7 +249,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(gSession.Get(), gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSession.Get(), chip::MakeOptional(gMessageTimeout));
     SuccessOrExit(err);
 
     gCommandCount++;
@@ -285,7 +285,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(gSession.Get(), gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSession.Get(), chip::MakeOptional(gMessageTimeout));
     SuccessOrExit(err);
     gCommandCount++;
     commandSender.release();
@@ -644,8 +644,8 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();

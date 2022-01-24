@@ -91,7 +91,7 @@ public:
      * @brief
      *   Send the command in internal command sender.
      */
-    CHIP_ERROR SendCommands(app::CommandSender * commandObj) override;
+    CHIP_ERROR SendCommands(app::CommandSender * commandObj, Optional<System::Clock::Timeout> timeout) override;
 
     /**
      * @brief Get the IP address and port assigned to the device.

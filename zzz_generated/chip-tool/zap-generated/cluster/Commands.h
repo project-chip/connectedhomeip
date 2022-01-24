@@ -146,6 +146,8 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
 
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1514,6 +1516,14 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("Icac", indent + 1, value.icac);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Icac'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
     ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
     return CHIP_NO_ERROR;
 }
@@ -2511,6 +2521,21 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'A'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -4600,6 +4625,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | Thermostat                                                          | 0x0201 |
 | ThermostatUserInterfaceConfiguration                                | 0x0204 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
+| TimeFormatLocalization                                              | 0x002C |
 | UserLabel                                                           | 0x0041 |
 | WakeOnLan                                                           | 0x0503 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
@@ -27025,6 +27051,7 @@ private:
 | Attributes:                                                         |        |
 | * ActiveLocale                                                      | 0x0001 |
 | * SupportedLocales                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
@@ -27191,6 +27218,78 @@ public:
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
         LogValue("LocalizationConfiguration.SupportedLocales report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadLocalizationConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "LocalizationConfiguration.ClusterRevision response", value);
+    }
+};
+
+class ReportLocalizationConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReportLocalizationConfigurationClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLocalizationConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("LocalizationConfiguration.ClusterRevision report", 0, value);
     }
 
 private:
@@ -32513,6 +32612,7 @@ private:
 | * UpdateNOC                                                         |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * NOCs                                                              | 0x0000 |
 | * FabricsList                                                       | 0x0001 |
 | * SupportedFabrics                                                  | 0x0002 |
 | * CommissionedFabrics                                               | 0x0003 |
@@ -32743,6 +32843,84 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type mRequest;
+};
+
+/*
+ * Attribute NOCs
+ */
+class ReadOperationalCredentialsNOCs : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsNOCs() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nocs");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsNOCs() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeEventResponse(context, "OperationalCredentials.NOCs response", value);
+    }
+};
+
+class ReportOperationalCredentialsNOCs : public ModelCommand
+{
+public:
+    ReportOperationalCredentialsNOCs() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nocs");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOperationalCredentialsNOCs() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value)
+    {
+        LogValue("OperationalCredentials.NOCs report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -56642,6 +56820,365 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster TimeFormatLocalization                                      | 0x002C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * HourFormat                                                        | 0x0000 |
+| * ActiveCalendarType                                                | 0x0001 |
+| * SupportedCalendarTypes                                            | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute HourFormat
+ */
+class ReadTimeFormatLocalizationHourFormat : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationHourFormat() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "hour-format");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.HourFormat response", value);
+    }
+};
+
+class WriteTimeFormatLocalizationHourFormat : public ModelCommand
+{
+public:
+    WriteTimeFormatLocalizationHourFormat() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "hour-format");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTimeFormatLocalizationHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) WriteAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TimeFormatLocalization::HourFormat mValue;
+};
+
+class ReportTimeFormatLocalizationHourFormat : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationHourFormat() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "hour-format");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+    {
+        LogValue("TimeFormatLocalization.HourFormat report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ActiveCalendarType
+ */
+class ReadTimeFormatLocalizationActiveCalendarType : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationActiveCalendarType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.ActiveCalendarType response", value);
+    }
+};
+
+class WriteTimeFormatLocalizationActiveCalendarType : public ModelCommand
+{
+public:
+    WriteTimeFormatLocalizationActiveCalendarType() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTimeFormatLocalizationActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) WriteAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TimeFormatLocalization::CalendarType mValue;
+};
+
+class ReportTimeFormatLocalizationActiveCalendarType : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationActiveCalendarType() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+    {
+        LogValue("TimeFormatLocalization.ActiveCalendarType report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SupportedCalendarTypes
+ */
+class ReadTimeFormatLocalizationSupportedCalendarTypes : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationSupportedCalendarTypes() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-calendar-types");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationSupportedCalendarTypes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.SupportedCalendarTypes response", value);
+    }
+};
+
+class ReportTimeFormatLocalizationSupportedCalendarTypes : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationSupportedCalendarTypes() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "supported-calendar-types");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationSupportedCalendarTypes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster
+            .SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo>(
+                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void
+    OnValueReport(void * context,
+                  const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    {
+        LogValue("TimeFormatLocalization.SupportedCalendarTypes report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadTimeFormatLocalizationClusterRevision : public ModelCommand
+{
+public:
+    ReadTimeFormatLocalizationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeFormatLocalizationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "TimeFormatLocalization.ClusterRevision response", value);
+    }
+};
+
+class ReportTimeFormatLocalizationClusterRevision : public ModelCommand
+{
+public:
+    ReportTimeFormatLocalizationClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTimeFormatLocalizationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeFormatLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("TimeFormatLocalization.ClusterRevision report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster UserLabel                                                   | 0x0041 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -60144,8 +60681,11 @@ void registerClusterAccessControl(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadAccessControlAcl>(),                             //
+        make_unique<ReportAccessControlAcl>(),                           //
         make_unique<ReadAccessControlExtension>(),                       //
+        make_unique<ReportAccessControlExtension>(),                     //
         make_unique<ReadAccessControlAttributeList>(),                   //
+        make_unique<ReportAccessControlAttributeList>(),                 //
         make_unique<ReadAccessControlClusterRevision>(),                 //
         make_unique<ReportAccessControlClusterRevision>(),               //
         make_unique<ReadAccessControlAccessControlEntryChanged>(),       //
@@ -60165,6 +60705,7 @@ void registerClusterAccountLogin(Commands & commands)
         make_unique<AccountLoginLoginRequest>(),          //
         make_unique<AccountLoginLogoutRequest>(),         //
         make_unique<ReadAccountLoginAttributeList>(),     //
+        make_unique<ReportAccountLoginAttributeList>(),   //
         make_unique<ReadAccountLoginClusterRevision>(),   //
         make_unique<ReportAccountLoginClusterRevision>(), //
     };
@@ -60186,6 +60727,7 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         make_unique<ReadAdministratorCommissioningAdminVendorId>(),            //
         make_unique<ReportAdministratorCommissioningAdminVendorId>(),          //
         make_unique<ReadAdministratorCommissioningAttributeList>(),            //
+        make_unique<ReportAdministratorCommissioningAttributeList>(),          //
         make_unique<ReadAdministratorCommissioningClusterRevision>(),          //
         make_unique<ReportAdministratorCommissioningClusterRevision>(),        //
     };
@@ -60210,7 +60752,9 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReadApplicationBasicApplicationVersion>(),   //
         make_unique<ReportApplicationBasicApplicationVersion>(), //
         make_unique<ReadApplicationBasicAllowedVendorList>(),    //
+        make_unique<ReportApplicationBasicAllowedVendorList>(),  //
         make_unique<ReadApplicationBasicAttributeList>(),        //
+        make_unique<ReportApplicationBasicAttributeList>(),      //
         make_unique<ReadApplicationBasicClusterRevision>(),      //
         make_unique<ReportApplicationBasicClusterRevision>(),    //
     };
@@ -60222,13 +60766,15 @@ void registerClusterApplicationLauncher(Commands & commands)
     const char * clusterName = "ApplicationLauncher";
 
     commands_list clusterCommands = {
-        make_unique<ApplicationLauncherHideAppRequest>(),              //
-        make_unique<ApplicationLauncherLaunchAppRequest>(),            //
-        make_unique<ApplicationLauncherStopAppRequest>(),              //
-        make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
-        make_unique<ReadApplicationLauncherAttributeList>(),           //
-        make_unique<ReadApplicationLauncherClusterRevision>(),         //
-        make_unique<ReportApplicationLauncherClusterRevision>(),       //
+        make_unique<ApplicationLauncherHideAppRequest>(),                //
+        make_unique<ApplicationLauncherLaunchAppRequest>(),              //
+        make_unique<ApplicationLauncherStopAppRequest>(),                //
+        make_unique<ReadApplicationLauncherApplicationLauncherList>(),   //
+        make_unique<ReportApplicationLauncherApplicationLauncherList>(), //
+        make_unique<ReadApplicationLauncherAttributeList>(),             //
+        make_unique<ReportApplicationLauncherAttributeList>(),           //
+        make_unique<ReadApplicationLauncherClusterRevision>(),           //
+        make_unique<ReportApplicationLauncherClusterRevision>(),         //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -60241,9 +60787,11 @@ void registerClusterAudioOutput(Commands & commands)
         make_unique<AudioOutputRenameOutputRequest>(),      //
         make_unique<AudioOutputSelectOutputRequest>(),      //
         make_unique<ReadAudioOutputAudioOutputList>(),      //
+        make_unique<ReportAudioOutputAudioOutputList>(),    //
         make_unique<ReadAudioOutputCurrentAudioOutput>(),   //
         make_unique<ReportAudioOutputCurrentAudioOutput>(), //
         make_unique<ReadAudioOutputAttributeList>(),        //
+        make_unique<ReportAudioOutputAttributeList>(),      //
         make_unique<ReadAudioOutputClusterRevision>(),      //
         make_unique<ReportAudioOutputClusterRevision>(),    //
     };
@@ -60266,6 +60814,7 @@ void registerClusterBarrierControl(Commands & commands)
         make_unique<ReadBarrierControlBarrierPosition>(),       //
         make_unique<ReportBarrierControlBarrierPosition>(),     //
         make_unique<ReadBarrierControlAttributeList>(),         //
+        make_unique<ReportBarrierControlAttributeList>(),       //
         make_unique<ReadBarrierControlClusterRevision>(),       //
         make_unique<ReportBarrierControlClusterRevision>(),     //
     };
@@ -60320,6 +60869,7 @@ void registerClusterBasic(Commands & commands)
         make_unique<ReadBasicUniqueID>(),                  //
         make_unique<ReportBasicUniqueID>(),                //
         make_unique<ReadBasicAttributeList>(),             //
+        make_unique<ReportBasicAttributeList>(),           //
         make_unique<ReadBasicClusterRevision>(),           //
         make_unique<ReportBasicClusterRevision>(),         //
         make_unique<ReadBasicStartUp>(),                   //
@@ -60348,6 +60898,7 @@ void registerClusterBinaryInputBasic(Commands & commands)
         make_unique<ReadBinaryInputBasicStatusFlags>(),       //
         make_unique<ReportBinaryInputBasicStatusFlags>(),     //
         make_unique<ReadBinaryInputBasicAttributeList>(),     //
+        make_unique<ReportBinaryInputBasicAttributeList>(),   //
         make_unique<ReadBinaryInputBasicClusterRevision>(),   //
         make_unique<ReportBinaryInputBasicClusterRevision>(), //
     };
@@ -60362,6 +60913,7 @@ void registerClusterBinding(Commands & commands)
         make_unique<BindingBind>(),                  //
         make_unique<BindingUnbind>(),                //
         make_unique<ReadBindingAttributeList>(),     //
+        make_unique<ReportBindingAttributeList>(),   //
         make_unique<ReadBindingClusterRevision>(),   //
         make_unique<ReportBindingClusterRevision>(), //
     };
@@ -60376,6 +60928,7 @@ void registerClusterBooleanState(Commands & commands)
         make_unique<ReadBooleanStateStateValue>(),        //
         make_unique<ReportBooleanStateStateValue>(),      //
         make_unique<ReadBooleanStateAttributeList>(),     //
+        make_unique<ReportBooleanStateAttributeList>(),   //
         make_unique<ReadBooleanStateClusterRevision>(),   //
         make_unique<ReportBooleanStateClusterRevision>(), //
         make_unique<ReadBooleanStateStateChange>(),       //
@@ -60402,10 +60955,13 @@ void registerClusterBridgedActions(Commands & commands)
         make_unique<BridgedActionsStartActionWithDuration>(),     //
         make_unique<BridgedActionsStopAction>(),                  //
         make_unique<ReadBridgedActionsActionList>(),              //
+        make_unique<ReportBridgedActionsActionList>(),            //
         make_unique<ReadBridgedActionsEndpointList>(),            //
+        make_unique<ReportBridgedActionsEndpointList>(),          //
         make_unique<ReadBridgedActionsSetupUrl>(),                //
         make_unique<ReportBridgedActionsSetupUrl>(),              //
         make_unique<ReadBridgedActionsAttributeList>(),           //
+        make_unique<ReportBridgedActionsAttributeList>(),         //
         make_unique<ReadBridgedActionsClusterRevision>(),         //
         make_unique<ReportBridgedActionsClusterRevision>(),       //
         make_unique<ReadBridgedActionsStateChanged>(),            //
@@ -60422,6 +60978,7 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadBridgedDeviceBasicAttributeList>(),     //
+        make_unique<ReportBridgedDeviceBasicAttributeList>(),   //
         make_unique<ReadBridgedDeviceBasicClusterRevision>(),   //
         make_unique<ReportBridgedDeviceBasicClusterRevision>(), //
     };
@@ -60437,7 +60994,9 @@ void registerClusterChannel(Commands & commands)
         make_unique<ChannelChangeChannelRequest>(),         //
         make_unique<ChannelSkipChannelRequest>(),           //
         make_unique<ReadChannelChannelList>(),              //
+        make_unique<ReportChannelChannelList>(),            //
         make_unique<ReadChannelAttributeList>(),            //
+        make_unique<ReportChannelAttributeList>(),          //
         make_unique<ReadChannelClusterRevision>(),          //
         make_unique<ReportChannelClusterRevision>(),        //
     };
@@ -60586,6 +61145,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<WriteColorControlStartUpColorTemperatureMireds>(),    //
         make_unique<ReportColorControlStartUpColorTemperatureMireds>(),   //
         make_unique<ReadColorControlAttributeList>(),                     //
+        make_unique<ReportColorControlAttributeList>(),                   //
         make_unique<ReadColorControlClusterRevision>(),                   //
         make_unique<ReportColorControlClusterRevision>(),                 //
     };
@@ -60600,10 +61160,12 @@ void registerClusterContentLauncher(Commands & commands)
         make_unique<ContentLauncherLaunchContentRequest>(),              //
         make_unique<ContentLauncherLaunchURLRequest>(),                  //
         make_unique<ReadContentLauncherAcceptHeaderList>(),              //
+        make_unique<ReportContentLauncherAcceptHeaderList>(),            //
         make_unique<ReadContentLauncherSupportedStreamingProtocols>(),   //
         make_unique<WriteContentLauncherSupportedStreamingProtocols>(),  //
         make_unique<ReportContentLauncherSupportedStreamingProtocols>(), //
         make_unique<ReadContentLauncherAttributeList>(),                 //
+        make_unique<ReportContentLauncherAttributeList>(),               //
         make_unique<ReadContentLauncherClusterRevision>(),               //
         make_unique<ReportContentLauncherClusterRevision>(),             //
     };
@@ -60616,10 +61178,15 @@ void registerClusterDescriptor(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadDescriptorDeviceList>(),        //
+        make_unique<ReportDescriptorDeviceList>(),      //
         make_unique<ReadDescriptorServerList>(),        //
+        make_unique<ReportDescriptorServerList>(),      //
         make_unique<ReadDescriptorClientList>(),        //
+        make_unique<ReportDescriptorClientList>(),      //
         make_unique<ReadDescriptorPartsList>(),         //
+        make_unique<ReportDescriptorPartsList>(),       //
         make_unique<ReadDescriptorAttributeList>(),     //
+        make_unique<ReportDescriptorAttributeList>(),   //
         make_unique<ReadDescriptorClusterRevision>(),   //
         make_unique<ReportDescriptorClusterRevision>(), //
     };
@@ -60633,6 +61200,7 @@ void registerClusterDiagnosticLogs(Commands & commands)
     commands_list clusterCommands = {
         make_unique<DiagnosticLogsRetrieveLogsRequest>(), //
         make_unique<ReadDiagnosticLogsAttributeList>(),   //
+        make_unique<ReportDiagnosticLogsAttributeList>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -60690,6 +61258,7 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<WriteDoorLockWrongCodeEntryLimit>(),          //
         make_unique<ReportDoorLockWrongCodeEntryLimit>(),         //
         make_unique<ReadDoorLockAttributeList>(),                 //
+        make_unique<ReportDoorLockAttributeList>(),               //
         make_unique<ReadDoorLockClusterRevision>(),               //
         make_unique<ReportDoorLockClusterRevision>(),             //
         make_unique<ReadDoorLockDoorLockAlarm>(),                 //
@@ -60734,6 +61303,7 @@ void registerClusterElectricalMeasurement(Commands & commands)
         make_unique<ReadElectricalMeasurementActivePowerMax>(),     //
         make_unique<ReportElectricalMeasurementActivePowerMax>(),   //
         make_unique<ReadElectricalMeasurementAttributeList>(),      //
+        make_unique<ReportElectricalMeasurementAttributeList>(),    //
         make_unique<ReadElectricalMeasurementClusterRevision>(),    //
         make_unique<ReportElectricalMeasurementClusterRevision>(),  //
     };
@@ -60765,6 +61335,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<ReadEthernetNetworkDiagnosticsTimeSinceReset>(),    //
         make_unique<ReportEthernetNetworkDiagnosticsTimeSinceReset>(),  //
         make_unique<ReadEthernetNetworkDiagnosticsAttributeList>(),     //
+        make_unique<ReportEthernetNetworkDiagnosticsAttributeList>(),   //
         make_unique<ReadEthernetNetworkDiagnosticsFeatureMap>(),        //
         make_unique<ReportEthernetNetworkDiagnosticsFeatureMap>(),      //
         make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(),   //
@@ -60779,7 +61350,9 @@ void registerClusterFixedLabel(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadFixedLabelLabelList>(),         //
+        make_unique<ReportFixedLabelLabelList>(),       //
         make_unique<ReadFixedLabelAttributeList>(),     //
+        make_unique<ReportFixedLabelAttributeList>(),   //
         make_unique<ReadFixedLabelClusterRevision>(),   //
         make_unique<ReportFixedLabelClusterRevision>(), //
     };
@@ -60800,6 +61373,7 @@ void registerClusterFlowMeasurement(Commands & commands)
         make_unique<ReadFlowMeasurementTolerance>(),          //
         make_unique<ReportFlowMeasurementTolerance>(),        //
         make_unique<ReadFlowMeasurementAttributeList>(),      //
+        make_unique<ReportFlowMeasurementAttributeList>(),    //
         make_unique<ReadFlowMeasurementClusterRevision>(),    //
         make_unique<ReportFlowMeasurementClusterRevision>(),  //
     };
@@ -60811,20 +61385,22 @@ void registerClusterGeneralCommissioning(Commands & commands)
     const char * clusterName = "GeneralCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<GeneralCommissioningArmFailSafe>(),                    //
-        make_unique<GeneralCommissioningCommissioningComplete>(),          //
-        make_unique<GeneralCommissioningSetRegulatoryConfig>(),            //
-        make_unique<ReadGeneralCommissioningBreadcrumb>(),                 //
-        make_unique<WriteGeneralCommissioningBreadcrumb>(),                //
-        make_unique<ReportGeneralCommissioningBreadcrumb>(),               //
-        make_unique<ReadGeneralCommissioningBasicCommissioningInfoList>(), //
-        make_unique<ReadGeneralCommissioningRegulatoryConfig>(),           //
-        make_unique<ReportGeneralCommissioningRegulatoryConfig>(),         //
-        make_unique<ReadGeneralCommissioningLocationCapability>(),         //
-        make_unique<ReportGeneralCommissioningLocationCapability>(),       //
-        make_unique<ReadGeneralCommissioningAttributeList>(),              //
-        make_unique<ReadGeneralCommissioningClusterRevision>(),            //
-        make_unique<ReportGeneralCommissioningClusterRevision>(),          //
+        make_unique<GeneralCommissioningArmFailSafe>(),                      //
+        make_unique<GeneralCommissioningCommissioningComplete>(),            //
+        make_unique<GeneralCommissioningSetRegulatoryConfig>(),              //
+        make_unique<ReadGeneralCommissioningBreadcrumb>(),                   //
+        make_unique<WriteGeneralCommissioningBreadcrumb>(),                  //
+        make_unique<ReportGeneralCommissioningBreadcrumb>(),                 //
+        make_unique<ReadGeneralCommissioningBasicCommissioningInfoList>(),   //
+        make_unique<ReportGeneralCommissioningBasicCommissioningInfoList>(), //
+        make_unique<ReadGeneralCommissioningRegulatoryConfig>(),             //
+        make_unique<ReportGeneralCommissioningRegulatoryConfig>(),           //
+        make_unique<ReadGeneralCommissioningLocationCapability>(),           //
+        make_unique<ReportGeneralCommissioningLocationCapability>(),         //
+        make_unique<ReadGeneralCommissioningAttributeList>(),                //
+        make_unique<ReportGeneralCommissioningAttributeList>(),              //
+        make_unique<ReadGeneralCommissioningClusterRevision>(),              //
+        make_unique<ReportGeneralCommissioningClusterRevision>(),            //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -60835,6 +61411,7 @@ void registerClusterGeneralDiagnostics(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadGeneralDiagnosticsNetworkInterfaces>(),       //
+        make_unique<ReportGeneralDiagnosticsNetworkInterfaces>(),     //
         make_unique<ReadGeneralDiagnosticsRebootCount>(),             //
         make_unique<ReportGeneralDiagnosticsRebootCount>(),           //
         make_unique<ReadGeneralDiagnosticsUpTime>(),                  //
@@ -60844,9 +61421,13 @@ void registerClusterGeneralDiagnostics(Commands & commands)
         make_unique<ReadGeneralDiagnosticsBootReasons>(),             //
         make_unique<ReportGeneralDiagnosticsBootReasons>(),           //
         make_unique<ReadGeneralDiagnosticsActiveHardwareFaults>(),    //
+        make_unique<ReportGeneralDiagnosticsActiveHardwareFaults>(),  //
         make_unique<ReadGeneralDiagnosticsActiveRadioFaults>(),       //
+        make_unique<ReportGeneralDiagnosticsActiveRadioFaults>(),     //
         make_unique<ReadGeneralDiagnosticsActiveNetworkFaults>(),     //
+        make_unique<ReportGeneralDiagnosticsActiveNetworkFaults>(),   //
         make_unique<ReadGeneralDiagnosticsAttributeList>(),           //
+        make_unique<ReportGeneralDiagnosticsAttributeList>(),         //
         make_unique<ReadGeneralDiagnosticsClusterRevision>(),         //
         make_unique<ReportGeneralDiagnosticsClusterRevision>(),       //
         make_unique<ReadGeneralDiagnosticsHardwareFaultChange>(),     //
@@ -60871,12 +61452,15 @@ void registerClusterGroupKeyManagement(Commands & commands)
         make_unique<GroupKeyManagementKeySetRemove>(),                //
         make_unique<GroupKeyManagementKeySetWrite>(),                 //
         make_unique<ReadGroupKeyManagementGroupKeyMap>(),             //
+        make_unique<ReportGroupKeyManagementGroupKeyMap>(),           //
         make_unique<ReadGroupKeyManagementGroupTable>(),              //
+        make_unique<ReportGroupKeyManagementGroupTable>(),            //
         make_unique<ReadGroupKeyManagementMaxGroupsPerFabric>(),      //
         make_unique<ReportGroupKeyManagementMaxGroupsPerFabric>(),    //
         make_unique<ReadGroupKeyManagementMaxGroupKeysPerFabric>(),   //
         make_unique<ReportGroupKeyManagementMaxGroupKeysPerFabric>(), //
         make_unique<ReadGroupKeyManagementAttributeList>(),           //
+        make_unique<ReportGroupKeyManagementAttributeList>(),         //
         make_unique<ReadGroupKeyManagementClusterRevision>(),         //
         make_unique<ReportGroupKeyManagementClusterRevision>(),       //
     };
@@ -60897,6 +61481,7 @@ void registerClusterGroups(Commands & commands)
         make_unique<ReadGroupsNameSupport>(),       //
         make_unique<ReportGroupsNameSupport>(),     //
         make_unique<ReadGroupsAttributeList>(),     //
+        make_unique<ReportGroupsAttributeList>(),   //
         make_unique<ReadGroupsClusterRevision>(),   //
         make_unique<ReportGroupsClusterRevision>(), //
     };
@@ -60917,6 +61502,7 @@ void registerClusterIdentify(Commands & commands)
         make_unique<ReadIdentifyIdentifyType>(),      //
         make_unique<ReportIdentifyIdentifyType>(),    //
         make_unique<ReadIdentifyAttributeList>(),     //
+        make_unique<ReportIdentifyAttributeList>(),   //
         make_unique<ReadIdentifyClusterRevision>(),   //
         make_unique<ReportIdentifyClusterRevision>(), //
     };
@@ -60939,6 +61525,7 @@ void registerClusterIlluminanceMeasurement(Commands & commands)
         make_unique<ReadIlluminanceMeasurementLightSensorType>(),    //
         make_unique<ReportIlluminanceMeasurementLightSensorType>(),  //
         make_unique<ReadIlluminanceMeasurementAttributeList>(),      //
+        make_unique<ReportIlluminanceMeasurementAttributeList>(),    //
         make_unique<ReadIlluminanceMeasurementClusterRevision>(),    //
         make_unique<ReportIlluminanceMeasurementClusterRevision>(),  //
     };
@@ -60952,6 +61539,7 @@ void registerClusterKeypadInput(Commands & commands)
     commands_list clusterCommands = {
         make_unique<KeypadInputSendKeyRequest>(),        //
         make_unique<ReadKeypadInputAttributeList>(),     //
+        make_unique<ReportKeypadInputAttributeList>(),   //
         make_unique<ReadKeypadInputClusterRevision>(),   //
         make_unique<ReportKeypadInputClusterRevision>(), //
     };
@@ -61007,6 +61595,7 @@ void registerClusterLevelControl(Commands & commands)
         make_unique<WriteLevelControlStartUpCurrentLevel>(),  //
         make_unique<ReportLevelControlStartUpCurrentLevel>(), //
         make_unique<ReadLevelControlAttributeList>(),         //
+        make_unique<ReportLevelControlAttributeList>(),       //
         make_unique<ReadLevelControlFeatureMap>(),            //
         make_unique<ReportLevelControlFeatureMap>(),          //
         make_unique<ReadLevelControlClusterRevision>(),       //
@@ -61020,10 +61609,13 @@ void registerClusterLocalizationConfiguration(Commands & commands)
     const char * clusterName = "LocalizationConfiguration";
 
     commands_list clusterCommands = {
-        make_unique<ReadLocalizationConfigurationActiveLocale>(),     //
-        make_unique<WriteLocalizationConfigurationActiveLocale>(),    //
-        make_unique<ReportLocalizationConfigurationActiveLocale>(),   //
-        make_unique<ReadLocalizationConfigurationSupportedLocales>(), //
+        make_unique<ReadLocalizationConfigurationActiveLocale>(),       //
+        make_unique<WriteLocalizationConfigurationActiveLocale>(),      //
+        make_unique<ReportLocalizationConfigurationActiveLocale>(),     //
+        make_unique<ReadLocalizationConfigurationSupportedLocales>(),   //
+        make_unique<ReportLocalizationConfigurationSupportedLocales>(), //
+        make_unique<ReadLocalizationConfigurationClusterRevision>(),    //
+        make_unique<ReportLocalizationConfigurationClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -61035,6 +61627,7 @@ void registerClusterLowPower(Commands & commands)
     commands_list clusterCommands = {
         make_unique<LowPowerSleep>(),                 //
         make_unique<ReadLowPowerAttributeList>(),     //
+        make_unique<ReportLowPowerAttributeList>(),   //
         make_unique<ReadLowPowerClusterRevision>(),   //
         make_unique<ReportLowPowerClusterRevision>(), //
     };
@@ -61051,9 +61644,11 @@ void registerClusterMediaInput(Commands & commands)
         make_unique<MediaInputSelectInputRequest>(),      //
         make_unique<MediaInputShowInputStatusRequest>(),  //
         make_unique<ReadMediaInputMediaInputList>(),      //
+        make_unique<ReportMediaInputMediaInputList>(),    //
         make_unique<ReadMediaInputCurrentMediaInput>(),   //
         make_unique<ReportMediaInputCurrentMediaInput>(), //
         make_unique<ReadMediaInputAttributeList>(),       //
+        make_unique<ReportMediaInputAttributeList>(),     //
         make_unique<ReadMediaInputClusterRevision>(),     //
         make_unique<ReportMediaInputClusterRevision>(),   //
     };
@@ -61089,6 +61684,7 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<ReadMediaPlaybackSeekRangeStart>(),    //
         make_unique<ReportMediaPlaybackSeekRangeStart>(),  //
         make_unique<ReadMediaPlaybackAttributeList>(),     //
+        make_unique<ReportMediaPlaybackAttributeList>(),   //
         make_unique<ReadMediaPlaybackClusterRevision>(),   //
         make_unique<ReportMediaPlaybackClusterRevision>(), //
     };
@@ -61104,6 +61700,7 @@ void registerClusterModeSelect(Commands & commands)
         make_unique<ReadModeSelectCurrentMode>(),       //
         make_unique<ReportModeSelectCurrentMode>(),     //
         make_unique<ReadModeSelectSupportedModes>(),    //
+        make_unique<ReportModeSelectSupportedModes>(),  //
         make_unique<ReadModeSelectOnMode>(),            //
         make_unique<WriteModeSelectOnMode>(),           //
         make_unique<ReportModeSelectOnMode>(),          //
@@ -61112,6 +61709,7 @@ void registerClusterModeSelect(Commands & commands)
         make_unique<ReadModeSelectDescription>(),       //
         make_unique<ReportModeSelectDescription>(),     //
         make_unique<ReadModeSelectAttributeList>(),     //
+        make_unique<ReportModeSelectAttributeList>(),   //
         make_unique<ReadModeSelectClusterRevision>(),   //
         make_unique<ReportModeSelectClusterRevision>(), //
     };
@@ -61132,6 +61730,7 @@ void registerClusterNetworkCommissioning(Commands & commands)
         make_unique<ReadNetworkCommissioningMaxNetworks>(),             //
         make_unique<ReportNetworkCommissioningMaxNetworks>(),           //
         make_unique<ReadNetworkCommissioningNetworks>(),                //
+        make_unique<ReportNetworkCommissioningNetworks>(),              //
         make_unique<ReadNetworkCommissioningScanMaxTimeSeconds>(),      //
         make_unique<ReportNetworkCommissioningScanMaxTimeSeconds>(),    //
         make_unique<ReadNetworkCommissioningConnectMaxTimeSeconds>(),   //
@@ -61162,6 +61761,7 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
         make_unique<OtaSoftwareUpdateProviderNotifyUpdateApplied>(),   //
         make_unique<OtaSoftwareUpdateProviderQueryImage>(),            //
         make_unique<ReadOtaSoftwareUpdateProviderAttributeList>(),     //
+        make_unique<ReportOtaSoftwareUpdateProviderAttributeList>(),   //
         make_unique<ReadOtaSoftwareUpdateProviderClusterRevision>(),   //
         make_unique<ReportOtaSoftwareUpdateProviderClusterRevision>(), //
     };
@@ -61175,6 +61775,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
     commands_list clusterCommands = {
         make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),       //
         make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProviders>(),   //
+        make_unique<ReportOtaSoftwareUpdateRequestorDefaultOtaProviders>(), //
         make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),        //
         make_unique<ReportOtaSoftwareUpdateRequestorUpdatePossible>(),      //
         make_unique<ReadOtaSoftwareUpdateRequestorUpdateState>(),           //
@@ -61182,6 +61783,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
         make_unique<ReadOtaSoftwareUpdateRequestorUpdateStateProgress>(),   //
         make_unique<ReportOtaSoftwareUpdateRequestorUpdateStateProgress>(), //
         make_unique<ReadOtaSoftwareUpdateRequestorAttributeList>(),         //
+        make_unique<ReportOtaSoftwareUpdateRequestorAttributeList>(),       //
         make_unique<ReadOtaSoftwareUpdateRequestorClusterRevision>(),       //
         make_unique<ReportOtaSoftwareUpdateRequestorClusterRevision>(),     //
         make_unique<ReadOtaSoftwareUpdateRequestorStateTransition>(),       //
@@ -61206,6 +61808,7 @@ void registerClusterOccupancySensing(Commands & commands)
         make_unique<ReadOccupancySensingOccupancySensorTypeBitmap>(),   //
         make_unique<ReportOccupancySensingOccupancySensorTypeBitmap>(), //
         make_unique<ReadOccupancySensingAttributeList>(),               //
+        make_unique<ReportOccupancySensingAttributeList>(),             //
         make_unique<ReadOccupancySensingClusterRevision>(),             //
         make_unique<ReportOccupancySensingClusterRevision>(),           //
     };
@@ -61237,6 +61840,7 @@ void registerClusterOnOff(Commands & commands)
         make_unique<WriteOnOffStartUpOnOff>(),        //
         make_unique<ReportOnOffStartUpOnOff>(),       //
         make_unique<ReadOnOffAttributeList>(),        //
+        make_unique<ReportOnOffAttributeList>(),      //
         make_unique<ReadOnOffFeatureMap>(),           //
         make_unique<ReportOnOffFeatureMap>(),         //
         make_unique<ReadOnOffClusterRevision>(),      //
@@ -61256,6 +61860,7 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands)
         make_unique<WriteOnOffSwitchConfigurationSwitchActions>(),    //
         make_unique<ReportOnOffSwitchConfigurationSwitchActions>(),   //
         make_unique<ReadOnOffSwitchConfigurationAttributeList>(),     //
+        make_unique<ReportOnOffSwitchConfigurationAttributeList>(),   //
         make_unique<ReadOnOffSwitchConfigurationClusterRevision>(),   //
         make_unique<ReportOnOffSwitchConfigurationClusterRevision>(), //
     };
@@ -61267,26 +61872,31 @@ void registerClusterOperationalCredentials(Commands & commands)
     const char * clusterName = "OperationalCredentials";
 
     commands_list clusterCommands = {
-        make_unique<OperationalCredentialsAddNOC>(),                       //
-        make_unique<OperationalCredentialsAddTrustedRootCertificate>(),    //
-        make_unique<OperationalCredentialsAttestationRequest>(),           //
-        make_unique<OperationalCredentialsCertificateChainRequest>(),      //
-        make_unique<OperationalCredentialsOpCSRRequest>(),                 //
-        make_unique<OperationalCredentialsRemoveFabric>(),                 //
-        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(), //
-        make_unique<OperationalCredentialsUpdateFabricLabel>(),            //
-        make_unique<OperationalCredentialsUpdateNOC>(),                    //
-        make_unique<ReadOperationalCredentialsFabricsList>(),              //
-        make_unique<ReadOperationalCredentialsSupportedFabrics>(),         //
-        make_unique<ReportOperationalCredentialsSupportedFabrics>(),       //
-        make_unique<ReadOperationalCredentialsCommissionedFabrics>(),      //
-        make_unique<ReportOperationalCredentialsCommissionedFabrics>(),    //
-        make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),  //
-        make_unique<ReadOperationalCredentialsCurrentFabricIndex>(),       //
-        make_unique<ReportOperationalCredentialsCurrentFabricIndex>(),     //
-        make_unique<ReadOperationalCredentialsAttributeList>(),            //
-        make_unique<ReadOperationalCredentialsClusterRevision>(),          //
-        make_unique<ReportOperationalCredentialsClusterRevision>(),        //
+        make_unique<OperationalCredentialsAddNOC>(),                        //
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(),     //
+        make_unique<OperationalCredentialsAttestationRequest>(),            //
+        make_unique<OperationalCredentialsCertificateChainRequest>(),       //
+        make_unique<OperationalCredentialsOpCSRRequest>(),                  //
+        make_unique<OperationalCredentialsRemoveFabric>(),                  //
+        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),  //
+        make_unique<OperationalCredentialsUpdateFabricLabel>(),             //
+        make_unique<OperationalCredentialsUpdateNOC>(),                     //
+        make_unique<ReadOperationalCredentialsNOCs>(),                      //
+        make_unique<ReportOperationalCredentialsNOCs>(),                    //
+        make_unique<ReadOperationalCredentialsFabricsList>(),               //
+        make_unique<ReportOperationalCredentialsFabricsList>(),             //
+        make_unique<ReadOperationalCredentialsSupportedFabrics>(),          //
+        make_unique<ReportOperationalCredentialsSupportedFabrics>(),        //
+        make_unique<ReadOperationalCredentialsCommissionedFabrics>(),       //
+        make_unique<ReportOperationalCredentialsCommissionedFabrics>(),     //
+        make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),   //
+        make_unique<ReportOperationalCredentialsTrustedRootCertificates>(), //
+        make_unique<ReadOperationalCredentialsCurrentFabricIndex>(),        //
+        make_unique<ReportOperationalCredentialsCurrentFabricIndex>(),      //
+        make_unique<ReadOperationalCredentialsAttributeList>(),             //
+        make_unique<ReportOperationalCredentialsAttributeList>(),           //
+        make_unique<ReadOperationalCredentialsClusterRevision>(),           //
+        make_unique<ReportOperationalCredentialsClusterRevision>(),         //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -61311,9 +61921,11 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<ReadPowerSourceBatteryChargeLevel>(),        //
         make_unique<ReportPowerSourceBatteryChargeLevel>(),      //
         make_unique<ReadPowerSourceActiveBatteryFaults>(),       //
+        make_unique<ReportPowerSourceActiveBatteryFaults>(),     //
         make_unique<ReadPowerSourceBatteryChargeState>(),        //
         make_unique<ReportPowerSourceBatteryChargeState>(),      //
         make_unique<ReadPowerSourceAttributeList>(),             //
+        make_unique<ReportPowerSourceAttributeList>(),           //
         make_unique<ReadPowerSourceFeatureMap>(),                //
         make_unique<ReportPowerSourceFeatureMap>(),              //
         make_unique<ReadPowerSourceClusterRevision>(),           //
@@ -61328,7 +61940,9 @@ void registerClusterPowerSourceConfiguration(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadPowerSourceConfigurationSources>(),           //
+        make_unique<ReportPowerSourceConfigurationSources>(),         //
         make_unique<ReadPowerSourceConfigurationAttributeList>(),     //
+        make_unique<ReportPowerSourceConfigurationAttributeList>(),   //
         make_unique<ReadPowerSourceConfigurationClusterRevision>(),   //
         make_unique<ReportPowerSourceConfigurationClusterRevision>(), //
     };
@@ -61347,6 +61961,7 @@ void registerClusterPressureMeasurement(Commands & commands)
         make_unique<ReadPressureMeasurementMaxMeasuredValue>(),   //
         make_unique<ReportPressureMeasurementMaxMeasuredValue>(), //
         make_unique<ReadPressureMeasurementAttributeList>(),      //
+        make_unique<ReportPressureMeasurementAttributeList>(),    //
         make_unique<ReadPressureMeasurementClusterRevision>(),    //
         make_unique<ReportPressureMeasurementClusterRevision>(),  //
     };
@@ -61411,6 +62026,7 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<ReadPumpConfigurationAndControlAlarmMask>(),                   //
         make_unique<ReportPumpConfigurationAndControlAlarmMask>(),                 //
         make_unique<ReadPumpConfigurationAndControlAttributeList>(),               //
+        make_unique<ReportPumpConfigurationAndControlAttributeList>(),             //
         make_unique<ReadPumpConfigurationAndControlFeatureMap>(),                  //
         make_unique<ReportPumpConfigurationAndControlFeatureMap>(),                //
         make_unique<ReadPumpConfigurationAndControlClusterRevision>(),             //
@@ -61467,6 +62083,7 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands)
         make_unique<ReadRelativeHumidityMeasurementTolerance>(),          //
         make_unique<ReportRelativeHumidityMeasurementTolerance>(),        //
         make_unique<ReadRelativeHumidityMeasurementAttributeList>(),      //
+        make_unique<ReportRelativeHumidityMeasurementAttributeList>(),    //
         make_unique<ReadRelativeHumidityMeasurementClusterRevision>(),    //
         make_unique<ReportRelativeHumidityMeasurementClusterRevision>(),  //
     };
@@ -61496,6 +62113,7 @@ void registerClusterScenes(Commands & commands)
         make_unique<ReadScenesNameSupport>(),       //
         make_unique<ReportScenesNameSupport>(),     //
         make_unique<ReadScenesAttributeList>(),     //
+        make_unique<ReportScenesAttributeList>(),   //
         make_unique<ReadScenesClusterRevision>(),   //
         make_unique<ReportScenesClusterRevision>(), //
     };
@@ -61509,6 +62127,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
     commands_list clusterCommands = {
         make_unique<SoftwareDiagnosticsResetWatermarks>(),                //
         make_unique<ReadSoftwareDiagnosticsThreadMetrics>(),              //
+        make_unique<ReportSoftwareDiagnosticsThreadMetrics>(),            //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapFree>(),            //
         make_unique<ReportSoftwareDiagnosticsCurrentHeapFree>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapUsed>(),            //
@@ -61516,6 +62135,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(),   //
         make_unique<ReportSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
         make_unique<ReadSoftwareDiagnosticsAttributeList>(),              //
+        make_unique<ReportSoftwareDiagnosticsAttributeList>(),            //
         make_unique<ReadSoftwareDiagnosticsFeatureMap>(),                 //
         make_unique<ReportSoftwareDiagnosticsFeatureMap>(),               //
         make_unique<ReadSoftwareDiagnosticsClusterRevision>(),            //
@@ -61538,6 +62158,7 @@ void registerClusterSwitch(Commands & commands)
         make_unique<ReadSwitchMultiPressMax>(),        //
         make_unique<ReportSwitchMultiPressMax>(),      //
         make_unique<ReadSwitchAttributeList>(),        //
+        make_unique<ReportSwitchAttributeList>(),      //
         make_unique<ReadSwitchFeatureMap>(),           //
         make_unique<ReportSwitchFeatureMap>(),         //
         make_unique<ReadSwitchClusterRevision>(),      //
@@ -61567,9 +62188,11 @@ void registerClusterTargetNavigator(Commands & commands)
     commands_list clusterCommands = {
         make_unique<TargetNavigatorNavigateTargetRequest>(),        //
         make_unique<ReadTargetNavigatorTargetNavigatorList>(),      //
+        make_unique<ReportTargetNavigatorTargetNavigatorList>(),    //
         make_unique<ReadTargetNavigatorCurrentNavigatorTarget>(),   //
         make_unique<ReportTargetNavigatorCurrentNavigatorTarget>(), //
         make_unique<ReadTargetNavigatorAttributeList>(),            //
+        make_unique<ReportTargetNavigatorAttributeList>(),          //
         make_unique<ReadTargetNavigatorClusterRevision>(),          //
         make_unique<ReportTargetNavigatorClusterRevision>(),        //
     };
@@ -61590,6 +62213,7 @@ void registerClusterTemperatureMeasurement(Commands & commands)
         make_unique<ReadTemperatureMeasurementTolerance>(),          //
         make_unique<ReportTemperatureMeasurementTolerance>(),        //
         make_unique<ReadTemperatureMeasurementAttributeList>(),      //
+        make_unique<ReportTemperatureMeasurementAttributeList>(),    //
         make_unique<ReadTemperatureMeasurementClusterRevision>(),    //
         make_unique<ReportTemperatureMeasurementClusterRevision>(),  //
     };
@@ -61698,8 +62322,11 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterOctetString>(),                        //
         make_unique<ReportTestClusterOctetString>(),                       //
         make_unique<ReadTestClusterListInt8u>(),                           //
+        make_unique<ReportTestClusterListInt8u>(),                         //
         make_unique<ReadTestClusterListOctetString>(),                     //
+        make_unique<ReportTestClusterListOctetString>(),                   //
         make_unique<ReadTestClusterListStructOctetString>(),               //
+        make_unique<ReportTestClusterListStructOctetString>(),             //
         make_unique<ReadTestClusterLongOctetString>(),                     //
         make_unique<WriteTestClusterLongOctetString>(),                    //
         make_unique<ReportTestClusterLongOctetString>(),                   //
@@ -61719,6 +62346,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterVendorId>(),                           //
         make_unique<ReportTestClusterVendorId>(),                          //
         make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(),     //
+        make_unique<ReportTestClusterListNullablesAndOptionalsStruct>(),   //
         make_unique<ReadTestClusterEnumAttr>(),                            //
         make_unique<WriteTestClusterEnumAttr>(),                           //
         make_unique<ReportTestClusterEnumAttr>(),                          //
@@ -61735,6 +62363,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterRangeRestrictedInt16s>(),              //
         make_unique<ReportTestClusterRangeRestrictedInt16s>(),             //
         make_unique<ReadTestClusterListLongOctetString>(),                 //
+        make_unique<ReportTestClusterListLongOctetString>(),               //
         make_unique<ReadTestClusterTimedWriteBoolean>(),                   //
         make_unique<WriteTestClusterTimedWriteBoolean>(),                  //
         make_unique<ReportTestClusterTimedWriteBoolean>(),                 //
@@ -61838,6 +62467,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(),      //
         make_unique<ReportTestClusterNullableRangeRestrictedInt16s>(),     //
         make_unique<ReadTestClusterAttributeList>(),                       //
+        make_unique<ReportTestClusterAttributeList>(),                     //
         make_unique<ReadTestClusterClusterRevision>(),                     //
         make_unique<ReportTestClusterClusterRevision>(),                   //
         make_unique<ReadTestClusterTestEvent>(),                           //
@@ -61900,6 +62530,7 @@ void registerClusterThermostat(Commands & commands)
         make_unique<ReadThermostatNumberOfDailyTransitions>(),     //
         make_unique<ReportThermostatNumberOfDailyTransitions>(),   //
         make_unique<ReadThermostatAttributeList>(),                //
+        make_unique<ReportThermostatAttributeList>(),              //
         make_unique<ReadThermostatFeatureMap>(),                   //
         make_unique<ReportThermostatFeatureMap>(),                 //
         make_unique<ReadThermostatClusterRevision>(),              //
@@ -61923,6 +62554,7 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands)
         make_unique<WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(),  //
         make_unique<ReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(), //
         make_unique<ReadThermostatUserInterfaceConfigurationAttributeList>(),                   //
+        make_unique<ReportThermostatUserInterfaceConfigurationAttributeList>(),                 //
         make_unique<ReadThermostatUserInterfaceConfigurationClusterRevision>(),                 //
         make_unique<ReportThermostatUserInterfaceConfigurationClusterRevision>(),               //
     };
@@ -61950,7 +62582,9 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReadThreadNetworkDiagnosticsOverrunCount>(),                        //
         make_unique<ReportThreadNetworkDiagnosticsOverrunCount>(),                      //
         make_unique<ReadThreadNetworkDiagnosticsNeighborTableList>(),                   //
+        make_unique<ReportThreadNetworkDiagnosticsNeighborTableList>(),                 //
         make_unique<ReadThreadNetworkDiagnosticsRouteTableList>(),                      //
+        make_unique<ReportThreadNetworkDiagnosticsRouteTableList>(),                    //
         make_unique<ReadThreadNetworkDiagnosticsPartitionId>(),                         //
         make_unique<ReportThreadNetworkDiagnosticsPartitionId>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsWeighting>(),                           //
@@ -62052,11 +62686,15 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReadThreadNetworkDiagnosticsDelay>(),                               //
         make_unique<ReportThreadNetworkDiagnosticsDelay>(),                             //
         make_unique<ReadThreadNetworkDiagnosticsSecurityPolicy>(),                      //
+        make_unique<ReportThreadNetworkDiagnosticsSecurityPolicy>(),                    //
         make_unique<ReadThreadNetworkDiagnosticsChannelMask>(),                         //
         make_unique<ReportThreadNetworkDiagnosticsChannelMask>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsOperationalDatasetComponents>(),        //
+        make_unique<ReportThreadNetworkDiagnosticsOperationalDatasetComponents>(),      //
         make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),             //
+        make_unique<ReportThreadNetworkDiagnosticsActiveNetworkFaultsList>(),           //
         make_unique<ReadThreadNetworkDiagnosticsAttributeList>(),                       //
+        make_unique<ReportThreadNetworkDiagnosticsAttributeList>(),                     //
         make_unique<ReadThreadNetworkDiagnosticsFeatureMap>(),                          //
         make_unique<ReportThreadNetworkDiagnosticsFeatureMap>(),                        //
         make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),                     //
@@ -62067,12 +62705,32 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterTimeFormatLocalization(Commands & commands)
+{
+    const char * clusterName = "TimeFormatLocalization";
+
+    commands_list clusterCommands = {
+        make_unique<ReadTimeFormatLocalizationHourFormat>(),               //
+        make_unique<WriteTimeFormatLocalizationHourFormat>(),              //
+        make_unique<ReportTimeFormatLocalizationHourFormat>(),             //
+        make_unique<ReadTimeFormatLocalizationActiveCalendarType>(),       //
+        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(),      //
+        make_unique<ReportTimeFormatLocalizationActiveCalendarType>(),     //
+        make_unique<ReadTimeFormatLocalizationSupportedCalendarTypes>(),   //
+        make_unique<ReportTimeFormatLocalizationSupportedCalendarTypes>(), //
+        make_unique<ReadTimeFormatLocalizationClusterRevision>(),          //
+        make_unique<ReportTimeFormatLocalizationClusterRevision>(),        //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterUserLabel(Commands & commands)
 {
     const char * clusterName = "UserLabel";
 
     commands_list clusterCommands = {
         make_unique<ReadUserLabelLabelList>(),         //
+        make_unique<ReportUserLabelLabelList>(),       //
         make_unique<ReadUserLabelClusterRevision>(),   //
         make_unique<ReportUserLabelClusterRevision>(), //
     };
@@ -62087,6 +62745,7 @@ void registerClusterWakeOnLan(Commands & commands)
         make_unique<ReadWakeOnLanWakeOnLanMacAddress>(),   //
         make_unique<ReportWakeOnLanWakeOnLanMacAddress>(), //
         make_unique<ReadWakeOnLanAttributeList>(),         //
+        make_unique<ReportWakeOnLanAttributeList>(),       //
         make_unique<ReadWakeOnLanClusterRevision>(),       //
         make_unique<ReportWakeOnLanClusterRevision>(),     //
     };
@@ -62126,6 +62785,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         make_unique<ReadWiFiNetworkDiagnosticsOverrunCount>(),             //
         make_unique<ReportWiFiNetworkDiagnosticsOverrunCount>(),           //
         make_unique<ReadWiFiNetworkDiagnosticsAttributeList>(),            //
+        make_unique<ReportWiFiNetworkDiagnosticsAttributeList>(),          //
         make_unique<ReadWiFiNetworkDiagnosticsFeatureMap>(),               //
         make_unique<ReportWiFiNetworkDiagnosticsFeatureMap>(),             //
         make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),          //
@@ -62190,6 +62850,7 @@ void registerClusterWindowCovering(Commands & commands)
         make_unique<ReadWindowCoveringSafetyStatus>(),                       //
         make_unique<ReportWindowCoveringSafetyStatus>(),                     //
         make_unique<ReadWindowCoveringAttributeList>(),                      //
+        make_unique<ReportWindowCoveringAttributeList>(),                    //
         make_unique<ReadWindowCoveringFeatureMap>(),                         //
         make_unique<ReportWindowCoveringFeatureMap>(),                       //
         make_unique<ReadWindowCoveringClusterRevision>(),                    //
@@ -62258,6 +62919,7 @@ void registerClusters(Commands & commands)
     registerClusterThermostat(commands);
     registerClusterThermostatUserInterfaceConfiguration(commands);
     registerClusterThreadNetworkDiagnostics(commands);
+    registerClusterTimeFormatLocalization(commands);
     registerClusterUserLabel(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWiFiNetworkDiagnostics(commands);

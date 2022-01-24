@@ -2577,6 +2577,12 @@ class ChipClusters:
                     "type": "str",
                     "reportable": True,
                 },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
             },
     }
     _LOW_POWER_CLUSTER_INFO = {
@@ -3317,6 +3323,12 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "NOCs",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                    "reportable": True,
+                },
                 0x00000001: {
                     "attributeName": "FabricsList",
                     "attributeId": 0x00000001,
@@ -5368,6 +5380,40 @@ class ChipClusters:
                 },
             },
     }
+    _TIME_FORMAT_LOCALIZATION_CLUSTER_INFO = {
+            "clusterName": "TimeFormatLocalization",
+            "clusterId": 0x0000002C,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "HourFormat",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000001: {
+                    "attributeName": "ActiveCalendarType",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000002: {
+                    "attributeName": "SupportedCalendarTypes",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
     _USER_LABEL_CLUSTER_INFO = {
             "clusterName": "UserLabel",
             "clusterId": 0x00000041,
@@ -5767,6 +5813,7 @@ class ChipClusters:
     0x00000201: _THERMOSTAT_CLUSTER_INFO,
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x0000002C: _TIME_FORMAT_LOCALIZATION_CLUSTER_INFO,
     0x00000041: _USER_LABEL_CLUSTER_INFO,
     0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
@@ -5831,6 +5878,7 @@ class ChipClusters:
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "TimeFormatLocalization": _TIME_FORMAT_LOCALIZATION_CLUSTER_INFO,
         "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,

@@ -25,7 +25,7 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define ChipDie() abort()
+#define CHIP_CONFIG_ABORT() abort()
 
 // TODO:(#756) Add FabricState support
 #define CHIP_CONFIG_ENABLE_FABRIC_STATE 0

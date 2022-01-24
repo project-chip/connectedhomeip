@@ -25,6 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Events.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
@@ -42,6 +43,11 @@
 #include <netinet/in.h>
 #include <signal.h>
 #include <unistd.h>
+
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+#endif
 
 using namespace ::chip::app::Clusters;
 
@@ -88,19 +94,19 @@ void SignalHandler(int signum)
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTRAP:
-        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::kEventId);
+        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
         break;
     case SIGILL:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::kEventId);
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
         break;
     case SIGALRM:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::kEventId);
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
         break;
     case SIGVTALRM:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::kEventId);
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
     case SIGIO:
-        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::kEventId);
+        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
         break;
     default:
         break;
@@ -355,6 +361,27 @@ PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLang
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+PlatformManagerImpl::_GetSupportedCalendarTypes(
+    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
+{
+    // In Linux simulation, return following supported Calendar Types
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kChinese);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kCoptic);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kGregorian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kHebrew);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIndian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIslamic);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kJapanese);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kKorean);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kPersian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
+
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
     PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
@@ -385,7 +412,7 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
         return;
     }
 
-    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::kEventId)
+    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::Id)
     {
         GeneralFaults<kMaxHardwareFaults> previous;
         GeneralFaults<kMaxHardwareFaults> current;
@@ -402,7 +429,7 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
 #endif
         delegate->OnHardwareFaultsDetected(previous, current);
     }
-    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::kEventId)
+    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::Id)
     {
         GeneralFaults<kMaxRadioFaults> previous;
         GeneralFaults<kMaxRadioFaults> current;
@@ -419,7 +446,7 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
 #endif
         delegate->OnRadioFaultsDetected(previous, current);
     }
-    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::kEventId)
+    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::Id)
     {
         GeneralFaults<kMaxNetworkFaults> previous;
         GeneralFaults<kMaxNetworkFaults> current;
@@ -470,7 +497,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
         return;
     }
 
-    if (EventId == Switch::Events::SwitchLatched::kEventId)
+    if (EventId == Switch::Events::SwitchLatched::Id)
     {
         uint8_t newPosition = 0;
 
@@ -479,7 +506,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 #endif
         delegate->OnSwitchLatched(newPosition);
     }
-    else if (EventId == Switch::Events::InitialPress::kEventId)
+    else if (EventId == Switch::Events::InitialPress::Id)
     {
         uint8_t newPosition = 0;
 
@@ -488,7 +515,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 #endif
         delegate->OnInitialPressed(newPosition);
     }
-    else if (EventId == Switch::Events::LongPress::kEventId)
+    else if (EventId == Switch::Events::LongPress::Id)
     {
         uint8_t newPosition = 0;
 
@@ -497,7 +524,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 #endif
         delegate->OnLongPressed(newPosition);
     }
-    else if (EventId == Switch::Events::ShortRelease::kEventId)
+    else if (EventId == Switch::Events::ShortRelease::Id)
     {
         uint8_t previousPosition = 0;
 
@@ -506,7 +533,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 #endif
         delegate->OnShortReleased(previousPosition);
     }
-    else if (EventId == Switch::Events::LongRelease::kEventId)
+    else if (EventId == Switch::Events::LongRelease::Id)
     {
         uint8_t previousPosition = 0;
 
@@ -515,7 +542,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 #endif
         delegate->OnLongReleased(previousPosition);
     }
-    else if (EventId == Switch::Events::MultiPressOngoing::kEventId)
+    else if (EventId == Switch::Events::MultiPressOngoing::Id)
     {
         uint8_t newPosition                   = 0;
         uint8_t currentNumberOfPressesCounted = 0;
@@ -526,7 +553,7 @@ void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 #endif
         delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
     }
-    else if (EventId == Switch::Events::MultiPressComplete::kEventId)
+    else if (EventId == Switch::Events::MultiPressComplete::Id)
     {
         uint8_t newPosition                 = 0;
         uint8_t totalNumberOfPressesCounted = 0;

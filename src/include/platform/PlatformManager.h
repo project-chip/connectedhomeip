@@ -37,9 +37,10 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
-static constexpr size_t kMaxFixedLabels  = 10;
-static constexpr size_t kMaxUserLabels   = 10;
-static constexpr size_t kMaxLanguageTags = 254; // Maximum number of entry type 'ARRAY' supports
+static constexpr size_t kMaxFixedLabels   = 10;
+static constexpr size_t kMaxUserLabels    = 10;
+static constexpr size_t kMaxLanguageTags  = 254; // Maximum number of entry type 'ARRAY' supports
+static constexpr size_t kMaxCalendarTypes = 12;
 
 class PlatformManagerImpl;
 class ConnectivityManagerImpl;
@@ -189,6 +190,8 @@ public:
     CHIP_ERROR GetUserLabelList(EndpointId endpoint,
                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
+    CHIP_ERROR GetSupportedCalendarTypes(
+        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
 private:
     bool mInitialized                   = false;
@@ -453,6 +456,12 @@ PlatformManager::GetUserLabelList(EndpointId endpoint,
 inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     return static_cast<ImplClass *>(this)->_GetSupportedLocales(supportedLocales);
+}
+
+inline CHIP_ERROR PlatformManager::GetSupportedCalendarTypes(
+    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
+{
+    return static_cast<ImplClass *>(this)->_GetSupportedCalendarTypes(supportedCalendarTypes);
 }
 
 } // namespace DeviceLayer

@@ -103,8 +103,11 @@ public:
         template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
         CHIP_ERROR Encode(T && aArg) const
         {
-            // If the fabric index does not match that present in the request, skip encoding this list item.
-            VerifyOrReturnError(aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex), CHIP_NO_ERROR);
+            // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
+            // request, skip encoding this list item.
+            VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
+                                    aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex),
+                                CHIP_NO_ERROR);
             return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
         }
 
@@ -150,11 +153,11 @@ public:
     };
 
     AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, FabricIndex aAccessingFabricIndex,
-                          const ConcreteAttributePath & aPath, DataVersion aDataVersion,
+                          const ConcreteAttributePath & aPath, DataVersion aDataVersion, bool aIsFabricFiltered = false,
                           const AttributeEncodeState & aState = AttributeEncodeState()) :
         mAttributeReportIBsBuilder(aAttributeReportIBsBuilder),
         mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-        mDataVersion(aDataVersion), mEncodeState(aState)
+        mDataVersion(aDataVersion), mIsFabricFiltered(aIsFabricFiltered), mEncodeState(aState)
     {}
 
     /**
@@ -300,6 +303,7 @@ private:
     const FabricIndex mAccessingFabricIndex;
     ConcreteDataAttributePath mPath;
     DataVersion mDataVersion;
+    bool mIsFabricFiltered = false;
     AttributeEncodeState mEncodeState;
     ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
 };

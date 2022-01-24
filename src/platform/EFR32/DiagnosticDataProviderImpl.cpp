@@ -25,8 +25,9 @@
 
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/EFR32/DiagnosticDataProviderImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
-
+#endif
 #include <lwip/tcpip.h>
 
 #include "AppConfig.h"
@@ -180,13 +181,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 {
     NetworkInterface * ifp = new NetworkInterface();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName       = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                            = Span<const char>(threadNetworkName, strlen(threadNetworkName));
     ifp->fabricConnected                 = true;
     ifp->offPremiseServicesReachableIPv4 = false;
     ifp->offPremiseServicesReachableIPv6 = false;
     ifp->type                            = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
-
+#else
+    /* TODO */
+#endif
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);

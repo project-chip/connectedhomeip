@@ -29,7 +29,7 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define ChipDie() abort()
+#define CHIP_CONFIG_ABORT() abort()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE uint16_t
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1

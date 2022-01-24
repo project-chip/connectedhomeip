@@ -46,3 +46,6 @@ pandas ; platform_machine != 'aarch64' and platform_machine != 'arm64'
 
 # scripts/build
 click
+
+# scripts/idl
+lark
