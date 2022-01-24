@@ -72,8 +72,8 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     mEndpoints.push_back(
         LockEndpoint(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser));
 
-    ChipLogProgress(Zcl, "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d]", endpointId, numberOfSupportedUsers,
-                    numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser);
+    ChipLogProgress(Zcl, "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d]",
+                    endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser);
 
     return true;
 }
