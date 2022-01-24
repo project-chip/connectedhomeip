@@ -772,7 +772,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
 
-    VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingCommissioned == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -1277,6 +1276,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
                                                     const ByteSpan & rcac)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    Crypto::P256PublicKey rootPubKey;
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
@@ -1293,14 +1293,16 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     device = commissioner->mDeviceBeingCommissioned;
 
     {
+        Credentials::P256PublicKeySpan rootPubKeySpan;
         // Reuse NOC Cert buffer for temporary store Root Cert.
         MutableByteSpan rootCert = device->GetMutableNOCCert();
 
         err = ConvertX509CertToChipCert(rcac, rootCert);
         SuccessOrExit(err);
 
-        err = commissioner->SendTrustedRootCertificate(device, rootCert);
-        SuccessOrExit(err);
+        SuccessOrExit(err = commissioner->SendTrustedRootCertificate(device, rootCert));
+        SuccessOrExit(err = Credentials::ExtractPublicKeyFromChipCert(rootCert, rootPubKeySpan));
+        rootPubKey = Crypto::P256PublicKey(rootPubKeySpan); // deep copy
     }
 
     if (!icac.empty())
@@ -1323,6 +1325,9 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
         err = device->SetNOCCertBufferSize(nocCert.size());
         SuccessOrExit(err);
     }
+
+    SuccessOrExit(err = device->SetPeerId(rootPubKey, device->GetNOCCert()));
+    VerifyOrExit(IsOperationalNodeId(device->GetDeviceId()), err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
     if (err != CHIP_NO_ERROR)

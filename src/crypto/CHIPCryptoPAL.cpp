@@ -657,5 +657,16 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     return status;
 }
 
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKey, uint64_t fabricId, uint64_t & compressedFabricId)
+{
+    uint8_t allocated[sizeof(fabricId)];
+    MutableByteSpan span(allocated);
+    ReturnErrorOnFailure(GenerateCompressedFabricId(rootPublicKey, fabricId, span));
+    // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
+    // returns a binary buffer and is agnostic of usage of the output as an integer type.
+    compressedFabricId = Encoding::BigEndian::Get64(allocated);
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Crypto
 } // namespace chip
