@@ -57,7 +57,7 @@ UserLabelAttrAccess gAttrAccess;
 CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+    DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
 
     if (DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList) == CHIP_NO_ERROR)
     {
@@ -80,7 +80,7 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 
 CHIP_ERROR UserLabelAttrAccess::WriteLabelList(EndpointId endpoint, AttributeValueDecoder & aDecoder)
 {
-    DeviceLayer::LabelList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+    DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
     LabelList::TypeInfo::DecodableType decodablelist;
 
     ReturnErrorOnFailure(aDecoder.Decode(decodablelist));

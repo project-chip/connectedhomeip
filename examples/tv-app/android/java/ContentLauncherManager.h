@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/af-structs.h>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/content-launch-server/content-launch-delegate.h>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <list>
@@ -29,27 +29,24 @@
 class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<ContentLaunchParamater> & parameterList,
-                                              bool autoplay, const chip::CharSpan & data) override;
-    ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                          const std::list<ContentLaunchBrandingInformation> & brandingInformation) override;
-    std::list<std::string> HandleGetAcceptHeaderList() override;
+    void
+    HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
+                            responser) override;
+    void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                         const std::list<BrandingInformation> & brandingInformation,
+                         chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
+                             responser) override;
+    CHIP_ERROR HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
 private:
-    friend ContentLauncherManager & ContentLauncherMgr();
-
-    static ContentLauncherManager sInstance;
     jobject mContentLauncherManagerObject           = nullptr;
     jmethodID mGetAcceptHeaderMethod                = nullptr;
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;
 };
-
-inline ContentLauncherManager & ContentLauncherMgr()
-{
-    return ContentLauncherManager::sInstance;
-}

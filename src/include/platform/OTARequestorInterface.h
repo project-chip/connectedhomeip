@@ -58,8 +58,14 @@ public:
     // Send QueryImage command
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
 
+    // Download image
+    virtual void DownloadUpdate() = 0;
+
     // Send ApplyImage command
     virtual void ApplyUpdate() = 0;
+
+    // Send NotifyUpdateApplied command
+    virtual void NotifyUpdateApplied(uint32_t version) = 0;
 
     // Manually set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;

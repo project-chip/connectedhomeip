@@ -130,7 +130,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
 
     TLV::TLVWriter innerStructureWriter;
 
-    ReturnErrorOnFailure(rootWriter.OpenContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, innerStructureWriter));
+    ReturnErrorOnFailure(rootWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, innerStructureWriter));
 
     for (OptionalQRCodeInfo info : optionalData)
     {

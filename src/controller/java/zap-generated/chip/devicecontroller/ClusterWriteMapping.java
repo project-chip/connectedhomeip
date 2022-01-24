@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -695,6 +695,28 @@ public class ClusterWriteMapping {
         "writeStartUpCurrentLevelAttribute",
         writeLevelControlStartUpCurrentLevelAttributeInteractionInfo);
     writeAttributeMap.put("levelControl", writeLevelControlInteractionInfo);
+    Map<String, InteractionInfo> writeLocalizationConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeLocalizationConfigurationActiveLocaleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo localizationConfigurationactiveLocaleCommandParameterInfo =
+        new CommandParameterInfo("value", String.class);
+    writeLocalizationConfigurationActiveLocaleCommandParams.put(
+        "value", localizationConfigurationactiveLocaleCommandParameterInfo);
+    InteractionInfo writeLocalizationConfigurationActiveLocaleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LocalizationConfigurationCluster) cluster)
+                  .writeActiveLocaleAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeLocalizationConfigurationActiveLocaleCommandParams);
+    writeLocalizationConfigurationInteractionInfo.put(
+        "writeActiveLocaleAttribute",
+        writeLocalizationConfigurationActiveLocaleAttributeInteractionInfo);
+    writeAttributeMap.put(
+        "localizationConfiguration", writeLocalizationConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeLowPowerInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("lowPower", writeLowPowerInteractionInfo);
     Map<String, InteractionInfo> writeMediaInputInteractionInfo = new LinkedHashMap<>();
@@ -1537,7 +1559,9 @@ public class ClusterWriteMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .writeTimedWriteBooleanAttribute(
-                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+                      (DefaultClusterCallback) callback,
+                      (Boolean) commandArguments.get("value"),
+                      10000);
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterTimedWriteBooleanCommandParams);
@@ -2348,6 +2372,43 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeThreadNetworkDiagnosticsInteractionInfo =
         new LinkedHashMap<>();
     writeAttributeMap.put("threadNetworkDiagnostics", writeThreadNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeTimeFormatLocalizationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeTimeFormatLocalizationHourFormatCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo timeFormatLocalizationhourFormatCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeTimeFormatLocalizationHourFormatCommandParams.put(
+        "value", timeFormatLocalizationhourFormatCommandParameterInfo);
+    InteractionInfo writeTimeFormatLocalizationHourFormatAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .writeHourFormatAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTimeFormatLocalizationHourFormatCommandParams);
+    writeTimeFormatLocalizationInteractionInfo.put(
+        "writeHourFormatAttribute", writeTimeFormatLocalizationHourFormatAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTimeFormatLocalizationActiveCalendarTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo timeFormatLocalizationactiveCalendarTypeCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeTimeFormatLocalizationActiveCalendarTypeCommandParams.put(
+        "value", timeFormatLocalizationactiveCalendarTypeCommandParameterInfo);
+    InteractionInfo writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .writeActiveCalendarTypeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTimeFormatLocalizationActiveCalendarTypeCommandParams);
+    writeTimeFormatLocalizationInteractionInfo.put(
+        "writeActiveCalendarTypeAttribute",
+        writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo);
+    writeAttributeMap.put("timeFormatLocalization", writeTimeFormatLocalizationInteractionInfo);
     Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();

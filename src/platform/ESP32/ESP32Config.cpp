@@ -71,6 +71,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
 const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the Chip-counters namespace

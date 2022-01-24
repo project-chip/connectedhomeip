@@ -76,7 +76,7 @@ public:
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
-    CHIP_ERROR _IncrementLifetimeCounter();
+    CHIP_ERROR IncrementLifetimeCounter() override;
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
@@ -91,7 +91,9 @@ public:
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
     CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override;
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
+    CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen) override;
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
+    CHIP_ERROR StoreActiveLocale(const char * code, size_t codeLen) override;
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
@@ -111,6 +113,11 @@ public:
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void NotifyOfAdvertisementStart() override;
+#else
+    void NotifyOfAdvertisementStart();
+#endif
     void LogDeviceConfig() override;
 
     virtual ~GenericConfigurationManagerImpl() = default;

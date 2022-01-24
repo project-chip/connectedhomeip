@@ -44,18 +44,18 @@ void Engine::Shutdown()
 {
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
-    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpGlobalDirtySet);
-    mpGlobalDirtySet = nullptr;
+    mGlobalDirtySet.ReleaseAll();
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
+Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                            AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
+                            AttributeValueEncoder::AttributeEncodeState * aEncoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
     MatterPreAttributeReadCallback(aPath);
-    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aPath, aAttributeReportIBs, aEncoderState));
+    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
     MatterPostAttributeReadCallback(aPath);
     return CHIP_NO_ERROR;
 }
@@ -96,14 +96,14 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             {
                 bool concretePathDirty = false;
                 // TODO: Optimize this implementation by making the iterator only emit intersected paths.
-                for (auto dirtyPath = mpGlobalDirtySet; dirtyPath != nullptr; dirtyPath = dirtyPath->mpNext)
-                {
+                mGlobalDirtySet.ForEachActiveObject([&](auto * dirtyPath) {
                     if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
                         concretePathDirty = true;
-                        break;
+                        return Loop::Break;
                     }
-                }
+                    return Loop::Continue;
+                });
 
                 if (!concretePathDirty)
                 {
@@ -118,7 +118,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), attributeReportIBs, pathForRetrieval, &encodeState);
+            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
+                                      pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
@@ -314,7 +315,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ReportDataMessage::Builder reportDataBuilder;
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
-    bool hasMoreChunks;
+    bool hasMoreChunks                         = false;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -489,8 +490,25 @@ void Engine::Run()
 
     if (allReadClean)
     {
-        InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpGlobalDirtySet);
+        mGlobalDirtySet.ReleaseAll();
     }
+}
+
+bool Engine::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
+{
+    return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
+        if (path->IsAttributePathSupersetOf(aAttributePath))
+        {
+            return Loop::Break;
+        }
+        if (aAttributePath.IsAttributePathSupersetOf(*path))
+        {
+            path->mListIndex   = aAttributePath.mListIndex;
+            path->mAttributeId = aAttributePath.mAttributeId;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
 }
 
 CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
@@ -513,10 +531,16 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
             }
         }
     }
-    if (!InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(mpGlobalDirtySet, aClusterInfo) &&
+    if (!MergeOverlappedAttributePath(aClusterInfo) &&
         InteractionModelEngine::GetInstance()->IsOverlappedAttributePath(aClusterInfo))
     {
-        ReturnLogErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpGlobalDirtySet, aClusterInfo));
+        ClusterInfo * clusterInfo = mGlobalDirtySet.CreateObject();
+        if (clusterInfo == nullptr)
+        {
+            ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        *clusterInfo = aClusterInfo;
     }
     return CHIP_NO_ERROR;
 }
@@ -535,17 +559,22 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     bool intersected = false;
     for (auto clusterInfo = aReadHandler.GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
     {
-        for (auto path = mpGlobalDirtySet; path != nullptr; path = path->mpNext)
-        {
+        mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
             if (path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path))
             {
                 intersected = true;
-                break;
+                return Loop::Break;
             }
+            return Loop::Continue;
+        });
+        if (intersected)
+        {
+            break;
         }
     }
     if (!intersected)
     {
+        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
         aReadHandler.ClearDirty();
     }
 }

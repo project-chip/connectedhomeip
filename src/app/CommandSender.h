@@ -123,7 +123,8 @@ public:
          * This function will:
          *      - Always be called exactly *once* for a given CommandSender instance.
          *      - Be called even in error circumstances.
-         *      - Only be called after a successful call to SendCommandRequest as been made.
+         *      - Only be called after a successful call to SendCommandRequest returns, if SendCommandRequest is used.
+         *      - Always be called before a successful return from SendGroupCommandRequest, if SendGroupCommandRequest is used.
          *
          * This function must be implemented to destroy the CommandSender object.
          *
@@ -170,6 +171,8 @@ public:
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
 
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
@@ -213,7 +216,14 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout = NullOptional);
+
+    // Sends a queued up group command request to the target encapsulated by the secureSession handle.
+    //
+    // If this function is successful, it will invoke the OnDone callback before returning to indicate
+    // to the application that it can destroy and free this object.
+    //
+    CHIP_ERROR SendGroupCommandRequest(const SessionHandle & session);
 
 private:
     friend class TestCommandInteraction;
@@ -277,8 +287,6 @@ private:
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
     CHIP_ERROR SendInvokeRequest();
-
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 

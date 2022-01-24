@@ -60,7 +60,7 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout)
+CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
@@ -69,8 +69,9 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    mpExchangeCtx->SetResponseTimeout(timeout);
+    mpExchangeCtx->SetResponseTimeout(timeout.ValueOr(kImMessageTimeout));
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
@@ -80,6 +81,23 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
     }
 
     return SendInvokeRequest();
+}
+
+CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
+{
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+
+    // Create a new exchange context.
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    ReturnErrorOnFailure(SendInvokeRequest());
+
+    Close();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::SendInvokeRequest()
@@ -171,7 +189,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
 
     while (CHIP_NO_ERROR == (err = invokeResponsesReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag == invokeResponsesReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeResponsesReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         InvokeResponseIB::Parser invokeResponse;
         ReturnErrorOnFailure(invokeResponse.Init(invokeResponsesReader));
         ReturnErrorOnFailure(ProcessInvokeResponseIB(invokeResponse));
@@ -282,7 +300,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             {
                 ChipLogProgress(DataManagement,
                                 "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx16,
+                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx8,
                                 endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
                                 to_underlying(statusIB.mStatus));
             }

@@ -121,7 +121,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
-    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateUpplied");
+    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateApplied");
 
     if (SendStatusIfDelegateNull(endpoint))
     {
@@ -174,6 +174,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     auto & requestorCanConsent = commandData.requestorCanConsent;
     auto & metadataForProvider = commandData.metadataForProvider;
 
+    (void) vendorId;
+    (void) productId;
+    (void) softwareVersion;
+
     EndpointId endpoint = commandPath.mEndpointId;
 
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
@@ -192,7 +196,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     auto protocolIter = protocolsSupported.begin();
     while (protocolIter.Next())
     {
-        ChipLogDetail(Zcl, "    %" PRIu8, protocolIter.GetValue());
+        ChipLogDetail(Zcl, "    %" PRIu8, to_underlying(protocolIter.GetValue()));
     }
     ChipLogDetail(Zcl, "  ]");
     if (hardwareVersion.HasValue())

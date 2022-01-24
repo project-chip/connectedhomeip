@@ -43,7 +43,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::Additi
     TLV::ContiguousBufferTLVReader innerReader;
 
     reader.Init(mPayloadBufferData, mPayloadBufferLength);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
     // Open the container
     ReturnErrorOnFailure(reader.OpenContainer(innerReader));

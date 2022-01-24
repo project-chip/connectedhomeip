@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -163,17 +163,11 @@
 #define CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER
 #endif
 
-#if defined(ZCL_USING_LOCALIZATION_TIME_FORMAT_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_TIME_FORMAT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_LOCALIZATION_TIME_FORMAT_CLUSTER                                                                         \
-    { ZCL_LOCALIZATION_TIME_FORMAT_CLUSTER_ID, 44, "Localization Time Format" },
+#if defined(ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER) || defined(ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER                                                                         \
+    { ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID, 44, "Time Format Localization" },
 #else
-#define CHIP_PRINTCLUSTER_LOCALIZATION_TIME_FORMAT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_LOCALIZATION_UNIT_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_UNIT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_LOCALIZATION_UNIT_CLUSTER { ZCL_LOCALIZATION_UNIT_CLUSTER_ID, 45, "Localization Unit" },
-#else
-#define CHIP_PRINTCLUSTER_LOCALIZATION_UNIT_CLUSTER
+#define CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_CLIENT)
@@ -824,8 +818,7 @@
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                           \
-    CHIP_PRINTCLUSTER_LOCALIZATION_TIME_FORMAT_CLUSTER                                                                             \
-    CHIP_PRINTCLUSTER_LOCALIZATION_UNIT_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_POWER_SOURCE_CONFIGURATION_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_POWER_SOURCE_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \

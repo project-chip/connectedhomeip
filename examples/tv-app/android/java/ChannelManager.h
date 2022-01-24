@@ -17,41 +17,32 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app/AttributeAccessInterface.h>
-
+#include <app/clusters/channel-server/channel-server.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
 
-class ChannelManager
+class ChannelManager : public chip::app::Clusters::Channel::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
-    CHIP_ERROR getChannelList(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR getChannelLineup(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR getCurrentChannel(chip::app::AttributeValueEncoder & aEncoder);
 
-    ChannelInfo ChangeChannelByMatch(std::string name);
-    bool changeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber);
-    bool skipChannnel(uint16_t count);
+    virtual CHIP_ERROR HandleGetChannelList(chip::app::AttributeValueEncoder & aEncoder) override;
+    virtual CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder) override;
+    virtual CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder) override;
+
+    virtual void HandleChangeChannel(
+        const chip::CharSpan & match,
+        chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser) override;
+    bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
+    bool HandleSkipChannel(const uint16_t & count) override;
 
 private:
-    friend ChannelManager & ChannelMgr();
-
-    static ChannelManager sInstance;
     jobject mChannelManagerObject      = nullptr;
     jmethodID mGetChannelListMethod    = nullptr;
     jmethodID mGetLineupMethod         = nullptr;
     jmethodID mGetCurrentChannelMethod = nullptr;
 
     jmethodID mChangeChannelMethod         = nullptr;
-    jmethodID mchangeChannelByNumberMethod = nullptr;
-    jmethodID mskipChannelMethod           = nullptr;
+    jmethodID mChangeChannelByNumberMethod = nullptr;
+    jmethodID mSkipChannelMethod           = nullptr;
 };
-
-inline class ChannelManager & ChannelMgr()
-{
-    return ChannelManager::sInstance;
-}

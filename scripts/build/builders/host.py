@@ -27,7 +27,9 @@ class HostApp(Enum):
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
     TV_APP = auto()
+    LOCK = auto()
     TESTS = auto()
+    SHELL = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -42,8 +44,12 @@ class HostApp(Enum):
             return 'minimal-mdns'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.LOCK:
+            return 'door-lock-app/linux'
         elif self == HostApp.TESTS:
             return '../'
+        elif self == HostApp.SHELL:
+            return 'shell/standalone'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -69,8 +75,14 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.LOCK:
+            yield 'chip-door-lock-app'
+            yield 'chip-door-lock-app.map'
         elif self == HostApp.TESTS:
             pass
+        elif self == HostApp.SHELL:
+            yield 'chip-shell'
+            yield 'chip-shell.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -119,7 +131,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False):
+                 test_group=False, use_libfuzzer=False, use_clang=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -146,6 +158,12 @@ class HostBuilder(GnBuilder):
         if test_group:
             self.extra_gn_options.append(
                 'chip_enable_group_messaging_tests=true')
+
+        if use_libfuzzer:
+            self.extra_gn_options.append('is_libfuzzer=true')
+
+        if use_clang:
+            self.extra_gn_options.append('is_clang=true')
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')

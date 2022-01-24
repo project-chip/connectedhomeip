@@ -91,7 +91,7 @@ Boot the SD card, login with the default user account "ubuntu" and password
 Finally, install some Raspberry Pi specific dependencies:
 
 ```
-sudo apt-get install pi-bluetooth
+sudo apt-get install pi-bluetooth avahi-utils
 ```
 
 You need to reboot your RPi after install `pi-bluetooth`.

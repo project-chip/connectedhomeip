@@ -100,8 +100,8 @@ limitations under the License.
             <description>TODO</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
             <arg name="DebugText" type="CHAR_STRING"/>
-            <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true"/>
-            <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true"/>
+            <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true" optional="true"/>
+            <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true" optional="true"/>
         </command>
         <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatewifinetwork">
             <description>TODO</description>

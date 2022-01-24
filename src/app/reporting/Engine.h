@@ -108,7 +108,7 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool * apHasMoreChunks, bool * apHasEncodedData);
-    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
@@ -136,6 +136,14 @@ private:
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 
     /**
+     * If the provided path is a superset of our of our existing paths, update that existing path to match the
+     * provided path.
+     *
+     * Return whether one of our paths is now a superset of the provided path.
+     */
+    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
+
+    /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
      * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
      *
@@ -155,13 +163,10 @@ private:
     uint32_t mCurReadHandlerIdx = 0;
 
     /**
-     *  mpGlobalDirtySet is used to track the dirty cluster info application modified for attributes during
-     *  post-subscription via SetDirty API, and further form the report. This reporting engine acquires this global dirty
-     *  set from mClusterInfoPool managed by InteractionModelEngine, where all active read handlers also acquire the interested
-     *  cluster Info list from mClusterInfoPool.
+     *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
      *
      */
-    ClusterInfo * mpGlobalDirtySet = nullptr;
+    BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint32_t mReservedSize = 0;

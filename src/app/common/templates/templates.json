@@ -13,6 +13,14 @@
         {
             "name": "header",
             "path": "../../zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "cluster_objects_struct",
+            "path": "../../zap-templates/partials/cluster-objects-struct.zapt"
+        },
+        {
+            "name": "cluster_objects_field_init",
+            "path": "../../zap-templates/partials/cluster-objects-field-init.zapt"
         }
     ],
     "templates": [
@@ -95,6 +103,11 @@
             "path": "../../zap-templates/templates/app/ids/Commands.zapt",
             "name": "Commands Ids header",
             "output": "ids/Commands.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Events.zapt",
+            "name": "Events Ids header",
+            "output": "ids/Events.h"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-objects.zapt",

@@ -251,6 +251,7 @@ public:
      * be called inside ScanNetworks.
      *
      * @param ssid    The interested SSID, the scanning MAY be restricted to to the given SSID.
+     * @param callback    Callback that will be invoked upon finishing the scan
      */
     virtual void ScanNetworks(ByteSpan ssid, ScanCallback * callback) = 0;
 

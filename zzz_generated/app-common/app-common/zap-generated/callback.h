@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -229,21 +229,13 @@ void emberAfOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpo
  */
 void emberAfLocalizationConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Localization Time Format Cluster Init
+/** @brief Time Format Localization Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLocalizationTimeFormatClusterInitCallback(chip::EndpointId endpoint);
-
-/** @brief Localization Unit Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfLocalizationUnitClusterInitCallback(chip::EndpointId endpoint);
+void emberAfTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Power Source Configuration Cluster Init
  *
@@ -3386,42 +3378,42 @@ void emberAfLocalizationConfigurationClusterServerTickCallback(chip::EndpointId 
 void emberAfLocalizationConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Localization Time Format Cluster
+// Time Format Localization Cluster
 //
 
-/** @brief Localization Time Format Cluster Server Init
+/** @brief Time Format Localization Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLocalizationTimeFormatClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfTimeFormatLocalizationClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Localization Time Format Cluster Client Init
+/** @brief Time Format Localization Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLocalizationTimeFormatClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfTimeFormatLocalizationClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Localization Time Format Cluster Server Attribute Changed
+/** @brief Time Format Localization Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterLocalizationTimeFormatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterTimeFormatLocalizationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Localization Time Format Cluster Client Attribute Changed
+/** @brief Time Format Localization Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterLocalizationTimeFormatClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterTimeFormatLocalizationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Localization Time Format Cluster Server Message Sent
+/** @brief Time Format Localization Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -3431,11 +3423,11 @@ void MatterLocalizationTimeFormatClusterClientAttributeChangedCallback(const chi
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfLocalizationTimeFormatClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+void emberAfTimeFormatLocalizationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                    EmberStatus status);
 
-/** @brief Localization Time Format Cluster Client Message Sent
+/** @brief Time Format Localization Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -3445,11 +3437,11 @@ void emberAfLocalizationTimeFormatClusterServerMessageSentCallback(const chip::M
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfLocalizationTimeFormatClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+void emberAfTimeFormatLocalizationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                    EmberStatus status);
 
-/** @brief Localization Time Format Cluster Server Pre Attribute Changed
+/** @brief Time Format Localization Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -3458,10 +3450,10 @@ void emberAfLocalizationTimeFormatClusterClientMessageSentCallback(const chip::M
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterLocalizationTimeFormatClusterServerPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Localization Time Format Cluster Client Pre Attribute Changed
+/** @brief Time Format Localization Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -3470,130 +3462,24 @@ chip::Protocols::InteractionModel::Status MatterLocalizationTimeFormatClusterSer
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterLocalizationTimeFormatClusterClientPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterClientPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Localization Time Format Cluster Server Tick
+/** @brief Time Format Localization Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfLocalizationTimeFormatClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfTimeFormatLocalizationClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Localization Time Format Cluster Client Tick
+/** @brief Time Format Localization Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfLocalizationTimeFormatClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
-// Localization Unit Cluster
-//
-
-/** @brief Localization Unit Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfLocalizationUnitClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Localization Unit Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfLocalizationUnitClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Localization Unit Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterLocalizationUnitClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Localization Unit Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterLocalizationUnitClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Localization Unit Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfLocalizationUnitClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
-
-/** @brief Localization Unit Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfLocalizationUnitClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
-
-/** @brief Localization Unit Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterLocalizationUnitClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Localization Unit Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterLocalizationUnitClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Localization Unit Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfLocalizationUnitClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Localization Unit Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfLocalizationUnitClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfTimeFormatLocalizationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Power Source Configuration Cluster
@@ -14805,11 +14691,11 @@ bool emberAfIasWdClusterStartWarningCallback(chip::app::CommandHandler * command
 bool emberAfIasWdClusterSquawkCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::IasWd::Commands::Squawk::DecodableType & commandData);
 /**
- * @brief Channel Cluster ChangeChannel Command callback (from client)
+ * @brief Channel Cluster ChangeChannelRequest Command callback (from client)
  */
-bool emberAfChannelClusterChangeChannelCallback(
+bool emberAfChannelClusterChangeChannelRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Channel::Commands::ChangeChannel::DecodableType & commandData);
+    const chip::app::Clusters::Channel::Commands::ChangeChannelRequest::DecodableType & commandData);
 /**
  * @brief Channel Cluster ChangeChannelResponse Command callback (from server)
  */
@@ -14817,285 +14703,214 @@ bool emberAfChannelClusterChangeChannelResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
     chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType);
 /**
- * @brief Channel Cluster ChangeChannelByNumber Command callback (from client)
+ * @brief Channel Cluster ChangeChannelByNumberRequest Command callback (from client)
  */
-bool emberAfChannelClusterChangeChannelByNumberCallback(
+bool emberAfChannelClusterChangeChannelByNumberRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::DecodableType & commandData);
+    const chip::app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::DecodableType & commandData);
 /**
- * @brief Channel Cluster SkipChannel Command callback (from client)
+ * @brief Channel Cluster SkipChannelRequest Command callback (from client)
  */
-bool emberAfChannelClusterSkipChannelCallback(
+bool emberAfChannelClusterSkipChannelRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Channel::Commands::SkipChannel::DecodableType & commandData);
+    const chip::app::Clusters::Channel::Commands::SkipChannelRequest::DecodableType & commandData);
 /**
- * @brief Target Navigator Cluster NavigateTarget Command callback (from client)
+ * @brief Target Navigator Cluster NavigateTargetRequest Command callback (from client)
  */
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(
+bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::DecodableType & commandData);
+    const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::DecodableType & commandData);
 /**
  * @brief Target Navigator Cluster NavigateTargetResponse Command callback (from server)
  */
 bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                  uint8_t status, chip::CharSpan data);
 /**
- * @brief Media Playback Cluster MediaPlay Command callback (from client)
+ * @brief Media Playback Cluster PlayRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaPlayCallback(
+bool emberAfMediaPlaybackClusterPlayRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPlay::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::PlayRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaPlayResponse Command callback (from server)
+ * @brief Media Playback Cluster PauseRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaPause Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaPauseCallback(
+bool emberAfMediaPlaybackClusterPauseRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPause::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::PauseRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaPauseResponse Command callback (from server)
+ * @brief Media Playback Cluster StopRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaStop Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaStopCallback(
+bool emberAfMediaPlaybackClusterStopRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaStop::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::StopRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaStopResponse Command callback (from server)
+ * @brief Media Playback Cluster StartOverRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaStartOver Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaStartOverCallback(
+bool emberAfMediaPlaybackClusterStartOverRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::StartOverRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaStartOverResponse Command callback (from server)
+ * @brief Media Playback Cluster PreviousRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaPrevious Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaPreviousCallback(
+bool emberAfMediaPlaybackClusterPreviousRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::PreviousRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaPreviousResponse Command callback (from server)
+ * @brief Media Playback Cluster NextRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaNext Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaNextCallback(
+bool emberAfMediaPlaybackClusterNextRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaNext::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::NextRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaNextResponse Command callback (from server)
+ * @brief Media Playback Cluster RewindRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaNextResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaRewind Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaRewindCallback(
+bool emberAfMediaPlaybackClusterRewindRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaRewind::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::RewindRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaRewindResponse Command callback (from server)
+ * @brief Media Playback Cluster FastForwardRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaFastForward Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaFastForwardCallback(
+bool emberAfMediaPlaybackClusterFastForwardRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::FastForwardRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaFastForwardResponse Command callback (from server)
+ * @brief Media Playback Cluster SkipForwardRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaSkipForward Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(
+bool emberAfMediaPlaybackClusterSkipForwardRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::SkipForwardRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaSkipForwardResponse Command callback (from server)
+ * @brief Media Playback Cluster SkipBackwardRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Playback Cluster MediaSkipBackward Command callback (from client)
- */
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(
+bool emberAfMediaPlaybackClusterSkipBackwardRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaSkipBackwardResponse Command callback (from server)
+ * @brief Media Playback Cluster PlaybackResponse Command callback (from server)
  */
-bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                  uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterPlaybackResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                         uint8_t status);
 /**
- * @brief Media Playback Cluster MediaSeek Command callback (from client)
+ * @brief Media Playback Cluster SeekRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaSeekCallback(
+bool emberAfMediaPlaybackClusterSeekRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSeek::DecodableType & commandData);
+    const chip::app::Clusters::MediaPlayback::Commands::SeekRequest::DecodableType & commandData);
 /**
- * @brief Media Playback Cluster MediaSeekResponse Command callback (from server)
+ * @brief Media Input Cluster SelectInputRequest Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus);
-/**
- * @brief Media Input Cluster SelectInput Command callback (from client)
- */
-bool emberAfMediaInputClusterSelectInputCallback(
+bool emberAfMediaInputClusterSelectInputRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaInput::Commands::SelectInput::DecodableType & commandData);
+    const chip::app::Clusters::MediaInput::Commands::SelectInputRequest::DecodableType & commandData);
 /**
- * @brief Media Input Cluster ShowInputStatus Command callback (from client)
+ * @brief Media Input Cluster ShowInputStatusRequest Command callback (from client)
  */
-bool emberAfMediaInputClusterShowInputStatusCallback(
+bool emberAfMediaInputClusterShowInputStatusRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaInput::Commands::ShowInputStatus::DecodableType & commandData);
+    const chip::app::Clusters::MediaInput::Commands::ShowInputStatusRequest::DecodableType & commandData);
 /**
- * @brief Media Input Cluster HideInputStatus Command callback (from client)
+ * @brief Media Input Cluster HideInputStatusRequest Command callback (from client)
  */
-bool emberAfMediaInputClusterHideInputStatusCallback(
+bool emberAfMediaInputClusterHideInputStatusRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaInput::Commands::HideInputStatus::DecodableType & commandData);
+    const chip::app::Clusters::MediaInput::Commands::HideInputStatusRequest::DecodableType & commandData);
 /**
- * @brief Media Input Cluster RenameInput Command callback (from client)
+ * @brief Media Input Cluster RenameInputRequest Command callback (from client)
  */
-bool emberAfMediaInputClusterRenameInputCallback(
+bool emberAfMediaInputClusterRenameInputRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaInput::Commands::RenameInput::DecodableType & commandData);
+    const chip::app::Clusters::MediaInput::Commands::RenameInputRequest::DecodableType & commandData);
 /**
  * @brief Low Power Cluster Sleep Command callback (from client)
  */
 bool emberAfLowPowerClusterSleepCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                          const chip::app::Clusters::LowPower::Commands::Sleep::DecodableType & commandData);
 /**
- * @brief Keypad Input Cluster SendKey Command callback (from client)
+ * @brief Keypad Input Cluster SendKeyRequest Command callback (from client)
  */
-bool emberAfKeypadInputClusterSendKeyCallback(
+bool emberAfKeypadInputClusterSendKeyRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::KeypadInput::Commands::SendKey::DecodableType & commandData);
+    const chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::DecodableType & commandData);
 /**
  * @brief Keypad Input Cluster SendKeyResponse Command callback (from server)
  */
 bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                       uint8_t status);
 /**
- * @brief Content Launcher Cluster LaunchContent Command callback (from client)
+ * @brief Content Launcher Cluster LaunchContentRequest Command callback (from client)
  */
-bool emberAfContentLauncherClusterLaunchContentCallback(
+bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData);
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData);
 /**
- * @brief Content Launcher Cluster LaunchContentResponse Command callback (from server)
+ * @brief Content Launcher Cluster LaunchURLRequest Command callback (from client)
  */
-bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t contentLaunchStatus, chip::CharSpan data);
-/**
- * @brief Content Launcher Cluster LaunchURL Command callback (from client)
- */
-bool emberAfContentLauncherClusterLaunchURLCallback(
+bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData);
 /**
- * @brief Content Launcher Cluster LaunchURLResponse Command callback (from server)
+ * @brief Content Launcher Cluster LaunchResponse Command callback (from server)
  */
-bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t contentLaunchStatus, chip::CharSpan data);
+bool emberAfContentLauncherClusterLaunchResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                         uint8_t status, chip::CharSpan data);
 /**
- * @brief Audio Output Cluster SelectOutput Command callback (from client)
+ * @brief Audio Output Cluster SelectOutputRequest Command callback (from client)
  */
-bool emberAfAudioOutputClusterSelectOutputCallback(
+bool emberAfAudioOutputClusterSelectOutputRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioOutput::Commands::SelectOutput::DecodableType & commandData);
+    const chip::app::Clusters::AudioOutput::Commands::SelectOutputRequest::DecodableType & commandData);
 /**
- * @brief Audio Output Cluster RenameOutput Command callback (from client)
+ * @brief Audio Output Cluster RenameOutputRequest Command callback (from client)
  */
-bool emberAfAudioOutputClusterRenameOutputCallback(
+bool emberAfAudioOutputClusterRenameOutputRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioOutput::Commands::RenameOutput::DecodableType & commandData);
+    const chip::app::Clusters::AudioOutput::Commands::RenameOutputRequest::DecodableType & commandData);
 /**
- * @brief Application Launcher Cluster LaunchApp Command callback (from client)
+ * @brief Application Launcher Cluster LaunchAppRequest Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterLaunchAppCallback(
+bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::DecodableType & commandData);
+    const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::DecodableType & commandData);
 /**
- * @brief Application Launcher Cluster LaunchAppResponse Command callback (from server)
+ * @brief Application Launcher Cluster StopAppRequest Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t status, chip::CharSpan data);
-/**
- * @brief Application Launcher Cluster StopApp Command callback (from client)
- */
-bool emberAfApplicationLauncherClusterStopAppCallback(
+bool emberAfApplicationLauncherClusterStopAppRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ApplicationLauncher::Commands::StopApp::DecodableType & commandData);
+    const chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::DecodableType & commandData);
 /**
- * @brief Application Launcher Cluster StopAppResponse Command callback (from server)
+ * @brief Application Launcher Cluster HideAppRequest Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterStopAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t status, chip::CharSpan data);
-/**
- * @brief Application Launcher Cluster HideApp Command callback (from client)
- */
-bool emberAfApplicationLauncherClusterHideAppCallback(
+bool emberAfApplicationLauncherClusterHideAppRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ApplicationLauncher::Commands::HideApp::DecodableType & commandData);
+    const chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::DecodableType & commandData);
 /**
- * @brief Application Launcher Cluster HideAppResponse Command callback (from server)
+ * @brief Application Launcher Cluster LauncherResponse Command callback (from server)
  */
-bool emberAfApplicationLauncherClusterHideAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t status, chip::CharSpan data);
+bool emberAfApplicationLauncherClusterLauncherResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t status, chip::CharSpan data);
 /**
- * @brief Application Basic Cluster ChangeStatus Command callback (from client)
+ * @brief Account Login Cluster GetSetupPINRequest Command callback (from client)
  */
-bool emberAfApplicationBasicClusterChangeStatusCallback(
+bool emberAfAccountLoginClusterGetSetupPINRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::DecodableType & commandData);
-/**
- * @brief Account Login Cluster GetSetupPIN Command callback (from client)
- */
-bool emberAfAccountLoginClusterGetSetupPINCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::DecodableType & commandData);
+    const chip::app::Clusters::AccountLogin::Commands::GetSetupPINRequest::DecodableType & commandData);
 /**
  * @brief Account Login Cluster GetSetupPINResponse Command callback (from server)
  */
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                            chip::CharSpan setupPIN);
 /**
- * @brief Account Login Cluster Login Command callback (from client)
+ * @brief Account Login Cluster LoginRequest Command callback (from client)
  */
-bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::AccountLogin::Commands::Login::DecodableType & commandData);
-/**
- * @brief Account Login Cluster Logout Command callback (from client)
- */
-bool emberAfAccountLoginClusterLogoutCallback(
+bool emberAfAccountLoginClusterLoginRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AccountLogin::Commands::Logout::DecodableType & commandData);
+    const chip::app::Clusters::AccountLogin::Commands::LoginRequest::DecodableType & commandData);
+/**
+ * @brief Account Login Cluster LogoutRequest Command callback (from client)
+ */
+bool emberAfAccountLoginClusterLogoutRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AccountLogin::Commands::LogoutRequest::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster Test Command callback (from client)
  */
@@ -15470,23 +15285,21 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  */
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                           chip::AttributeId attributeId, uint8_t mask,
-                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type);
+                                                                          uint8_t * value, uint8_t type);
 
 /** @brief Attribute Read Access
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute read.
  */
-bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                        chip::AttributeId attributeId);
+bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /** @brief Attribute Write Access
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute write.
  */
-bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                         chip::AttributeId attributeId);
+bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /** @brief Default Response
  *
@@ -15566,8 +15379,8 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  * application was not able to read the attribute.
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength);
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -15610,8 +15423,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * attribute.
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer);
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 /** @brief Get Current Time
  *

@@ -35,21 +35,21 @@ enum CommissioningStage : uint8_t
     kDeviceAttestation,
     kCheckCertificates,
     kConfigACL,
-    kWifiNetworkSetup,
+    kWiFiNetworkSetup,
     kThreadNetworkSetup,
-    kWifiNetworkEnable,
+    kWiFiNetworkEnable,
     kThreadNetworkEnable,
     kFindOperational,
     kSendComplete,
     kCleanup,
 };
 
-struct WifiCredentials
+struct WiFiCredentials
 {
     ByteSpan ssid;
     // TODO(cecille): We should add a PII bytespan concept.
     ByteSpan credentials;
-    WifiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
+    WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
 };
 class CommissioningParameters
 {
@@ -59,12 +59,19 @@ public:
     static constexpr size_t kMaxCredentialsLen   = 64;
     bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
     bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
-    bool HasWifiCredentials() const { return mWifiCreds.HasValue(); }
+    bool HasWiFiCredentials() const { return mWiFiCreds.HasValue(); }
     bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
+    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
-    const Optional<WifiCredentials> GetWifiCredentials() const { return mWifiCreds; }
+    const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
+
+    CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
+    {
+        mFailsafeTimerSeconds = seconds;
+        return *this;
+    }
 
     // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
     CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
@@ -79,9 +86,9 @@ public:
         mAttestationNonce.SetValue(attestationNonce);
         return *this;
     }
-    CommissioningParameters & SetWifiCredentials(WifiCredentials wifiCreds)
+    CommissioningParameters & SetWiFiCredentials(WiFiCredentials wifiCreds)
     {
-        mWifiCreds.SetValue(wifiCreds);
+        mWiFiCreds.SetValue(wifiCreds);
         return *this;
     }
 
@@ -91,12 +98,16 @@ public:
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
         return *this;
     }
+    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
+    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
 
 private:
+    uint16_t mFailsafeTimerSeconds = 60;
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
-    Optional<WifiCredentials> mWifiCreds;
+    Optional<WiFiCredentials> mWiFiCreds;
     Optional<ByteSpan> mThreadOperationalDataset;
+    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
 };
 
 class CommissioningDelegate

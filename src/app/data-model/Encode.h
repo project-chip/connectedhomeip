@@ -22,6 +22,8 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace app {
 namespace DataModel {
@@ -115,6 +117,15 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
     {
         return writer.PutNull(tag);
     }
+    // Allow sending invalid values for nullables when
+    // CONFIG_IM_BUILD_FOR_UNIT_TEST is true, so we can test how the other side
+    // responds.
+#if !CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if (!x.HasValidValue())
+    {
+        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
+    }
+#endif // !CONFIG_IM_BUILD_FOR_UNIT_TEST
     return Encode(writer, tag, x.Value());
 }
 

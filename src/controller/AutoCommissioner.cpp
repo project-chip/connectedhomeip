@@ -29,16 +29,16 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     if (params.HasThreadOperationalDataset())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
-        if (dataset.size() > CommissioningParameters::kMaxCredentialsLen)
+        if (dataset.size() > CommissioningParameters::kMaxThreadDatasetLen)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         memcpy(mThreadOperationalDataset, dataset.data(), dataset.size());
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
     }
-    if (params.HasWifiCredentials())
+    if (params.HasWiFiCredentials())
     {
-        WifiCredentials creds = params.GetWifiCredentials().Value();
+        WiFiCredentials creds = params.GetWiFiCredentials().Value();
         if (creds.ssid.size() > CommissioningParameters::kMaxSsidLen ||
             creds.credentials.size() > CommissioningParameters::kMaxCredentialsLen)
         {
@@ -46,14 +46,18 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         }
         memcpy(mSsid, creds.ssid.data(), creds.ssid.size());
         memcpy(mCredentials, creds.credentials.data(), creds.credentials.size());
-        mParams.SetWifiCredentials(
-            WifiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
+        mParams.SetWiFiCredentials(
+            WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
     return CHIP_NO_ERROR;
 }
 
-CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage)
+CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr)
 {
+    if (lastErr != CHIP_NO_ERROR)
+    {
+        return CommissioningStage::kCleanup;
+    }
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
@@ -66,9 +70,9 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-        if (mParams.HasWifiCredentials())
+        if (mParams.HasWiFiCredentials())
         {
-            return CommissioningStage::kWifiNetworkSetup;
+            return CommissioningStage::kWiFiNetworkSetup;
         }
         else if (mParams.HasThreadOperationalDataset())
         {
@@ -82,26 +86,26 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kSendComplete;
 #endif
         }
-    case CommissioningStage::kWifiNetworkSetup:
+    case CommissioningStage::kWiFiNetworkSetup:
         if (mParams.HasThreadOperationalDataset())
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
         else
         {
-            return CommissioningStage::kWifiNetworkEnable;
+            return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.HasWifiCredentials())
+        if (mParams.HasWiFiCredentials())
         {
-            return CommissioningStage::kWifiNetworkEnable;
+            return CommissioningStage::kWiFiNetworkEnable;
         }
         else
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
 
-    case CommissioningStage::kWifiNetworkEnable:
+    case CommissioningStage::kWiFiNetworkEnable:
         if (mParams.HasThreadOperationalDataset())
         {
             return CommissioningStage::kThreadNetworkEnable;
@@ -133,19 +137,33 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 {
     // TODO: check that there is no commissioning in progress currently.
     mCommissioneeDeviceProxy = proxy;
-    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this);
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this, 0,
+                                            GetCommandTimeout(CommissioningStage::kArmFailsafe));
+}
+
+Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
+{
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkEnable:
+    case CommissioningStage::kThreadNetworkEnable:
+        return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
+    default:
+        // Use default timeout specified in the IM.
+        return NullOptional;
+    }
 }
 
 void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
-
     if (report.stageCompleted == CommissioningStage::kFindOperational)
     {
         mOperationalDeviceProxy = report.OperationalNodeFoundData.operationalProxy;
     }
-    CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted);
+    CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted, err);
     DeviceProxy * proxy          = mCommissioneeDeviceProxy;
-    if (nextStage == CommissioningStage::kSendComplete || nextStage == CommissioningStage::kCleanup)
+    if (nextStage == CommissioningStage::kSendComplete ||
+        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))
     {
         proxy = mOperationalDeviceProxy;
     }
@@ -155,7 +173,10 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
         ChipLogError(Controller, "Invalid device for commissioning");
         return;
     }
-    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
+
+    mParams.SetCompletionStatus(err);
+    // TODO: Get real endpoint
+    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
 }
 
 } // namespace Controller

@@ -77,11 +77,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
 
 static void ErrorCallback(void * context, CHIP_ERROR error)
 {
-    if (error != CHIP_NO_ERROR)
-    {
-        fprintf(stderr, "Mdns error: %" CHIP_ERROR_FORMAT "\n", error.Format());
-        abort();
-    }
+    VerifyOrDieWithMsg(error == CHIP_NO_ERROR, DeviceLayer, "Mdns error: %" CHIP_ERROR_FORMAT "\n", error.Format());
 }
 
 void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)

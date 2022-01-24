@@ -17,40 +17,25 @@
 
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "esp_heap_caps_init.h"
 #include "esp_log.h"
-#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_spiffs.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app-common/zap-generated/callback.h>
 #include <app/server/Server.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <cmath>
-#include <cstdio>
-#include <string>
-#include <vector>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#include <BdxOtaSender.h>
+#include <OTAProviderCommands.h>
 #include <app/clusters/ota-provider/ota-provider.h>
+#include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
+#include <shell_extension/launch.h>
 
-using chip::BitFlags;
-using chip::app::Clusters::OTAProviderDelegate;
-using chip::bdx::TransferControlFlags;
 using chip::Callback::Callback;
-using chip::Messaging::ExchangeManager;
 using namespace ::chip;
+using namespace ::chip::Shell;
 using namespace ::chip::System;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -64,17 +49,13 @@ namespace {
 const char * TAG               = "ota-provider-app";
 const uint8_t kMaxImagePathlen = 35;
 static DeviceCallbacks EchoCallbacks;
-BdxOtaSender bdxServer;
 
 // TODO: this should probably be done dynamically
-constexpr chip::EndpointId kOtaProviderEndpoint     = 0;
-constexpr uint32_t kMaxBdxBlockSize                 = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
-constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
-const char * otaFilename                            = CONFIG_OTA_IMAGE_NAME;
-FILE * otaImageFile                                 = NULL;
-uint32_t otaImageLen                                = 0;
-uint32_t otaTransferInProgress                      = false;
+constexpr chip::EndpointId kOtaProviderEndpoint = 0;
+const char * otaFilename                        = CONFIG_OTA_IMAGE_NAME;
+FILE * otaImageFile                             = NULL;
+uint32_t otaImageLen                            = 0;
+uint32_t otaTransferInProgress                  = false;
 static OTAProviderExample otaProvider;
 
 chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nullptr);
@@ -93,8 +74,12 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         }
         otaTransferInProgress = true;
     }
+
+    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
+    VerifyOrReturnError(bdxOtaSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
-    uint16_t transferBlockSize       = bdxServer.GetTransferBlockSize();
+    uint16_t transferBlockSize       = bdxOtaSender->GetTransferBlockSize();
 
     size = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
     if (offset + size >= otaImageLen)
@@ -134,17 +119,6 @@ extern "C" void app_main()
 {
     ESP_LOGI(TAG, "OTA Provider!");
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
-             (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)
@@ -167,9 +141,12 @@ extern "C" void app_main()
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
+    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
+    VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));
+
     // Register handler to handle bdx messages
     error = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
-                                                                                                          &bdxServer);
+                                                                                                          bdxOtaSender);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
@@ -180,7 +157,7 @@ extern "C" void app_main()
     callbacks.onBlockQuery       = &onBlockQueryCallback;
     callbacks.onTransferComplete = &onTransferCompleteCallback;
     callbacks.onTransferFailed   = &onTransferFailedCallback;
-    bdxServer.SetCallbacks(callbacks);
+    bdxOtaSender->SetCallbacks(callbacks);
 
     esp_vfs_spiffs_conf_t spiffs_conf = {
         .base_path              = "/spiffs",
@@ -218,13 +195,9 @@ extern "C" void app_main()
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
 
-    BitFlags<TransferControlFlags> bdxFlags;
-    bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-    error = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                         kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(BDX, "Failed to init BDX server: %s", chip::ErrorStr(error));
-        return;
-    }
+    // Launch a chip shell and register OTA Provider Commands
+    chip::LaunchShell();
+    OTAProviderCommands & otaProviderCommands = OTAProviderCommands::GetInstance();
+    otaProviderCommands.SetExampleOTAProvider(&otaProvider);
+    otaProviderCommands.Register();
 }

@@ -73,7 +73,10 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
+
+    // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;

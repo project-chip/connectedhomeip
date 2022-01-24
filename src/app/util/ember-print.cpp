@@ -76,7 +76,14 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
             const uint32_t outStringEnd   = segmentLength * perByteCharCount;
             for (uint32_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
             {
+                // The perByteFormatStr is in fact a literal (one of two), but
+                // the compiler does not realize that.  We could branch on
+                // perByteFormatStr and have separate snprintf calls, but this
+                // seems like it might lead to smaller code.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
                 snprintf(result + dst_idx, outStringEnd - dst_idx + 1, perByteFormatStr, buffer[index]);
+#pragma GCC diagnostic pop
             }
             result[outStringEnd] = 0;
             emberAfPrint(category, "%s", result);

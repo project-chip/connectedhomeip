@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -94,12 +94,9 @@ static constexpr ClusterId Id = 0x0000002A;
 namespace LocalizationConfiguration {
 static constexpr ClusterId Id = 0x0000002B;
 } // namespace LocalizationConfiguration
-namespace LocalizationTimeFormat {
+namespace TimeFormatLocalization {
 static constexpr ClusterId Id = 0x0000002C;
-} // namespace LocalizationTimeFormat
-namespace LocalizationUnit {
-static constexpr ClusterId Id = 0x0000002D;
-} // namespace LocalizationUnit
+} // namespace TimeFormatLocalization
 namespace PowerSourceConfiguration {
 static constexpr ClusterId Id = 0x0000002E;
 } // namespace PowerSourceConfiguration

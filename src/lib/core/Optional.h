@@ -23,9 +23,10 @@
  */
 #pragma once
 
+#include <new>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/InPlace.h>
-#include <lib/support/Variant.h>
 
 namespace chip {
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,7 +24,13 @@
 class Test_TC_DM_1_3_Simulated : public TestCommand
 {
 public:
-    Test_TC_DM_1_3_Simulated() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0) {}
+    Test_TC_DM_1_3_Simulated() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DM_1_3_Simulated() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -148,6 +154,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -166,7 +175,7 @@ private:
 
     CHIP_ERROR TestQueryInteractionModelVersion_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool,
                      "[Endpoint: 0x%08x Cluster: Basic Attribute: InteractionModelVersion] Query Interaction Model Version",
                      endpoint);
@@ -179,7 +188,7 @@ private:
 
     CHIP_ERROR TestQueryVendorName_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: VendorName] Query Vendor Name", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -190,7 +199,7 @@ private:
 
     CHIP_ERROR TestQueryVendorID_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: VendorID] Query VendorID", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -201,7 +210,7 @@ private:
 
     CHIP_ERROR TestQueryProductName_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: ProductName] Query Product Name", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -212,7 +221,7 @@ private:
 
     CHIP_ERROR TestQueryProductID_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: ProductID] Query ProductID", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -223,7 +232,7 @@ private:
 
     CHIP_ERROR TestQueryNodeLabel_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: NodeLabel] Query Node Label", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -234,7 +243,7 @@ private:
 
     CHIP_ERROR TestQueryUserLocation_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: Location] Query User Location", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -245,7 +254,7 @@ private:
 
     CHIP_ERROR TestQueryHardwareVersion_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: HardwareVersion] Query HardwareVersion", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -256,7 +265,7 @@ private:
 
     CHIP_ERROR TestQueryHardwareVersionString_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: HardwareVersionString] Query HardwareVersionString",
                      endpoint);
 
@@ -268,7 +277,7 @@ private:
 
     CHIP_ERROR TestQuerySoftwareVersion_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: SoftwareVersion] Query SoftwareVersion", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -279,7 +288,7 @@ private:
 
     CHIP_ERROR TestQuerySoftwareVersionString_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: SoftwareVersionString] Query SoftwareVersionString",
                      endpoint);
 
@@ -291,7 +300,7 @@ private:
 
     CHIP_ERROR TestQueryManufacturingDate_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: ManufacturingDate] Query ManufacturingDate", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -302,7 +311,7 @@ private:
 
     CHIP_ERROR TestQueryPartNumber_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: PartNumber] Query PartNumber", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -313,7 +322,7 @@ private:
 
     CHIP_ERROR TestQueryProductURL_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: ProductURL] Query ProductURL", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -324,7 +333,7 @@ private:
 
     CHIP_ERROR TestQueryProductLabel_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: ProductLabel] Query ProductLabel", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -335,7 +344,7 @@ private:
 
     CHIP_ERROR TestQuerySerialNumber_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: SerialNumber] Query SerialNumber", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -346,7 +355,7 @@ private:
 
     CHIP_ERROR TestQueryLocalConfigDisabled_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: LocalConfigDisabled] Query LocalConfigDisabled",
                      endpoint);
 
@@ -358,7 +367,7 @@ private:
 
     CHIP_ERROR TestQueryReachable_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: Reachable] Query Reachable", endpoint);
 
         ClearAttributeAndCommandPaths();
@@ -369,12 +378,183 @@ private:
 
     CHIP_ERROR TestQueryUniqueID_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: UniqueID] Query UniqueID", endpoint);
 
         ClearAttributeAndCommandPaths();
         mAttributePath = chip::app::ConcreteAttributePath(endpoint, chip::app::Clusters::Basic::Id,
                                                           chip::app::Clusters::Basic::Attributes::UniqueID::Id);
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DM_3_3_Simulated : public TestCommand
+{
+public:
+    Test_TC_DM_3_3_Simulated() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DM_3_3_Simulated() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DM_3_3_Simulated\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DM_3_3_Simulated\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the device to be commissioned\n");
+            err = TestWaitForTheDeviceToBeCommissioned_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for Scan Network Command\n");
+            err = TestWaitForScanNetworkCommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait for Add Wifi Network Command\n");
+            if (ShouldSkip("WIFI"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWaitForAddWifiNetworkCommand_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait for Update Thread Network Command\n");
+            if (ShouldSkip("THREAD"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWaitForUpdateThreadNetworkCommand_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait for Enable Network Command\n");
+            err = TestWaitForEnableNetworkCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait for Remove Network Command\n");
+            if (ShouldSkip("WIFI | THREAD"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWaitForRemoveNetworkCommand_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheDeviceToBeCommissioned_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissioning();
+    }
+
+    CHIP_ERROR TestWaitForScanNetworkCommand_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Network Commissioning Command: ScanNetworks] Wait for Scan Network Command",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::NetworkCommissioning::Id,
+                                                      chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForAddWifiNetworkCommand_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(
+            chipTool,
+            "[Endpoint: 0x%08x Cluster: Network Commissioning Command: AddOrUpdateWiFiNetwork] Wait for Add Wifi Network Command",
+            endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::NetworkCommissioning::Id,
+                                           chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForUpdateThreadNetworkCommand_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Network Commissioning Command: AddOrUpdateThreadNetwork] Wait for Update Thread "
+                     "Network Command",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::NetworkCommissioning::Id,
+                                           chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForEnableNetworkCommand_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Network Commissioning Command: ConnectNetwork] Wait for Enable Network Command",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::NetworkCommissioning::Id,
+                                                      chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForRemoveNetworkCommand_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Network Commissioning Command: RemoveNetwork] Wait for Remove Network Command",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::NetworkCommissioning::Id,
+                                                      chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Id);
         return CHIP_NO_ERROR;
     }
 };
@@ -385,6 +565,17 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     {
         return std::unique_ptr<Test_TC_DM_1_3_Simulated>(new Test_TC_DM_1_3_Simulated());
     }
+    if (testName == "Test_TC_DM_3_3_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DM_3_3_Simulated>(new Test_TC_DM_3_3_Simulated());
+    }
 
     return nullptr;
+}
+
+void PrintTestCommands()
+{
+    ChipLogError(chipTool, "Supported commands:");
+    ChipLogError(chipTool, "\t* Test_TC_DM_1_3_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DM_3_3_Simulated");
 }

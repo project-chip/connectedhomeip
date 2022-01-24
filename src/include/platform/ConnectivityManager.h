@@ -167,7 +167,7 @@ public:
     CHIP_ERROR SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
-    CHIP_ERROR GetAndLogWifiStatsCounters();
+    CHIP_ERROR GetAndLogWiFiStatsCounters();
 
     // WiFi AP methods
     WiFiAPMode GetWiFiAPMode();
@@ -406,9 +406,9 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeout(System::Clock::Timeout val
     static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeout(val);
 }
 
-inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
+inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 {
-    return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
+    return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
 inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()

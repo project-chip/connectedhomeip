@@ -27,6 +27,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
@@ -53,8 +54,11 @@ class OctetStringData
 {
 public:
     uint8_t * Data() { return mDataBuf; }
+    const uint8_t * Data() const { return mDataBuf; }
     size_t Length() const { return mDataLen; }
     void SetLength(size_t size) { mDataLen = size; }
+
+    ByteSpan AsSpan() const { return ByteSpan(Data(), Length()); }
 
 private:
     uint8_t mDataBuf[kAttributeEntryLength];
@@ -84,6 +88,7 @@ private:
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -91,10 +96,15 @@ uint8_t gListUint8Data[kAttributeListLength];
 OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
-Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::kValueA,
-                                                      ByteSpan(), CharSpan(), BitFlags<SimpleBitmap>(),
-                                                      0,          0 };
+OctetStringData gStructAttributeByteSpanData;
+Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
+
+// We don't actually support any interesting bits in the struct for now, except
+// for a non-null nullableList member.
+SimpleEnum gSimpleEnums[kAttributeListLength];
+size_t gSimpleEnumCount = 0;
+Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -117,6 +127,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case ListLongOctetString::Id: {
         return ReadListLongOctetStringAttribute(aEncoder);
+    }
+    case ListFabricScoped::Id: {
+        return ReadListFabricScopedAttribute(aEncoder);
     }
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
@@ -211,8 +224,7 @@ CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & 
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            ByteSpan span(gListOctetStringData[index].Data(), gListOctetStringData[index].Length());
-            ReturnErrorOnFailure(encoder.Encode(span));
+            ReturnErrorOnFailure(encoder.Encode(gListOctetStringData[index].AsSpan()));
         }
         return CHIP_NO_ERROR;
     });
@@ -317,9 +329,8 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDec
         memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
         gListOperationalCert[index].SetLength(entry.operationalCert.size());
 
-        listStructOctetStringData[index].fabricIndex = entry.fabricIndex;
-        listStructOctetStringData[index].operationalCert =
-            ByteSpan(gListOperationalCert[index].Data(), gListOperationalCert[index].Length());
+        listStructOctetStringData[index].fabricIndex     = entry.fabricIndex;
+        listStructOctetStringData[index].operationalCert = gListOperationalCert[index].AsSpan();
         index++;
     }
 
@@ -334,17 +345,59 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDec
 CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // Just encode a single default-initialized
-        // entry for now.
-        Structs::NullablesAndOptionalsStruct::Type entry;
-        ReturnErrorOnFailure(encoder.Encode(entry));
+        // Just encode our one struct for now.
+        ReturnErrorOnFailure(encoder.Encode(gNullablesAndOptionalsStruct));
         return CHIP_NO_ERROR;
     });
 }
 
 CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder)
 {
-    // TODO Add yaml test case for NullablesAndOptionalsStruct list
+    DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> list;
+    ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    size_t count;
+    ReturnErrorOnFailure(list.ComputeSize(&count));
+    // This should really send proper errors on invalid input!
+    VerifyOrReturnError(count == 1, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & value = iter.GetValue();
+        // We only support some values so far.
+        VerifyOrReturnError(value.nullableString.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(value.nullableStruct.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        VerifyOrReturnError(!value.optionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.optionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.optionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // Start our value off as null, just in case we fail to decode things.
+        gNullablesAndOptionalsStruct.nullableList.SetNull();
+        if (!value.nullableList.IsNull())
+        {
+            ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
+            VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
+            auto iter2       = value.nullableList.Value().begin();
+            gSimpleEnumCount = 0;
+            while (iter2.Next())
+            {
+                gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
+                ++gSimpleEnumCount;
+            }
+            ReturnErrorOnFailure(iter2.GetStatus());
+            gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
+        }
+        gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
+        gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
+        gNullablesAndOptionalsStruct.nullableOptionalInt = value.nullableOptionalInt;
+    }
+
+    ReturnErrorOnFailure(iter.GetStatus());
     return CHIP_NO_ERROR;
 }
 
@@ -355,7 +408,37 @@ CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder)
 {
-    return aDecoder.Decode(gStructAttributeValue);
+    // We don't support a nonempty charspan here for now.
+    Structs::SimpleStruct::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    VerifyOrReturnError(temp.e.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    const size_t octet_size = temp.d.size();
+    VerifyOrReturnError(octet_size <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    gStructAttributeValue = temp;
+    memcpy(gStructAttributeByteSpanData.Data(), temp.d.data(), octet_size);
+    gStructAttributeByteSpanData.SetLength(octet_size);
+    gStructAttributeValue.d = gStructAttributeByteSpanData.AsSpan();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
+
+        for (const auto & fb : Server::GetInstance().GetFabricTable())
+        {
+            val.fabricIndex = fb.GetFabricIndex();
+            ReturnErrorOnFailure(encoder.Encode(val));
+        }
+
+        // Always append a fake fabric index so we can test fabric filter even when there is only one fabric provisioned.
+        val.fabricIndex = kUndefinedFabricIndex;
+        ReturnErrorOnFailure(encoder.Encode(val));
+        return CHIP_NO_ERROR;
+    });
 }
 
 } // namespace
@@ -363,6 +446,25 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
                                            const Test::DecodableType & commandData)
 {
+    // Setup the test variables
+    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    for (int i = 0; i < kAttributeListLength; ++i)
+    {
+        gListUint8Data[i] = 0;
+        gListOctetStringData[i].SetLength(0);
+        gListOperationalCert[i].SetLength(0);
+        listStructOctetStringData[i].fabricIndex     = 0;
+        listStructOctetStringData[i].operationalCert = ByteSpan();
+        gSimpleEnums[i]                              = SimpleEnum::kUnspecified;
+    }
+    gSimpleEnumCount = 0;
+
+    gStructAttributeValue = Structs::SimpleStruct::Type();
+
+    gNullableStructAttributeValue.SetNull();
+
+    gNullablesAndOptionalsStruct = Structs::NullablesAndOptionalsStruct::Type();
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -562,6 +664,11 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     {
         auto iter = commandData.arg1.begin();
         Commands::TestListInt8UReverseResponse::Type responseData;
+        if (count == 0)
+        {
+            SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+            return true;
+        }
         size_t cur = count;
         Platform::ScopedMemoryBuffer<uint8_t> responseBuf;
         VerifyOrExit(responseBuf.Calloc(count), );

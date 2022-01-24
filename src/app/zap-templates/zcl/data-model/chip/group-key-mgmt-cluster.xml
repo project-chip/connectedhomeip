@@ -19,7 +19,7 @@ limitations under the License.
 
   <struct name="GroupKey">
     <cluster code="0x003F"/>
-    <item fieldId="0" name="fabricIndex" type="INT16U"/>
+    <item fieldId="0" name="fabricIndex" type="fabric_idx"/>
     <item fieldId="1" name="groupId" type="INT16U"/>
     <item fieldId="2" name="groupKeySetID" type="INT16U"/>
   </struct>

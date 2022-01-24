@@ -63,9 +63,11 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
+#include <app/util/util.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IasZone;
 
 #define UNDEFINED_ZONE_ID 0xFF
@@ -592,32 +594,10 @@ uint8_t emberAfPluginIasZoneServerGetZoneId(EndpointId endpoint)
 //------------------------------------------------------------------------------
 static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
 {
-    EmberAfAttributeMetadata * metadata;
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID,
-                                              CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!metadata->IsNonVolatile())
-    {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!metadata->IsNonVolatile())
-    {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!metadata->IsNonVolatile())
-    {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ID_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!metadata->IsNonVolatile())
+    if (!emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id, true) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id, true) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id, true) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, true))
     {
         return false;
     }

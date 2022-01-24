@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
@@ -49,9 +50,9 @@ public:
     bool onCommand(const chip::app::ConcreteCommandPath & commandPath);
     bool toggleCommand(const chip::app::ConcreteCommandPath & commandPath);
     void initOnOffServer(chip::EndpointId endpoint);
-    bool offWithEffectCommand(const chip::app::ConcreteCommandPath & commandPath,
+    bool offWithEffectCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & commandData);
-    bool OnWithRecallGlobalSceneCommand(const chip::app::ConcreteCommandPath & commandPath);
+    bool OnWithRecallGlobalSceneCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     bool OnWithTimedOffCommand(const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
@@ -62,9 +63,9 @@ private:
      * Functions Definitions
      *********************************************************/
 
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
-#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#endif
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 

@@ -165,6 +165,7 @@ CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::U
     return endpoint->JoinMulticastGroup(interfaceId, address);
 }
 
+#if CHIP_ERROR_LOGGING
 const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
 {
     switch (addressType)
@@ -179,6 +180,7 @@ const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
         return "UNKNOWN";
     }
 }
+#endif
 
 } // namespace
 
@@ -189,10 +191,7 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
-    mEndpoints.ForEachActiveObject([&](auto * endpoint) {
-        ShutdownEndpoint(*endpoint);
-        return chip::Loop::Continue;
-    });
+    mEndpoints.ReleaseAll();
 }
 
 void ServerBase::ShutdownEndpoint(EndpointInfo & aEndpoint)

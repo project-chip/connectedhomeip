@@ -18,25 +18,18 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
+#include <app/clusters/wake-on-lan-server/wake-on-lan-server.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
 
-class WakeOnLanManager
+class WakeOnLanManager : public chip::app::Clusters::WakeOnLan::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
-    void InitWakeOnLanCluster(chip::EndpointId endpoint);
+
+    CHIP_ERROR HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder) override;
 
 private:
-    friend WakeOnLanManager & WakeOnLanMgr();
-
-    static WakeOnLanManager sInstance;
     jobject mWakeOnLanManagerObject = nullptr;
     jmethodID mGetMacMethod         = nullptr;
 };
-
-inline WakeOnLanManager & WakeOnLanMgr()
-{
-    return WakeOnLanManager::sInstance;
-}

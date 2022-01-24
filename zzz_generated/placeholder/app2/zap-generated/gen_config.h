@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,14 +30,19 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (2)
+#define EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -45,6 +50,15 @@
 #define ZCL_USING_BASIC_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_BASIC_SERVER
 #define EMBER_AF_PLUGIN_BASIC
+
+// Use this macro to check if the server side of the Color Control cluster is included
+#define ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER
+#define EMBER_AF_PLUGIN_COLOR_CONTROL
+// User options for server plugin Color Control
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
@@ -71,14 +85,23 @@
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL
 // User options for server plugin Level Control
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 255
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
+
+// Use this macro to check if the server side of the Network Commissioning cluster is included
+#define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
+#define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING
 
 // Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF
+
+// Use this macro to check if the client side of the Operational Credentials cluster is included
+#define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_CLIENT
 
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
@@ -91,3 +114,12 @@
 #define EMBER_AF_PLUGIN_SCENES
 // User options for server plugin Scenes
 #define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
+
+// Use this macro to check if the client side of the Temperature Measurement cluster is included
+#define ZCL_USING_TEMP_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the server side of the Temperature Measurement cluster is included
+#define ZCL_USING_TEMP_MEASUREMENT_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+#define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT

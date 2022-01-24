@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1094,6 +1094,14 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocale {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveLocale
+
+namespace SupportedLocales {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedLocales
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1109,8 +1117,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace LocalizationConfiguration
 
-namespace LocalizationTimeFormat {
+namespace TimeFormatLocalization {
 namespace Attributes {
+
+namespace HourFormat {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace HourFormat
+
+namespace ActiveCalendarType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveCalendarType
+
+namespace SupportedCalendarTypes {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedCalendarTypes
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1125,25 +1145,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace LocalizationTimeFormat
-
-namespace LocalizationUnit {
-namespace Attributes {
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace LocalizationUnit
+} // namespace TimeFormatLocalization
 
 namespace PowerSourceConfiguration {
 namespace Attributes {
@@ -2047,6 +2049,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 namespace OperationalCredentials {
 namespace Attributes {
+
+namespace NOCs {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace NOCs
 
 namespace FabricsList {
 static constexpr AttributeId Id = 0x00000001;
@@ -5054,6 +5060,10 @@ namespace ApplicationVersion {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace ApplicationVersion
 
+namespace AllowedVendorList {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace AllowedVendorList
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -5261,6 +5271,10 @@ static constexpr AttributeId Id = 0x00000029;
 namespace ListLongOctetString {
 static constexpr AttributeId Id = 0x0000002A;
 } // namespace ListLongOctetString
+
+namespace ListFabricScoped {
+static constexpr AttributeId Id = 0x0000002B;
+} // namespace ListFabricScoped
 
 namespace TimedWriteBoolean {
 static constexpr AttributeId Id = 0x00000030;

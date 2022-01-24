@@ -59,6 +59,7 @@ public interface ConfigurationManager {
   String kConfigKey_WiFiStationSecType = "sta-sec-type";
   String kConfigKey_RegulatoryLocation = "regulatory-location";
   String kConfigKey_CountryCode = "country-code";
+  String kConfigKey_ActiveLocale = "active-locale";
   String kConfigKey_Breadcrumb = "breadcrumb";
 
   // Prefix used for NVS keys that contain Chip group encryption keys.

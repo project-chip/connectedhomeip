@@ -262,8 +262,6 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
-    Commands::ConnectNetworkResponse::Type response;
-
     mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
@@ -338,7 +336,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         result.extendedAddress = scanResponse.extendedAddress;
         result.rssi            = scanResponse.rssi;
         result.lqi             = scanResponse.lqi;
-        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag, result));
+        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
 
     SuccessOrExit(err = writer->EndContainer(listContainerType));
@@ -390,7 +388,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
         result.channel  = scanResponse.channel;
         result.wiFiBand = ToClusterObjectEnum(scanResponse.wiFiBand);
         result.rssi     = scanResponse.rssi;
-        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag, result));
+        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
 
     SuccessOrExit(err = writer->EndContainer(listContainerType));

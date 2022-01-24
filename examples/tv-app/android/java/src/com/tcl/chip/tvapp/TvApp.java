@@ -17,22 +17,39 @@
  */
 package com.tcl.chip.tvapp;
 
+import android.util.Log;
+
 public class TvApp {
-  public TvApp() {}
+  private TvAppCallback mCallback;
+  private static final String TAG = "TvApp";
 
-  public native void setKeypadInputManager(KeypadInputManager manager);
+  public TvApp(TvAppCallback callback) {
+    mCallback = callback;
+    nativeInit();
+  }
 
-  public native void setWakeOnLanManager(WakeOnLanManager manager);
+  private void postClusterInit(int clusterId, int endpoint) {
+    Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
+    if (mCallback != null) {
+      mCallback.onClusterInit(this, clusterId, endpoint);
+    }
+  }
 
-  public native void setMediaInputManager(MediaInputManager manager);
+  public native void nativeInit();
 
-  public native void setContentLaunchManager(ContentLaunchManager manager);
+  public native void setKeypadInputManager(int endpoint, KeypadInputManager manager);
 
-  public native void setLowPowerManager(LowPowerManager manager);
+  public native void setWakeOnLanManager(int endpoint, WakeOnLanManager manager);
 
-  public native void setMediaPlaybackManager(MediaPlaybackManager manager);
+  public native void setMediaInputManager(int endpoint, MediaInputManager manager);
 
-  public native void setChannelManager(ChannelManager manager);
+  public native void setContentLaunchManager(int endpoint, ContentLaunchManager manager);
+
+  public native void setLowPowerManager(int endpoint, LowPowerManager manager);
+
+  public native void setMediaPlaybackManager(int endpoint, MediaPlaybackManager manager);
+
+  public native void setChannelManager(int endpoint, ChannelManager manager);
 
   static {
     System.loadLibrary("TvApp");

@@ -76,6 +76,18 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
+# Generating android-arm-chip-tv-casting-app
+gn gen --check --fail-on-unused-args {out}/android-arm-chip-tv-casting-app '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-casting-app/android/
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
 # Generating android-arm-chip-tvserver
 gn gen --check --fail-on-unused-args {out}/android-arm-chip-tvserver '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
 
@@ -102,6 +114,18 @@ python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm64-chip-tool
 gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-arm64-chip-tv-casting-app
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tv-casting-app '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-casting-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -141,6 +165,9 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating cyw30739-cyw930739m2evb_01-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
 
 # Generating efr32-brd4161a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
@@ -331,6 +358,17 @@ rm -f examples/bridge-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
+
+# Generating esp32-devkitc-light
+mkdir -p {out}/esp32-devkitc-light
+
+cp examples/lighting-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-light/sdkconfig.defaults
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
 
 # Generating esp32-devkitc-lock
 mkdir -p {out}/esp32-devkitc-lock
@@ -553,65 +591,70 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
 
-# Generating nrf-nrf52840-light
+# Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf52840-light-rpc
+# Generating nrf-nrf52840dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
-# Generating nrf-nrf52840-lock
+# Generating nrf-nrf52840dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
 
-# Generating nrf-nrf52840-pump
+# Generating nrf-nrf52840dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
 
-# Generating nrf-nrf52840-pump-controller
+# Generating nrf-nrf52840dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
 
-# Generating nrf-nrf52840-shell
+# Generating nrf-nrf52840dk-shell
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
-# Generating nrf-nrf5340-light
+# Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf5340-light-rpc
+# Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf5340dk-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf5340-lock
+# Generating nrf-nrf5340dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
-# Generating nrf-nrf5340-pump
+# Generating nrf-nrf5340dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
 
-# Generating nrf-nrf5340-pump-controller
+# Generating nrf-nrf5340dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
 
-# Generating nrf-nrf5340-shell
+# Generating nrf-nrf5340dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
+
+# Generating nrf-nrf5340dk-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340dk-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
@@ -667,6 +710,21 @@ cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 
 # Building APP android-arm-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tool assembleDebug
+
+# Building JNI android-arm-chip-tv-casting-app
+ninja -C {out}/android-arm-chip-tv-casting-app
+
+# Prepare Native libs android-arm-chip-tv-casting-app
+mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a
+
+cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
+
+cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
+
+# Building Example android-arm-chip-tv-casting-app
+{root}/examples/tv-casting-app/android/App/gradlew -p {root}/examples/tv-casting-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tv-casting-app -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tv-casting-app assembleDebug
 
 # Building JNI android-arm-chip-tvserver
 ninja -C {out}/android-arm-chip-tvserver
@@ -733,6 +791,21 @@ cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {r
 # Building APP android-arm64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug
 
+# Building JNI android-arm64-chip-tv-casting-app
+ninja -C {out}/android-arm64-chip-tv-casting-app
+
+# Prepare Native libs android-arm64-chip-tv-casting-app
+mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a
+
+cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+
+cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm64-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
+
+# Building Example android-arm64-chip-tv-casting-app
+{root}/examples/tv-casting-app/android/App/gradlew -p {root}/examples/tv-casting-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tv-casting-app -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tv-casting-app assembleDebug
+
 # Building JNI android-arm64-chip-tvserver
 ninja -C {out}/android-arm64-chip-tvserver
 
@@ -797,6 +870,9 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+
+# Building cyw30739-cyw930739m2evb_01-light
+ninja -C {out}/cyw30739-cyw930739m2evb_01-light
 
 # Building efr32-brd4161a-light
 ninja -C {out}/efr32-brd4161a-light
@@ -969,6 +1045,13 @@ rm -f examples/bridge-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge build'
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+# Building esp32-devkitc-light
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
 
 rm -f examples/lock-app/esp32/sdkconfig
 
@@ -1146,41 +1229,44 @@ ninja -C {out}/nrf-native-posix-64-tests
 # Run Tests nrf-native-posix-64-tests
 ctest --build-nocmake -V --output-on-failure --test-dir {out}/nrf-native-posix-64-tests
 
-# Building nrf-nrf52840-light
-ninja -C {out}/nrf-nrf52840-light
+# Building nrf-nrf52840dk-light
+ninja -C {out}/nrf-nrf52840dk-light
 
-# Building nrf-nrf52840-light-rpc
-ninja -C {out}/nrf-nrf52840-light-rpc
+# Building nrf-nrf52840dk-light-rpc
+ninja -C {out}/nrf-nrf52840dk-light-rpc
 
-# Building nrf-nrf52840-lock
-ninja -C {out}/nrf-nrf52840-lock
+# Building nrf-nrf52840dk-lock
+ninja -C {out}/nrf-nrf52840dk-lock
 
-# Building nrf-nrf52840-pump
-ninja -C {out}/nrf-nrf52840-pump
+# Building nrf-nrf52840dk-pump
+ninja -C {out}/nrf-nrf52840dk-pump
 
-# Building nrf-nrf52840-pump-controller
-ninja -C {out}/nrf-nrf52840-pump-controller
+# Building nrf-nrf52840dk-pump-controller
+ninja -C {out}/nrf-nrf52840dk-pump-controller
 
-# Building nrf-nrf52840-shell
-ninja -C {out}/nrf-nrf52840-shell
+# Building nrf-nrf52840dk-shell
+ninja -C {out}/nrf-nrf52840dk-shell
 
-# Building nrf-nrf5340-light
-ninja -C {out}/nrf-nrf5340-light
+# Building nrf-nrf52840dongle-light
+ninja -C {out}/nrf-nrf52840dongle-light
 
-# Building nrf-nrf5340-light-rpc
-ninja -C {out}/nrf-nrf5340-light-rpc
+# Building nrf-nrf5340dk-light
+ninja -C {out}/nrf-nrf5340dk-light
 
-# Building nrf-nrf5340-lock
-ninja -C {out}/nrf-nrf5340-lock
+# Building nrf-nrf5340dk-light-rpc
+ninja -C {out}/nrf-nrf5340dk-light-rpc
 
-# Building nrf-nrf5340-pump
-ninja -C {out}/nrf-nrf5340-pump
+# Building nrf-nrf5340dk-lock
+ninja -C {out}/nrf-nrf5340dk-lock
 
-# Building nrf-nrf5340-pump-controller
-ninja -C {out}/nrf-nrf5340-pump-controller
+# Building nrf-nrf5340dk-pump
+ninja -C {out}/nrf-nrf5340dk-pump
 
-# Building nrf-nrf5340-shell
-ninja -C {out}/nrf-nrf5340-shell
+# Building nrf-nrf5340dk-pump-controller
+ninja -C {out}/nrf-nrf5340dk-pump-controller
+
+# Building nrf-nrf5340dk-shell
+ninja -C {out}/nrf-nrf5340dk-shell
 
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock

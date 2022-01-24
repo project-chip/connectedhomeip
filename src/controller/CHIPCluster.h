@@ -33,6 +33,7 @@
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
 #include <lib/core/Optional.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -58,6 +59,9 @@ public:
     CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
+    // Temporary function to set command timeout before we move over to InvokeCommand
+    // TODO: remove when we start using InvokeCommand everywhere
+    void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
 
     ClusterId GetClusterId() const { return mClusterId; }
 
@@ -84,7 +88,7 @@ public:
         };
 
         return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
-                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs);
+                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs, mTimeout);
     }
 
     template <typename RequestDataT>
@@ -115,6 +119,7 @@ public:
                               WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
                               const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
     {
+        CHIP_ERROR err = CHIP_NO_ERROR;
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
@@ -139,9 +144,19 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>(
-            (mSessionHandle.HasValue() ? mSessionHandle.Value() : mDevice->GetSecureSession().Value()), mEndpoint, clusterId,
-            attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+        if (mGroupSession)
+        {
+            err = chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
+                                                             onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+            mDevice->GetExchangeManager()->GetSessionManager()->RemoveGroupSession(mGroupSession->AsGroupSession());
+        }
+        else
+        {
+            err = chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
+                                                             requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+        }
+
+        return err;
     }
 
     template <typename AttributeInfo>
@@ -256,13 +271,77 @@ public:
             onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
     }
 
+    /**
+     * Read an event and get a type-safe callback with the event data.
+     */
+    template <typename DecodableType>
+    CHIP_ERROR ReadEvent(void * context, ReadResponseSuccessCallback<DecodableType> successCb,
+                         ReadResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
+            if (successCb != nullptr)
+            {
+                successCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status status,
+                                                CHIP_ERROR error) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status));
+            }
+        };
+
+        return Controller::ReadEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                                    onSuccessCb, onFailureCb);
+    }
+
+    template <typename DecodableType>
+    CHIP_ERROR SubscribeEvent(void * context, ReadResponseSuccessCallback<DecodableType> reportCb,
+                              ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+                              uint16_t maxIntervalCeilingSeconds,
+                              SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onReportCb = [context, reportCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
+            if (reportCb != nullptr)
+            {
+                reportCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status));
+            }
+        };
+
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+            if (subscriptionEstablishedCb != nullptr)
+            {
+                subscriptionEstablishedCb(context);
+            }
+        };
+
+        return Controller::SubscribeEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                         mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds,
+                                                         maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
+    }
+
 protected:
-    ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
+    ClusterBase(ClusterId cluster) : mClusterId(cluster) {}
 
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
-    chip::Optional<SessionHandle> mSessionHandle;
+    SessionHolder mGroupSession;
+    Optional<System::Clock::Timeout> mTimeout;
 };
 
 } // namespace Controller

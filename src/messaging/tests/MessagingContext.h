@@ -88,6 +88,14 @@ public:
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
 
+    CHIP_ERROR CreateSessionBobToAlice();
+    CHIP_ERROR CreateSessionAliceToBob();
+    CHIP_ERROR CreateSessionBobToFriends();
+
+    void ExpireSessionBobToAlice();
+    void ExpireSessionAliceToBob();
+    void ExpireSessionBobToFriends();
+
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
     SessionHandle GetSessionBobToFriends();
@@ -176,6 +184,8 @@ public:
     Transport & GetLoopback() { return mTransportManager.GetTransport().template GetImplAtIndex<0>(); }
 
     TransportMgrBase & GetTransportMgr() { return mTransportManager; }
+
+    IOContext & GetIOContext() { return mIOContext; }
 
     /*
      * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,

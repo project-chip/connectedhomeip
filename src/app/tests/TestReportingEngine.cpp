@@ -52,6 +52,7 @@ class TestReportingEngine
 {
 public:
     static void TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext);
+    static void TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -76,9 +77,8 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 
     err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeContext * exchangeCtx = ctx.GetExchangeManager().NewContext(SessionHandle(0, 0, 0, 0), nullptr);
     TestExchangeDelegate delegate;
-    exchangeCtx->SetDelegate(&delegate);
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(&delegate);
 
     writer.Init(std::move(readRequestbuf));
     err = readRequestBuilder.Init(&writer);
@@ -104,7 +104,35 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
     readHandler.OnReadInitialRequest(std::move(readRequestbuf));
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    readHandler.Shutdown(app::ReadHandler::ShutdownOptions::AbortCurrentExchange);
+}
+
+void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ClusterInfo * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
+    clusterInfo->mAttributeId = 1;
+
+    {
+        chip::app::ClusterInfo testClusterInfo;
+        testClusterInfo.mAttributeId = 3;
+        NL_TEST_ASSERT(apSuite,
+                       !InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
+    }
+    {
+        chip::app::ClusterInfo testClusterInfo;
+        testClusterInfo.mAttributeId = 1;
+        testClusterInfo.mListIndex   = 2;
+        NL_TEST_ASSERT(apSuite,
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
+    }
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
 }
 
 } // namespace reporting
@@ -116,6 +144,7 @@ namespace {
 const nlTest sTests[] =
 {
     NL_TEST_DEF("CheckBuildAndSendSingleReportData", chip::app::reporting::TestReportingEngine::TestBuildAndSendSingleReportData),
+    NL_TEST_DEF("TestMergeOverlappedAttributePath", chip::app::reporting::TestReportingEngine::TestMergeOverlappedAttributePath),
     NL_TEST_SENTINEL()
 };
 // clang-format on

@@ -50,14 +50,10 @@ tests:
       command: "readAttribute"
       attribute: "fabrics list"
       response:
-          value:
-              [
+          value: [
                   {
-                      FabricIndex: 0,
-                      RootPublicKey: 65,
-                      VendorID: 65521,
-                      FabricID: 0,
-                      NodeID: 305414945,
+                      # We really don't know what values to expect for any of
+                      # the fields, except Label.
                       Label: "",
                   },
               ]

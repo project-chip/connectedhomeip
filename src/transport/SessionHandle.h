@@ -17,93 +17,39 @@
 
 #pragma once
 
-#include <access/AccessControl.h>
-#include <app/util/basic-types.h>
-#include <lib/core/NodeId.h>
-#include <lib/core/Optional.h>
-#include <transport/UnauthenticatedSessionTable.h>
-#include <transport/raw/PeerAddress.h>
+#include <access/SubjectDescriptor.h>
+#include <lib/support/ReferenceCountedHandle.h>
 
 namespace chip {
 
-class SessionManager;
+namespace Transport {
+class Session;
+} // namespace Transport
 
+class SessionHolder;
+
+/** @brief
+ *    Non-copyable session reference. All SessionHandles are created within SessionManager. SessionHandle is not
+ *    reference *counted, hence it is not allowed to store SessionHandle anywhere except for function arguments and
+ *    return values. SessionHandle is short-lived as it is only available as stack variable, so it is never dangling. */
 class SessionHandle
 {
 public:
-    using SubjectDescriptor = Access::SubjectDescriptor;
+    SessionHandle(Transport::Session & session) : mSession(session) {}
+    ~SessionHandle() {}
 
-    SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
+    SessionHandle(const SessionHandle &) = delete;
+    SessionHandle operator=(const SessionHandle &) = delete;
+    SessionHandle(SessionHandle &&)                = default;
+    SessionHandle & operator=(SessionHandle &&) = delete;
 
-    SessionHandle(Transport::UnauthenticatedSessionHandle session) :
-        mPeerNodeId(kPlaceholderNodeId), mFabric(kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
-    {}
+    bool operator==(const SessionHandle & that) const { return &mSession.Get() == &that.mSession.Get(); }
 
-    SessionHandle(NodeId peerNodeId, uint16_t localSessionId, uint16_t peerSessionId, FabricIndex fabric) :
-        mPeerNodeId(peerNodeId), mFabric(fabric)
-    {
-        mLocalSessionId.SetValue(localSessionId);
-        mPeerSessionId.SetValue(peerSessionId);
-    }
-
-    SessionHandle(NodeId peerNodeId, GroupId groupId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric)
-    {
-        mGroupId.SetValue(groupId);
-    }
-
-    bool IsSecure() const { return !mUnauthenticatedSessionHandle.HasValue(); }
-
-    bool HasFabricIndex() const { return (mFabric != kUndefinedFabricIndex); }
-    FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
-    void SetGroupId(GroupId groupId) { mGroupId.SetValue(groupId); }
-
-    SubjectDescriptor GetSubjectDescriptor() const;
-
-    bool operator==(const SessionHandle & that) const
-    {
-        if (IsSecure())
-        {
-            return that.IsSecure() && mLocalSessionId.Value() == that.mLocalSessionId.Value();
-        }
-        else
-        {
-            return !that.IsSecure() && mUnauthenticatedSessionHandle.Value() == that.mUnauthenticatedSessionHandle.Value();
-        }
-    }
-
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    bool IsGroupSession() const { return mGroupId.HasValue(); }
-    const Optional<GroupId> & GetGroupId() const { return mGroupId; }
-    const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
-    const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
-
-    // Return the peer address for this session.  May return null if the peer
-    // address is not known.  This can happen for secure sessions that have been
-    // torn down, at the very least.
-    const Transport::PeerAddress * GetPeerAddress(SessionManager * sessionManager) const;
-
-    const ReliableMessageProtocolConfig & GetMRPConfig(SessionManager * sessionManager) const;
-    void SetMRPConfig(SessionManager * sessionManager, const ReliableMessageProtocolConfig & config);
-
-    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
+    Transport::Session * operator->() const { return mSession.operator->(); }
 
 private:
-    friend class SessionManager;
-
-    // Fields for secure session
-    NodeId mPeerNodeId;
-    Optional<uint16_t> mLocalSessionId;
-    Optional<uint16_t> mPeerSessionId;
-    Optional<GroupId> mGroupId;
-    // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
-    //       The Fabric ID will not be available for PASE and group sessions. So need
-    //       to identify an approach that'll allow looking up the corresponding information for
-    //       such sessions.
-    FabricIndex mFabric;
-
-    // Fields for unauthenticated session
-    Optional<Transport::UnauthenticatedSessionHandle> mUnauthenticatedSessionHandle;
+    friend class SessionHolder;
+    ReferenceCountedHandle<Transport::Session> mSession;
 };
 
 } // namespace chip

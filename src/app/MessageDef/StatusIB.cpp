@@ -30,9 +30,12 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 
 using namespace chip;
 using namespace chip::TLV;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -140,6 +143,90 @@ StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const StatusIB & aStatusIB
     EndOfContainer();
 exit:
     return *this;
+}
+
+CHIP_ERROR StatusIB::ToChipError() const
+{
+    if (mStatus == Status::Success)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (mClusterStatus.HasValue())
+    {
+        return ChipError(ChipError::SdkPart::kIMClusterStatus, mClusterStatus.Value());
+    }
+
+    return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
+}
+
+void StatusIB::InitFromChipError(CHIP_ERROR aError)
+{
+    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatus))
+    {
+        mStatus        = Status::Failure;
+        mClusterStatus = MakeOptional(aError.GetSdkCode());
+        return;
+    }
+
+    mClusterStatus = NullOptional;
+    if (aError == CHIP_NO_ERROR)
+    {
+        mStatus = Status::Success;
+        return;
+    }
+
+    if (aError.IsPart(ChipError::SdkPart::kIMGlobalStatus))
+    {
+        mStatus = static_cast<Status>(aError.GetSdkCode());
+        return;
+    }
+
+    mStatus = Status::Failure;
+}
+
+namespace {
+bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!err.IsIMStatus())
+    {
+        return false;
+    }
+
+    const char * desc = nullptr;
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    constexpr char generalFormat[] = "General error: 0x%02" PRIx8;
+    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02" PRIx8;
+
+    // Formatting an 8-bit int will take at most 2 chars, and replace the '%'
+    // and the format letter(s) for PRIx8, so a buffer big enough to hold our
+    // format string will also hold our formatted string.
+    constexpr size_t formattedSize = max(sizeof(generalFormat), sizeof(clusterFormat));
+    char formattedString[formattedSize];
+
+    StatusIB status;
+    status.InitFromChipError(err);
+    if (status.mClusterStatus.HasValue())
+    {
+        snprintf(formattedString, formattedSize, clusterFormat, status.mClusterStatus.Value());
+    }
+    else
+    {
+        snprintf(formattedString, formattedSize, generalFormat, to_underlying(status.mStatus));
+    }
+    desc = formattedString;
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+    FormatError(buf, bufSize, "IM", err, desc);
+
+    return true;
+}
+} // anonymous namespace
+
+void StatusIB::RegisterErrorFormatter()
+{
+    static ErrorFormatter sStatusIBErrorFormatter = { FormatStatusIBError, nullptr };
+
+    ::RegisterErrorFormatter(&sStatusIBErrorFormatter);
 }
 
 }; // namespace app

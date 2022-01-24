@@ -67,30 +67,18 @@ CHIP_ERROR TCPEndPointImplLwIP::BindImpl(IPAddressType addrType, const IPAddress
     CHIP_ERROR res = GetPCB(addrType);
 
     // Bind the PCB to the specified address/port.
+    ip_addr_t ipAddr;
     if (res == CHIP_NO_ERROR)
     {
         if (reuseAddr)
         {
             ip_set_option(mTCP, SOF_REUSEADDR);
         }
+        res = addr.ToLwIPAddr(addrType, ipAddr);
+    }
 
-        ip_addr_t ipAddr;
-        if (addr != IPAddress::Any)
-        {
-            ipAddr = addr.ToLwIPAddr();
-        }
-        else if (addrType == IPAddressType::kIPv6)
-        {
-            ipAddr = ip6_addr_any;
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == IPAddressType::kIPv4)
-        {
-            ipAddr = ip_addr_any;
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-        else
-            res = INET_ERROR_WRONG_ADDRESS_TYPE;
+    if (res == CHIP_NO_ERROR)
+    {
         res = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipAddr, port));
     }
 

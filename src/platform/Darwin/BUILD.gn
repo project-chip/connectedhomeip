@@ -81,8 +81,6 @@ static_library("Darwin") {
       # using the implements from Linux platform
       "../Linux/OTAImageProcessorImpl.cpp",
       "../Linux/OTAImageProcessorImpl.h",
-      "../Linux/OTARequestorDriverImpl.cpp",
-      "../Linux/OTARequestorDriverImpl.h",
     ]
   }
 

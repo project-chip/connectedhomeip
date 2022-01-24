@@ -76,7 +76,7 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(app::CommandHandler 
     {
         emberAfGroupsClusterPrint(" [0x%2x]", emberAfGetInt16u(groupList + (i << 1), 0, 2));
     }
-    emberAfGroupsClusterPrintln("");
+    emberAfGroupsClusterPrintln("%s", "");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }

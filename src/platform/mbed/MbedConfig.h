@@ -71,6 +71,7 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
 
     // Config value accessors.

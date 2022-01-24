@@ -33,8 +33,6 @@
         "illuminance-measurement-cluster.xml",
         "keypad-input-cluster.xml",
         "localization-configuration-cluster.xml",
-        "localization-time-format-cluster.xml",
-        "localization-unit-cluster.xml",
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
@@ -57,8 +55,10 @@
         "test-cluster.xml",
         "thermostat-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
+        "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
         "user-label-cluster.xml",
+        "unit-localization-cluster.xml",
         "wake-on-lan-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
@@ -88,5 +88,5 @@
             "commandDiscovery": true
         }
     },
-    "defaultReportable": true
+    "defaultReportingPolicy": "mandatory"
 }

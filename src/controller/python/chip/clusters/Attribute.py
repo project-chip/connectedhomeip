@@ -23,6 +23,7 @@ import ctypes
 from dataclasses import dataclass, field
 from typing import Tuple, Type, Union, List, Any, Callable, Dict, Set
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint64, c_uint32,  c_uint16, c_uint8, py_object, c_uint64
+import construct
 from rich.pretty import pprint
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
@@ -763,12 +764,14 @@ def _OnWriteDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest]) -> int:
+def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None) -> int:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncWriteTransaction(future, eventLoop)
 
     writeargs = []
     for attr in attributes:
+        if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+            raise ValueError(
+                f"Attribute {attr.__class__} must use timed write, please specify a valid timedRequestTimeoutMs value.")
         path = chip.interaction_model.AttributePathIBstruct.parse(
             b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
@@ -780,15 +783,25 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
         writeargs.append(ctypes.c_char_p(bytes(tlv)))
         writeargs.append(ctypes.c_int(len(tlv)))
 
+    transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = handle.pychip_WriteClient_WriteAttributes(
-        ctypes.py_object(transaction), device, ctypes.c_size_t(len(attributes)), *writeargs)
+        ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs)
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
 
 
-def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None) -> int:
+# This struct matches the PyReadAttributeParams in attribute.cpp, for passing various params together.
+_ReadParams = construct.Struct(
+    "MinInterval" / construct.Int32ul,
+    "MaxInterval" / construct.Int32ul,
+    "IsSubscription" / construct.Flag,
+    "IsFabricFiltered" / construct.Flag,
+)
+
+
+def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(
         future, eventLoop, devCtrl, TransactionType.READ_ATTRIBUTES, returnClusterObject)
@@ -813,17 +826,21 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
     readClientObj = ctypes.POINTER(c_void_p)()
     readCallbackObj = ctypes.POINTER(c_void_p)()
 
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    params = _ReadParams.parse(b'\x00' * _ReadParams.sizeof())
     if subscriptionParameters is not None:
-        minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
-        maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+        params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
+        params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+        params.IsSubscription = True
+    params.IsFabricFiltered = fabricFiltered
+    params = _ReadParams.build(params)
 
     res = handle.pychip_ReadClient_ReadAttributes(
         ctypes.py_object(transaction),
         ctypes.byref(readClientObj),
         ctypes.byref(readCallbackObj),
         device,
-        ctypes.c_bool(subscriptionParameters is not None),
-        ctypes.c_uint32(minInterval), ctypes.c_uint32(maxInterval),
+        ctypes.c_char_p(params),
         ctypes.c_size_t(len(attributes)), *readargs)
 
     transaction.SetClientObjPointers(readClientObj, readCallbackObj)
@@ -852,15 +869,16 @@ def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPat
         readargs.append(ctypes.c_char_p(path))
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    minInterval = 0
-    maxInterval = 0
+    params = _ReadParams.parse(b'\x00' * _ReadParams.sizeof())
     if subscriptionParameters is not None:
-        minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
-        maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+        params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
+        params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+        params.IsSubscription = True
+    params = _ReadParams.build(params)
+
     res = handle.pychip_ReadClient_ReadEvents(
         ctypes.py_object(transaction), device,
-        ctypes.c_bool(subscriptionParameters is not None),
-        ctypes.c_uint32(minInterval), ctypes.c_uint32(maxInterval),
+        ctypes.c_char_p(params),
         ctypes.c_size_t(len(events)), *readargs)
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))

@@ -242,9 +242,9 @@ class ChipDeviceController(object):
             return False
         return self._ChipStack.commissioningEventRes == 0
 
-    def SetWifiCredentials(self, ssid, credentials):
+    def SetWiFiCredentials(self, ssid, credentials):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetWifiCredentials(
+            lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
                 ssid, credentials)
         )
 
@@ -392,19 +392,21 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
-    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None):
+    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
         If a valid responseType is passed in, that will be used to deserialize the object. If not, the type will be automatically deduced
         from the metadata received over the wire.
+
+        timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         '''
 
         eventLoop = asyncio.get_running_loop()
@@ -417,17 +419,18 @@ class ChipDeviceController(object):
                     EndpointId=endpoint,
                     ClusterId=payload.cluster_id,
                     CommandId=payload.command_id,
-                ), payload)
+                ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs)
         )
         if res != 0:
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]], timedRequestTimeoutMs: int = None):
         '''
         Write a list of attributes on a target node.
 
         nodeId: Target's Node ID
+        timedWriteTimeoutMs: Timeout for a timed write request. Omit or set to 'None' to indicate a non-timed request.
         attributes: A list of tuples of type (endpoint, cluster-object):
 
         E.g
@@ -445,7 +448,7 @@ class ChipDeviceController(object):
 
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
-                future, eventLoop, device, attrs)
+                future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs)
         )
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -462,7 +465,7 @@ class ChipDeviceController(object):
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None):
+    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
         '''
         Read a list of attributes from a target node
 
@@ -522,7 +525,7 @@ class ChipDeviceController(object):
             attrs.append(ClusterAttribute.AttributePath(
                 EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -696,9 +699,9 @@ class ChipDeviceController(object):
                 c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [
+            self._dmLib.pychip_DeviceController_SetWiFiCredentials.argtypes = [
                 c_char_p, c_char_p]
-            self._dmLib.pychip_DeviceController_SetWifiCredentials.restype = c_uint32
+            self._dmLib.pychip_DeviceController_SetWiFiCredentials.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
                 c_void_p, c_uint64]

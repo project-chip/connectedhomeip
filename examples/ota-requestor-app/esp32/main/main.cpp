@@ -32,21 +32,14 @@
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 
-#include <cmath>
-#include <cstdio>
-#include <string>
-#include <vector>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/support/ErrorStr.h>
 
 #include "OTAImageProcessorImpl.h"
-#include "OTARequestorDriverImpl.h"
+#include "platform/GenericOTARequestorDriver.h"
 #include "platform/OTARequestorInterface.h"
-#include <argtable3/argtable3.h>
-#include <esp_console.h>
 
 using namespace ::chip;
 using namespace ::chip::System;
@@ -54,54 +47,15 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-struct CmdArgs
-{
-    struct arg_end * end;
-};
-
 namespace {
 const char * TAG = "ota-requester-app";
 static DeviceCallbacks EchoCallbacks;
-CmdArgs applyUpdateCmdArgs;
 
 OTARequestor gRequestorCore;
-OTARequestorDriverImpl gRequestorUser;
+GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 } // namespace
-
-int ESPApplyUpdateCmdHandler(int argc, char ** argv)
-{
-    gRequestorCore.ApplyUpdate();
-    ESP_LOGI(TAG, "Apply the Update");
-    return 0;
-}
-
-void ESPInitConsole(void)
-{
-    esp_console_repl_t * repl                = NULL;
-    esp_console_repl_config_t replConfig     = ESP_CONSOLE_REPL_CONFIG_DEFAULT();
-    esp_console_dev_uart_config_t uartConfig = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();
-    /* Prompt to be printed before each line.
-     * This can be customized, made dynamic, etc.
-     */
-    replConfig.prompt = "esp32 >";
-
-    esp_console_register_help_command();
-
-    esp_console_cmd_t applyUpdateCommand;
-    memset(&applyUpdateCommand, 0, sizeof(applyUpdateCommand));
-
-    applyUpdateCmdArgs.end = arg_end(1);
-
-    applyUpdateCommand.command = "ApplyUpdateRequest", applyUpdateCommand.help = "Request to OTA update image",
-    applyUpdateCommand.func = &ESPApplyUpdateCmdHandler, applyUpdateCommand.argtable = &applyUpdateCmdArgs;
-
-    esp_console_cmd_register(&applyUpdateCommand);
-
-    esp_console_new_repl_uart(&uartConfig, &replConfig, &repl);
-    esp_console_start_repl(repl);
-}
 
 extern "C" void app_main()
 {
@@ -140,15 +94,9 @@ extern "C" void app_main()
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    ESPInitConsole();
     SetRequestorInstance(&gRequestorCore);
-
-    Server * server = &(Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
-
+    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 }

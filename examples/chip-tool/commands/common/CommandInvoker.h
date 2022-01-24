@@ -34,12 +34,13 @@ class ResponseReceiver : public app::CommandSender::Callback
 public:
     using SuccessCallback = void (*)(void * context, const ResponseType & data);
     using FailureCallback = void (*)(void * context, EmberAfStatus status);
+    using DoneCallback    = void (*)(void * context);
 
     virtual ~ResponseReceiver() {}
 
 protected:
-    ResponseReceiver(void * aContext, SuccessCallback aOnSuccess, FailureCallback aOnError) :
-        mContext(aContext), mOnSuccess(aOnSuccess), mOnError(aOnError)
+    ResponseReceiver(void * aContext, SuccessCallback aOnSuccess, FailureCallback aOnError, DoneCallback aOnDone) :
+        mContext(aContext), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
     {}
 
     inline void OnResponse(app::CommandSender * aCommandSender, const app::ConcreteCommandPath & aPath,
@@ -52,6 +53,11 @@ protected:
 
     void OnDone(app::CommandSender * aCommandSender) override
     {
+        if (mOnDone != nullptr)
+        {
+            mOnDone(mContext);
+        }
+
         Platform::Delete(aCommandSender);
         Platform::Delete(this);
     }
@@ -60,6 +66,7 @@ private:
     void * mContext;
     SuccessCallback mOnSuccess;
     FailureCallback mOnError;
+    DoneCallback mOnDone = nullptr;
 };
 
 template <typename RequestType>
@@ -68,8 +75,9 @@ class CommandInvoker final : public ResponseReceiver<typename RequestType::Respo
     using Super = ResponseReceiver<typename RequestType::ResponseType>;
 
 public:
-    CommandInvoker(void * aContext, typename Super::SuccessCallback aOnSuccess, typename Super::FailureCallback aOnError) :
-        Super(aContext, aOnSuccess, aOnError)
+    CommandInvoker(void * aContext, typename Super::SuccessCallback aOnSuccess, typename Super::FailureCallback aOnError,
+                   typename Super::DoneCallback aOnDone) :
+        Super(aContext, aOnSuccess, aOnError, aOnDone)
     {}
 
     /**
@@ -80,9 +88,10 @@ public:
      *   ReturnErrorOnFailure(invoker->InvokeCommand(args));
      *   invoker.release(); // The invoker will deallocate itself now.
      */
-    static auto Alloc(void * aContext, typename Super::SuccessCallback aOnSuccess, typename Super::FailureCallback aOnError)
+    static auto Alloc(void * aContext, typename Super::SuccessCallback aOnSuccess, typename Super::FailureCallback aOnError,
+                      typename Super::DoneCallback aOnDone)
     {
-        return Platform::MakeUnique<CommandInvoker>(aContext, aOnSuccess, aOnError);
+        return Platform::MakeUnique<CommandInvoker>(aContext, aOnSuccess, aOnError, aOnDone);
     }
 
     CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, EndpointId aEndpoint, const RequestType & aRequestData,
@@ -100,35 +109,30 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, GroupId groupId, const RequestType & aRequestData)
+    CHIP_ERROR InvokeGroupCommand(Messaging::ExchangeManager * exchangeManager, GroupId groupId, const RequestType & aRequestData)
     {
         app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, RequestType::GetClusterId(), RequestType::GetCommandId(),
                                                (app::CommandPathFlags::kGroupIdValid) };
 
-        auto commandSender = Platform::MakeUnique<app::CommandSender>(this, aDevice->GetExchangeManager());
+        auto commandSender = Platform::MakeUnique<app::CommandSender>(this, exchangeManager);
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
 
-        if (aDevice->GetSecureSession().HasValue())
+        Optional<SessionHandle> session = exchangeManager->GetSessionManager()->CreateGroupSession(groupId);
+        if (!session.HasValue())
         {
-            SessionHandle session = aDevice->GetSecureSession().Value();
-            session.SetGroupId(groupId);
-
-            if (!session.IsGroupSession())
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
-        }
-        else
-        {
-            // something fishy is going on
-            return CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_NO_MEMORY;
         }
 
+        // this (invoker) and commandSender will be deleted by the onDone call before the return of SendGroupCommandRequest
+        // this (invoker) should not be used after the SendGroupCommandRequest call
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
+
+        // this (invoker) and commandSender are already deleted and are not to be used
         commandSender.release();
+        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
+
         return CHIP_NO_ERROR;
     }
 };
@@ -190,7 +194,8 @@ CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, void * aContext,
                          typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, EndpointId aEndpoint,
                          const RequestType & aRequestData, const Optional<uint16_t> & aTimedInvokeTimeoutMs)
 {
-    auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback);
+    auto invoker =
+        detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback, nullptr /* aDoneCallback */);
     VerifyOrReturnError(invoker != nullptr, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(invoker->InvokeCommand(aDevice, aEndpoint, aRequestData, aTimedInvokeTimeoutMs));
     invoker.release();
@@ -220,12 +225,18 @@ CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, void * aContext,
 template <typename RequestType, typename std::enable_if_t<!RequestType::MustUseTimedInvoke(), int> = 0>
 CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
                               typename detail::CommandInvoker<RequestType>::SuccessCallback aSuccessCallback,
-                              typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, GroupId groupId,
+                              typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback,
+                              typename detail::CommandInvoker<RequestType>::DoneCallback aDoneCallback, GroupId groupId,
                               const RequestType & aRequestData)
 {
-    auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback);
+    auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback, aDoneCallback);
     VerifyOrReturnError(invoker != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice, groupId, aRequestData));
+
+    // invoker will be deleted by the onDone call before the return of InvokeGroupCommand
+    // invoker should not be used after the InvokeGroupCommand call
+    ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice->GetExchangeManager(), groupId, aRequestData));
+
+    //  invoker is already deleted and is not to be used
     invoker.release();
     return CHIP_NO_ERROR;
 }

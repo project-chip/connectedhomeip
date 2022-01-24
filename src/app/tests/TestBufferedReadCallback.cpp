@@ -321,7 +321,7 @@ void DataSeriesGenerator::Generate()
             Clusters::TestCluster::Attributes::Int8u::TypeInfo::Type value = index;
             path.mAttributeId                                              = Clusters::TestCluster::Attributes::Int8u::Id;
             path.mListOp                                                   = ConcreteDataAttributePath::ListOperation::NotList;
-            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
 
@@ -331,7 +331,7 @@ void DataSeriesGenerator::Generate()
             Clusters::TestCluster::Attributes::Int32u::TypeInfo::Type value = index;
             path.mAttributeId                                               = Clusters::TestCluster::Attributes::Int32u::Id;
             path.mListOp                                                    = ConcreteDataAttributePath::ListOperation::NotList;
-            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
 
@@ -341,7 +341,7 @@ void DataSeriesGenerator::Generate()
             Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
             path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
-            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
 
@@ -361,7 +361,7 @@ void DataSeriesGenerator::Generate()
             path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
-            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
 
@@ -371,7 +371,7 @@ void DataSeriesGenerator::Generate()
             Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::Type value;
             path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
-            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
 
@@ -391,7 +391,7 @@ void DataSeriesGenerator::Generate()
             path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
-            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
 
@@ -426,7 +426,7 @@ void DataSeriesGenerator::Generate()
 
                 path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
 
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
@@ -449,7 +449,7 @@ void DataSeriesGenerator::Generate()
 
                 listItem.fabricIndex = (uint64_t) i;
 
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, listItem) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), listItem) == CHIP_NO_ERROR);
 
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
@@ -469,7 +469,7 @@ void DataSeriesGenerator::Generate()
 
                 path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, value) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
 
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
@@ -488,7 +488,7 @@ void DataSeriesGenerator::Generate()
                 path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag, (uint8_t)(i)) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t)(i)) == CHIP_NO_ERROR);
 
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));

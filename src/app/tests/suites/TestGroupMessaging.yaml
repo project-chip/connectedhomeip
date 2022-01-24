@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
+# This test file tests Group Multicast Messaging.
+# For this test to work, A Group Write/Command and a unicast read need to occur to be able to confirm that the group Communication works. Every test comes in a pair
+# Only Works on Linux machines
+# When building chip-tool, chip_enable_group_messaging_tests needs to be set to true in the build command for the test to pass
+# ./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=true chip_enable_group_messaging_tests=true
 name: Basic Group Messaging Tests
 
 config:
@@ -26,45 +32,47 @@ tests:
     #TODO : Add Group membership command when implemented Issue #11077
     # - label: "Add device to Group"
     #   command: "TODO"
-
+    # Test Pair 1 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
       command: "writeAttribute"
       attribute: "location"
       groupId: "1234"
       arguments:
           value: "us"
-    #Disabled due to issue-12983
+
+      # Test Pair 1 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
           value: "us"
 
+    # Test Pair 2 : Sends a Group Write Attribute
     - label: "Restore initial location value"
       command: "writeAttribute"
       attribute: "location"
       groupId: "1234"
       arguments:
           value: ""
-    #Disabled due to issue-12983
+
+    # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
           value: ""
 
+    # Test Pair 3 : Sends a Group command
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
       groupId: "1234"
-      disabled: true
 
+      # Test Pair 3 : Validates previous group command with a unicast to read
     - label: "Check on/off attribute value is true after on command"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
-      disabled: true
+      endpoint: 1
       response:
           value: 1

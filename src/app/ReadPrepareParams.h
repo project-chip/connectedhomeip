@@ -29,7 +29,7 @@ namespace chip {
 namespace app {
 struct ReadPrepareParams
 {
-    SessionHandle mSessionHandle;
+    SessionHolder mSessionHolder;
     EventPathParams * mpEventPathParamsList         = nullptr;
     size_t mEventPathParamsListSize                 = 0;
     AttributePathParams * mpAttributePathParamsList = nullptr;
@@ -39,9 +39,10 @@ struct ReadPrepareParams
     uint16_t mMinIntervalFloorSeconds               = 0;
     uint16_t mMaxIntervalCeilingSeconds             = 0;
     bool mKeepSubscriptions                         = true;
+    bool mIsFabricFiltered                          = false;
 
-    ReadPrepareParams(const SessionHandle & sessionHandle) : mSessionHandle(sessionHandle) {}
-    ReadPrepareParams(ReadPrepareParams && other) : mSessionHandle(other.mSessionHandle)
+    ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
+    ReadPrepareParams(ReadPrepareParams && other) : mSessionHolder(other.mSessionHolder)
     {
         mKeepSubscriptions                 = other.mKeepSubscriptions;
         mpEventPathParamsList              = other.mpEventPathParamsList;
@@ -52,6 +53,7 @@ struct ReadPrepareParams
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
+        mIsFabricFiltered                  = other.mIsFabricFiltered;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
@@ -64,7 +66,7 @@ struct ReadPrepareParams
             return *this;
 
         mKeepSubscriptions                 = other.mKeepSubscriptions;
-        mSessionHandle                     = other.mSessionHandle;
+        mSessionHolder                     = other.mSessionHolder;
         mpEventPathParamsList              = other.mpEventPathParamsList;
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
@@ -73,6 +75,7 @@ struct ReadPrepareParams
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
+        mIsFabricFiltered                  = other.mIsFabricFiltered;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
