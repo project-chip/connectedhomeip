@@ -44,6 +44,14 @@ pkg_config("glib") {
   ]
 }
 
+pkg_config("luna-service") {
+  packages = [
+    "luna-service2",
+    "PmLogLib",
+    "pbnjson_cpp",
+  ]
+}
+
 static_library("webos") {
   if (enable_syslog) {
     print("### enable syslog logging ###")
@@ -105,6 +113,7 @@ static_library("webos") {
     public_configs += [
       ":avahi_client_config",
       ":glib",
+      ":luna-service",
     ]
   }
 

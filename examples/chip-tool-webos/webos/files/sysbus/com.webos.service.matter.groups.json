@@ -1,4 +1,0 @@
-{
-    "allowedNames": ["com.webos.service.matter"],
-    "matter.operation": ["oem"]
-}
