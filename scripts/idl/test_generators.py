@@ -56,8 +56,9 @@ class GeneratorTestCase:
 
 
 class TestCaseStorage(GeneratorStorage):
-    def __init__(self, test_case: GeneratorTestCase):
+    def __init__(self, test_case: GeneratorTestCase, checker: unittest.TestCase):
         self.test_case = test_case
+        self.checker = checker
         self.checked_files = set()
 
     def get_existing_data(self, relative_path: str):
@@ -75,7 +76,14 @@ class TestCaseStorage(GeneratorStorage):
     def write_new_data(self, relative_path: str, content: str):
         # This is a unit test failure: we do NOT expect
         # to write any new data
-        raise Error("Unexpected write to %s" % relative_path)
+
+        # This will display actual diffs in the output files
+        self.checker.assertEqual(
+            self.get_existing_data(relative_path), content)
+
+        # Even if no diff, to be build system friendly, we do NOT expect any
+        # actual data writes.
+        raise AssertionError("Unexpected write to %s" % relative_path)
 
 
 @dataclass
@@ -95,16 +103,16 @@ class GeneratorTest:
 
     def run_test_cases(self, checker: unittest.TestCase):
         for test in self.test_cases:
-            storage = TestCaseStorage(test)
+            with checker.subTest(idl=test.input_idl):
+                storage = TestCaseStorage(test, checker)
+                with open(os.path.join(TESTS_DIR, test.input_idl), 'rt') as stream:
+                    idl = CreateParser().parse(stream.read())
 
-            with open(os.path.join(TESTS_DIR, test.input_idl), 'rt') as stream:
-                idl = CreateParser().parse(stream.read())
+                generator = self._create_generator(storage, idl)
+                generator.render(dry_run=False)
 
-            generator = self._create_generator(storage, idl)
-            generator.render(dry_run=False)
-
-            checker.assertEqual(storage.checked_files, set(
-                map(lambda x: x.file_name, test.outputs)))
+                checker.assertEqual(storage.checked_files, set(
+                    map(lambda x: x.file_name, test.outputs)))
 
 
 def build_tests(yaml_data) -> List[GeneratorTest]:
@@ -128,7 +136,8 @@ class TestGenerators(unittest.TestCase):
             yaml_data = yaml.safe_load(stream)
 
         for test in build_tests(yaml_data):
-            test.run_test_cases(self)
+            with self.subTest(generator=test.generator_name):
+                test.run_test_cases(self)
 
 
 if __name__ == '__main__':
