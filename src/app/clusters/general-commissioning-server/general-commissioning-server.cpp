@@ -82,6 +82,10 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case LocationCapability::Id: {
         return ReadIfSupported(&ConfigurationManager::GetLocationCapability, aEncoder);
     }
+    case BasicCommissioningInfoList::Id: {
+        // TODO: This should not be a list at all!
+        return aEncoder.EncodeEmptyList();
+    }
     default: {
         break;
     }

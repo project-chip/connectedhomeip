@@ -351,7 +351,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   attribute ProviderLocation defaultOtaProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
-  readonly attribute int8u updateStateProgress = 3;
+  readonly attribute nullable int8u updateStateProgress = 3;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {

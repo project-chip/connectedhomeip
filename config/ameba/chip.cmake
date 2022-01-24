@@ -103,6 +103,7 @@ string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 
 # Build RPC
+if (matter_enable_rpc)
 #string(APPEND CHIP_GN_ARGS "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]\n")
 string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
 string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"\n")
@@ -110,6 +111,12 @@ string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/
 string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/ameba/pw_sys_io:pw_sys_io_ameba\"\n")
 string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"\n")
 string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert:impl\", \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log:impl\"]\n")
+endif (matter_enable_rpc)
+
+# Build ota-requestor
+if (matter_enable_ota_requestor)
+string(APPEND CHIP_GN_ARGS "chip_enable_ota_requestor = true\n")
+endif (matter_enable_ota_requestor)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 

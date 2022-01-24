@@ -286,6 +286,14 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();
 #endif
+
+    // Erase all key-values including fabric info.
+    err = PersistedStorage::KeyValueStoreMgrImpl().EraseAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Clear Key-Value Storage failed");
+    }
+
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     esp_restart();
