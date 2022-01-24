@@ -3112,8 +3112,9 @@ emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayInd
     return DlStatus::kFailure;
 }
 
-DlStatus __attribute__((weak)) emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, DlScheduleStatus status,
-                                                                uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime)
+DlStatus __attribute__((weak))
+emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, DlScheduleStatus status, uint16_t userIndex,
+                                 uint32_t localStartTime, uint32_t localEndTime)
 {
     return DlStatus::kFailure;
 }
