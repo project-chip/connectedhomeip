@@ -553,6 +553,258 @@ void CHIPDoorLockClusterGetUserResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, userIndex, userName, userUniqueId, userStatus, userType, credentialRule,
                         credentials, creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);
 }
+CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::~CHIPDoorLockClusterGetWeekDayScheduleResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPDoorLockClusterGetWeekDayScheduleResponseCallback,
+                    void (*)(CHIPDoorLockClusterGetWeekDayScheduleResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPDoorLockClusterGetWeekDayScheduleResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPDoorLockClusterGetWeekDayScheduleResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess",
+        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+        "Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+        &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject weekDayIndex;
+
+    std::string weekDayIndexClassName     = "java/lang/Integer";
+    std::string weekDayIndexCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(weekDayIndexClassName.c_str(), weekDayIndexCtorSignature.c_str(),
+                                                                  dataResponse.weekDayIndex, weekDayIndex);
+    jobject userIndex;
+
+    std::string userIndexClassName     = "java/lang/Integer";
+    std::string userIndexCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
+                                                                   dataResponse.userIndex, userIndex);
+    jobject status;
+
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    jobject daysMask;
+    if (!dataResponse.daysMask.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, daysMask);
+    }
+    else
+    {
+
+        std::string daysMaskClassName     = "java/lang/Integer";
+        std::string daysMaskCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(
+            daysMaskClassName.c_str(), daysMaskCtorSignature.c_str(), dataResponse.daysMask.Value(), daysMask);
+        chip::JniReferences::GetInstance().CreateOptional(daysMask, daysMask);
+    }
+    jobject startHour;
+    if (!dataResponse.startHour.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, startHour);
+    }
+    else
+    {
+
+        std::string startHourClassName     = "java/lang/Integer";
+        std::string startHourCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(startHourClassName.c_str(), startHourCtorSignature.c_str(),
+                                                                      dataResponse.startHour.Value(), startHour);
+        chip::JniReferences::GetInstance().CreateOptional(startHour, startHour);
+    }
+    jobject startMinute;
+    if (!dataResponse.startMinute.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, startMinute);
+    }
+    else
+    {
+
+        std::string startMinuteClassName     = "java/lang/Integer";
+        std::string startMinuteCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            startMinuteClassName.c_str(), startMinuteCtorSignature.c_str(), dataResponse.startMinute.Value(), startMinute);
+        chip::JniReferences::GetInstance().CreateOptional(startMinute, startMinute);
+    }
+    jobject endHour;
+    if (!dataResponse.endHour.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, endHour);
+    }
+    else
+    {
+
+        std::string endHourClassName     = "java/lang/Integer";
+        std::string endHourCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(endHourClassName.c_str(), endHourCtorSignature.c_str(),
+                                                                      dataResponse.endHour.Value(), endHour);
+        chip::JniReferences::GetInstance().CreateOptional(endHour, endHour);
+    }
+    jobject endMinute;
+    if (!dataResponse.endMinute.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, endMinute);
+    }
+    else
+    {
+
+        std::string endMinuteClassName     = "java/lang/Integer";
+        std::string endMinuteCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(endMinuteClassName.c_str(), endMinuteCtorSignature.c_str(),
+                                                                      dataResponse.endMinute.Value(), endMinute);
+        chip::JniReferences::GetInstance().CreateOptional(endMinute, endMinute);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour,
+                        endMinute);
+}
+CHIPDoorLockClusterGetYearDayScheduleResponseCallback::CHIPDoorLockClusterGetYearDayScheduleResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockClusterGetYearDayScheduleResponseCallback::~CHIPDoorLockClusterGetYearDayScheduleResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPDoorLockClusterGetYearDayScheduleResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPDoorLockClusterGetYearDayScheduleResponseCallback,
+                    void (*)(CHIPDoorLockClusterGetYearDayScheduleResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPDoorLockClusterGetYearDayScheduleResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPDoorLockClusterGetYearDayScheduleResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess",
+        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject yearDayIndex;
+
+    std::string yearDayIndexClassName     = "java/lang/Integer";
+    std::string yearDayIndexCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(yearDayIndexClassName.c_str(), yearDayIndexCtorSignature.c_str(),
+                                                                  dataResponse.yearDayIndex, yearDayIndex);
+    jobject userIndex;
+
+    std::string userIndexClassName     = "java/lang/Integer";
+    std::string userIndexCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
+                                                                   dataResponse.userIndex, userIndex);
+    jobject status;
+
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    jobject localStartTime;
+    if (!dataResponse.localStartTime.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, localStartTime);
+    }
+    else
+    {
+
+        std::string localStartTimeClassName     = "java/lang/Long";
+        std::string localStartTimeCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(localStartTimeClassName.c_str(),
+                                                                       localStartTimeCtorSignature.c_str(),
+                                                                       dataResponse.localStartTime.Value(), localStartTime);
+        chip::JniReferences::GetInstance().CreateOptional(localStartTime, localStartTime);
+    }
+    jobject localEndTime;
+    if (!dataResponse.localEndTime.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, localEndTime);
+    }
+    else
+    {
+
+        std::string localEndTimeClassName     = "java/lang/Long";
+        std::string localEndTimeCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+            localEndTimeClassName.c_str(), localEndTimeCtorSignature.c_str(), dataResponse.localEndTime.Value(), localEndTime);
+        chip::JniReferences::GetInstance().CreateOptional(localEndTime, localEndTime);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, yearDayIndex, userIndex, status, localStartTime, localEndTime);
+}
 CHIPDoorLockClusterSetCredentialResponseCallback::CHIPDoorLockClusterSetCredentialResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>(CallbackFn, this)
 {

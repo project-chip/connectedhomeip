@@ -300,9 +300,17 @@ public:
     CHIP_ERROR ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                uint8_t credentialType, uint16_t credentialIndex);
     CHIP_ERROR ClearUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
+    CHIP_ERROR ClearWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t weekDayIndex, uint16_t userIndex);
+    CHIP_ERROR ClearYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t yearDayIndex, uint16_t userIndex);
     CHIP_ERROR GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    uint8_t credentialType, uint16_t credentialIndex);
     CHIP_ERROR GetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
+    CHIP_ERROR GetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t weekDayIndex, uint16_t userIndex);
+    CHIP_ERROR GetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t yearDayIndex, uint16_t userIndex);
     CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
     CHIP_ERROR SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                              uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex, chip::ByteSpan credentialData,
@@ -310,8 +318,15 @@ public:
     CHIP_ERROR SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t operationType,
                        uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
                        uint8_t credentialRule);
+    CHIP_ERROR SetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t weekDayIndex, uint16_t userIndex, uint8_t daysMask, uint8_t startHour,
+                                  uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    CHIP_ERROR SetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t yearDayIndex, uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime);
     CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                           chip::ByteSpan pinCode);
+    CHIP_ERROR UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint16_t timeout, chip::ByteSpan pinCode);
 };
 
 class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase

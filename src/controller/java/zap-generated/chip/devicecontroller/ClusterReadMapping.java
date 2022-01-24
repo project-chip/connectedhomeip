@@ -1980,6 +1980,36 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readNumberOfRFIDUsersSupportedAttribute",
         readDoorLockNumberOfRFIDUsersSupportedAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readDoorLockNumberOfWeekDaySchedulesSupportedPerUserCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockNumberOfWeekDaySchedulesSupportedPerUserAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockNumberOfWeekDaySchedulesSupportedPerUserCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readNumberOfWeekDaySchedulesSupportedPerUserAttribute",
+        readDoorLockNumberOfWeekDaySchedulesSupportedPerUserAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readDoorLockNumberOfYearDaySchedulesSupportedPerUserCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockNumberOfYearDaySchedulesSupportedPerUserAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readNumberOfYearDaySchedulesSupportedPerUserAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockNumberOfYearDaySchedulesSupportedPerUserCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readNumberOfYearDaySchedulesSupportedPerUserAttribute",
+        readDoorLockNumberOfYearDaySchedulesSupportedPerUserAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockMaxPINCodeLengthCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockMaxPINCodeLengthAttributeInteractionInfo =

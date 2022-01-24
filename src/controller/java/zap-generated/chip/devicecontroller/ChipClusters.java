@@ -4596,6 +4596,32 @@ public class ChipClusters {
       clearUser(chipClusterPtr, callback, userIndex, timedInvokeTimeoutMs);
     }
 
+    public void clearWeekDaySchedule(
+        DefaultClusterCallback callback, Integer weekDayIndex, Integer userIndex) {
+      clearWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex, null);
+    }
+
+    public void clearWeekDaySchedule(
+        DefaultClusterCallback callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        int timedInvokeTimeoutMs) {
+      clearWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex, timedInvokeTimeoutMs);
+    }
+
+    public void clearYearDaySchedule(
+        DefaultClusterCallback callback, Integer yearDayIndex, Integer userIndex) {
+      clearYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex, null);
+    }
+
+    public void clearYearDaySchedule(
+        DefaultClusterCallback callback,
+        Integer yearDayIndex,
+        Integer userIndex,
+        int timedInvokeTimeoutMs) {
+      clearYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex, timedInvokeTimeoutMs);
+    }
+
     public void getCredentialStatus(
         GetCredentialStatusResponseCallback callback,
         Integer credentialType,
@@ -4619,6 +4645,32 @@ public class ChipClusters {
     public void getUser(
         GetUserResponseCallback callback, Integer userIndex, int timedInvokeTimeoutMs) {
       getUser(chipClusterPtr, callback, userIndex, timedInvokeTimeoutMs);
+    }
+
+    public void getWeekDaySchedule(
+        GetWeekDayScheduleResponseCallback callback, Integer weekDayIndex, Integer userIndex) {
+      getWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex, null);
+    }
+
+    public void getWeekDaySchedule(
+        GetWeekDayScheduleResponseCallback callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        int timedInvokeTimeoutMs) {
+      getWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex, timedInvokeTimeoutMs);
+    }
+
+    public void getYearDaySchedule(
+        GetYearDayScheduleResponseCallback callback, Integer yearDayIndex, Integer userIndex) {
+      getYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex, null);
+    }
+
+    public void getYearDaySchedule(
+        GetYearDayScheduleResponseCallback callback,
+        Integer yearDayIndex,
+        Integer userIndex,
+        int timedInvokeTimeoutMs) {
+      getYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex, timedInvokeTimeoutMs);
     }
 
     public void lockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
@@ -4720,6 +4772,78 @@ public class ChipClusters {
           timedInvokeTimeoutMs);
     }
 
+    public void setWeekDaySchedule(
+        DefaultClusterCallback callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        Integer daysMask,
+        Integer startHour,
+        Integer startMinute,
+        Integer endHour,
+        Integer endMinute) {
+      setWeekDaySchedule(
+          chipClusterPtr,
+          callback,
+          weekDayIndex,
+          userIndex,
+          daysMask,
+          startHour,
+          startMinute,
+          endHour,
+          endMinute,
+          null);
+    }
+
+    public void setWeekDaySchedule(
+        DefaultClusterCallback callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        Integer daysMask,
+        Integer startHour,
+        Integer startMinute,
+        Integer endHour,
+        Integer endMinute,
+        int timedInvokeTimeoutMs) {
+      setWeekDaySchedule(
+          chipClusterPtr,
+          callback,
+          weekDayIndex,
+          userIndex,
+          daysMask,
+          startHour,
+          startMinute,
+          endHour,
+          endMinute,
+          timedInvokeTimeoutMs);
+    }
+
+    public void setYearDaySchedule(
+        DefaultClusterCallback callback,
+        Integer yearDayIndex,
+        Integer userIndex,
+        Long localStartTime,
+        Long localEndTime) {
+      setYearDaySchedule(
+          chipClusterPtr, callback, yearDayIndex, userIndex, localStartTime, localEndTime, null);
+    }
+
+    public void setYearDaySchedule(
+        DefaultClusterCallback callback,
+        Integer yearDayIndex,
+        Integer userIndex,
+        Long localStartTime,
+        Long localEndTime,
+        int timedInvokeTimeoutMs) {
+      setYearDaySchedule(
+          chipClusterPtr,
+          callback,
+          yearDayIndex,
+          userIndex,
+          localStartTime,
+          localEndTime,
+          timedInvokeTimeoutMs);
+    }
+
     public void unlockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
       unlockDoor(chipClusterPtr, callback, pinCode, null);
     }
@@ -4727,6 +4851,19 @@ public class ChipClusters {
     public void unlockDoor(
         DefaultClusterCallback callback, Optional<byte[]> pinCode, int timedInvokeTimeoutMs) {
       unlockDoor(chipClusterPtr, callback, pinCode, timedInvokeTimeoutMs);
+    }
+
+    public void unlockWithTimeout(
+        DefaultClusterCallback callback, Integer timeout, Optional<byte[]> pinCode) {
+      unlockWithTimeout(chipClusterPtr, callback, timeout, pinCode, null);
+    }
+
+    public void unlockWithTimeout(
+        DefaultClusterCallback callback,
+        Integer timeout,
+        Optional<byte[]> pinCode,
+        int timedInvokeTimeoutMs) {
+      unlockWithTimeout(chipClusterPtr, callback, timeout, pinCode, timedInvokeTimeoutMs);
     }
 
     private native void clearCredential(
@@ -4742,6 +4879,20 @@ public class ChipClusters {
         Integer userIndex,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void clearWeekDaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void clearYearDaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer yearDayIndex,
+        Integer userIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void getCredentialStatus(
         long chipClusterPtr,
         GetCredentialStatusResponseCallback Callback,
@@ -4752,6 +4903,20 @@ public class ChipClusters {
     private native void getUser(
         long chipClusterPtr,
         GetUserResponseCallback Callback,
+        Integer userIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void getWeekDaySchedule(
+        long chipClusterPtr,
+        GetWeekDayScheduleResponseCallback Callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void getYearDaySchedule(
+        long chipClusterPtr,
+        GetYearDayScheduleResponseCallback Callback,
+        Integer yearDayIndex,
         Integer userIndex,
         @Nullable Integer timedInvokeTimeoutMs);
 
@@ -4785,9 +4950,37 @@ public class ChipClusters {
         @Nullable Integer credentialRule,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void setWeekDaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer weekDayIndex,
+        Integer userIndex,
+        Integer daysMask,
+        Integer startHour,
+        Integer startMinute,
+        Integer endHour,
+        Integer endMinute,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setYearDaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer yearDayIndex,
+        Integer userIndex,
+        Long localStartTime,
+        Long localEndTime,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void unlockDoor(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
+        Optional<byte[]> pinCode,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void unlockWithTimeout(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer timeout,
         Optional<byte[]> pinCode,
         @Nullable Integer timedInvokeTimeoutMs);
 
@@ -4813,6 +5006,31 @@ public class ChipClusters {
           @Nullable Integer creatorFabricIndex,
           @Nullable Integer lastModifiedFabricIndex,
           @Nullable Integer nextUserIndex);
+
+      void onError(Exception error);
+    }
+
+    public interface GetWeekDayScheduleResponseCallback {
+      void onSuccess(
+          Integer weekDayIndex,
+          Integer userIndex,
+          Integer status,
+          Optional<Integer> daysMask,
+          Optional<Integer> startHour,
+          Optional<Integer> startMinute,
+          Optional<Integer> endHour,
+          Optional<Integer> endMinute);
+
+      void onError(Exception error);
+    }
+
+    public interface GetYearDayScheduleResponseCallback {
+      void onSuccess(
+          Integer yearDayIndex,
+          Integer userIndex,
+          Integer status,
+          Optional<Long> localStartTime,
+          Optional<Long> localEndTime);
 
       void onError(Exception error);
     }
@@ -4911,6 +5129,28 @@ public class ChipClusters {
     public void subscribeNumberOfRFIDUsersSupportedAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeNumberOfRFIDUsersSupportedAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+        IntegerAttributeCallback callback) {
+      readNumberOfWeekDaySchedulesSupportedPerUserAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readNumberOfYearDaySchedulesSupportedPerUserAttribute(
+        IntegerAttributeCallback callback) {
+      readNumberOfYearDaySchedulesSupportedPerUserAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -5140,6 +5380,18 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeNumberOfRFIDUsersSupportedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readNumberOfYearDaySchedulesSupportedPerUserAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readMaxPINCodeLengthAttribute(

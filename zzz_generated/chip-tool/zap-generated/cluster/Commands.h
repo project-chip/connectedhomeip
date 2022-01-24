@@ -3782,6 +3782,78 @@ static void OnDoorLockGetUserResponseSuccess(void * context,
     command->SetCommandExitStatus(err);
 };
 
+static void OnDoorLockGetWeekDayScheduleResponseSuccess(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received GetWeekDayScheduleResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("weekDayIndex", 1, data.weekDayIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("userIndex", 1, data.userIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("daysMask", 1, data.daysMask);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("startHour", 1, data.startHour);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("startMinute", 1, data.startMinute);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("endHour", 1, data.endHour);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("endMinute", 1, data.endMinute);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnDoorLockGetYearDayScheduleResponseSuccess(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received GetYearDayScheduleResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("yearDayIndex", 1, data.yearDayIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("userIndex", 1, data.userIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("localStartTime", 1, data.localStartTime);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("localEndTime", 1, data.localEndTime);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 static void
 OnDoorLockSetCredentialResponseSuccess(void * context,
                                        const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
@@ -17298,12 +17370,19 @@ private:
 | Commands:                                                           |        |
 | * ClearCredential                                                   |   0x26 |
 | * ClearUser                                                         |   0x1D |
+| * ClearWeekDaySchedule                                              |   0x0D |
+| * ClearYearDaySchedule                                              |   0x10 |
 | * GetCredentialStatus                                               |   0x24 |
 | * GetUser                                                           |   0x1B |
+| * GetWeekDaySchedule                                                |   0x0C |
+| * GetYearDaySchedule                                                |   0x0F |
 | * LockDoor                                                          |   0x00 |
 | * SetCredential                                                     |   0x22 |
 | * SetUser                                                           |   0x1A |
+| * SetWeekDaySchedule                                                |   0x0B |
+| * SetYearDaySchedule                                                |   0x0E |
 | * UnlockDoor                                                        |   0x01 |
+| * UnlockWithTimeout                                                 |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
@@ -17313,6 +17392,8 @@ private:
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
 | * NumberOfRFIDUsersSupported                                        | 0x0013 |
+| * NumberOfWeekDaySchedulesSupportedPerUser                          | 0x0014 |
+| * NumberOfYearDaySchedulesSupportedPerUser                          | 0x0015 |
 | * MaxPINCodeLength                                                  | 0x0017 |
 | * MinPINCodeLength                                                  | 0x0018 |
 | * MaxRFIDCodeLength                                                 | 0x0019 |
@@ -17385,6 +17466,56 @@ private:
 };
 
 /*
+ * Command ClearWeekDaySchedule
+ */
+class DoorLockClearWeekDaySchedule : public ModelCommand
+{
+public:
+    DoorLockClearWeekDaySchedule() : ModelCommand("clear-week-day-schedule")
+    {
+        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type mRequest;
+};
+
+/*
+ * Command ClearYearDaySchedule
+ */
+class DoorLockClearYearDaySchedule : public ModelCommand
+{
+public:
+    DoorLockClearYearDaySchedule() : ModelCommand("clear-year-day-schedule")
+    {
+        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type mRequest;
+};
+
+/*
  * Command GetCredentialStatus
  */
 class DoorLockGetCredentialStatus : public ModelCommand
@@ -17430,6 +17561,56 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::GetUser::Type mRequest;
+};
+
+/*
+ * Command GetWeekDaySchedule
+ */
+class DoorLockGetWeekDaySchedule : public ModelCommand
+{
+public:
+    DoorLockGetWeekDaySchedule() : ModelCommand("get-week-day-schedule")
+    {
+        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetWeekDayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type mRequest;
+};
+
+/*
+ * Command GetYearDaySchedule
+ */
+class DoorLockGetYearDaySchedule : public ModelCommand
+{
+public:
+    DoorLockGetYearDaySchedule() : ModelCommand("get-year-day-schedule")
+    {
+        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetYearDayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type mRequest;
 };
 
 /*
@@ -17518,6 +17699,64 @@ private:
 };
 
 /*
+ * Command SetWeekDaySchedule
+ */
+class DoorLockSetWeekDaySchedule : public ModelCommand
+{
+public:
+    DoorLockSetWeekDaySchedule() : ModelCommand("set-week-day-schedule")
+    {
+        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("DaysMask", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::DoorLock::DlDaysMaskMap> *>(&mRequest.daysMask));
+        AddArgument("StartHour", 0, UINT8_MAX, &mRequest.startHour);
+        AddArgument("StartMinute", 0, UINT8_MAX, &mRequest.startMinute);
+        AddArgument("EndHour", 0, UINT8_MAX, &mRequest.endHour);
+        AddArgument("EndMinute", 0, UINT8_MAX, &mRequest.endMinute);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type mRequest;
+};
+
+/*
+ * Command SetYearDaySchedule
+ */
+class DoorLockSetYearDaySchedule : public ModelCommand
+{
+public:
+    DoorLockSetYearDaySchedule() : ModelCommand("set-year-day-schedule")
+    {
+        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
+        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type mRequest;
+};
+
+/*
  * Command UnlockDoor
  */
 class DoorLockUnlockDoor : public ModelCommand
@@ -17539,6 +17778,31 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type mRequest;
+};
+
+/*
+ * Command UnlockWithTimeout
+ */
+class DoorLockUnlockWithTimeout : public ModelCommand
+{
+public:
+    DoorLockUnlockWithTimeout() : ModelCommand("unlock-with-timeout")
+    {
+        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
+        AddArgument("PinCode", &mRequest.pinCode);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
 };
 
 /*
@@ -18386,6 +18650,152 @@ public:
     }
 
     static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfRFIDUsersSupported report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NumberOfWeekDaySchedulesSupportedPerUser
+ */
+class ReadDoorLockNumberOfWeekDaySchedulesSupportedPerUser : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfWeekDaySchedulesSupportedPerUser() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-week-day-schedules-supported-per-user");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfWeekDaySchedulesSupportedPerUser() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "DoorLock.NumberOfWeekDaySchedulesSupportedPerUser response", value);
+    }
+};
+
+class ReportDoorLockNumberOfWeekDaySchedulesSupportedPerUser : public ModelCommand
+{
+public:
+    ReportDoorLockNumberOfWeekDaySchedulesSupportedPerUser() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "number-of-week-day-schedules-supported-per-user");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockNumberOfWeekDaySchedulesSupportedPerUser() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster
+            .SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo>(
+                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        LogValue("DoorLock.NumberOfWeekDaySchedulesSupportedPerUser report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NumberOfYearDaySchedulesSupportedPerUser
+ */
+class ReadDoorLockNumberOfYearDaySchedulesSupportedPerUser : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfYearDaySchedulesSupportedPerUser() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-year-day-schedules-supported-per-user");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfYearDaySchedulesSupportedPerUser() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "DoorLock.NumberOfYearDaySchedulesSupportedPerUser response", value);
+    }
+};
+
+class ReportDoorLockNumberOfYearDaySchedulesSupportedPerUser : public ModelCommand
+{
+public:
+    ReportDoorLockNumberOfYearDaySchedulesSupportedPerUser() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "number-of-year-day-schedules-supported-per-user");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockNumberOfYearDaySchedulesSupportedPerUser() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster
+            .SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo>(
+                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        LogValue("DoorLock.NumberOfYearDaySchedulesSupportedPerUser report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -61417,73 +61827,84 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearCredential>(),                   //
-        make_unique<DoorLockClearUser>(),                         //
-        make_unique<DoorLockGetCredentialStatus>(),               //
-        make_unique<DoorLockGetUser>(),                           //
-        make_unique<DoorLockLockDoor>(),                          //
-        make_unique<DoorLockSetCredential>(),                     //
-        make_unique<DoorLockSetUser>(),                           //
-        make_unique<DoorLockUnlockDoor>(),                        //
-        make_unique<ReadDoorLockLockState>(),                     //
-        make_unique<ReportDoorLockLockState>(),                   //
-        make_unique<ReadDoorLockLockType>(),                      //
-        make_unique<ReportDoorLockLockType>(),                    //
-        make_unique<ReadDoorLockActuatorEnabled>(),               //
-        make_unique<ReportDoorLockActuatorEnabled>(),             //
-        make_unique<ReadDoorLockDoorState>(),                     //
-        make_unique<ReportDoorLockDoorState>(),                   //
-        make_unique<ReadDoorLockNumberOfTotalUsersSupported>(),   //
-        make_unique<ReportDoorLockNumberOfTotalUsersSupported>(), //
-        make_unique<ReadDoorLockNumberOfPINUsersSupported>(),     //
-        make_unique<ReportDoorLockNumberOfPINUsersSupported>(),   //
-        make_unique<ReadDoorLockNumberOfRFIDUsersSupported>(),    //
-        make_unique<ReportDoorLockNumberOfRFIDUsersSupported>(),  //
-        make_unique<ReadDoorLockMaxPINCodeLength>(),              //
-        make_unique<ReportDoorLockMaxPINCodeLength>(),            //
-        make_unique<ReadDoorLockMinPINCodeLength>(),              //
-        make_unique<ReportDoorLockMinPINCodeLength>(),            //
-        make_unique<ReadDoorLockMaxRFIDCodeLength>(),             //
-        make_unique<ReportDoorLockMaxRFIDCodeLength>(),           //
-        make_unique<ReadDoorLockMinRFIDCodeLength>(),             //
-        make_unique<ReportDoorLockMinRFIDCodeLength>(),           //
-        make_unique<ReadDoorLockLanguage>(),                      //
-        make_unique<WriteDoorLockLanguage>(),                     //
-        make_unique<ReportDoorLockLanguage>(),                    //
-        make_unique<ReadDoorLockAutoRelockTime>(),                //
-        make_unique<WriteDoorLockAutoRelockTime>(),               //
-        make_unique<ReportDoorLockAutoRelockTime>(),              //
-        make_unique<ReadDoorLockSoundVolume>(),                   //
-        make_unique<WriteDoorLockSoundVolume>(),                  //
-        make_unique<ReportDoorLockSoundVolume>(),                 //
-        make_unique<ReadDoorLockOperatingMode>(),                 //
-        make_unique<WriteDoorLockOperatingMode>(),                //
-        make_unique<ReportDoorLockOperatingMode>(),               //
-        make_unique<ReadDoorLockSupportedOperatingModes>(),       //
-        make_unique<ReportDoorLockSupportedOperatingModes>(),     //
-        make_unique<ReadDoorLockEnableOneTouchLocking>(),         //
-        make_unique<WriteDoorLockEnableOneTouchLocking>(),        //
-        make_unique<ReportDoorLockEnableOneTouchLocking>(),       //
-        make_unique<ReadDoorLockEnablePrivacyModeButton>(),       //
-        make_unique<WriteDoorLockEnablePrivacyModeButton>(),      //
-        make_unique<ReportDoorLockEnablePrivacyModeButton>(),     //
-        make_unique<ReadDoorLockWrongCodeEntryLimit>(),           //
-        make_unique<WriteDoorLockWrongCodeEntryLimit>(),          //
-        make_unique<ReportDoorLockWrongCodeEntryLimit>(),         //
-        make_unique<ReadDoorLockAttributeList>(),                 //
-        make_unique<ReportDoorLockAttributeList>(),               //
-        make_unique<ReadDoorLockClusterRevision>(),               //
-        make_unique<ReportDoorLockClusterRevision>(),             //
-        make_unique<ReadDoorLockDoorLockAlarm>(),                 //
-        make_unique<ReportDoorLockDoorLockAlarm>(),               //
-        make_unique<ReadDoorLockDoorStateChange>(),               //
-        make_unique<ReportDoorLockDoorStateChange>(),             //
-        make_unique<ReadDoorLockLockOperation>(),                 //
-        make_unique<ReportDoorLockLockOperation>(),               //
-        make_unique<ReadDoorLockLockOperationError>(),            //
-        make_unique<ReportDoorLockLockOperationError>(),          //
-        make_unique<ReadDoorLockLockUserChange>(),                //
-        make_unique<ReportDoorLockLockUserChange>(),              //
+        make_unique<DoorLockClearCredential>(),                                //
+        make_unique<DoorLockClearUser>(),                                      //
+        make_unique<DoorLockClearWeekDaySchedule>(),                           //
+        make_unique<DoorLockClearYearDaySchedule>(),                           //
+        make_unique<DoorLockGetCredentialStatus>(),                            //
+        make_unique<DoorLockGetUser>(),                                        //
+        make_unique<DoorLockGetWeekDaySchedule>(),                             //
+        make_unique<DoorLockGetYearDaySchedule>(),                             //
+        make_unique<DoorLockLockDoor>(),                                       //
+        make_unique<DoorLockSetCredential>(),                                  //
+        make_unique<DoorLockSetUser>(),                                        //
+        make_unique<DoorLockSetWeekDaySchedule>(),                             //
+        make_unique<DoorLockSetYearDaySchedule>(),                             //
+        make_unique<DoorLockUnlockDoor>(),                                     //
+        make_unique<DoorLockUnlockWithTimeout>(),                              //
+        make_unique<ReadDoorLockLockState>(),                                  //
+        make_unique<ReportDoorLockLockState>(),                                //
+        make_unique<ReadDoorLockLockType>(),                                   //
+        make_unique<ReportDoorLockLockType>(),                                 //
+        make_unique<ReadDoorLockActuatorEnabled>(),                            //
+        make_unique<ReportDoorLockActuatorEnabled>(),                          //
+        make_unique<ReadDoorLockDoorState>(),                                  //
+        make_unique<ReportDoorLockDoorState>(),                                //
+        make_unique<ReadDoorLockNumberOfTotalUsersSupported>(),                //
+        make_unique<ReportDoorLockNumberOfTotalUsersSupported>(),              //
+        make_unique<ReadDoorLockNumberOfPINUsersSupported>(),                  //
+        make_unique<ReportDoorLockNumberOfPINUsersSupported>(),                //
+        make_unique<ReadDoorLockNumberOfRFIDUsersSupported>(),                 //
+        make_unique<ReportDoorLockNumberOfRFIDUsersSupported>(),               //
+        make_unique<ReadDoorLockNumberOfWeekDaySchedulesSupportedPerUser>(),   //
+        make_unique<ReportDoorLockNumberOfWeekDaySchedulesSupportedPerUser>(), //
+        make_unique<ReadDoorLockNumberOfYearDaySchedulesSupportedPerUser>(),   //
+        make_unique<ReportDoorLockNumberOfYearDaySchedulesSupportedPerUser>(), //
+        make_unique<ReadDoorLockMaxPINCodeLength>(),                           //
+        make_unique<ReportDoorLockMaxPINCodeLength>(),                         //
+        make_unique<ReadDoorLockMinPINCodeLength>(),                           //
+        make_unique<ReportDoorLockMinPINCodeLength>(),                         //
+        make_unique<ReadDoorLockMaxRFIDCodeLength>(),                          //
+        make_unique<ReportDoorLockMaxRFIDCodeLength>(),                        //
+        make_unique<ReadDoorLockMinRFIDCodeLength>(),                          //
+        make_unique<ReportDoorLockMinRFIDCodeLength>(),                        //
+        make_unique<ReadDoorLockLanguage>(),                                   //
+        make_unique<WriteDoorLockLanguage>(),                                  //
+        make_unique<ReportDoorLockLanguage>(),                                 //
+        make_unique<ReadDoorLockAutoRelockTime>(),                             //
+        make_unique<WriteDoorLockAutoRelockTime>(),                            //
+        make_unique<ReportDoorLockAutoRelockTime>(),                           //
+        make_unique<ReadDoorLockSoundVolume>(),                                //
+        make_unique<WriteDoorLockSoundVolume>(),                               //
+        make_unique<ReportDoorLockSoundVolume>(),                              //
+        make_unique<ReadDoorLockOperatingMode>(),                              //
+        make_unique<WriteDoorLockOperatingMode>(),                             //
+        make_unique<ReportDoorLockOperatingMode>(),                            //
+        make_unique<ReadDoorLockSupportedOperatingModes>(),                    //
+        make_unique<ReportDoorLockSupportedOperatingModes>(),                  //
+        make_unique<ReadDoorLockEnableOneTouchLocking>(),                      //
+        make_unique<WriteDoorLockEnableOneTouchLocking>(),                     //
+        make_unique<ReportDoorLockEnableOneTouchLocking>(),                    //
+        make_unique<ReadDoorLockEnablePrivacyModeButton>(),                    //
+        make_unique<WriteDoorLockEnablePrivacyModeButton>(),                   //
+        make_unique<ReportDoorLockEnablePrivacyModeButton>(),                  //
+        make_unique<ReadDoorLockWrongCodeEntryLimit>(),                        //
+        make_unique<WriteDoorLockWrongCodeEntryLimit>(),                       //
+        make_unique<ReportDoorLockWrongCodeEntryLimit>(),                      //
+        make_unique<ReadDoorLockAttributeList>(),                              //
+        make_unique<ReportDoorLockAttributeList>(),                            //
+        make_unique<ReadDoorLockClusterRevision>(),                            //
+        make_unique<ReportDoorLockClusterRevision>(),                          //
+        make_unique<ReadDoorLockDoorLockAlarm>(),                              //
+        make_unique<ReportDoorLockDoorLockAlarm>(),                            //
+        make_unique<ReadDoorLockDoorStateChange>(),                            //
+        make_unique<ReportDoorLockDoorStateChange>(),                          //
+        make_unique<ReadDoorLockLockOperation>(),                              //
+        make_unique<ReportDoorLockLockOperation>(),                            //
+        make_unique<ReadDoorLockLockOperationError>(),                         //
+        make_unique<ReportDoorLockLockOperationError>(),                       //
+        make_unique<ReadDoorLockLockUserChange>(),                             //
+        make_unique<ReportDoorLockLockUserChange>(),                           //
     };
 
     commands.Register(clusterName, clusterCommands);

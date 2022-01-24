@@ -5373,6 +5373,87 @@ void CHIPDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
+{
+    auto * response = [CHIPDoorLockClusterGetWeekDayScheduleResponseParams new];
+    {
+        response.weekDayIndex = [NSNumber numberWithUnsignedChar:data.weekDayIndex];
+    }
+    {
+        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
+    }
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        if (data.daysMask.HasValue()) {
+            response.daysMask = [NSNumber numberWithUnsignedChar:data.daysMask.Value().Raw()];
+        } else {
+            response.daysMask = nil;
+        }
+    }
+    {
+        if (data.startHour.HasValue()) {
+            response.startHour = [NSNumber numberWithUnsignedChar:data.startHour.Value()];
+        } else {
+            response.startHour = nil;
+        }
+    }
+    {
+        if (data.startMinute.HasValue()) {
+            response.startMinute = [NSNumber numberWithUnsignedChar:data.startMinute.Value()];
+        } else {
+            response.startMinute = nil;
+        }
+    }
+    {
+        if (data.endHour.HasValue()) {
+            response.endHour = [NSNumber numberWithUnsignedChar:data.endHour.Value()];
+        } else {
+            response.endHour = nil;
+        }
+    }
+    {
+        if (data.endMinute.HasValue()) {
+            response.endMinute = [NSNumber numberWithUnsignedChar:data.endMinute.Value()];
+        } else {
+            response.endMinute = nil;
+        }
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
+{
+    auto * response = [CHIPDoorLockClusterGetYearDayScheduleResponseParams new];
+    {
+        response.yearDayIndex = [NSNumber numberWithUnsignedChar:data.yearDayIndex];
+    }
+    {
+        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
+    }
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        if (data.localStartTime.HasValue()) {
+            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
+        } else {
+            response.localStartTime = nil;
+        }
+    }
+    {
+        if (data.localEndTime.HasValue()) {
+            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
+        } else {
+            response.localEndTime = nil;
+        }
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {

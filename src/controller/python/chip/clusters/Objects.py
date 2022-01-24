@@ -14625,21 +14625,21 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="weekDayIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="userIndex", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="status", Tag=2, Type=DoorLock.Enums.DlStatus),
-                            ClusterObjectFieldDescriptor(Label="daysMask", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="startHour", Tag=4, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="startMinute", Tag=5, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="endHour", Tag=6, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="endMinute", Tag=7, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="daysMask", Tag=3, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="startHour", Tag=4, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="startMinute", Tag=5, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="endHour", Tag=6, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="endMinute", Tag=7, Type=typing.Optional[uint]),
                     ])
 
             weekDayIndex: 'uint' = 0
             userIndex: 'uint' = 0
             status: 'DoorLock.Enums.DlStatus' = 0
-            daysMask: 'uint' = 0
-            startHour: 'uint' = 0
-            startMinute: 'uint' = 0
-            endHour: 'uint' = 0
-            endMinute: 'uint' = 0
+            daysMask: 'typing.Optional[uint]' = None
+            startHour: 'typing.Optional[uint]' = None
+            startMinute: 'typing.Optional[uint]' = None
+            endHour: 'typing.Optional[uint]' = None
+            endMinute: 'typing.Optional[uint]' = None
 
         @dataclass
         class ClearWeekDaySchedule(ClusterCommand):
@@ -14709,15 +14709,15 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="yearDayIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="userIndex", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="status", Tag=2, Type=DoorLock.Enums.DlStatus),
-                            ClusterObjectFieldDescriptor(Label="localStartTime", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="localEndTime", Tag=4, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="localStartTime", Tag=3, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="localEndTime", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             yearDayIndex: 'uint' = 0
             userIndex: 'uint' = 0
             status: 'DoorLock.Enums.DlStatus' = 0
-            localStartTime: 'uint' = 0
-            localEndTime: 'uint' = 0
+            localStartTime: 'typing.Optional[uint]' = None
+            localEndTime: 'typing.Optional[uint]' = None
 
         @dataclass
         class ClearYearDaySchedule(ClusterCommand):
@@ -14784,16 +14784,16 @@ class DoorLock(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="holidayIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="status", Tag=1, Type=DoorLock.Enums.DlStatus),
-                            ClusterObjectFieldDescriptor(Label="localStartTime", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="localEndTime", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="operatingMode", Tag=4, Type=DoorLock.Enums.DlOperatingMode),
+                            ClusterObjectFieldDescriptor(Label="localStartTime", Tag=2, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="localEndTime", Tag=3, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="operatingMode", Tag=4, Type=typing.Optional[DoorLock.Enums.DlOperatingMode]),
                     ])
 
             holidayIndex: 'uint' = 0
             status: 'DoorLock.Enums.DlStatus' = 0
-            localStartTime: 'uint' = 0
-            localEndTime: 'uint' = 0
-            operatingMode: 'DoorLock.Enums.DlOperatingMode' = 0
+            localStartTime: 'typing.Optional[uint]' = None
+            localEndTime: 'typing.Optional[uint]' = None
+            operatingMode: 'typing.Optional[DoorLock.Enums.DlOperatingMode]' = None
 
         @dataclass
         class ClearHolidaySchedule(ClusterCommand):
