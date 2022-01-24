@@ -26,6 +26,7 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRe
 CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload);
 CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string & aQRCode);
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
+CHIP_ERROR GetLongManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload);
 CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousInformationFlags aRendezvousFlags);
 
