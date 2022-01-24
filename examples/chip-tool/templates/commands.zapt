@@ -203,9 +203,9 @@ static void OnDefaultSuccessResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDefaultFailure(void * context, EmberAfStatus status)
+static void OnDefaultFailure(void * context, CHIP_ERROR err)
 {
-    ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", chip::to_underlying(status));
+    ChipLogProgress(chipTool, "Default Failure Response: %" CHIP_ERROR_FORMAT, err.Format());
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);

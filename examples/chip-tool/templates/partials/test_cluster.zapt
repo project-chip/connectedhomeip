@@ -131,7 +131,8 @@ class {{filename}}: public TestCommand
     {{#*inline "staticDoneResponse"}}OnDoneCallback_{{index}}{{/inline}}
 
     {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#first}}{{#if ../leadingComma}}, {{/if}}{{/first}} {{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{#not_last}}, {{/not_last}}{{/chip_tests_item_response_parameters}}{{/inline}}
-    {{#*inline "failureArguments"}}{{#if leadingComma}}, {{/if}}EmberAfStatus status{{/inline}}
+    {{! TODO: Temporary if cascade until everything is converted to the new status setup }}
+    {{#*inline "failureArguments"}}{{#if leadingComma}}, {{/if}}CHIP_ERROR error{{/inline}}
     {{#*inline "staticSuccessArguments"}}void * context{{> successArguments leadingComma=true}}{{/inline}}
     {{#*inline "staticFailureArguments"}}void * context{{> failureArguments leadingComma=true}}{{/inline}}
     {{#*inline "staticDoneArguments"}}void * context{{/inline}}
@@ -155,7 +156,7 @@ class {{filename}}: public TestCommand
 
     static void {{>staticFailureResponse}}({{>staticFailureArguments}})
     {
-        (static_cast<{{filename}} *>(context))->{{>failureResponse}}(status);
+        (static_cast<{{filename}} *>(context))->{{>failureResponse}}(error);
     }
 
     static void {{>staticSuccessResponse}}({{> staticSuccessArguments}})
@@ -247,8 +248,8 @@ class {{filename}}: public TestCommand
             (static_cast<{{filename}} *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<{{filename}} *>(context))->{{>failureResponse}}(status);
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<{{filename}} *>(context))->{{>failureResponse}}(error);
         };
 
         {{#if isGroupCommand}}
@@ -305,14 +306,15 @@ class {{filename}}: public TestCommand
 
     void {{>failureResponse}}({{>failureArguments}})
     {
+        chip::app::StatusIB status(error);
         {{#if response.error}}
-          VerifyOrReturn(CheckValue("status", status, {{response.error}}));
+          VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
           {{#unless async}}NextTest();{{/unless}}
         {{else if response.errorWrongValue}}
-          VerifyOrReturn(CheckConstraintNotValue("status", status, 0));
+          VerifyOrReturn(CheckConstraintNotValue("status", chip::to_underlying(status.mStatus), 0));
           {{#unless async}}NextTest();{{/unless}}
         {{else}}
-          {{#if optional}}(status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : {{/if}}ThrowFailureResponse();
+          {{#if optional}}(status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : {{/if}}ThrowFailureResponse();
         {{/if}}
     }
 

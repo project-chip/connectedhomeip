@@ -1,6 +1,8 @@
 #include <jni.h>
 
-#include <zap-generated/CHIPClientCallbacks.h>
+#include <lib/core/CHIPError.h>
+#include <zap-generated/CHIPCallbackTypes.h>
+#include "zap-generated/CHIPClientCallbacks.h"
 
 namespace chip {
 
@@ -19,14 +21,14 @@ private:
 };
 
 /** A failure callback that delegates to the Java DefaultClusterCallback.onError(). */
-class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallback>
+class CHIPDefaultFailureCallback : public Callback::Callback<CHIPDefaultFailureCallbackType>
 {
 public:
     CHIPDefaultFailureCallback(jobject javaCallback);
 
     ~CHIPDefaultFailureCallback();
 
-    static void CallbackFn(void * context, uint8_t status);
+    static void CallbackFn(void * context, CHIP_ERROR err);
 
 private:
     jobject javaCallbackRef;

@@ -121,12 +121,11 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusIB status(Protocols::InteractionModel::Status::Failure);
     VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (mState == State::AwaitingTimedStatus)
     {
-        err = HandleTimedStatus(aPayloadHeader, std::move(aPayload), status);
+        err = HandleTimedStatus(aPayloadHeader, std::move(aPayload));
         // Skip all other processing here (which is for the response to the
         // invoke request), no matter whether err is success or not.
         goto exit;
@@ -136,11 +135,10 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload));
         SuccessOrExit(err);
-        status.mStatus = Protocols::InteractionModel::Status::Success;
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
     else
@@ -153,7 +151,7 @@ exit:
     {
         if (err != CHIP_NO_ERROR)
         {
-            mpCallback->OnError(this, status, err);
+            mpCallback->OnError(this, err);
         }
     }
 
@@ -210,9 +208,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
     if (mpCallback != nullptr)
     {
-        StatusIB status;
-        status.mStatus = Protocols::InteractionModel::Status::Failure;
-        mpCallback->OnError(this, status, CHIP_ERROR_TIMEOUT);
+        mpCallback->OnError(this, CHIP_ERROR_TIMEOUT);
     }
 
     Close();
@@ -309,14 +305,14 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
         if (mpCallback != nullptr)
         {
-            if (statusIB.mStatus == Protocols::InteractionModel::Status::Success)
+            if (statusIB.IsSuccess())
             {
                 mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
                                        hasDataResponse ? &commandDataReader : nullptr);
             }
             else
             {
-                mpCallback->OnError(this, statusIB, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+                mpCallback->OnError(this, statusIB.ToChipError());
             }
         }
     }
@@ -382,10 +378,9 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     }
 }
 
-CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
-                                            StatusIB & aStatusIB)
+CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
-    ReturnErrorOnFailure(TimedRequest::HandleResponse(aPayloadHeader, std::move(aPayload), aStatusIB));
+    ReturnErrorOnFailure(TimedRequest::HandleResponse(aPayloadHeader, std::move(aPayload)));
 
     return SendInvokeRequest();
 }

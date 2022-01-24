@@ -28,13 +28,16 @@ namespace chip {
 namespace Controller {
 
 /*
- * This provides an adapter class that implements InteractionModelEngine::InteractionModelDelegate and provides two additional
+ * This provides an adapter class that implements ReadClient::Callback and provides three additional
  * features:
  *  1. The ability to pass in std::function closures to permit more flexible programming scenarios than are provided by the strict
  *     delegate interface stipulated by by InteractionModelDelegate.
  *
  *  2. Automatic decoding of attribute data provided in the TLVReader by InteractionModelDelegate::OnReportData into a decoded
  *     cluster object.
+ *
+ *  3. Automatically representing all errors as a CHIP_ERROR (which might
+ *     encapsulate a StatusIB).
  */
 template <typename DecodableAttributeType>
 class TypedReadAttributeCallback final : public app::ReadClient::Callback
@@ -42,8 +45,7 @@ class TypedReadAttributeCallback final : public app::ReadClient::Callback
 public:
     using OnSuccessCallbackType =
         std::function<void(const app::ConcreteAttributePath & aPath, const DecodableAttributeType & aData)>;
-    using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
-                                                   Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
+    using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
@@ -70,7 +72,7 @@ private:
         //
         VerifyOrDie(!aPath.IsListItemOperation());
 
-        VerifyOrExit(aStatus.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -82,23 +84,11 @@ private:
     exit:
         if (err != CHIP_NO_ERROR)
         {
-            //
-            // Override aStatus to indicate an error if something bad happened above.
-            //
-            Protocols::InteractionModel::Status imStatus = aStatus.mStatus;
-            if (aStatus.mStatus == Protocols::InteractionModel::Status::Success)
-            {
-                imStatus = Protocols::InteractionModel::Status::Failure;
-            }
-
-            mOnError(&aPath, imStatus, err);
+            mOnError(&aPath, err);
         }
     }
 
-    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
-    {
-        mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
-    }
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
@@ -124,8 +114,7 @@ class TypedReadEventCallback final : public app::ReadClient::Callback
 {
 public:
     using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
-    using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader,
-                                                   Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
+    using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * client, TypedReadEventCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
@@ -154,14 +143,11 @@ private:
     exit:
         if (err != CHIP_NO_ERROR)
         {
-            mOnError(&aEventHeader, Protocols::InteractionModel::Status::Failure, err);
+            mOnError(&aEventHeader, err);
         }
     }
 
-    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
-    {
-        mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
-    }
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 

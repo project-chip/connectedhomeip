@@ -74,9 +74,7 @@ public:
             CHIP_ERROR err = writer.CopyContainer(TLV::AnonymousTag(), *aData);
             if (err != CHIP_NO_ERROR)
             {
-                app::StatusIB status;
-                status.mStatus = Protocols::InteractionModel::Status::Failure;
-                this->OnError(apCommandSender, aStatus, err);
+                this->OnError(apCommandSender, err);
                 return;
             }
             size = writer.GetLengthWritten();
@@ -88,11 +86,11 @@ public:
             size);
     }
 
-    void OnError(const CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aProtocolError) override
+    void OnError(const CommandSender * apCommandSender, CHIP_ERROR aProtocolError) override
     {
-        gOnCommandSenderErrorCallback(mAppContext, to_underlying(aStatus.mStatus),
-                                      aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value()
-                                                                        : chip::python::kUndefinedClusterStatus,
+        StatusIB status(aProtocolError);
+        gOnCommandSenderErrorCallback(mAppContext, to_underlying(status.mStatus),
+                                      status.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus),
                                       aProtocolError.AsInteger());
     }
 

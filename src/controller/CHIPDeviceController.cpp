@@ -394,10 +394,13 @@ void DeviceController::OnVIDReadResponse(void * context, VendorId value)
     }
 }
 
-void DeviceController::OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status)
+void DeviceController::OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Failed to read VID/PID for the device. status %d", status);
-    OnOpenPairingWindowFailureResponse(context, status);
+    ChipLogProgress(Controller, "Failed to read VID/PID for the device. error %" CHIP_ERROR_FORMAT, error.Format());
+    // TODO: The second arg here is wrong, but we need to fix the signature of
+    // OnOpenPairingWindowFailureResponse and how we send some commands to fix
+    // that.
+    OnOpenPairingWindowFailureResponse(context, to_underlying(app::StatusIB(error).mStatus));
 }
 
 void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)

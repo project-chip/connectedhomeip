@@ -33,7 +33,7 @@ class ResponseReceiver : public app::CommandSender::Callback
 {
 public:
     using SuccessCallback = void (*)(void * context, const ResponseType & data);
-    using FailureCallback = void (*)(void * context, EmberAfStatus status);
+    using FailureCallback = void (*)(void * context, CHIP_ERROR err);
     using DoneCallback    = void (*)(void * context);
 
     virtual ~ResponseReceiver() {}
@@ -46,10 +46,7 @@ protected:
     inline void OnResponse(app::CommandSender * aCommandSender, const app::ConcreteCommandPath & aPath,
                            const app::StatusIB & aStatus, TLV::TLVReader * aData) override;
 
-    void OnError(const app::CommandSender * aCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override
-    {
-        mOnError(mContext, app::ToEmberAfStatus(aStatus.mStatus));
-    }
+    void OnError(const app::CommandSender * aCommandSender, CHIP_ERROR aError) override { mOnError(mContext, aError); }
 
     void OnDone(app::CommandSender * aCommandSender) override
     {
@@ -164,7 +161,7 @@ void ResponseReceiver<ResponseType>::OnResponse(app::CommandSender * aCommandSen
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        mOnError(mContext, app::ToEmberAfStatus(Protocols::InteractionModel::Status::Failure));
+        mOnError(mContext, err);
     }
 }
 
@@ -178,7 +175,7 @@ inline void ResponseReceiver<app::DataModel::NullObjectType>::OnResponse(app::Co
     //
     if (aData != nullptr)
     {
-        mOnError(mContext, app::ToEmberAfStatus(Protocols::InteractionModel::Status::Failure));
+        mOnError(mContext, CHIP_ERROR_SCHEMA_MISMATCH);
         return;
     }
 

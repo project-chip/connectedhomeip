@@ -5,7 +5,7 @@
 
 typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataModel::NullObjectType &);
 typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
-typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
