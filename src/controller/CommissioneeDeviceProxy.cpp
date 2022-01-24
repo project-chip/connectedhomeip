@@ -204,7 +204,12 @@ bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port
 
 CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(const Crypto::P256PublicKey & rootPublicKey, ByteSpan noc)
 {
-    return Credentials::ExtractOperationalDiscoveryIdFromRootPubKeyOpCert(rootPublicKey, noc, this->mPeerId);
+    CompressedFabricId compressedFabricId;
+    NodeId nodeId;
+    ReturnErrorOnFailure(
+        Credentials::ExtractNodeIdCompressedFabricIdFromRootPubKeyOpCert(rootPublicKey, noc, compressedFabricId, nodeId));
+    mPeerId = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
+    return CHIP_NO_ERROR;
 }
 
 void CommissioneeDeviceProxy::ReleaseDAC()
