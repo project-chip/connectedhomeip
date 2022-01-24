@@ -444,9 +444,7 @@ template("efr32_sdk") {
 
     if (defined(invoker.sleepy_device)) {
       if (invoker.sleepy_device) {
-        sources += [
-          "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
-        ]
+        sources += [ "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c" ]
       }
     }
 
