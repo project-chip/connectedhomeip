@@ -69,10 +69,7 @@ public:
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
-
-    // Sets user consent delegate and also sets userConsentCallback
-    // which should be called by application when it gets the user consent.
-    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate);
+    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
 
 private:
     BdxOtaSender mBdxOtaSender;
@@ -84,5 +81,5 @@ private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
-    chip::ota::UserConsentDelegate * mUserConsentDelegate;
+    chip::ota::UserConsentDelegate * mUserConsentDelegate = nullptr;
 };
