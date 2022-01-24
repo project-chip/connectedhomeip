@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "LockEndpoint.h"
+#include <cstring>
 
 using chip::to_underlying;
 
@@ -268,10 +269,10 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
         return DlStatus::kFailure;
     }
 
-    auto & scheduleInStorage = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
+    auto & scheduleInStorage                  = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
     scheduleInStorage.schedule.localStartTime = localStartTime;
-    scheduleInStorage.schedule.localEndTime = localEndTime;
-    scheduleInStorage.status = status;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.status                  = status;
 
     return DlStatus::kSuccess;
 }
