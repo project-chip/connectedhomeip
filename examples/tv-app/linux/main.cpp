@@ -112,7 +112,14 @@ int main(int argc, char * argv[])
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&factory);
-    GetCommissionerDiscoveryController()->SetPincodeService(&gMyPincodeService);
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+    if (cdc != nullptr)
+    {
+        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetUserPrompter(&gMyUserPrompter);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -120,7 +127,6 @@ int main(int argc, char * argv[])
     Shell::RegisterAppPlatformCommands();
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #endif
-    GetCommissionerDiscoveryController()->SetUserPrompter(&gMyUserPrompter);
 
     ChipLinuxAppMainLoop();
 

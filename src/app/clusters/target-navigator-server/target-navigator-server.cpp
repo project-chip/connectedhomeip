@@ -172,14 +172,13 @@ bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHand
     EndpointId endpoint = commandPath.mEndpointId;
     auto & target       = commandData.target;
     auto & data         = commandData.data;
+    app::CommandResponseHelper<Commands::NavigateTargetResponse::Type> responder(command, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Commands::NavigateTargetResponse::Type response = delegate->HandleNavigateTarget(target, data);
-        err                                             = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleNavigateTarget(responder, target, data);
     }
 
 exit:

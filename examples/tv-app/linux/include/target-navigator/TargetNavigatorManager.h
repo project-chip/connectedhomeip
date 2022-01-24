@@ -20,6 +20,7 @@
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
 using chip::CharSpan;
+using chip::app::CommandResponseHelper;
 using TargetNavigatorDelegate    = chip::app::Clusters::TargetNavigator::Delegate;
 using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type;
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
@@ -32,7 +33,8 @@ public:
 
     std::list<TargetInfoType> HandleGetTargetList() override;
     uint8_t HandleGetCurrentTarget() override;
-    NavigateTargetResponseType HandleNavigateTarget(const uint64_t & target, const CharSpan & data) override;
+    void HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & responser, const uint64_t & target,
+                              const CharSpan & data) override;
 
 protected:
     // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"

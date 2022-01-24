@@ -48,7 +48,8 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return mCurrentTarget;
 }
 
-NavigateTargetResponseType TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target, const CharSpan & data)
+void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & helper,
+                                                  const uint64_t & target, const CharSpan & data)
 {
     NavigateTargetResponseType response;
     if (target == kNoCurrentTarget || target > mTargets.size())
@@ -56,11 +57,12 @@ NavigateTargetResponseType TargetNavigatorManager::HandleNavigateTarget(const ui
         response.data = CharSpan("error", strlen("error"));
         // TODO: should be TARGET_NOT_FOUND
         response.status = StatusEnum::kAppNotAvailable;
-        return response;
+        helper.Success(response);
+        return;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
     response.data   = CharSpan("data response", strlen("data response"));
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
