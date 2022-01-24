@@ -361,7 +361,7 @@ public:
      * 2) Return success and attempt to encode data using aEncoder.  The data is
      *    returned to the client.
      * 3) Return success and not attempt to encode any data using aEncoder.  In
-     *    this case, normal attribute access will happen for the read. This may
+     *    this case, Ember attribute access will happen for the read. This may
      *    involve reading from the attribute store or external attribute
      *    callbacks.
      */
@@ -381,7 +381,7 @@ public:
      * 2) Return success and attempt to decode from aDecoder.  This is
      *    treated as a successful write.
      * 3) Return success and not attempt to decode from aDecoder.  In
-     *    this case, normal attribute access will happen for the write. This may
+     *    this case, Ember attribute access will happen for the write. This may
      *    involve writing to the attribute store or external attribute
      *    callbacks.
      */
