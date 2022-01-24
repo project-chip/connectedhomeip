@@ -71,7 +71,6 @@ class FileSystemGeneratorStorage(GeneratorStorage):
         logging.info("Writing new data to: %s" % target)
         with open(target, "wt") as out:
             out.write(content)
-        logging.info("Generation for %s completed" % output_file_name)
 
 
 class CodeGenerator:
