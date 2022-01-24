@@ -906,7 +906,13 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     uint16_t currentOnOffTransitionTime;
     EmberAfStatus status;
 
-    EmberAfLevelControlState * state        = getState(endpoint);
+    EmberAfLevelControlState * state = getState(endpoint);
+    if (state == NULL)
+    {
+        emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
+        return;
+    }
+
     uint8_t minimumLevelAllowedForTheDevice = state->minLevel;
 
     // "Temporarily store CurrentLevel."
@@ -994,8 +1000,15 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
-    state->minLevel                  = EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
-    state->maxLevel                  = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
+
+    if (state == NULL)
+    {
+        emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
+        return;
+    }
+
+    state->minLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
+    state->maxLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
 
     // If these read only attributes are enabled we use those values as our set minLevel and maxLevel
     // if get isn't possible, value stays at default
