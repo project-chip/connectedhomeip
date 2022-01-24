@@ -802,6 +802,13 @@ public:
     CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
+class DLL_EXPORT TimeFormatLocalizationCluster : public ClusterBase
+{
+public:
+    TimeFormatLocalizationCluster() : ClusterBase(app::Clusters::TimeFormatLocalization::Id) {}
+    ~TimeFormatLocalizationCluster() {}
+};
+
 class DLL_EXPORT UserLabelCluster : public ClusterBase
 {
 public:

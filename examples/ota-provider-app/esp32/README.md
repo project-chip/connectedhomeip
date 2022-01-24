@@ -41,6 +41,15 @@ idf.py -p <OTAProviderSerialPort> flash
 ./out/debug/chip-tool pairing ble-wifi 12345 <ssid> <passphrase> 20202021 3841
 ```
 
+## Set delayed action time (Optional)
+
+-   Set delayed action time in the Query Image Response and Apply Update
+    Response, default is zero.
+
+```
+> matter OTAProvider delay <delay seconds>
+```
+
 ---
 
 Once OTA provider is commissioned then head over to

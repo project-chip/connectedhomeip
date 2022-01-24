@@ -590,6 +590,8 @@ typedef void (*CHIPLocalizationConfigurationClusterActiveLocaleAttributeCallback
     void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo::DecodableArgType);
 typedef void (*CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType)(
     void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo::DecodableType &);
+typedef void (*CHIPLocalizationConfigurationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPLowPowerClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo::DecodableType &);
@@ -1310,6 +1312,15 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterFeatureMapAttributeCallbackTyp
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
+typedef void (*CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo::DecodableArgType);
+typedef void (*CHIPTimeFormatLocalizationClusterActiveCalendarTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo::DecodableArgType);
+typedef void (*CHIPTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallbackType)(
+    void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo::DecodableType &);
+typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPUserLabelClusterLabelListAttributeCallbackType)(
     void *, const chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo::DecodableType &);

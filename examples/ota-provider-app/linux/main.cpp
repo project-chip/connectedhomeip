@@ -124,7 +124,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
                              "        Status value in the Query Image Response\n"
                              "  -d/--DelayedActionTimeSec <time>\n"
-                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n" };
+                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
+                             "        and Apply Update Response\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 

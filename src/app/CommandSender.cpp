@@ -60,7 +60,7 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout)
+CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
@@ -69,8 +69,9 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    mpExchangeCtx->SetResponseTimeout(timeout);
+    mpExchangeCtx->SetResponseTimeout(timeout.ValueOr(kImMessageTimeout));
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
@@ -80,6 +81,23 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
     }
 
     return SendInvokeRequest();
+}
+
+CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
+{
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+
+    // Create a new exchange context.
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    ReturnErrorOnFailure(SendInvokeRequest());
+
+    Close();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::SendInvokeRequest()

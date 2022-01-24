@@ -27,6 +27,7 @@ adb
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddThreadNetwork
 adk
 adoc
 AdvAutonomous
@@ -252,6 +253,7 @@ customizations
 cvfJ
 cxx
 CY
+CYW
 DAC
 DAP
 DataFrame
@@ -357,6 +359,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EnableNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName
@@ -416,6 +419,7 @@ fsl
 fstab
 fsync
 fullclean
+gbl
 gcloud
 GDB
 GeneralCommissioning
@@ -725,6 +729,7 @@ OTA
 OTADownloader
 OTAImageProcessorDriver
 OTAImageProcessorInterface
+OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
@@ -840,6 +845,7 @@ RendezVousTest
 repo
 req
 Requestor
+Requestors
 responder
 retargeting
 reusability

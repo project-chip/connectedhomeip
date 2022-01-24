@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 0;
-    CHAR_STRING value = 1;
+    CHAR_STRING<16> label = 0;
+    CHAR_STRING<16> value = 1;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -58,24 +58,24 @@ server cluster Basic = 40 {
   }
 
   readonly attribute int16u interactionModelVersion = 0;
-  readonly attribute char_string vendorName = 1;
+  readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string productName = 3;
+  readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string nodeLabel = 5;
-  attribute char_string location = 6;
+  attribute char_string<32> nodeLabel = 5;
+  attribute char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string softwareVersionString = 10;
-  readonly attribute char_string manufacturingDate = 11;
-  readonly attribute char_string partNumber = 12;
-  readonly attribute long_char_string productURL = 13;
-  readonly attribute char_string productLabel = 14;
-  readonly attribute char_string serialNumber = 15;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
-  readonly attribute char_string uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
@@ -286,11 +286,11 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING name = 0;
+    CHAR_STRING<32> name = 0;
     BOOLEAN fabricConnected = 1;
     BOOLEAN offPremiseServicesReachableIPv4 = 2;
     BOOLEAN offPremiseServicesReachableIPv6 = 3;
-    OCTET_STRING hardwareAddress = 4;
+    OCTET_STRING<8> hardwareAddress = 4;
     InterfaceType type = 5;
   }
 
@@ -340,7 +340,7 @@ server cluster GroupKeyManagement = 63 {
     INT16U fabricIndex = 0;
     INT16U groupId = 1;
     INT16U endpoints[] = 2;
-    CHAR_STRING groupName = 3;
+    CHAR_STRING<16> groupName = 3;
   }
 
   readonly attribute GroupKey groupKeyMap[] = 0;
@@ -482,8 +482,9 @@ server cluster Identify = 3 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string activeLocale = 1;
+  attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -542,7 +543,7 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
   readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute octet_string<32> lastNetworkID = 6;
   readonly attribute int32u lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -692,11 +693,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     fabric_idx fabricIndex = 0;
-    OCTET_STRING rootPublicKey = 1;
+    OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
-    CHAR_STRING label = 5;
+    CHAR_STRING<32> label = 5;
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
@@ -882,7 +883,7 @@ server cluster Scenes = 5 {
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
     INT64U id = 0;
-    CHAR_STRING name = 1;
+    CHAR_STRING<8> name = 1;
     INT32U stackFreeCurrent = 2;
     INT32U stackFreeMinimum = 3;
     INT32U stackSize = 4;
@@ -1046,10 +1047,10 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string networkName = 2;
+  readonly attribute octet_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string meshLocalPrefix = 5;
+  readonly attribute octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
@@ -1104,10 +1105,37 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u pendingTimestamp = 57;
   readonly attribute int32u delay = 58;
   readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string channelMask = 60;
+  readonly attribute octet_string<4> channelMask = 60;
   readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
+server cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1160,7 +1188,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string bssid = 0;
+  readonly attribute octet_string<6> bssid = 0;
   readonly attribute enum8 securityType = 1;
   readonly attribute enum8 wiFiVersion = 2;
   readonly attribute int16u channelNumber = 3;
@@ -1196,6 +1224,7 @@ endpoint 0 {
   server  cluster OperationalCredentials;
   server  cluster SoftwareDiagnostics;
   server  cluster ThreadNetworkDiagnostics;
+  server  cluster TimeFormatLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

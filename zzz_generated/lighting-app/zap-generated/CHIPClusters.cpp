@@ -71,7 +71,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -116,7 +116,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -175,7 +175,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.

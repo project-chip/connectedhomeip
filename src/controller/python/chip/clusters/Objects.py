@@ -7156,16 +7156,16 @@ class TimeFormatLocalization(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="hourFormat", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="calendarType", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="hourFormat", Tag=0x00000000, Type=TimeFormatLocalization.Enums.HourFormat),
+                ClusterObjectFieldDescriptor(Label="activeCalendarType", Tag=0x00000001, Type=typing.Optional[TimeFormatLocalization.Enums.CalendarType]),
                 ClusterObjectFieldDescriptor(Label="supportedCalendarTypes", Tag=0x00000002, Type=typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    hourFormat: 'uint' = None
-    calendarType: 'typing.Optional[uint]' = None
+    hourFormat: 'TimeFormatLocalization.Enums.HourFormat' = None
+    activeCalendarType: 'typing.Optional[TimeFormatLocalization.Enums.CalendarType]' = None
     supportedCalendarTypes: 'typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
@@ -7206,12 +7206,12 @@ class TimeFormatLocalization(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=TimeFormatLocalization.Enums.HourFormat)
 
-            value: 'uint' = 0
+            value: 'TimeFormatLocalization.Enums.HourFormat' = 0
 
         @dataclass
-        class CalendarType(ClusterAttributeDescriptor):
+        class ActiveCalendarType(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x002C
@@ -7222,9 +7222,9 @@ class TimeFormatLocalization(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[TimeFormatLocalization.Enums.CalendarType])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[TimeFormatLocalization.Enums.CalendarType]' = None
 
         @dataclass
         class SupportedCalendarTypes(ClusterAttributeDescriptor):
@@ -29819,6 +29819,7 @@ class TestCluster(Cluster):
                 ClusterObjectFieldDescriptor(Label="rangeRestrictedInt16u", Tag=0x00000028, Type=uint),
                 ClusterObjectFieldDescriptor(Label="rangeRestrictedInt16s", Tag=0x00000029, Type=int),
                 ClusterObjectFieldDescriptor(Label="listLongOctetString", Tag=0x0000002A, Type=typing.List[bytes]),
+                ClusterObjectFieldDescriptor(Label="listFabricScoped", Tag=0x0000002B, Type=typing.List[TestCluster.Structs.TestFabricScoped]),
                 ClusterObjectFieldDescriptor(Label="timedWriteBoolean", Tag=0x00000030, Type=bool),
                 ClusterObjectFieldDescriptor(Label="unsupported", Tag=0x000000FF, Type=bool),
                 ClusterObjectFieldDescriptor(Label="nullableBoolean", Tag=0x00008000, Type=typing.Union[Nullable, bool]),
@@ -29902,6 +29903,7 @@ class TestCluster(Cluster):
     rangeRestrictedInt16u: 'uint' = None
     rangeRestrictedInt16s: 'int' = None
     listLongOctetString: 'typing.List[bytes]' = None
+    listFabricScoped: 'typing.List[TestCluster.Structs.TestFabricScoped]' = None
     timedWriteBoolean: 'bool' = None
     unsupported: 'bool' = None
     nullableBoolean: 'typing.Union[Nullable, bool]' = None
@@ -30056,6 +30058,17 @@ class TestCluster(Cluster):
                     ])
 
             a: 'typing.List[TestCluster.Structs.NestedStructList]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class TestFabricScoped(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
+                    ])
+
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class TestListStructOctet(ClusterObject):
@@ -31348,6 +31361,22 @@ class TestCluster(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
             value: 'typing.List[bytes]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class ListFabricScoped(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[TestCluster.Structs.TestFabricScoped])
+
+            value: 'typing.List[TestCluster.Structs.TestFabricScoped]' = field(default_factory=lambda: [])
 
         @dataclass
         class TimedWriteBoolean(ClusterAttributeDescriptor):

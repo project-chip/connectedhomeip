@@ -31,6 +31,7 @@
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOnOffPluginServerInitCallback();                                                                                         \
+    MatterOperationalCredentialsPluginClientInitCallback();                                                                        \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterScenesPluginServerInitCallback();                                                                                        \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \

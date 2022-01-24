@@ -26,12 +26,23 @@
 
 #pragma once
 
-#ifdef __cplusplus
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+/**
+ * Base-level abnormal termination.
+ *
+ * Terminate the program immediately, without invoking destructors, atexit callbacks, etc.
+ * Used to implement the default `chipDie()`.
+ *
+ * @note
+ *  This should never be invoked directly by code outside this file.
+ */
+#if !defined(CHIP_CONFIG_ABORT)
+#define CHIP_CONFIG_ABORT() abort()
+#endif
 
 /**
  *  @name chip-specific nlassert.h Overrides
@@ -41,34 +52,34 @@
  */
 
 /**
- *  @def CHIP_ASSERT_ABORT()
+ *  @def NL_ASSERT_ABORT()
  *
  *  @brief
- *    This implements a chip-specific override for #CHIP_ASSERT_ABORT *
+ *    This implements a chip-specific override for #NL_ASSERT_ABORT *
  *    from nlassert.h.
  *
  */
-#if !defined(CHIP_ASSERT_ABORT)
-#define CHIP_ASSERT_ABORT() chipDie()
+#if !defined(NL_ASSERT_ABORT)
+#define NL_ASSERT_ABORT() chipAbort()
 #endif
 
 /**
- *  @def CHIP_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)
+ *  @def NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)
  *
  *  @brief
- *    This implements a chip-specific override for \c CHIP_ASSERT_LOG
+ *    This implements a chip-specific override for \c NL_ASSERT_LOG
  *    from nlassert.h.
  *
  *  @param[in]  aPrefix     A pointer to a NULL-terminated C string printed
  *                          at the beginning of the logged assertion
  *                          message. Typically this is and should be
- *                          \c CHIP_ASSERT_PREFIX_STRING.
+ *                          \c NL_ASSERT_PREFIX_STRING.
  *  @param[in]  aName       A pointer to a NULL-terminated C string printed
  *                          following @a aPrefix that indicates what
  *                          module, program, application or subsystem
  *                          the assertion occurred in Typically this
  *                          is and should be
- *                          \c CHIP_ASSERT_COMPONENT_STRING.
+ *                          \c NL_ASSERT_COMPONENT_STRING.
  *  @param[in]  aCondition  A pointer to a NULL-terminated C string indicating
  *                          the expression that evaluated to false in
  *                          the assertion. Typically this is a
@@ -93,12 +104,12 @@
  *
  */
 // clang-format off
-#if !defined(CHIP_ASSERT_LOG)
-#define CHIP_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
+#if !defined(NL_ASSERT_LOG)
+#define NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
     do                                                                                    \
     {                                                                                     \
         ChipLogError(NotSpecified,                                                       \
-                      CHIP_ASSERT_LOG_FORMAT_DEFAULT,                                       \
+                      NL_ASSERT_LOG_FORMAT_DEFAULT,                                       \
                       aPrefix,                                                            \
                       (((aName) == 0) || (*(aName) == '\0')) ? "" : aName,                \
                       (((aName) == 0) || (*(aName) == '\0')) ? "" : ": ",                 \
@@ -455,18 +466,25 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @endcode
  *
  */
+#ifndef chipAbort
+extern "C" void chipAbort(void) __attribute((noreturn));
+
+inline void chipAbort(void)
+{
+    while (true)
+    {
+        // NL_ASSERT_ABORT is redefined to be chipAbort, so not useful here.
+        CHIP_CONFIG_ABORT();
+    }
+}
+#endif // chipAbort
 #ifndef chipDie
 extern "C" void chipDie(void) __attribute((noreturn));
 
 inline void chipDie(void)
 {
     ChipLogError(NotSpecified, "chipDie chipDie chipDie");
-
-    while (true)
-    {
-        // CHIP_ASSERT_ABORT is redefined to be chipDie, so not useful here.
-        abort();
-    }
+    chipAbort();
 }
 #endif // chipDie
 
@@ -630,8 +648,6 @@ inline void chipDie(void)
 #else
 #define FALLTHROUGH (void) 0
 #endif
-
-#endif // __cplusplus
 
 /**
  * @def ArraySize(aArray)
