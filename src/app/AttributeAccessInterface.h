@@ -338,7 +338,7 @@ public:
 private:
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
-    Access::SubjectDescriptor mSubjectDescriptor;
+    const Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 class AttributeAccessInterface
