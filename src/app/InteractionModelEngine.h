@@ -277,6 +277,9 @@ private:
 
     bool HasActiveRead();
 
+    CHIP_ERROR ShutdownExistingSubscriptionsIfNeeded(Messaging::ExchangeContext * apExchangeContext,
+                                                     System::PacketBufferHandle && aPayload);
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;

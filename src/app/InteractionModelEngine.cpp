@@ -246,15 +246,15 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 {
     ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
-    bool keepExistingSubscriptions = true;
 
     //
-    // Let's first figure out if the client has requested we keep any existing
+    // Let's first figure out if the client has sent us a subscribe request and requested we keep any existing
     // subscriptions from that source.
     //
     if (aInteractionType == ReadHandler::InteractionType::Subscribe)
     {
         System::PacketBufferTLVReader reader;
+        bool keepExistingSubscriptions = true;
 
         reader.Init(aPayload.Retain());
         ReturnErrorOnFailure(reader.Next());
@@ -263,26 +263,26 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
 
         ReturnErrorOnFailure(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions));
-    }
 
-    if (!keepExistingSubscriptions)
-    {
-        //
-        // Walk through all existing subscriptions and shut down those whose subscriber matches
-        // that which just came in.
-        //
-        mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
-            if (handler->IsFromSubscriber(*apExchangeContext))
-            {
-                ChipLogProgress(InteractionModel,
-                                "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
-                                ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
-                mReadHandlers.ReleaseObject(handler);
-            }
+        if (!keepExistingSubscriptions)
+        {
+            //
+            // Walk through all existing subscriptions and shut down those whose subscriber matches
+            // that which just came in.
+            //
+            mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
+                if (handler->IsFromSubscriber(*apExchangeContext))
+                {
+                    ChipLogProgress(InteractionModel,
+                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                                    ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
+                                    apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+                    mReadHandlers.ReleaseObject(handler);
+                }
 
-            return Loop::Continue;
-        });
+                return Loop::Continue;
+            });
+        }
     }
 
     size_t handlerPoolCapacity = mReadHandlers.Capacity();

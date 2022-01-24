@@ -10,32 +10,24 @@ set(list_chip_main_sources chip_main_sources)
 
 include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 
-if (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
-    #OTARequestor
+
+    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
+    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
+    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
+    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/CHIPClientCallbacks.cpp
+
+    ${chip_dir}/examples/ota-requestor-app/ameba/main/chipinterface.cpp
+    ${chip_dir}/examples/ota-requestor-app/ameba/main/Globals.cpp
+    ${chip_dir}/examples/ota-requestor-app/ameba/main/LEDWidget.cpp
+    ${chip_dir}/examples/ota-requestor-app/ameba/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/ota-requestor-app/ameba/main/DeviceCallbacks.cpp
+
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-)
-endif (matter_enable_ota_requestor)
-
-list(
-    APPEND ${list_chip_main_sources}
-
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/CHIPClientCallbacks.cpp
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/callback-stub.cpp
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/IMClusterCommandHandler.cpp
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/CHIPClusters.cpp
-
-    ${chip_dir}/examples/lighting-app/lighting-common/color_format/color_format.cpp
-
-    ${chip_dir}/examples/lighting-app/ameba/main/chipinterface.cpp
-    ${chip_dir}/examples/lighting-app/ameba/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/lighting-app/ameba/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/lighting-app/ameba/main/Globals.cpp
-    ${chip_dir}/examples/lighting-app/ameba/main/LEDWidget.cpp
-    ${chip_dir}/examples/lighting-app/ameba/main/DsoHack.cpp
+    ${chip_dir}/src/app/util/im-client-callbacks.cpp
 )
 
 add_library(
@@ -46,19 +38,16 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../lighting-common/lighting-app.zap
+    ZAP_FILE ${matter_example_path}/../ota-requestor-common/ota-requestor-app.zap
 )
 
 target_include_directories(
     ${chip_main}
     PUBLIC
 	${inc_path}
-    ${chip_dir}/zzz_generated/lighting-app
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated
+    ${chip_dir}/zzz_generated/ota-requestor-app
     ${chip_dir}/zzz_generated/app-common
-    ${chip_dir}/examples/lighting-app/lighting-common
-    ${chip_dir}/examples/lighting-app/lighting-common/color_format
-    ${chip_dir}/examples/lighting-app/ameba/main/include
+    ${chip_dir}/zzz_generated
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/
@@ -70,6 +59,11 @@ target_include_directories(
     ${chip_dir}/src/controller/data_model
     ${chip_dir}/third_party/nlio/repo/include/
     ${chip_dir}/third_party/nlunit-test/repo/src
+
+    ${chip_dir}/src/app/clusters/ota-requestor
+    ${chip_dir}/examples/ota-requestor-app/ameba/main/include
+
+    ${sdk_root}/component/soc/realtek/amebad/fwlib/include
 )
 
 list(
@@ -82,14 +76,6 @@ list(
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
-
-if (matter_enable_ota_requestor)
-list(
-    APPEND chip_main_flags
-
-    -DCONFIG_ENABLE_OTA_REQUESTOR=1
-)
-endif (matter_enable_ota_requestor)
 
 list(
     APPEND chip_main_cpp_flags
