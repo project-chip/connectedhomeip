@@ -182,7 +182,7 @@ void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandP
         (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
 
     if (commandExchangeCtx->IsGroupExchangeContext())
-    {   
+    {
         imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
     }
     else

@@ -82,7 +82,7 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
-    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId()).Value());
+    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId(), mSrcFabricIndex).Value());
     return CHIP_NO_ERROR;
 }
 

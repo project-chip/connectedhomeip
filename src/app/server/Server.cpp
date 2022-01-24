@@ -149,7 +149,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     );
 
-    err = mListener.init(&mTransports);
+    err = mListener.Init(&mTransports);
     SuccessOrExit(err);
     mGroupsProvider.SetListener(&mListener);
 
@@ -237,7 +237,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         ConstFabricIterator fabricIterator = mFabrics.cbegin();
         while (!fabricIterator.IsAtEnd())
         {
-            FabricInfo fabric = *fabricIterator;
+            const FabricInfo & fabric = *fabricIterator;
             Credentials::GroupDataProvider::GroupInfo groupInfo;
 
             Credentials::GroupDataProvider::GroupInfoIterator * iterator =
@@ -259,7 +259,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
             iterator->Release();
         }
     }
-#endif // CONFIG_OPENTHREAD_ENABLED
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_THREAD
 exit:
     if (err != CHIP_NO_ERROR)
     {

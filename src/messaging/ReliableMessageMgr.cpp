@@ -118,10 +118,6 @@ void ReliableMessageMgr::ExecuteActions()
 
     // Retransmit / cancel anything in the retrans table whose retrans timeout has expired
     mRetransTable.ForEachActiveObject([&](auto * entry) {
-        // Check if groups
-        if (entry->ec->IsGroupExchangeContext())
-            return Loop::Continue;
-
         if (entry->nextRetransTime > now)
             return Loop::Continue;
 
