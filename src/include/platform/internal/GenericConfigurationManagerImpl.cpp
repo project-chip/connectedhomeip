@@ -337,21 +337,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCountryCode(char * b
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen)
-{
-    return ReadConfigValueStr(ConfigClass::kConfigKey_ActiveLocale, buf, bufSize, codeLen);
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCountryCode(const char * code, size_t codeLen)
 {
     return WriteConfigValueStr(ConfigClass::kConfigKey_CountryCode, code, codeLen);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreActiveLocale(const char * code, size_t codeLen)
-{
-    return WriteConfigValueStr(ConfigClass::kConfigKey_ActiveLocale, code, codeLen);
 }
 
 template <class ConfigClass>
