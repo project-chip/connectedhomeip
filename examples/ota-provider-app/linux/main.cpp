@@ -50,29 +50,113 @@ using chip::Messaging::ExchangeManager;
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
 constexpr uint16_t kOptionFilepath             = 'f';
+constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
-uint32_t gDelayedActionTimeSec                                 = 0;
-const char * gOtaFilepath                                      = nullptr;
+static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+static uint32_t gDelayedActionTimeSec                                 = 0;
+static const char * gOtaFilepath                                      = nullptr;
+static const char * gOtaImageListFilepath                             = nullptr;
+
+// Basic CSV parser that expects a precise format - Device Software Version Model Schema.
+// vendorId,productId,softwareVersion,softwareVersionString,CDVersionNumber,softwareVersionValid,minApplicableSoftwareVersion,maxApplicableSoftwareVersion,otaURL
+// Example of file contents:
+// 1,1,10,Version_1,18,true,0,100,/tmp/ota1.txt
+// 1,1,20,Version_2,45,false,4,123,/tmp/ota2.txt
+// TODO: Replace with a JSON file for simpler parsing. The idea is that the contents of the
+// response from the DCL server will be populated into this file appropriately.
+static bool parse_csv_file_and_populate_candidates(const char* filepath, std::vector<OTAProviderExample::DeviceSoftwareVersionModel>& candidates)
+{
+    std::ifstream fpStream(filepath);
+    std::string line;
+    while(std::getline(fpStream, line))
+    {
+        OTAProviderExample::DeviceSoftwareVersionModel candidate;
+        if (line.find("#") == 0) continue; // Ignore lines starting with #
+        std::istringstream s(line);
+        std::string field;
+        uint8_t pos = 0;
+        while (getline(s, field,','))
+        {
+            switch(pos)
+            {
+                case 0:
+                    candidate.vendorId = static_cast<uint16_t>(std::stoul(field));
+                    break;
+                case 1:
+                    candidate.productId = static_cast<uint16_t>(std::stoul(field));
+                    break;
+                case 2:
+                    candidate.softwareVersion = static_cast<uint32_t>(std::stoul(field));
+                    break;
+                case 3:
+                    strncpy(candidate.softwareVersionString, field.c_str(), OTAProviderExample::SW_VER_STR_MAX_LEN);
+                    break;
+                case 4:
+                    candidate.CDVersionNumber = static_cast<uint16_t>(std::stoul(field));
+                    break;
+                case 5:
+                    candidate.softwareVersionValid = (strcmp(field.c_str(), "true") == 0) ? true : false;
+                    break;
+                case 6:
+                    candidate.minApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
+                    break;
+                case 7:
+                    candidate.maxApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
+                    break;
+                case 8:
+                    strncpy(candidate.otaURL, field.c_str(), OTAProviderExample::OTA_URL_MAX_LEN);
+                    break;
+            }
+            pos++;
+        }
+        candidates.push_back(candidate);
+    }
+    return true;
+}
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     bool retval = true;
+    static bool kOptionFilepathSelected;
+    static bool kOptionOtaImageListSelected;
 
     switch (aIdentifier)
     {
     case kOptionFilepath:
+        kOptionFilepathSelected = true;
         if (0 != access(aValue, R_OK))
         {
             PrintArgError("%s: not permitted to read %s\n", aProgram, aValue);
             retval = false;
         }
+        else if (kOptionOtaImageListSelected)
+        {
+            PrintArgError("%s: Cannot have both OptionOtaImageList and kOptionOtaFilepath \n", aProgram);
+            retval = false;
+        }
         else
         {
             gOtaFilepath = aValue;
+        }
+        break;
+    case kOptionOtaImageList:
+        kOptionOtaImageListSelected = true;
+        if (0 != access(aValue, R_OK))
+        {
+            PrintArgError("%s: not permitted to read %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else if (kOptionFilepathSelected)
+        {
+            PrintArgError("%s: Cannot have both OptionOtaImageList and kOptionOtaFilepath \n", aProgram);
+            retval = false;
+        }
+        else
+        {
+            gOtaImageListFilepath = aValue;
         }
         break;
     case kOptionQueryImageBehavior:
@@ -113,6 +197,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 OptionDef cmdLineOptionsDef[] = {
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
+    { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "QueryImageBehavior", chip::ArgParser::kArgumentRequired, kOptionQueryImageBehavior },
     { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     {},
@@ -121,6 +206,8 @@ OptionDef cmdLineOptionsDef[] = {
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
                              "  -f/--filepath <file>\n"
                              "        Path to a file containing an OTA image.\n"
+                             "  -o/--otaImageList <file>\n"
+                             "        Path to a file containing a list of OTA images.\n"
                              "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
                              "        Status value in the Query Image Response\n"
                              "  -d/--DelayedActionTimeSec <time>\n"
@@ -178,6 +265,16 @@ int main(int argc, char * argv[])
 
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
+
+    ChipLogDetail(SoftwareUpdate, "using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
+
+    if (gOtaImageListFilepath != nullptr)
+    {
+        // Parse CSV file and load the ota candidates
+        std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
+        parse_csv_file_and_populate_candidates(gOtaImageListFilepath, candidates);
+        otaProvider.SetOTACandidates(candidates);
+    }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
 
