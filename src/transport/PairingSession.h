@@ -104,7 +104,6 @@ public:
                                           TLV::TLVWriter & tlvWriter);
 
 protected:
-    // void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
