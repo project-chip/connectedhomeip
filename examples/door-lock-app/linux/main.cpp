@@ -78,8 +78,8 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
                                           DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
 {
-    return LockManager::Instance().SetSchedule(endpointId, weekdayIndex, userIndex, status, daysMask,
-                                               startHour, startMinute, endHour, endMinute);
+    return LockManager::Instance().SetSchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,
+                                               endHour, endMinute);
 }
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
