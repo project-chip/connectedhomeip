@@ -83,6 +83,7 @@ public:
     bool GetNumberOfPINCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfPINCredentials);
     bool GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials);
     bool GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfWeekDaySchedulesPerUser);
+    bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
 
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
@@ -115,6 +116,16 @@ public:
     void ClearWeekDayScheduleCommandHandler(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData);
+
+    void SetYearDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData);
+    void GetYearDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData);
+    void ClearYearDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
 
     bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
@@ -284,12 +295,22 @@ struct EmberAfPluginDoorLockWeekDaySchedule
     uint8_t endMinute;
 };
 
+struct EmberAfPluginDoorLockYearDaySchedule
+{
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+};
+
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule);
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockYearDaySchedule & schedule);
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute);
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
 
 typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 

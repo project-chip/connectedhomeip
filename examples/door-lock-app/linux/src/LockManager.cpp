@@ -69,11 +69,24 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
         numberOfWeekDaySchedulesPerUser = 10;
     }
 
-    mEndpoints.push_back(
-        LockEndpoint(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser));
+    uint8_t numberOfYearDaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYearDaySchedulesPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported year day schedules per user when initializing lock endpoint, defaulting to "
+                     "10 [endpointId=%d]",
+                     endpointId);
+        numberOfYearDaySchedulesPerUser = 10;
+    }
 
-    ChipLogProgress(Zcl, "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d]",
-                    endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser);
+    mEndpoints.push_back(LockEndpoint(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials,
+                                      numberOfWeekDaySchedulesPerUser, numberOfYearDaySchedulesPerUser));
+
+    ChipLogProgress(
+        Zcl,
+        "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d,yearDaySchedulesPerUser=%d]",
+        endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
+        numberOfYearDaySchedulesPerUser);
 
     return true;
 }
@@ -174,6 +187,32 @@ DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIn
         return DlStatus::kFailure;
     }
     return lockEndpoint->SetSchedule(weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
+}
+
+DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                  EmberAfPluginDoorLockYearDaySchedule & schedule)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to get the year day schedule - endpoint does not exist or not initialized [endpointId=%d]",
+                     endpointId);
+        return DlStatus::kFailure;
+    }
+    return lockEndpoint->GetSchedule(yearDayIndex, userIndex, schedule);
+}
+
+DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                  uint32_t localStartTime, uint32_t localEndTime)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to set the year day schedule - endpoint does not exist or not initialized [endpointId=%d]",
+                     endpointId);
+        return DlStatus::kFailure;
+    }
+    return lockEndpoint->SetSchedule(yearDayIndex, userIndex, status, localStartTime, localEndTime);
 }
 
 LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)
