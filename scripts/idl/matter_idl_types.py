@@ -13,6 +13,7 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     GLOBAL = enum.auto()
+    NOSUBSCRIBE = enum.auto()
 
 
 class EventPriority(enum.Enum):

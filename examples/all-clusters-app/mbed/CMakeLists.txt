@@ -138,6 +138,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
                ${APP_CLUSTERS}/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
+               ${APP_CLUSTERS}/power-source-server/power-source-server.cpp
                ${APP_CLUSTERS}/ota-requestor/ota-requestor-server.cpp
                ${APP_CLUSTERS}/ota-requestor/BDXDownloader.cpp
                ${APP_CLUSTERS}/ota-requestor/OTARequestor.cpp

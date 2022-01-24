@@ -179,8 +179,8 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId,
-                                              &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex));
+    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress),
+                                              GetDeviceId(), &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex));
     mState = ConnectionState::SecureConnected;
 
 exit:
@@ -200,6 +200,16 @@ bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port
     addr = mDeviceAddress.GetIPAddress();
     port = mDeviceAddress.GetPort();
     return true;
+}
+
+CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(const Crypto::P256PublicKey & rootPublicKey, ByteSpan noc)
+{
+    CompressedFabricId compressedFabricId;
+    NodeId nodeId;
+    ReturnErrorOnFailure(
+        Credentials::ExtractNodeIdCompressedFabricIdFromRootPubKeyOpCert(rootPublicKey, noc, compressedFabricId, nodeId));
+    mPeerId = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
+    return CHIP_NO_ERROR;
 }
 
 void CommissioneeDeviceProxy::ReleaseDAC()

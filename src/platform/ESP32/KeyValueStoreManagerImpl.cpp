@@ -87,6 +87,17 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR KeyValueStoreManagerImpl::EraseAll(void)
+{
+    Internal::ScopedNvsHandle handle;
+
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
+    ReturnMappedErrorOnFailure(nvs_erase_all(handle));
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace PersistedStorage
 } // namespace DeviceLayer
 } // namespace chip
