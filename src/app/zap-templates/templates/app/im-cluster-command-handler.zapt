@@ -24,14 +24,13 @@ namespace app {
 
 namespace Clusters {
 
-{{#all_user_clusters}}
-{{#if (isServer side)}}
-{{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asUpperCamelCase name}} {
+{{#all_user_clusters_with_incoming_commands}}
+{{#if (isServer clusterSide)}}
+namespace {{asUpperCamelCase clusterName}} {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    {{#chip_available_cluster_commands}}
+    {{#all_incoming_commands_for_cluster clusterName clusterSide isMfgSpecific="false"}}
     {{#first}}
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled = false;
@@ -39,7 +38,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
     {{/first}}
-        case Commands::{{asUpperCamelCase name}}::Id: {
+        case Commands::{{asUpperCamelCase commandName}}::Id: {
         {{> im_command_handler_cluster_commands}}
             break;
         }
@@ -59,17 +58,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
       ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
     {{/last}}
-    {{else}}
-    apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-    {{/chip_available_cluster_commands}}
+    {{/all_incoming_commands_for_cluster}}
 }
 
 }
 
 {{/if}}
-{{/if}}
-{{/all_user_clusters}}
+{{/all_user_clusters_with_incoming_commands}}
 
 } // namespace Clusters
 

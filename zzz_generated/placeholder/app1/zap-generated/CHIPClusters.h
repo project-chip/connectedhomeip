@@ -35,6 +35,60 @@ class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 public:
     GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
     ~GeneralCommissioningCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR ArmFailSafeResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t errorCode, chip::CharSpan debugText);
+    CHIP_ERROR CommissioningCompleteResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint8_t errorCode, chip::CharSpan debugText);
+    CHIP_ERROR SetRegulatoryConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t errorCode, chip::CharSpan debugText);
+};
+
+class DLL_EXPORT GroupsCluster : public ClusterBase
+{
+public:
+    GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
+    ~GroupsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AddGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
+                                uint16_t groupId);
+    CHIP_ERROR GetGroupMembershipResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t capacity, /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+    CHIP_ERROR RemoveGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t status, uint16_t groupId);
+    CHIP_ERROR ViewGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
+                                 uint16_t groupId, chip::CharSpan groupName);
+};
+
+class DLL_EXPORT IdentifyCluster : public ClusterBase
+{
+public:
+    IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
+    ~IdentifyCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR IdentifyQueryResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint16_t timeout);
+};
+
+class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
+{
+public:
+    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
+    ~NetworkCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ConnectNetworkResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t networkingStatus, chip::CharSpan debugText, int32_t errorValue);
+    CHIP_ERROR NetworkConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t networkingStatus, chip::CharSpan debugText);
+    CHIP_ERROR ScanNetworksResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t networkingStatus, chip::CharSpan debugText);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
@@ -44,11 +98,43 @@ public:
     ~OperationalCredentialsCluster() {}
 };
 
-class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
-    ~TemperatureMeasurementCluster() {}
+    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
+    ~OperationalCredentialsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AttestationResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   chip::ByteSpan attestationElements, chip::ByteSpan signature);
+    CHIP_ERROR CertificateChainResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        chip::ByteSpan certificate);
+    CHIP_ERROR NOCResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t statusCode,
+                           uint8_t fabricIndex, chip::CharSpan debugText);
+    CHIP_ERROR OpCSRResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             chip::ByteSpan NOCSRElements, chip::ByteSpan attestationSignature);
+};
+
+class DLL_EXPORT ScenesCluster : public ClusterBase
+{
+public:
+    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
+    ~ScenesCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AddSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
+                                uint16_t groupId, uint8_t sceneId);
+    CHIP_ERROR GetSceneMembershipResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+                                          /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+    CHIP_ERROR RemoveAllScenesResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint8_t status, uint16_t groupId);
+    CHIP_ERROR RemoveSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t status, uint16_t groupId, uint8_t sceneId);
+    CHIP_ERROR StoreSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t status, uint16_t groupId, uint8_t sceneId);
+    CHIP_ERROR ViewSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
+                                 uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName);
 };
 
 } // namespace Controller

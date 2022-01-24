@@ -309,9 +309,9 @@ exit:
 }
 
 // OtaSoftwareUpdateProvider Cluster Commands
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateResponse(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint8_t action,
-                                                                 uint32_t delayedActionTime)
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback,
+                                                                chip::ByteSpan updateToken, uint32_t newVersion)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -324,7 +324,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateResponse(Callback::Cance
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id,
+                                         OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -335,10 +335,10 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateResponse(Callback::Cance
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // action: OTAApplyUpdateAction
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), action));
-    // delayedActionTime: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), delayedActionTime));
+    // updateToken: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    // newVersion: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), newVersion));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -354,12 +354,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImageResponse(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint8_t status,
-                                                                uint32_t delayedActionTime, chip::CharSpan imageURI,
-                                                                uint32_t softwareVersion, chip::CharSpan softwareVersionString,
-                                                                chip::ByteSpan updateToken, bool userConsentNeeded,
-                                                                chip::ByteSpan metadataForRequestor)
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback,
+                                                                 chip::ByteSpan updateToken, uint32_t softwareVersion)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -372,7 +369,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImageResponse(Callback::Cancel
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
+                                         OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -383,22 +380,70 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImageResponse(Callback::Cancel
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // status: OTAQueryStatus
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
-    // delayedActionTime: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), delayedActionTime));
-    // imageURI: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), imageURI));
-    // softwareVersion: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
-    // softwareVersionString: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), softwareVersionString));
     // updateToken: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
-    // userConsentNeeded: boolean
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userConsentNeeded));
-    // metadataForRequestor: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForRequestor));
+    // softwareVersion: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, chip::VendorId vendorId,
+                                                        uint16_t productId, uint32_t softwareVersion,
+                                                        /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported,
+                                                        uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                                                        chip::ByteSpan metadataForProvider)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // vendorId: vendorId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
+    // productId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), productId));
+    // softwareVersion: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
+    // protocolsSupported: OTADownloadProtocol
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
+    // hardwareVersion: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
+    // location: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location));
+    // requestorCanConsent: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
+    // metadataForProvider: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForProvider));
 
     SuccessOrExit(err = sender->FinishCommand());
 
