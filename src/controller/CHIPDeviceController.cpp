@@ -1628,7 +1628,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kGetNetworkTechnology: {
         ChipLogProgress(Controller, "Sending request for network cluster feature map");
         NetworkCommissioningCluster netCom;
-        // TODO: swap to givin endpoint once that PR is merged
+        // TODO: swap to given endpoint once that PR is merged
         netCom.Associate(proxy, 0);
         netCom.ReadAttribute<app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(this, OnFeatureMapSuccess,
                                                                                                     AttributeReadFailure);
