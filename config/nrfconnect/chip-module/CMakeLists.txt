@@ -150,6 +150,12 @@ if (CONFIG_CHIP_OPENTHREAD_CONFIG)
     zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
 endif()
 
+# Set up Zephyr symbol level
+
+if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+    set_compiler_property(PROPERTY debug -g0)
+endif()
+
 # Find required programs
 
 find_program(GN_EXECUTABLE gn)
@@ -201,8 +207,8 @@ chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
-    chip_gn_arg_bool  ("chip_enable_rotating_device_id"          "true")
-    chip_gn_arg_bool  ("chip_enable_additional_data_advertising" "true")
+    chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
+    chip_gn_arg_bool("chip_enable_additional_data_advertising" "true")
 endif()
 
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
@@ -218,6 +224,10 @@ if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
 elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
+endif()
+
+if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+    chip_gn_arg_string("symbol_level" "0")
 endif()
 
 if (CONFIG_CHIP_PW_RPC)
