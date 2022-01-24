@@ -24,6 +24,7 @@
 struct LockUserInfo;
 struct LockCredentialInfo;
 struct WeekDaysScheduleInfo;
+struct YearDayScheduleInfo;
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
 
@@ -31,11 +32,12 @@ class LockEndpoint
 {
 public:
     LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported,
-                 uint8_t weekDaySchedulesPerUser) :
+                 uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser) :
         mEndpointId(endpointId),
         mLockState(DlLockState::kLocked), mLockUsers(numberOfLockUsersSupported),
         mLockCredentials(numberOfCredentialsSupported + 1),
-        mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser))
+        mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser)),
+        mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(numberOfLockUsersSupported))
     {}
 
     inline chip::EndpointId GetEndpointId() { return mEndpointId; }
@@ -55,8 +57,11 @@ public:
                        const chip::ByteSpan & credentialData);
 
     DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
     DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DlDaysMaskMap daysMask,
                          uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
+                         uint32_t localEndTime);
 
 private:
     bool setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin);
@@ -70,6 +75,7 @@ private:
     std::vector<LockUserInfo> mLockUsers;
     std::vector<LockCredentialInfo> mLockCredentials;
     std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
+    std::vector<std::vector<YearDayScheduleInfo>> mYearDaySchedules;
 };
 
 struct LockUserInfo
@@ -97,4 +103,10 @@ struct WeekDaysScheduleInfo
 {
     DlScheduleStatus status;
     EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
 };

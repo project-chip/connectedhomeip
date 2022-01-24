@@ -232,6 +232,50 @@ DlStatus LockEndpoint::SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
+DlStatus LockEndpoint::GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
+{
+    if (0 == userIndex || userIndex > mYearDaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    if (0 == yearDayIndex || yearDayIndex > mYearDaySchedules.at(userIndex - 1).size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    const auto & scheduleInStorage = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
+
+    schedule = scheduleInStorage.schedule;
+
+    return DlStatus::kSuccess;
+}
+
+DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                   uint32_t localEndTime)
+{
+    if (0 == userIndex || userIndex > mYearDaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    if (0 == yearDayIndex || yearDayIndex > mYearDaySchedules.at(userIndex - 1).size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    auto & scheduleInStorage = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime = localEndTime;
+    scheduleInStorage.status = status;
+
+    return DlStatus::kSuccess;
+}
+
 bool LockEndpoint::setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin)
 {
     if (mLockState == lockState)
