@@ -210,7 +210,7 @@ public:
 
     WriteClient::Callback * GetChunkedCallback() { return &mCallback; }
 
-    void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, app::StatusIB aStatus) override
+    void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & aPath, app::StatusIB aStatus) override
     {
         gOnWriteResponseCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                  to_underlying(aStatus.mStatus));

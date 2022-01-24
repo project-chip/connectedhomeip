@@ -82,7 +82,8 @@ DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 class TestWriteCallback : public app::WriteClient::Callback
 {
 public:
-    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath, app::StatusIB status) override
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
+                    app::StatusIB status) override
     {
         if (status.mStatus == Protocols::InteractionModel::Status::Success)
         {
@@ -183,8 +184,8 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
 
         gIterationCount = (uint32_t) i;
 
-        app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
-        writeClient.SetWriterReserved(static_cast<uint16_t>(800 + i));
+        app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+                                     static_cast<uint16_t>(800 + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength];
 
