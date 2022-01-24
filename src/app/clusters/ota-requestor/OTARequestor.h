@@ -254,19 +254,19 @@ private:
      * QueryImage callbacks
      */
     static void OnQueryImageResponse(void * context, const QueryImageResponseDecodableType & response);
-    static void OnQueryImageFailure(void * context, EmberAfStatus status);
+    static void OnQueryImageFailure(void * context, CHIP_ERROR error);
 
     /**
      * ApplyUpdate callbacks
      */
     static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
-    static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+    static void OnApplyUpdateFailure(void * context, CHIP_ERROR error);
 
     /**
      * NotifyUpdateApplied callbacks
      */
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
-    static void OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus);
+    static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     NodeId mProviderNodeId                    = kUndefinedNodeId;

@@ -25,6 +25,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 typedef CHIP_ERROR (^CHIPActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 template <class T> class CHIPCallbackBridge {
 public:
@@ -52,7 +53,7 @@ public:
 
     virtual ~CHIPCallbackBridge() {};
 
-    static void OnFailureFn(void * context, uint8_t status) { DispatchFailure(context, [CHIPError errorForZCLErrorCode:status]); }
+    static void OnFailureFn(void * context, CHIP_ERROR error) { DispatchFailure(context, [CHIPError errorForCHIPErrorCode:error]); }
 
     static void DispatchSuccess(void * context, id value) { DispatchCallbackResult(context, nil, value); }
 
@@ -92,5 +93,5 @@ private:
     bool mKeepAlive;
 
     chip::Callback::Callback<T> mSuccess;
-    chip::Callback::Callback<DefaultFailureCallback> mFailure;
+    chip::Callback::Callback<CHIPDefaultFailureCallbackType> mFailure;
 };

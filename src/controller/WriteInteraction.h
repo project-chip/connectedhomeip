@@ -46,9 +46,8 @@ public:
     //
     // In the latter case, path will be non-null. Otherwise, it shall be null.
     //
-    using OnErrorCallbackType =
-        std::function<void(const app::ConcreteAttributePath * path, app::StatusIB status, CHIP_ERROR aError)>;
-    using OnDoneCallbackType = std::function<void(app::WriteClient *)>;
+    using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * path, CHIP_ERROR err)>;
+    using OnDoneCallbackType  = std::function<void(app::WriteClient *)>;
 
     WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
@@ -56,20 +55,17 @@ public:
 
     void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath, app::StatusIB status) override
     {
-        if (status.mStatus == Protocols::InteractionModel::Status::Success)
+        if (status.IsSuccess())
         {
             mOnSuccess(aPath);
         }
         else
         {
-            mOnError(&aPath, status, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+            mOnError(&aPath, status.ToChipError());
         }
     }
 
-    void OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError) override
-    {
-        mOnError(nullptr, aStatus, aError);
-    }
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone(app::WriteClient * apWriteClient) override
     {

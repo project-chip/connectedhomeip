@@ -18,8 +18,11 @@
 #import "CHIPError.h"
 #import "CHIPError_Internal.h"
 
+#import <app/MessageDef/StatusIB.h>
 #import <app/util/af-enums.h>
+#import <app/util/error-mapping.h>
 #import <inet/InetError.h>
+#import <lib/support/TypeTraits.h>
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
@@ -27,6 +30,16 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
+    if (errorCode == CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (errorCode.IsIMStatus()) {
+        chip::app::StatusIB status(errorCode);
+        // TODO: What about the cluster-specific part of the status?
+        return [CHIPError errorForZCLErrorCode:chip::app::ToEmberAfStatus(status.mStatus)];
+    }
+
     if (errorCode == CHIP_ERROR_INVALID_STRING_LENGTH) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidStringLength
@@ -67,10 +80,6 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeConstraintError
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Value out of range.", nil) }];
-    }
-
-    if (errorCode == CHIP_NO_ERROR) {
-        return nil;
     }
 
     return [NSError errorWithDomain:CHIPErrorDomain

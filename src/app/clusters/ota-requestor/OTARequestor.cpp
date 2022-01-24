@@ -148,13 +148,13 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     }
 }
 
-void OTARequestor::OnQueryImageFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
 }
 
 void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
@@ -180,24 +180,24 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
     }
 }
 
-void OTARequestor::OnApplyUpdateFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, error);
 }
 
 void OTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) {}
 
-void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, error);
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
