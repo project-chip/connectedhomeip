@@ -1,6 +1,7 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
+{{#all_user_clusters_with_outgoing_commands}}
+{{#first}}
 // Prevent multiple inclusion
 #pragma once
 
@@ -14,15 +15,16 @@
 namespace chip {
 namespace Controller {
 
-{{#chip_client_clusters}}
-class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
+{{/first}}
+class DLL_EXPORT {{asUpperCamelCase clusterName}}Cluster : public ClusterBase
 {
 public:
-    {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
-    ~{{asUpperCamelCase name}}Cluster() {}
+    {{asUpperCamelCase clusterName}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase clusterName}}::Id) {}
+    ~{{asUpperCamelCase clusterName}}Cluster() {}
 };
 
-{{/chip_client_clusters}}
+{{#last}}
 } // namespace Controller
 } // namespace chip
-{{/if}}
+{{/last}}
+{{/all_user_clusters_with_outgoing_commands}}

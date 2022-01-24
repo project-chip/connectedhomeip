@@ -30,13 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT AccessControlCluster : public ClusterBase
-{
-public:
-    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
-    ~AccessControlCluster() {}
-};
-
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:
@@ -51,18 +44,20 @@ public:
     ~AdministratorCommissioningCluster() {}
 };
 
-class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
-{
-public:
-    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
-    ~ApplicationBasicCluster() {}
-};
-
 class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
 {
 public:
     ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
     ~ApplicationLauncherCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::CharSpan data);
+    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
@@ -100,25 +95,11 @@ public:
     ~BindingCluster() {}
 };
 
-class DLL_EXPORT BooleanStateCluster : public ClusterBase
-{
-public:
-    BooleanStateCluster() : ClusterBase(app::Clusters::BooleanState::Id) {}
-    ~BooleanStateCluster() {}
-};
-
 class DLL_EXPORT BridgedActionsCluster : public ClusterBase
 {
 public:
     BridgedActionsCluster() : ClusterBase(app::Clusters::BridgedActions::Id) {}
     ~BridgedActionsCluster() {}
-};
-
-class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
-{
-public:
-    BridgedDeviceBasicCluster() : ClusterBase(app::Clusters::BridgedDeviceBasic::Id) {}
-    ~BridgedDeviceBasicCluster() {}
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
@@ -140,6 +121,7 @@ class DLL_EXPORT ContentLauncherCluster : public ClusterBase
 public:
     ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
     ~ContentLauncherCluster() {}
+<<<<<<< HEAD
 };
 
 class DLL_EXPORT DescriptorCluster : public ClusterBase
@@ -147,6 +129,14 @@ class DLL_EXPORT DescriptorCluster : public ClusterBase
 public:
     DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
     ~DescriptorCluster() {}
+=======
+
+    // Cluster Commands
+    CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    bool autoPlay, chip::CharSpan data);
+    CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::CharSpan contentURL, chip::CharSpan displayString);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
@@ -161,13 +151,23 @@ class DLL_EXPORT DoorLockCluster : public ClusterBase
 public:
     DoorLockCluster() : ClusterBase(app::Clusters::DoorLock::Id) {}
     ~DoorLockCluster() {}
-};
+<<<<<<< HEAD
+=======
 
-class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase
-{
-public:
-    ElectricalMeasurementCluster() : ClusterBase(app::Clusters::ElectricalMeasurement::Id) {}
-    ~ElectricalMeasurementCluster() {}
+    // Cluster Commands
+    CHIP_ERROR ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ClearUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
+    CHIP_ERROR GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR GetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
+    CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
+    CHIP_ERROR SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             uint8_t operationType, chip::ByteSpan credentialData, uint16_t userIndex, uint8_t userStatus);
+    CHIP_ERROR SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t operationType,
+                       uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
+                       uint8_t credentialRule);
+    CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          chip::ByteSpan pinCode);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT EthernetNetworkDiagnosticsCluster : public ClusterBase
@@ -177,20 +177,6 @@ public:
     ~EthernetNetworkDiagnosticsCluster() {}
 };
 
-class DLL_EXPORT FixedLabelCluster : public ClusterBase
-{
-public:
-    FixedLabelCluster() : ClusterBase(app::Clusters::FixedLabel::Id) {}
-    ~FixedLabelCluster() {}
-};
-
-class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
-{
-public:
-    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
-    ~FlowMeasurementCluster() {}
-};
-
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
@@ -198,18 +184,23 @@ public:
     ~GeneralCommissioningCluster() {}
 };
 
-class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
-{
-public:
-    GeneralDiagnosticsCluster() : ClusterBase(app::Clusters::GeneralDiagnostics::Id) {}
-    ~GeneralDiagnosticsCluster() {}
-};
-
 class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
 {
 public:
     GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
     ~GroupKeyManagementCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          uint16_t groupKeySetID);
+    CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
+    CHIP_ERROR KeySetRemove(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            uint16_t groupKeySetID);
+    CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase
@@ -217,6 +208,20 @@ class DLL_EXPORT GroupsCluster : public ClusterBase
 public:
     GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
     ~GroupsCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
+                        chip::CharSpan groupName);
+    CHIP_ERROR AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint16_t groupId, chip::CharSpan groupName);
+    CHIP_ERROR GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+    CHIP_ERROR RemoveAllGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId);
+    CHIP_ERROR ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT IdentifyCluster : public ClusterBase
@@ -224,13 +229,6 @@ class DLL_EXPORT IdentifyCluster : public ClusterBase
 public:
     IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
     ~IdentifyCluster() {}
-};
-
-class DLL_EXPORT IlluminanceMeasurementCluster : public ClusterBase
-{
-public:
-    IlluminanceMeasurementCluster() : ClusterBase(app::Clusters::IlluminanceMeasurement::Id) {}
-    ~IlluminanceMeasurementCluster() {}
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
@@ -245,13 +243,6 @@ class DLL_EXPORT LevelControlCluster : public ClusterBase
 public:
     LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
     ~LevelControlCluster() {}
-};
-
-class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
-{
-public:
-    LocalizationConfigurationCluster() : ClusterBase(app::Clusters::LocalizationConfiguration::Id) {}
-    ~LocalizationConfigurationCluster() {}
 };
 
 class DLL_EXPORT LowPowerCluster : public ClusterBase
@@ -294,6 +285,19 @@ class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 public:
     OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
     ~OtaSoftwareUpdateProviderCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::ByteSpan updateToken, uint32_t newVersion);
+    CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   chip::ByteSpan updateToken, uint32_t softwareVersion);
+    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion,
+                          /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint16_t hardwareVersion,
+                          chip::CharSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT OtaSoftwareUpdateRequestorCluster : public ClusterBase
@@ -303,25 +307,11 @@ public:
     ~OtaSoftwareUpdateRequestorCluster() {}
 };
 
-class DLL_EXPORT OccupancySensingCluster : public ClusterBase
-{
-public:
-    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
-    ~OccupancySensingCluster() {}
-};
-
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
     OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
     ~OnOffCluster() {}
-};
-
-class DLL_EXPORT OnOffSwitchConfigurationCluster : public ClusterBase
-{
-public:
-    OnOffSwitchConfigurationCluster() : ClusterBase(app::Clusters::OnOffSwitchConfiguration::Id) {}
-    ~OnOffSwitchConfigurationCluster() {}
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
@@ -331,46 +321,30 @@ public:
     ~OperationalCredentialsCluster() {}
 };
 
-class DLL_EXPORT PowerSourceCluster : public ClusterBase
-{
-public:
-    PowerSourceCluster() : ClusterBase(app::Clusters::PowerSource::Id) {}
-    ~PowerSourceCluster() {}
-};
-
-class DLL_EXPORT PowerSourceConfigurationCluster : public ClusterBase
-{
-public:
-    PowerSourceConfigurationCluster() : ClusterBase(app::Clusters::PowerSourceConfiguration::Id) {}
-    ~PowerSourceConfigurationCluster() {}
-};
-
-class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
-{
-public:
-    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
-    ~PressureMeasurementCluster() {}
-};
-
-class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
-{
-public:
-    PumpConfigurationAndControlCluster() : ClusterBase(app::Clusters::PumpConfigurationAndControl::Id) {}
-    ~PumpConfigurationAndControlCluster() {}
-};
-
-class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
-{
-public:
-    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
-    ~RelativeHumidityMeasurementCluster() {}
-};
-
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
     ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
     ~ScenesCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
+                        uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName);
+    CHIP_ERROR GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint16_t groupId);
+    CHIP_ERROR RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
+                           uint8_t sceneId, uint16_t transitionTime);
+    CHIP_ERROR RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                               uint16_t groupId);
+    CHIP_ERROR RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
+                           uint8_t sceneId);
+    CHIP_ERROR StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
+                          uint8_t sceneId);
+    CHIP_ERROR ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
+                         uint8_t sceneId);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT SoftwareDiagnosticsCluster : public ClusterBase
@@ -380,13 +354,6 @@ public:
     ~SoftwareDiagnosticsCluster() {}
 };
 
-class DLL_EXPORT SwitchCluster : public ClusterBase
-{
-public:
-    SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
-    ~SwitchCluster() {}
-};
-
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 {
 public:
@@ -394,18 +361,43 @@ public:
     ~TargetNavigatorCluster() {}
 };
 
-class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
-{
-public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
-    ~TemperatureMeasurementCluster() {}
-};
-
 class DLL_EXPORT TestClusterCluster : public ClusterBase
 {
 public:
     TestClusterCluster() : ClusterBase(app::Clusters::TestCluster::Id) {}
     ~TestClusterCluster() {}
+<<<<<<< HEAD
+=======
+
+    // Cluster Commands
+    CHIP_ERROR SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestAddArguments(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t arg1,
+                                uint8_t arg2);
+    CHIP_ERROR TestEmitTestEventRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint8_t arg1, uint8_t arg2, bool arg3);
+    CHIP_ERROR TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::VendorId arg1, uint8_t arg2);
+    CHIP_ERROR TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+    CHIP_ERROR TestListInt8UReverseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+    CHIP_ERROR TestListNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestNestedStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestNullableOptionalRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t arg1);
+    CHIP_ERROR TestSimpleOptionalArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 bool arg1);
+    CHIP_ERROR TestSpecific(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestUnknownCommand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TimedInvokeRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT ThermostatCluster : public ClusterBase
@@ -413,13 +405,20 @@ class DLL_EXPORT ThermostatCluster : public ClusterBase
 public:
     ThermostatCluster() : ClusterBase(app::Clusters::Thermostat::Id) {}
     ~ThermostatCluster() {}
-};
+<<<<<<< HEAD
+=======
 
-class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
-{
-public:
-    ThermostatUserInterfaceConfigurationCluster() : ClusterBase(app::Clusters::ThermostatUserInterfaceConfiguration::Id) {}
-    ~ThermostatUserInterfaceConfigurationCluster() {}
+    // Cluster Commands
+    CHIP_ERROR ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR GetRelayStatusLog(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR GetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint8_t daysToReturn, uint8_t modeToReturn);
+    CHIP_ERROR SetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                 /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+    CHIP_ERROR SetpointRaiseLower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t mode,
+                                  int8_t amount);
+>>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
 class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase

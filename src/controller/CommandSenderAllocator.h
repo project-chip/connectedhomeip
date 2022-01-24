@@ -31,5 +31,7 @@ class CommandSenderPlatformDeleter
 public:
     void operator()(app::CommandSender * commandSender) const { chip::Platform::Delete(commandSender); }
 };
+
+using CommandSenderHandle = std::unique_ptr<app::CommandSender, CommandSenderPlatformDeleter>;
 } // namespace Controller
 } // namespace chip
