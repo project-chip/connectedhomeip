@@ -98,7 +98,6 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ rm -rf out/
 
-
 *   Build the example as Sleepy End Device (SED)
 
           $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app_SED BRD4161A --sed
