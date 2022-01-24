@@ -86,7 +86,7 @@ public:
         mBdxDownloader      = downloader;
 
         uint32_t version;
-        VerifyOrDie(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version) == CHIP_NO_ERROR);
+        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
