@@ -26,6 +26,15 @@ pw_python_package("idl") {
 
     # Templates used for generation
     "generators/java/ChipClustersRead.jinja",
+
+    # Unit test data
+    "tests/available_tests.yaml",
+    "tests/inputs/cluster_struct_attribute.matter",
+    "tests/inputs/global_struct_attribute.matter",
+    "tests/inputs/simple_attribute.matter",
+    "tests/outputs/cluster_struct_attribute/jni/CHIPClustersRead.cpp",
+    "tests/outputs/global_struct_attribute/jni/CHIPClustersRead.cpp",
+    "tests/outputs/simple_attribute/jni/CHIPClustersRead.cpp",
   ]
 
   sources = [
@@ -38,5 +47,8 @@ pw_python_package("idl") {
     "matter_idl_types.py",
   ]
 
-  tests = [ "test_matter_idl_parser.py" ]
+  tests = [
+    "test_matter_idl_parser.py",
+    "test_generators.py",
+  ]
 }

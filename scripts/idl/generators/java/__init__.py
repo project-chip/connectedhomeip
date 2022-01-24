@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from idl.generators import CodeGenerator
+from idl.generators import CodeGenerator, GeneratorStorage
 from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute
 from idl import matter_idl_types
 from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType
@@ -100,8 +100,8 @@ class JavaGenerator(CodeGenerator):
     Generation of java code for matter.
     """
 
-    def __init__(self, output_dir: str, idl: Idl):
-        super().__init__(output_dir, idl)
+    def __init__(self, storage: GeneratorStorage, idl: Idl):
+        super().__init__(storage, idl)
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName

@@ -19,15 +19,15 @@ import coloredlogs
 import enum
 
 try:
-    from .idl.matter_idl_parser import CreateParser
-    from .idl.generators.java import JavaGenerator
+    from idl.matter_idl_parser import CreateParser
 except:
     import os
     import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
     from idl.matter_idl_parser import CreateParser
-    from idl.generators.java import JavaGenerator
+
+from idl.generators import FileSystemGeneratorStorage
+from idl.generators.java import JavaGenerator
 
 
 class CodeGeneratorTypes(enum.Enum):
@@ -90,7 +90,7 @@ def main(log_level, generator, output_dir, dry_run, idl_path):
 
     logging.info("Running code generator %s" % generator)
     generator = __GENERATORS__[generator].CreateGenerator(
-        output_dir=output_dir, idl=idl_tree)
+        storage=FileSystemGeneratorStorage(output_dir), idl=idl_tree)
     generator.render(dry_run)
     logging.info("Done")
 

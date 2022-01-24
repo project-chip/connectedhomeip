@@ -23,14 +23,65 @@ from idl.matter_idl_types import Idl
 from .filters import RegisterCommonFilters
 
 
+class GeneratorStorage:
+    """
+    Handles file operations for generator output. Specificall can create
+    required files for output.
+
+    Is overriden for unit tests.
+    """
+
+    def get_existing_data(self, relative_path: str):
+        """Gets the existing data at the given path.
+        If such data does not exist, will return None.
+        """
+        raise NotImplementedError()
+
+    def write_new_data(self, relative_path: str, content: str):
+        """Write new data to the given path."""
+        raise NotImplementedError()
+
+
+class FileSystemGeneratorStorage(GeneratorStorage):
+    def __init__(self, output_dir: str):
+        self.output_dir = output_dir
+
+    def get_existing_data(self, relative_path: str):
+        """Gets the existing data at the given path.
+        If such data does not exist, will return None.
+        """
+        target = os.path.join(self.output_dir, relative_path)
+
+        if not os.path.exists(target):
+            return None
+
+        logging.info("Checking existing data in %s" % target)
+        with open(target, 'rt') as existing:
+            return existing.read()
+
+    def write_new_data(self, relative_path: str, content: str):
+        """Write new data to the given path."""
+
+        target = os.path.join(self.output_dir, relative_path)
+        target_dir = os.path.dirname(target)
+        if not os.path.exists(target_dir):
+            logging.info("Creating output directory: %s" % target_dir)
+            os.makedirs(target_dir)
+
+        logging.info("Writing new data to: %s" % target)
+        with open(target, "wt") as out:
+            out.write(content)
+        logging.info("Generation for %s completed" % output_file_name)
+
+
 class CodeGenerator:
     """
     Defines the general interface for things that can
     generate code output.
     """
 
-    def __init__(self, output_dir: str, idl: Idl):
-        self.output_dir = output_dir
+    def __init__(self, storage: GeneratorStorage, idl: Idl):
+        self.storage = storage
         self.idl = idl
         self.jinja_env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(searchpath=os.path.dirname(__file__)))
@@ -80,23 +131,9 @@ class CodeGenerator:
         if self.dry_run:
             return
 
-        target = os.path.join(self.output_dir, output_file_name)
-        data = self.jinja_env.get_template(template_path).render(vars)
+        rendered = self.jinja_env.get_template(template_path).render(vars)
 
-        target_dir = os.path.dirname(target)
-        if not os.path.exists(target_dir):
-            logging.info("Creating output directory: %s" % target_dir)
-            os.makedirs(target_dir)
-        elif os.path.exists(target):
-            # Be friendly to builds systems: if content is identical, do not
-            # re-write it (as to not change the file stamp)
-            with open(target, "rt") as existing:
-                existing_data = existing.read()
-                if data == existing_data:
-                    logging.info("File content not changed: %s" % target)
-                    return
-
-        logging.info("Writing new data to: %s" % target)
-        with open(target, "wt") as target:
-            target.write(data)
-        logging.info("Generation for %s completed" % output_file_name)
+        if rendered == self.storage.get_existing_data(output_file_name):
+            logging.info("File content not changed")
+        else:
+            self.storage.write_new_data(output_file_name, rendered)
