@@ -43,7 +43,7 @@ using namespace chip::app::Clusters::WindowCovering;
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
 /*
- * ConvertValue: Permits to convert values from one range to another
+ * ConvertValue: Converts values from one range to another
  * Range In  -> from  inputLowValue to   inputHighValue
  * Range Out -> from outputLowValue to outputtHighValue
  * offset true  -> allows to take into account the minimum of each range in the conversion
