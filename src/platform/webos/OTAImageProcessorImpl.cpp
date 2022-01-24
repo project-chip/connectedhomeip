@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <platform/OTARequestorInterface.h>
 
 #include "OTAImageProcessorImpl.h"
 
@@ -42,6 +43,7 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -119,6 +121,21 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
+}
+
+void OTAImageProcessorImpl::HandleApply(intptr_t context)
+{
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor != nullptr)
+    {
+        requestor->NotifyUpdateApplied(imageProcessor->mHeader.softwareVersion);
+    }
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)

@@ -27,8 +27,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/webos/ConnectivityUtils.h>
-#include <platform/webos/DiagnosticDataProviderImpl.h>
+#include <platform/Linux/ConnectivityUtils.h>
+#include <platform/Linux/DiagnosticDataProviderImpl.h>
 
 #include <arpa/inet.h>
 #include <dirent.h>

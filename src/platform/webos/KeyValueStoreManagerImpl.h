@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <platform/webos/CHIPLinuxStorage.h>
+#include <platform/Linux/CHIPLinuxStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,7 +34,7 @@ class KeyValueStoreManagerImpl : public KeyValueStoreManager
 public:
     /**
      * @brief
-     * Initialize the KVS, must be called before using.
+     * Initalize the KVS, must be called before using.
      */
     void Init(const char * file) { mStorage.Init(file); }
 

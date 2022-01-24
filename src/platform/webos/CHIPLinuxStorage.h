@@ -34,7 +34,7 @@
 #pragma once
 
 #include <mutex>
-#include <platform/webos/CHIPLinuxStorageIni.h>
+#include <platform/Linux/CHIPLinuxStorageIni.h>
 
 #ifndef FATCONFDIR
 #define FATCONFDIR "/tmp"
