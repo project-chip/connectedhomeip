@@ -333,7 +333,7 @@ public:
     /**
      * The accessing subject descriptor for this write interaction.
      */
-    Access::SubjectDescriptor & GetSubjectDescriptor() { return mSubjectDescriptor; }
+    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
 private:
     TLV::TLVReader & mReader;
