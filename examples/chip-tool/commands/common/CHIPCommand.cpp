@@ -103,7 +103,7 @@ void CHIPCommand::SetIdentity(const char * identity)
 {
     std::string name = std::string(identity);
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
-        name.compare(kIdentityNull))
+        name.compare(kIdentityNull) != 0)
     {
         ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
                      kIdentityBeta, kIdentityGamma);
@@ -117,7 +117,7 @@ std::string CHIPCommand::GetIdentity()
 {
     std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
-        name.compare(kIdentityNull))
+        name.compare(kIdentityNull) != 0)
     {
         ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
                      kIdentityBeta, kIdentityGamma);
