@@ -211,7 +211,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
     }
 }
 
-CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac)
+CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject)
 {
     // Reuse ICA Cert buffer for temporary store Root Cert.
     MutableByteSpan rootCert = MutableByteSpan(mICACertBuffer);
@@ -236,6 +236,9 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
     {
         mParams.SetIcac(ByteSpan());
     }
+
+    mParams.SetIpk(ipk);
+    mParams.SetAdminSubject(adminSubject);
 
     return CHIP_NO_ERROR;
 }
@@ -278,7 +281,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     case CommissioningStage::kGenerateNOCChain:
         // For NOC chain generation, we re-use the buffers. NOCChainGenerated triggers the next stage before
         // storing the returned certs, so just return here without triggering the next stage.
-        return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac);
+        return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac, report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
     case CommissioningStage::kFindOperational:
         mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
         break;
