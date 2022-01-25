@@ -75,7 +75,8 @@ public:
 
     CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
-    CHIP_ERROR AddStatus(const AttributePathParams & aAttributePathParams, const Protocols::InteractionModel::Status aStatus);
+    CHIP_ERROR AddStatus(const ConcreteAttributePath & aPath, const Protocols::InteractionModel::Status aStatus);
+    CHIP_ERROR AddStatus(const ConcreteAttributePath & aPath, const StatusIB & aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
     {

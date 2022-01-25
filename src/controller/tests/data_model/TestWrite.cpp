@@ -90,13 +90,13 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
             VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+            ConcreteAttributePath attributePath(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
+            aWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
         }
         else
         {
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
+            ConcreteAttributePath attributePath(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
+            aWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Failure);
         }
 
         return CHIP_NO_ERROR;
