@@ -232,6 +232,8 @@ CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
 
     // invoker will be deleted by the onDone call before the return of InvokeGroupCommand
     // invoker should not be used after the InvokeGroupCommand call
+    //
+    //  We assume the aDevice already has a Case session which is way we can use he established Secure Session
     ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice->GetExchangeManager(),
                                                      aDevice->GetSecureSession().Value()->AsSecureSession()->GetFabricIndex(),
                                                      groupId, aRequestData));

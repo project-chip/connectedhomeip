@@ -256,8 +256,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                 {
                     ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %" PRIu8,
                                  groupInfo.group_id, fabric.GetFabricIndex());
-                    iterator->Release();
-                    SuccessOrExit(err);
+                    break;
                 }
             }
 
