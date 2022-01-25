@@ -203,7 +203,7 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleChangeChannel(match, responder);
+        delegate->HandleChangeChannel(responder, match);
     }
 
 exit:

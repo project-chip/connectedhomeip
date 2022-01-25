@@ -33,11 +33,10 @@ public:
     ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};
     ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
 
-    void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
-                             CommandResponseHelper<LaunchResponseType> & responser) override;
-    void HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
-                         const std::list<BrandingInformation> & brandingInformation,
-                         CommandResponseHelper<LaunchResponseType> & responser) override;
+    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper, const std::list<Parameter> & parameterList,
+                             bool autoplay, const CharSpan & data) override;
+    void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
+                         const CharSpan & displayString, const std::list<BrandingInformation> & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 

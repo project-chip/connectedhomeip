@@ -18,9 +18,10 @@
 #include "ChannelManager.h"
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::Channel;
 
-CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
@@ -42,7 +43,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder
     });
 }
 
-CHIP_ERROR ChannelManager::HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
     chip::app::Clusters::Channel::Structs::LineupInfo::Type lineup;
     lineup.operatorName   = chip::CharSpan("operatorName", strlen("operatorName"));
@@ -53,7 +54,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(chip::app::AttributeValueEncoder & aE
     return aEncoder.Encode(lineup);
 }
 
-CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEncoder)
 {
     chip::app::Clusters::Channel::Structs::ChannelInfo::Type currentChannel;
     currentChannel.affiliateCallSign = chip::CharSpan("exampleASign", strlen("exampleASign"));
@@ -65,11 +66,9 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEnco
     return aEncoder.Encode(currentChannel);
 }
 
-void ChannelManager::HandleChangeChannel(
-    const chip::CharSpan & match,
-    chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser)
+void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
 {
-    Commands::ChangeChannelResponse::Type response;
+    ChangeChannelResponseType response;
     response.channelMatch.majorNumber       = 1;
     response.channelMatch.minorNumber       = 0;
     response.channelMatch.name              = chip::CharSpan("name", strlen("name"));
@@ -77,7 +76,7 @@ void ChannelManager::HandleChangeChannel(
     response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
     response.errorType                      = chip::app::Clusters::Channel::ErrorTypeEnum::kMultipleMatches;
 
-    responser.Success(response);
+    helper.Success(response);
 }
 
 bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)

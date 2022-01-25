@@ -32,20 +32,20 @@ class AccountLoginManager : public AccountLoginDelegate
 {
 public:
     AccountLoginManager() : AccountLoginManager("tempPin123"){};
-    AccountLoginManager(const char * setupPIN);
+    AccountLoginManager(const char * setupPin);
 
-    inline void SetSetupPIN(char * setupPIN) override { CopyString(mSetupPIN, sizeof(mSetupPIN), setupPIN); };
+    inline void SetSetupPin(char * setupPin) override { CopyString(mSetupPin, sizeof(mSetupPin), setupPin); };
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
     bool HandleLogout() override;
     void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                            const CharSpan & tempAccountIdentifierString) override;
-    inline void GetSetupPin(char * setupPIN, int setupPINSize, const CharSpan & tempAccountIdentifierString) override
+    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override
     {
-        CopyString(setupPIN, setupPINSize, mSetupPIN);
+        CopyString(setupPin, setupPinSize, mSetupPin);
     };
 
 protected:
-    static const int kSetupPINSize = 12;
-    char mSetupPIN[kSetupPINSize];
+    static const size_t kSetupPinSize = 12;
+    char mSetupPin[kSetupPinSize];
 };

@@ -37,12 +37,11 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
-                                     CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
+    virtual void HandleLaunchContent(CommandResponseHelper<Commands::LaunchResponse::Type> & helper,
+                                     const std::list<Parameter> & parameterList, bool autoplay, const CharSpan & data) = 0;
 
-    virtual void HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
-                                 const std::list<BrandingInformation> & brandingInformation,
-                                 CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
+    virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LaunchResponse::Type> & helper, const CharSpan & contentUrl,
+                                 const CharSpan & displayString, const std::list<BrandingInformation> & brandingInformation) = 0;
 
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
 

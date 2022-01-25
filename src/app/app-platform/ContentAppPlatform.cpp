@@ -376,7 +376,7 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
         return 0;
     }
 
-    static const int kSetupPINSize = 12;
+    static const size_t kSetupPINSize = 12;
     char mSetupPIN[kSetupPINSize];
 
     app->GetAccountLoginDelegate()->GetSetupPin(mSetupPIN, kSetupPINSize, rotatingId);

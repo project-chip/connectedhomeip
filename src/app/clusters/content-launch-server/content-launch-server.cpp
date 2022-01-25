@@ -200,7 +200,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchContent(parameterList, autoplay, data, responder);
+        delegate->HandleLaunchContent(responder, parameterList, autoplay, data);
     }
 
 exit:
@@ -236,7 +236,7 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList, responder);
+        delegate->HandleLaunchUrl(responder, contentUrl, displayString, brandingInformationList);
     }
 
 exit:

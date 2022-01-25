@@ -29,8 +29,8 @@ ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderLis
     mSupportedStreamingProtocols = supportedStreamingProtocols;
 }
 
-void ContentLauncherManager::HandleLaunchContent(const list<Parameter> & parameterList, bool autoplay, const CharSpan & data,
-                                                 CommandResponseHelper<LaunchResponseType> & responser)
+void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                                                 const list<Parameter> & parameterList, bool autoplay, const CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
@@ -39,12 +39,11 @@ void ContentLauncherManager::HandleLaunchContent(const list<Parameter> & paramet
     // TODO: Insert code here
     response.data   = CharSpan("exampleData", strlen("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    responser.Success(response);
+    helper.Success(response);
 }
 
-void ContentLauncherManager::HandleLaunchUrl(const CharSpan & contentUrl, const CharSpan & displayString,
-                                             const list<BrandingInformation> & brandingInformation,
-                                             CommandResponseHelper<LaunchResponseType> & responser)
+void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
+                                             const CharSpan & displayString, const list<BrandingInformation> & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -55,7 +54,7 @@ void ContentLauncherManager::HandleLaunchUrl(const CharSpan & contentUrl, const 
     LaunchResponseType response;
     response.data   = CharSpan("exampleData", strlen("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    responser.Success(response);
+    helper.Success(response);
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)

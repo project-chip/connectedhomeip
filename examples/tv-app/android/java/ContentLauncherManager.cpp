@@ -43,9 +43,9 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::ContentLauncher::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-void ContentLauncherManager::HandleLaunchContent(
-    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
-    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                                                 const std::list<Parameter> & parameterList, bool autoplay,
+                                                 const chip::CharSpan & data)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -87,7 +87,7 @@ void ContentLauncherManager::HandleLaunchContent(
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
 
-        err = responser.Success(response);
+        err = helper.Success(response);
     }
 
 exit:
@@ -97,10 +97,9 @@ exit:
     }
 }
 
-void ContentLauncherManager::HandleLaunchUrl(
-    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-    const std::list<BrandingInformation> & brandingInformation,
-    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const chip::CharSpan & contentUrl,
+                                             const chip::CharSpan & displayString,
+                                             const std::list<BrandingInformation> & brandingInformation)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -143,7 +142,7 @@ void ContentLauncherManager::HandleLaunchUrl(
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
 
-        err = responser.Success(response);
+        err = helper.Success(response);
     }
 
 exit:
@@ -153,7 +152,7 @@ exit:
     }
 }
 
-CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();

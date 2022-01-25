@@ -78,11 +78,11 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
 
         CharSpan rotatingIdSpan = CharSpan(rotatingIdString, state->GetRotatingIdLength());
 
-        static const int kSetupPINSize = 12;
-        char mSetupPIN[kSetupPINSize];
+        static const size_t kSetupPinSize = 12;
+        char setupPin[kSetupPinSize];
 
-        app->GetAccountLoginDelegate()->GetSetupPin(mSetupPIN, kSetupPINSize, rotatingIdSpan);
-        std::string pinString(mSetupPIN);
+        app->GetAccountLoginDelegate()->GetSetupPin(setupPin, kSetupPinSize, rotatingIdSpan);
+        std::string pinString(setupPin);
 
         char * eptr;
         uint32_t pincode = (uint32_t) strtol(pinString.c_str(), &eptr, 10);
@@ -184,7 +184,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
             ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with endpoint id=%d ", endpoint);
             return CHIP_ERROR_BAD_REQUEST;
         }
-        app->GetAccountLoginDelegate()->SetSetupPIN(pincode);
+        app->GetAccountLoginDelegate()->SetSetupPin(pincode);
 
         ChipLogProgress(DeviceLayer, "set pin success");
 

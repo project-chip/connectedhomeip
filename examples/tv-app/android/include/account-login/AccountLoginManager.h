@@ -31,14 +31,14 @@ using GetSetupPINResponse  = chip::app::Clusters::AccountLogin::Commands::GetSet
 class AccountLoginManager : public AccountLoginDelegate
 {
 public:
-    inline void SetSetupPIN(char * setupPIN) override { return; };
+    inline void SetSetupPin(char * setupPin) override { return; };
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
     bool HandleLogout() override;
     void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                            const CharSpan & tempAccountIdentifierString) override;
-    inline void GetSetupPin(char * setupPIN, int setupPINSize, const CharSpan & tempAccountIdentifierString) override
+    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override
     {
-        CopyString(setupPIN, setupPINSize, "");
+        CopyString(setupPin, setupPinSize, "");
     };
 };
