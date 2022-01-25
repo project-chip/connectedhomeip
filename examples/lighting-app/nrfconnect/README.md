@@ -566,7 +566,6 @@ From within the console you can then invoke rpcs:
 
         rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
 
-
 ## Device Tracing
 
 Device tracing is available to analyze the device performance. To turn on
