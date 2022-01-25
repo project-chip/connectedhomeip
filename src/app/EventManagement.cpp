@@ -603,7 +603,8 @@ static bool IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, co
             }
             else if (eventLoadOutContext->mFabricIndex == event.mFabricIndex.Value())
             {
-                ChipLogError(EventLogging, "eventLoadOutContext->mFabricIndex and event.mFabricIndex.Value() is %u vs %u", eventLoadOutContext->mFabricIndex, eventLoadOutContext->mFabricIndex);
+                ChipLogError(EventLogging, "eventLoadOutContext->mFabricIndex and event.mFabricIndex.Value() is %u vs %u",
+                             eventLoadOutContext->mFabricIndex, eventLoadOutContext->mFabricIndex);
                 return true;
             }
         }
