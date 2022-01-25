@@ -205,10 +205,7 @@ public:
 
     void AdoptReadClient(chip::Platform::UniquePtr<chip::app::ReadClient> apReadClient) { mReadClient = std::move(apReadClient); }
 
-    void Shutdown()
-    {
-        mReadClient.reset();
-    }
+    void Shutdown() { mReadClient.reset(); }
 
 private:
     chip::Platform::UniquePtr<chip::app::ReadClient> mReadClient;
