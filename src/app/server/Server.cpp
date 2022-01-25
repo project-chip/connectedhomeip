@@ -237,6 +237,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     //
     // This is disabled for thread device because the same code is already present for thread devices in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
+    // https://github.com/project-chip/connectedhomeip/issues/14254
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     {
         ChipLogProgress(AppServer, "Adding Multicast groups");
