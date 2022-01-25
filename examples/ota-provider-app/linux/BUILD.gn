@@ -27,7 +27,10 @@ executable("chip-ota-provider-app") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  cflags = [ "-Wconversion", "-ljsoncpp" ]
+  cflags = [
+    "-Wconversion",
+    "-ljsoncpp",
+  ]
 
   output_dir = root_out_dir
 }
