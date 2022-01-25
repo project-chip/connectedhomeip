@@ -248,7 +248,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
     }
 
-    uint16_t softwareVersion;
+    uint32_t softwareVersion;
     if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
     {
         status = Attributes::SoftwareVersion::Set(endpoint, softwareVersion);

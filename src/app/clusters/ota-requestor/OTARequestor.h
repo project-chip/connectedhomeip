@@ -86,7 +86,7 @@ public:
         mBdxDownloader      = downloader;
 
         uint32_t version;
-        VerifyOrDie(app::Clusters::Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &version) == EMBER_ZCL_STATUS_SUCCESS);
+        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);

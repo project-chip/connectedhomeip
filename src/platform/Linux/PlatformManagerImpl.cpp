@@ -395,7 +395,7 @@ void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
     // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
     if (platformManagerDelegate != nullptr)
     {
-        uint16_t softwareVersion;
+        uint32_t softwareVersion;
 
         ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
         platformManagerDelegate->OnStartUp(softwareVersion);
