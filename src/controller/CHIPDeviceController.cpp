@@ -1180,16 +1180,16 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 
     // TODO(#13825): If not passed by the signer, the commissioner should
     // provide its current IPK to the commissionee in the AddNOC command.
-    const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
 
-    report.Set<NocChain>(NocChain(noc, icac, rcac,
-        ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
-        adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
+    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
+                                  adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
     err = commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1229,7 +1229,8 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk, const NodeId adminSubject)
+                                                          const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk,
+                                                          const NodeId adminSubject)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1238,8 +1239,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.AddNOC(
-        successCallback, failureCallback, nocCertBuf, icaCertBuf, ipk, adminSubject, mVendorId));
+    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ipk, adminSubject, mVendorId));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1658,8 +1658,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     case CommissioningStage::kAttestationVerification:
         ChipLogProgress(Controller, "Verifying attestation");
-        if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() || !params.GetAttestationNonce().HasValue() ||
-            !params.GetDAC().HasValue() || !params.GetPAI().HasValue())
+        if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
+            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue())
         {
             ChipLogError(Controller, "Missing attestation information");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1733,14 +1733,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendNOC:
-        if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() || !params.GetAdminSubject().HasValue())
+        if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() ||
+            !params.GetAdminSubject().HasValue())
         {
             ChipLogError(Controller, "AddNOC contents not specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Sending operational certificate chain to the device");
-        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(), params.GetAdminSubject().Value());
+        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
+                                   params.GetAdminSubject().Value());
         break;
     case CommissioningStage::kConfigACL:
         // TODO: Implement
