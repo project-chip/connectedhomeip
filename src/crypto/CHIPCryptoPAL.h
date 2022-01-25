@@ -1298,5 +1298,75 @@ enum class MatterOid
  **/
 CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
 
+/**
+ * @brief Opaque context used to protect the symmetric key. The key operations must
+ *        be performed without exposing the protected key value.
+ */
+class SymmetricKeyContext
+{
+public:
+    virtual ~SymmetricKeyContext() = default;
+    /**
+     * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
+     * @param[inout] plaintext     Outgoing message payload.
+     * @param[in] aad           Additional data (message header contents)
+     * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
+     * @param[out] out_mic      Outgoing Message Integrity Check
+     * @return CHIP_ERROR
+     */
+    virtual CHIP_ERROR EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      MutableByteSpan & out_mic) const = 0;
+    /**
+     * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
+     * @param ciphertext[inout] Incoming encrypted payload
+     * @param aad[in]   Additional data (message header contents)
+     * @param nonce[in] Nonce (Security Flags | Message Counter | Source Node ID)
+     * @param mic[in]   Incoming Message Integrity Check
+     * @return CHIP_ERROR
+     */
+    virtual CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      const ByteSpan & mic) const = 0;
+
+    /**
+     * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)
+     * @param header[in/out]    Message header to encrypt
+     * @param session_id[in]    Outgoing SessionID
+     * @param payload[in]       Encrypted payload
+     * @param mic[in]       Outgoing Message Integrity Check
+     * @return CHIP_ERROR
+     */
+    virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
+                                      const ByteSpan & mic) const = 0;
+
+    /**
+     * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
+     * @param header[in/out]    Message header to decrypt
+     * @param session_id[in]    Incoming SessionID
+     * @param payload[in]       Encrypted payload
+     * @param mic[in]           Outgoing Message Integrity Check
+     * @return CHIP_ERROR
+     */
+    virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
+                                      const ByteSpan & mic) const = 0;
+};
+
+/**
+ *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[out] out_key  Symmetric key used as the encryption key during message processing for group communication.
+ The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
+
+/**
+ *  @brief Derives the Group Session ID from a given operational group key using
+ *         the Key Derivation Function (Group Key Hash)
+ * @param[in] operational_key  The operational group key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[out] session_id  Output of the Group Key Hash
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INVALID_ARGUMENT if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id);
+
 } // namespace Crypto
 } // namespace chip

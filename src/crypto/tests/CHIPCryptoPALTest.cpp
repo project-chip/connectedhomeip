@@ -2123,6 +2123,56 @@ static void TestPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+const uint8_t kEpochKeyBuffer1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
+                                                                                   0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf };
+const uint8_t kEpochKeyBuffer2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
+                                                                                   0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf };
+const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x9d, 0xe1, 0x07, 0xde, 0x33, 0x11,
+                                                                                        0x2c, 0x52, 0x11, 0x0b, 0x7e, 0xc1,
+                                                                                        0x20, 0x9e, 0x6f, 0x0c };
+const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x7a, 0x33, 0xdb, 0x90, 0x5c, 0x7b,
+                                                                                        0x7e, 0x14, 0xa9, 0x20, 0xf8, 0x40,
+                                                                                        0xae, 0x48, 0xd3, 0xfe };
+const uint16_t kGroupSessionId1                                                     = 0xbc66;
+const uint16_t kGroupSessionId2                                                     = 0x038d;
+
+static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t key_buffer[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+    ByteSpan epoch_key(kEpochKeyBuffer1, sizeof(kEpochKeyBuffer1));
+    MutableByteSpan operational_key(key_buffer, sizeof(key_buffer));
+
+    // Invalid Epoch Key
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == DeriveGroupOperationalKey(ByteSpan(), operational_key));
+
+    // Epoch Key 1
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, operational_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey1, sizeof(kGroupOperationalKey1)));
+
+    // Epoch Key 2
+    epoch_key = ByteSpan(kEpochKeyBuffer2, sizeof(kEpochKeyBuffer2));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, operational_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey2, sizeof(kGroupOperationalKey2)));
+}
+
+static void TestGroup_SessionIdDerivation(nlTestSuite * inSuite, void * inContext)
+{
+    ByteSpan operational_key1(kGroupOperationalKey1, sizeof(kGroupOperationalKey1));
+    ByteSpan operational_key2(kGroupOperationalKey2, sizeof(kGroupOperationalKey2));
+    uint16_t session_id = 0;
+
+    // Bad Key
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == DeriveGroupSessionId(ByteSpan(), session_id));
+
+    // Session ID 1
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupSessionId(operational_key1, session_id));
+    NL_TEST_ASSERT(inSuite, kGroupSessionId1 == session_id);
+
+    // Session ID 2
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupSessionId(operational_key2, session_id));
+    NL_TEST_ASSERT(inSuite, kGroupSessionId2 == session_id);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -2189,6 +2239,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test Vendor ID Extraction from x509 Attestation Certificate", TestVID_x509Extraction),
     NL_TEST_DEF("Test Product ID Extraction from x509 Attestation Certificate", TestPID_x509Extraction),
+    NL_TEST_DEF("Test Group Operation Key Derivation", TestGroup_OperationalKeyDerivation),
+    NL_TEST_DEF("Test Group Session ID Derivation", TestGroup_SessionIdDerivation),
     NL_TEST_SENTINEL()
 };
 
