@@ -98,20 +98,31 @@ with other Thread devices in the network.
 
 ### Device Firmware Upgrade
 
-The example supports over-the-air (OTA) device firmware upgrade (DFU) using one of the two available methods:
-- Matter OTA update that is mandatory for Matter-compliant devices and enabled by default
-- [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt) over Bluetooth LE, an optional proprietary method that can be enabled to work alongside the default Matter OTA update. Note that this protocol is not a part of the Matter specification.
+The example supports over-the-air (OTA) device firmware upgrade (DFU) using one
+of the two available methods:
 
-For both methods, the [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html) bootloader solution is used to replace the old firmware image with the new one.
+-   Matter OTA update that is mandatory for Matter-compliant devices and enabled
+    by default
+-   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
+    over Bluetooth LE, an optional proprietary method that can be enabled to
+    work alongside the default Matter OTA update. Note that this protocol is not
+    a part of the Matter specification.
+
+For both methods, the
+[MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
+bootloader solution is used to replace the old firmware image with the new one.
 
 #### Matter Over-the-Air Update
 
-The Matter over-the-air update distinguishes two types of nodes: OTA Provider and OTA Requestor.
+The Matter over-the-air update distinguishes two types of nodes: OTA Provider
+and OTA Requestor.
 
-An OTA Provider is a node that hosts a new firmware image and is able to respond on an OTA Requestor's
-queries regarding availability of new firmware images or requests to start sending the update packages.
+An OTA Provider is a node that hosts a new firmware image and is able to respond
+on an OTA Requestor's queries regarding availability of new firmware images or
+requests to start sending the update packages.
 
-An OTA Requestor is a node that wants to download a new firmware image and sends requests to an OTA Provider to start the update process.
+An OTA Requestor is a node that wants to download a new firmware image and sends
+requests to an OTA Provider to start the update process.
 
 #### Simple Management Protocol
 
@@ -119,8 +130,8 @@ Simple Management Protocol (SMP) is a basic transfer encoding that is used for
 device management purposes, including application image management. SMP supports
 using different transports, such as Bluetooth LE, UDP, or serial USB/UART.
 
-In this example, the Matter device runs the SMP Server to download the application
-update image using the Bluetooth LE transport.
+In this example, the Matter device runs the SMP Server to download the
+application update image using the Bluetooth LE transport.
 
 See the
 [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
@@ -134,9 +145,9 @@ versions and generating proper build output files that can be used in the device
 firmware upgrade process.
 
 The bootloader solution requires an area of flash memory to swap application
-images during the firmware upgrade. Nordic Semiconductor devices use an external memory
-chip for this purpose. The memory chip communicates with the microcontroller
-through the QSPI bus.
+images during the firmware upgrade. Nordic Semiconductor devices use an external
+memory chip for this purpose. The memory chip communicates with the
+microcontroller through the QSPI bus.
 
 See the
 [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
@@ -215,9 +226,9 @@ following states are possible:
     procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
     initiated.
 
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    over Bluetooth LE process. This feature is disabled by default, but can be enabled by
-    following the
+-   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update over
+    Bluetooth LE process. This feature is disabled by default, but can be
+    enabled by following the
     [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
     instruction.
 
@@ -393,14 +404,14 @@ Semiconductor's kit you own:
 
 Support for DFU using Matter OTA is enabled by default.
 
-To enable DFU over Bluetooth LE, run the following
-command with _build-target_ replaced with the build target name of the Nordic
-Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
+To enable DFU over Bluetooth LE, run the following command with _build-target_
+replaced with the build target name of the Nordic Semiconductor kit you are
+using (for example `nrf52840dk_nrf52840`):
 
     $ west build -b build-target -- -DBUILD_WITH_DFU=BLE
 
-To completely disable support for both DFU methods, run the following
-command with _build-target_ replaced with the build target name of the Nordic
+To completely disable support for both DFU methods, run the following command
+with _build-target_ replaced with the build target name of the Nordic
 Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
     $ west build -b build-target -- -DBUILD_WITH_DFU=OFF
@@ -414,19 +425,24 @@ Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 > upgrading the application core and network core firmware in two-core nRF5340
 > DK devices.
 >
-> Currently the multi-image mode is only available for the DFU over Bluetooth LE method.
-
+> Currently the multi-image mode is only available for the DFU over Bluetooth LE
+> method.
 
 #### Changing Device Firmware Upgrade configuration
 
-To change the default DFU configuration, edit the following overlay files corresponding to the selected configuration:
-- `overlay-mcuboot_qspi_nor_support.conf` - general file enabling MCUboot and QSPI NOR support, used by all DFU configurations
-- `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU over Bluetooth LE using SMP
-- `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU over Bluetooth LE using SMP
-- `overlay-ota_requestor.conf` - file enabling Matter OTA Requestor support.
+To change the default DFU configuration, edit the following overlay files
+corresponding to the selected configuration:
 
-The files are located in the `config/nrfconnect/app` directory.
-You can also define the desired options in your example's `prj.conf` file.
+-   `overlay-mcuboot_qspi_nor_support.conf` - general file enabling MCUboot and
+    QSPI NOR support, used by all DFU configurations
+-   `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU
+    over Bluetooth LE using SMP
+-   `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU
+    over Bluetooth LE using SMP
+-   `overlay-ota_requestor.conf` - file enabling Matter OTA Requestor support.
+
+The files are located in the `config/nrfconnect/app` directory. You can also
+define the desired options in your example's `prj.conf` file.
 
 #### Changing bootloader configuration
 

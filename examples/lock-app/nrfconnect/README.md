@@ -397,13 +397,18 @@ Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
 
 #### Changing Device Firmware Upgrade configuration
 
-To change the default DFU configuration, edit some of the following overlay files depending on selected configuration:
-- `overlay-mcuboot_qspi_nor_support.conf` - generic file enabling MCUboot and QSPI NOR support, used by all DFU configurations
-- `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU over Bluetooth LE using SMP
-- `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU over Bluetooth LE using SMP
+To change the default DFU configuration, edit some of the following overlay
+files depending on selected configuration:
 
-The files are located in the `config/nrfconnect/app` directory.
-You can also define the desired options in your example's `prj.conf` file.
+-   `overlay-mcuboot_qspi_nor_support.conf` - generic file enabling MCUboot and
+    QSPI NOR support, used by all DFU configurations
+-   `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU
+    over Bluetooth LE using SMP
+-   `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU
+    over Bluetooth LE using SMP
+
+The files are located in the `config/nrfconnect/app` directory. You can also
+define the desired options in your example's `prj.conf` file.
 
 #### Changing bootloader configuration
 
