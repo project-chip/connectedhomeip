@@ -134,6 +134,12 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
     }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
+    }
     default: {
         break;
     }

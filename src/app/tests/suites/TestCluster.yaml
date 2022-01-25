@@ -3727,3 +3727,17 @@ tests:
           # TODO: We don't have a way to represent cluster-specific status
           # here yet.
           error: FAILURE
+
+    - label: "Read attribute that returns general status on read"
+      command: "readAttribute"
+      attribute: "general_error_boolean"
+      response:
+          error: INVALID_DATA_TYPE
+
+    - label: "read attribute that returns cluster-specific status on read"
+      command: "readAttribute"
+      attribute: "cluster_error_boolean"
+      response:
+          # TODO: We don't have a way to represent cluster-specific status
+          # here yet.
+          error: FAILURE
