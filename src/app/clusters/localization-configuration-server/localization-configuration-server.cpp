@@ -153,8 +153,8 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     DeviceLayer::AttributeList<CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
     CharSpan validLocale;
 
-    char outBuffer[kMaxActiveLocaleLength] = "";
-    MutableCharSpan activeLocale(outBuffer, kMaxActiveLocaleLength);
+    char outBuffer[kMaxActiveLocaleLength];
+    MutableCharSpan activeLocale(outBuffer);
     EmberAfStatus status = ActiveLocale::Get(endpoint, activeLocale);
 
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", status));
