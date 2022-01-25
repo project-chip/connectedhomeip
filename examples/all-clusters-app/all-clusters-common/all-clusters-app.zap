@@ -1718,7 +1718,7 @@
               "reportableChange": 0
             },
             {
-              "name": "CalendarType",
+              "name": "ActiveCalendarType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -16550,6 +16550,36 @@
               "reportableChange": 0
             },
             {
+              "name": "general_error_boolean",
+              "code": 49,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "cluster_error_boolean",
+              "code": 50,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "unsupported",
               "code": 255,
               "mfgCode": null,
@@ -17069,7 +17099,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -17084,7 +17114,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -20465,5 +20495,10 @@
       "endpointVersion": 1,
       "deviceIdentifier": 256
     }
+<<<<<<< HEAD
   ]
+=======
+  ],
+  "log": []
+>>>>>>> upstream/master
 }

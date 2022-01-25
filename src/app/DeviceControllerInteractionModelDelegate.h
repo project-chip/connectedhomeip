@@ -42,17 +42,17 @@ public:
         }
     }
 
-    void OnError(const app::CommandSender * apCommandSender, const chip::app::StatusIB & aStatus,
-                 CHIP_ERROR aProtocolError) override
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
         // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
-        // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
+        // Ember status codes. Consequently, let's convert the error over to a meaningful Ember status before dispatching.
         //
-        // This however, results in loss (aError is completely discarded). When full cluster-specific status codes are implemented
-        // as well, this will be an even bigger problem.
+        // This however, results in loss (non-IM errors and cluster-specific
+        // status codes are completely discarded).
         //
         // For now, #10331 tracks this issue.
-        IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aStatus.mStatus));
+        app::StatusIB status(aError);
+        IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(status.mStatus));
     }
 
     void OnDone(app::CommandSender * apCommandSender) override { return chip::Platform::Delete(apCommandSender); }
@@ -63,9 +63,10 @@ public:
         IMWriteResponseCallback(apWriteClient, attributeStatus.mStatus);
     }
 
-    void OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError) override
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
     {
-        IMWriteResponseCallback(apWriteClient, aStatus.mStatus);
+        app::StatusIB status(aError);
+        IMWriteResponseCallback(apWriteClient, status.mStatus);
     }
 
     void OnDone(app::WriteClient * apWriteClient) override {}

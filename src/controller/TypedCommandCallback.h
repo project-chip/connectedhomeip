@@ -41,7 +41,7 @@ class TypedCommandCallback final : public app::CommandSender::Callback
 public:
     using OnSuccessCallbackType =
         std::function<void(const app::ConcreteCommandPath &, const app::StatusIB &, const CommandResponseObjectT &)>;
-    using OnErrorCallbackType = std::function<void(const app::StatusIB & aStatus, CHIP_ERROR aError)>;
+    using OnErrorCallbackType = std::function<void(CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(app::CommandSender * commandSender)>;
 
     /*
@@ -61,10 +61,7 @@ private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
                     const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
 
-    void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override
-    {
-        mOnError(aStatus, aError);
-    }
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mOnError(aError); }
 
     void OnDone(app::CommandSender * apCommandSender) override { mOnDone(apCommandSender); }
 
@@ -107,9 +104,7 @@ void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        app::StatusIB status;
-        status.mStatus = Protocols::InteractionModel::Status::Failure;
-        mOnError(status, err);
+        mOnError(err);
     }
 }
 
@@ -130,9 +125,7 @@ inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app
     //
     if (aReader != nullptr)
     {
-        app::StatusIB status;
-        status.mStatus = Protocols::InteractionModel::Status::Failure;
-        mOnError(status, CHIP_ERROR_SCHEMA_MISMATCH);
+        mOnError(CHIP_ERROR_SCHEMA_MISMATCH);
         return;
     }
 

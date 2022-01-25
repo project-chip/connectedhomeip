@@ -31,21 +31,14 @@
         {
             "name": "decode_value",
             "path": "partials/decode_value.zapt"
-        },
-        {
-            "name": "list_attribute_callback_type",
-            "path": "partials/list_attribute_callback_type.zapt"
-        },
-        {
-            "name": "command_callback_responses",
-            "path": "partials/command_callback_responses.zapt"
-        },
-        {
-            "name": "java_type_for_argument",
-            "path": "partials/java_type_for_argument.zapt"
         }
     ],
     "templates": [
+        {
+            "path": "ChipStructs-java.zapt",
+            "name": "CHIP structs for Java",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipStructs.java"
+        },
         {
             "path": "CHIPInvokeCallbacks.zapt",
             "name": "CHIP cluster invoke callbacks for Java (native code)",

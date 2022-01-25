@@ -418,6 +418,7 @@ FreeRTOSConfig
 fsl
 fstab
 fsync
+ftd
 fullclean
 gbl
 gcloud
@@ -887,6 +888,7 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
+SED
 SEGGER
 semver
 sendto
