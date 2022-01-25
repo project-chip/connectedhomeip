@@ -154,7 +154,7 @@ public:
         mIpk.SetValue(AesCcm128Key(ipk));
         return *this;
     }
-    CommissioningParameters & SetIpk(const NodeId adminSubject)
+    CommissioningParameters & SetAdminSubject(const NodeId adminSubject)
     {
         mAdminSubject.SetValue(adminSubject);
         return *this;
