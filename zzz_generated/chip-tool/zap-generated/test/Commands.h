@@ -170,6 +170,7 @@ public:
         printf("TestIdentifyCluster\n");
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
+        printf("TestSystemCommands\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
         printf("Test_TC_SWDIAG_3_1\n");
@@ -73022,6 +73023,104 @@ private:
     void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 };
 
+class TestSystemCommands : public TestCommand
+{
+public:
+    TestSystemCommands(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestSystemCommands", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestSystemCommands() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestSystemCommands\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestSystemCommands\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Stop the accessory\n");
+            err = TestStopTheAccessory_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Start the accessory with a given discriminator\n");
+            err = TestStartTheAccessoryWithAGivenDiscriminator_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reboot the accessory with an other given discriminator\n");
+            err = TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestStopTheAccessory_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Stop();
+    }
+
+    CHIP_ERROR TestStartTheAccessoryWithAGivenDiscriminator_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Start(1111);
+    }
+
+    CHIP_ERROR TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(2222);
+    }
+};
+
 class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
@@ -85238,6 +85337,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestIdentifyCluster>(credsIssuerConfig),
         make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
         make_unique<TestModeSelectCluster>(credsIssuerConfig),
+        make_unique<TestSystemCommands>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),
