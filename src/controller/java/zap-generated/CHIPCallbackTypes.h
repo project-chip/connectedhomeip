@@ -1046,6 +1046,10 @@ typedef void (*CHIPTestClusterClusterListLongOctetStringAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterGeneralErrorBooleanAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterClusterErrorBooleanAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterUnsupportedAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableBooleanAttributeCallbackType)(

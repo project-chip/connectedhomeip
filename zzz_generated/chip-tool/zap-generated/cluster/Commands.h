@@ -41752,6 +41752,8 @@ private:
 | * RangeRestrictedInt16s                                             | 0x0029 |
 | * ListLongOctetString                                               | 0x002A |
 | * TimedWriteBoolean                                                 | 0x0030 |
+| * GeneralErrorBoolean                                               | 0x0031 |
+| * ClusterErrorBoolean                                               | 0x0032 |
 | * Unsupported                                                       | 0x00FF |
 | * NullableBoolean                                                   | 0x8000 |
 | * NullableBitmap8                                                   | 0x8001 |
@@ -46258,6 +46260,196 @@ public:
     }
 
     static void OnValueReport(void * context, bool value) { LogValue("TestCluster.TimedWriteBoolean report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute GeneralErrorBoolean
+ */
+class ReadTestClusterGeneralErrorBoolean : public ModelCommand
+{
+public:
+    ReadTestClusterGeneralErrorBoolean() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "general-error-boolean");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterGeneralErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.GeneralErrorBoolean response", value);
+    }
+};
+
+class WriteTestClusterGeneralErrorBoolean : public ModelCommand
+{
+public:
+    WriteTestClusterGeneralErrorBoolean() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "general-error-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterGeneralErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+class ReportTestClusterGeneralErrorBoolean : public ModelCommand
+{
+public:
+    ReportTestClusterGeneralErrorBoolean() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "general-error-boolean");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterGeneralErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.GeneralErrorBoolean report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClusterErrorBoolean
+ */
+class ReadTestClusterClusterErrorBoolean : public ModelCommand
+{
+public:
+    ReadTestClusterClusterErrorBoolean() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-error-boolean");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterClusterErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.ClusterErrorBoolean response", value);
+    }
+};
+
+class WriteTestClusterClusterErrorBoolean : public ModelCommand
+{
+public:
+    WriteTestClusterClusterErrorBoolean() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "cluster-error-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterClusterErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+class ReportTestClusterClusterErrorBoolean : public ModelCommand
+{
+public:
+    ReportTestClusterClusterErrorBoolean() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-error-boolean");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterClusterErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.ClusterErrorBoolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -62367,6 +62559,12 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterTimedWriteBoolean>(),                   //
         make_unique<WriteTestClusterTimedWriteBoolean>(),                  //
         make_unique<ReportTestClusterTimedWriteBoolean>(),                 //
+        make_unique<ReadTestClusterGeneralErrorBoolean>(),                 //
+        make_unique<WriteTestClusterGeneralErrorBoolean>(),                //
+        make_unique<ReportTestClusterGeneralErrorBoolean>(),               //
+        make_unique<ReadTestClusterClusterErrorBoolean>(),                 //
+        make_unique<WriteTestClusterClusterErrorBoolean>(),                //
+        make_unique<ReportTestClusterClusterErrorBoolean>(),               //
         make_unique<ReadTestClusterUnsupported>(),                         //
         make_unique<WriteTestClusterUnsupported>(),                        //
         make_unique<ReportTestClusterUnsupported>(),                       //

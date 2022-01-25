@@ -37010,6 +37010,50 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestCluster_000472_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute that returns general status on write"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id generalErrorBooleanArgument;
+    generalErrorBooleanArgument = [NSNumber numberWithBool:false];
+    [cluster writeAttributeGeneralErrorBooleanWithValue:generalErrorBooleanArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute that returns general status on write Error: %@", err);
+
+                                          XCTAssertEqual(
+                                              [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000473_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write attribute that returns cluster-specific status on write"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id clusterErrorBooleanArgument;
+    clusterErrorBooleanArgument = [NSNumber numberWithBool:false];
+    [cluster writeAttributeClusterErrorBooleanWithValue:clusterErrorBooleanArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute that returns cluster-specific status on write Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_FAILURE);
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestSaveAs_000000_WaitForCommissionee
 {

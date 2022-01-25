@@ -107,12 +107,9 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
 void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    ConcreteAttributePath attributePath(2, 3, 4);
 
-    err = aWriteHandler.AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+    err = aWriteHandler.AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -310,7 +307,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     writer.CopyElement(TLV::AnonymousTag(), aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
     return aWriteHandler->AddStatus(
-        AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
+        ConcreteAttributePath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
         Protocols::InteractionModel::Status::Success);
 }
 

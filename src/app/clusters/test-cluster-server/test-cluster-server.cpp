@@ -164,6 +164,12 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case NullableStruct::Id: {
         return WriteNullableStruct(aDecoder);
     }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
+    }
     default: {
         break;
     }
