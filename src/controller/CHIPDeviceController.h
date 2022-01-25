@@ -395,7 +395,7 @@ private:
 
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
-    static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
+    static void OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR OpenCommissioningWindowInternal();
 

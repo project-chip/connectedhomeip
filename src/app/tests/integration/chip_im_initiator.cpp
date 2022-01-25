@@ -180,9 +180,9 @@ public:
                static_cast<double>(gCommandRespCount) * 100 / static_cast<double>(gCommandCount),
                static_cast<double>(transitTime.count()) / 1000);
     }
-    void OnError(const chip::app::CommandSender * apCommandSender, const chip::app::StatusIB & aStatus, CHIP_ERROR aError) override
+    void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
-        gCommandRespCount += (aError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        gCommandRespCount += (aError.IsIMStatus());
         gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
@@ -200,7 +200,7 @@ public:
                static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount),
                static_cast<double>(transitTime.count()) / 1000);
     }
-    void OnError(const chip::app::WriteClient * apCommandSender, const chip::app::StatusIB &, CHIP_ERROR aError) override
+    void OnError(const chip::app::WriteClient * apCommandSender, CHIP_ERROR aError) override
     {
         printf("WriteClient::OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
