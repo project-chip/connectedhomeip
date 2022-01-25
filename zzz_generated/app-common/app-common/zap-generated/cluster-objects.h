@@ -6610,6 +6610,8 @@ public:
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
 
+    auto GetFabricIndex() const { return adminFabricIndex; }
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -6653,6 +6655,8 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
+
+    auto GetFabricIndex() const { return adminFabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19327,6 +19331,8 @@ public:
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
 
+    auto GetFabricIndex() const { return fabricIndex; }
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -19375,6 +19381,8 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19425,6 +19433,8 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     DataModel::Nullable<uint16_t> dataIndex;
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -36110,6 +36120,7 @@ enum class Fields
     kArg4 = 4,
     kArg5 = 5,
     kArg6 = 6,
+    kArg7 = 7,
 };
 
 struct Type
@@ -36125,6 +36136,9 @@ public:
     Structs::SimpleStruct::Type arg4;
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
     DataModel::List<const SimpleEnum> arg6;
+    chip::FabricIndex arg7 = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return arg7; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -36142,6 +36156,7 @@ public:
     Structs::SimpleStruct::DecodableType arg4;
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg5;
     DataModel::DecodableList<SimpleEnum> arg6;
+    chip::FabricIndex arg7 = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
