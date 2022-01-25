@@ -256,7 +256,7 @@ private:
 
     /**
      * ProcessGroupCommandDataIB is only called when a group invoke command request is received
-     * It doesn't need the endpointId in it's command path since it's uses the GroupId in message metadata to find it
+     * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
     CHIP_ERROR ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();

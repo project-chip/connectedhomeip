@@ -133,7 +133,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If session requires MRP, NoAutoRequestAck send flag is not specificed and is not a group exchange context, request reliable
+    // If session requires MRP, NoAutoRequestAck send flag is not specified and is not a group exchange context, request reliable
     // transmission.
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
