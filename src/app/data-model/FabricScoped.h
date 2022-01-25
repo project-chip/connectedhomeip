@@ -28,7 +28,7 @@ namespace DataModel {
 /*
  * Check whether a cluster object struct is fabric scoped.
  *   A fabric scoped struct contains a field of "FabricIndex" type, however, we cannot tell the difference between that field and
- * other uint8_t fields. Thus we add a GetFabricIndex member function for checking the fabric id. Here, IsFabricScoped check the
+ * other uint8_t fields. Thus we add a GetFabricIndex member function for getting the fabric id. Here, IsFabricScoped checks the
  * presence of GetFabricIndex function. This template can be used with std::enable_if.
  */
 template <typename T>
