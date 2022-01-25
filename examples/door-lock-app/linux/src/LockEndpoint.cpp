@@ -20,14 +20,14 @@
 
 using chip::to_underlying;
 
-bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin)
+bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    return setLockState(DlLockState::kLocked, pin);
+    return setLockState(DlLockState::kLocked, pin, err);
 }
 
-bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin)
+bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    return setLockState(DlLockState::kUnlocked, pin);
+    return setLockState(DlLockState::kUnlocked, pin, err);
 }
 
 bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
@@ -286,7 +286,7 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
-bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin)
+bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     if (mLockState == lockState)
     {
@@ -329,6 +329,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
                   "[endpointId=%d]",
                   lockStateToString(lockState), mEndpointId);
 
+    err = DlOperationError::kInvalidCredential;
     return false;
 }
 
