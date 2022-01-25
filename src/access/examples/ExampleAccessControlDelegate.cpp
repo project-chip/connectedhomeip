@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <string>
 #include <type_traits>
 
 namespace {
@@ -1325,6 +1326,7 @@ AccessControl::Delegate & GetAccessControlDelegate()
 
 void SetAccessControlDelegateStorage(chip::PersistentStorageDelegate * storageDelegate)
 {
+    ChipLogDetail(DataManagement, "Examples::SetAccessControlDelegateStorage");
     AccessControlDelegate & accessControlDelegate = static_cast<AccessControlDelegate &>(GetAccessControlDelegate());
     accessControlDelegate.SetStorageDelegate(storageDelegate);
 }
