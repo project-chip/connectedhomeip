@@ -104,7 +104,7 @@ Silicon Labs platform.
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=efr32_board="BRD4161A" sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RCP
 

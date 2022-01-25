@@ -65,7 +65,7 @@ if [ "$#" == "0" ]; then
             Discriminatoor value used for BLE connexion. (Default 3840)
         setupPinCode
             PIN code for PASE session establishment. (Default 73141520)
-        sleepy_device
+        enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
         use_rs911x
@@ -116,7 +116,7 @@ else
                 shift
                 ;;
             --sed)
-                optArgs+="sleepy_device=true chip_openthread_ftd=false "
+                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
                 shift
                 ;;
             *)

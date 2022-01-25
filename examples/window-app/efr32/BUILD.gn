@@ -39,7 +39,7 @@ declare_args() {
   enable_heap_monitoring = false
 
   # Enable Sleepy end device
-  sleepy_device = false
+  enable_sleepy_device = false
 
   # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
   use_wf200 = false

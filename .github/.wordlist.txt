@@ -888,7 +888,6 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
-sed
 SED
 SEGGER
 semver
