@@ -30,36 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
-{
-public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
-    ~GeneralCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ArmFailSafeResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t errorCode, chip::CharSpan debugText);
-    CHIP_ERROR CommissioningCompleteResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t errorCode, chip::CharSpan debugText);
-    CHIP_ERROR SetRegulatoryConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint8_t errorCode, chip::CharSpan debugText);
-};
-
-class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
-{
-public:
-    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
-    ~NetworkCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ConnectNetworkResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint8_t networkingStatus, chip::CharSpan debugText, int32_t errorValue);
-    CHIP_ERROR NetworkConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t networkingStatus, chip::CharSpan debugText);
-    CHIP_ERROR ScanNetworksResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t networkingStatus, chip::CharSpan debugText);
-};
-
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
@@ -79,6 +49,7 @@ public:
                           chip::CharSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 };
 
+<<<<<<< HEAD
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
@@ -97,5 +68,7 @@ public:
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
+=======
+>>>>>>> - Generation for outgoing commands which originate from the client side only.
 } // namespace Controller
 } // namespace chip

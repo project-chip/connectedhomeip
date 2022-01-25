@@ -30,106 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT DoorLockCluster : public ClusterBase
-{
-public:
-    DoorLockCluster() : ClusterBase(app::Clusters::DoorLock::Id) {}
-    ~DoorLockCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR GetCredentialStatusResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           bool credentialExists, uint16_t userIndex, uint16_t nextCredentialIndex);
-    CHIP_ERROR GetUserResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                               uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus,
-                               uint8_t userType, uint8_t credentialRule, chip::FabricIndex creatorFabricIndex,
-                               chip::FabricIndex lastModifiedFabricIndex, uint16_t nextUserIndex);
-    CHIP_ERROR SetCredentialResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t status, uint16_t userIndex, uint16_t nextCredentialIndex);
-};
-
-class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
-{
-public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
-    ~GeneralCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ArmFailSafeResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t errorCode, chip::CharSpan debugText);
-    CHIP_ERROR CommissioningCompleteResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t errorCode, chip::CharSpan debugText);
-    CHIP_ERROR SetRegulatoryConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint8_t errorCode, chip::CharSpan debugText);
-};
-
-class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
-{
-public:
-    GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
-    ~GroupKeyManagementCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR KeySetReadAllIndicesResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
-    CHIP_ERROR KeySetReadResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT GroupsCluster : public ClusterBase
-{
-public:
-    GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
-    ~GroupsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
-                                uint16_t groupId);
-    CHIP_ERROR GetGroupMembershipResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t capacity, /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
-    CHIP_ERROR RemoveGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t status, uint16_t groupId);
-    CHIP_ERROR ViewGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
-                                 uint16_t groupId, chip::CharSpan groupName);
-};
-
-class DLL_EXPORT IasZoneCluster : public ClusterBase
-{
-public:
-    IasZoneCluster() : ClusterBase(app::Clusters::IasZone::Id) {}
-    ~IasZoneCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ZoneEnrollRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t zoneType, uint16_t manufacturerCode);
-    CHIP_ERROR ZoneStatusChangeNotification(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId, uint16_t delay);
-};
-
-class DLL_EXPORT IdentifyCluster : public ClusterBase
-{
-public:
-    IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
-    ~IdentifyCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR IdentifyQueryResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t timeout);
-};
-
-class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
-{
-public:
-    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
-    ~NetworkCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ConnectNetworkResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint8_t networkingStatus, chip::CharSpan debugText, int32_t errorValue);
-    CHIP_ERROR NetworkConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t networkingStatus, chip::CharSpan debugText);
-    CHIP_ERROR ScanNetworksResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t networkingStatus, chip::CharSpan debugText);
-};
-
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
@@ -149,6 +49,7 @@ public:
                           chip::CharSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 };
 
+<<<<<<< HEAD
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
@@ -211,5 +112,7 @@ public:
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
+=======
+>>>>>>> - Generation for outgoing commands which originate from the client side only.
 } // namespace Controller
 } // namespace chip

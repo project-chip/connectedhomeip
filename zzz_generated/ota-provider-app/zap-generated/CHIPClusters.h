@@ -31,6 +31,7 @@ namespace chip {
 namespace Controller {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class DLL_EXPORT AccessControlCluster : public ClusterBase
 {
 public:
@@ -100,5 +101,7 @@ public:
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
+=======
+>>>>>>> - Generation for outgoing commands which originate from the client side only.
 } // namespace Controller
 } // namespace chip
