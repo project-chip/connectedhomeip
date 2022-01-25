@@ -14,9 +14,11 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <jni.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
+#include <vector>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -28,16 +30,18 @@ using namespace chip::Controller;
 {{#chip_server_cluster_attributes}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isWritableAttribute}}
-{{! TODO: Lists not supported in attribute writes yet. }}
-{{#unless isList}}
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type true}} value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
     TypeInfo::Type cppValue;
 
-    {{>encode_value target="cppValue" source="value" cluster=parent.name}}
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {{>encode_value target="cppValue" source="value" cluster=(asUpperCamelCase parent.name) depth=0}}
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -66,7 +70,6 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     onSuccess.release();
     onFailure.release();
 }
-{{/unless}}
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
