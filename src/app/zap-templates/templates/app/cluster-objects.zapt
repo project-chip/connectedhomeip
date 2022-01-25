@@ -206,6 +206,12 @@ public:
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
     {{/zcl_event_fields}}
 
+    {{#if event_is_fabric_scoped}}
+    auto GetFabricIndex() const {
+        return {{ asLowerCamelCase event_fabric_idx_field }};
+    }
+    {{/if}}
+
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 };
 
