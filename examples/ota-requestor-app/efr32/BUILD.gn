@@ -63,6 +63,7 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
+    "${chip_root}/src/lib",
   ]
 
   defines = [
@@ -81,6 +82,8 @@ efr32_sdk("sdk") {
 
 efr32_executable("ota_requestor_app") {
   output_name = "chip-efr32-ota-requestor-example.out"
+  include_dirs = [ "include" ]
+  defines = []
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
@@ -115,10 +118,6 @@ efr32_executable("ota_requestor_app") {
       "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
     ]
   }
-
-  include_dirs = [ "include" ]
-
-  defines = []
 
   if (show_qr_code) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
