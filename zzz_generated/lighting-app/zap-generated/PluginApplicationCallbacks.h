@@ -31,6 +31,7 @@
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \

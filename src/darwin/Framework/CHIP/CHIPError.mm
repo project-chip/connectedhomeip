@@ -128,6 +128,11 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
             errorWithDomain:CHIPErrorDomain
                        code:CHIPErrorCodeUnsupportedWrite
                    userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attempt to write read-only attribute.", nil) }];
+    case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
+        return [NSError
+            errorWithDomain:CHIPErrorDomain
+                       code:CHIPErrorCodeInvalidDataType
+                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Data type is not correct for a field.", nil) }];
     case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
         return
             [NSError errorWithDomain:CHIPErrorDomain

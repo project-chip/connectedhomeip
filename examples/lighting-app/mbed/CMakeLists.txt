@@ -101,6 +101,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)
