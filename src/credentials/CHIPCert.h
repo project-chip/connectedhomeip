@@ -800,22 +800,21 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
 
 /**
  * Extract Node ID, Fabric ID and Compressed Fabric ID from an operational
- * certificate and root public key.
+ * certificate and its associated root certificate.
  *
  * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
  */
-CHIP_ERROR ExtractNodeIdFabricIdCompressedFabricIdFromRootPubKeyOpCert(const Crypto::P256PublicKey & rootPubKey, ByteSpan noc,
-                                                                       CompressedFabricId & compressedFabricId, FabricId & fabricId,
-                                                                       NodeId & nodeId);
+CHIP_ERROR ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                              FabricId & fabricId, NodeId & nodeId);
 
 /**
  * Extract Node ID and Compressed Fabric ID from an operational certificate
- * and root public key.
+ * and its associated root certificate.
  *
  * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
  */
-CHIP_ERROR ExtractNodeIdCompressedFabricIdFromRootPubKeyOpCert(const Crypto::P256PublicKey & rootPubKey, ByteSpan noc,
-                                                               CompressedFabricId & compressedFabricId, NodeId & nodeId);
+CHIP_ERROR ExtractNodeIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                      NodeId & nodeId);
 
 /**
  * Extract CASE Authenticated Tags from an operational certificate in ByteSpan TLV-encoded form.
