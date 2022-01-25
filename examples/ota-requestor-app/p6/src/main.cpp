@@ -48,30 +48,9 @@ extern "C"
 #include "MemMonitoring.h"
 #endif
 
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/P6/OTAImageProcessorImpl.h"
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
-
-using chip::BDXDownloader;
-using chip::CharSpan;
-using chip::FabricIndex;
-using chip::GetRequestorInstance;
-using chip::NodeId;
-using chip::OTADownloader;
-using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
-using chip::OTARequestor;
-using chip::System::Layer;
-
-OTARequestor gRequestorCore;
-GenericOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
 
 volatile int apperror_cnt;
 // ================================================================================
@@ -143,12 +122,6 @@ int main(void)
         P6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
         appError(ret);
     }
-
-    //SetRequestorInstance(&gRequestorCore);
-    //gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
-    //gImageProcessor.SetOTADownloader(&gDownloader);
-    //gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    //gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     P6_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();

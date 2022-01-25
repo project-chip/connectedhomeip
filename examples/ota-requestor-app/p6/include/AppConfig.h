@@ -23,7 +23,7 @@
 #include "cybsp.h"
 #include "cyhal.h"
 
-// ---- Lighting Example App Config ----
+// ---- OTA Requestor Example App Config ----
 
 #define APP_TASK_NAME "APP"
 
