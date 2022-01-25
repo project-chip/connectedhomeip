@@ -29,6 +29,7 @@ enum CommissioningStage : uint8_t
     kError,
     kSecurePairing,
     kGetPartsList,
+    kCheckEndpointIsCommissionable,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
@@ -243,16 +244,22 @@ struct EndpointParts
     EndpointId endpoints[kMaxEndpoints];
     size_t numEndpoints;
 };
+struct EndpointCommissioningInfo
+{
+    EndpointCommissioningInfo(bool commissionable, bool network) : isCommissionable(commissionable), hasNetworkCluster(network) {}
+    bool isCommissionable  = false;
+    bool hasNetworkCluster = false;
+};
+
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport
-        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, EndpointParts>
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
+                                         EndpointParts, EndpointCommissioningInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
-        // TODO: Add other things the delegate needs to know.
     };
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
 };

@@ -1580,7 +1580,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
 void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint,
                                       Optional<System::Clock::Timeout> timeout)
 {
-    base.Associate(proxy, 0);
+    base.Associate(proxy, endpoint);
     base.SetCommandTimeout(timeout);
 }
 
@@ -1595,6 +1595,40 @@ void DescriptorClusterPartsCallback(void * context, const chip::app::DataModel::
     }
     CommissioningDelegate::CommissioningReport report;
     report.Set<EndpointParts>(parts);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void DescriptorClusterServerCallback(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & data)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    bool hasGeneralCommissioning   = false;
+    bool hasNetworkCommissioning   = false;
+    bool hasBasic                  = false;
+    bool hasOperationalCredentials = false;
+
+    auto iter = data.begin();
+    while (iter.Next())
+    {
+        switch (iter.GetValue())
+        {
+        case app::Clusters::GeneralCommissioning::Id:
+            hasGeneralCommissioning = true;
+            break;
+        case app::Clusters::NetworkCommissioning::Id:
+            hasNetworkCommissioning = true;
+            break;
+        case app::Clusters::Basic::Id:
+            hasBasic = true;
+            break;
+        case app::Clusters::OperationalCredentials::Id:
+            hasOperationalCredentials = true;
+            break;
+        }
+    }
+    bool isCommissionable = hasGeneralCommissioning && hasBasic && hasOperationalCredentials;
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<EndpointCommissioningInfo>(EndpointCommissioningInfo(isCommissionable, hasNetworkCommissioning));
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
@@ -1630,6 +1664,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SetupCluster(desc, proxy, endpoint, timeout);
         desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(this, DescriptorClusterPartsCallback,
                                                                                              DescriptorClusterFailure);
+    }
+    break;
+    case CommissioningStage::kCheckEndpointIsCommissionable: {
+        ChipLogProgress(Controller, "Reading descriptor cluster server list for endpoint %u", endpoint);
+        DescriptorCluster desc;
+        SetupCluster(desc, proxy, endpoint, timeout);
+        desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(this, DescriptorClusterServerCallback,
+                                                                                              DescriptorClusterFailure);
     }
     break;
     case CommissioningStage::kArmFailsafe: {

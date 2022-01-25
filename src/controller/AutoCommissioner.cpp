@@ -102,11 +102,20 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     {
         return CommissioningStage::kCleanup;
     }
+    mEndpoint = 0;
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
         return CommissioningStage::kGetPartsList;
     case CommissioningStage::kGetPartsList:
+        return CommissioningStage::kCheckEndpointIsCommissionable;
+    case CommissioningStage::kCheckEndpointIsCommissionable:
+        if (mAllEndpoints.numEndpoints > 0)
+        {
+            // Cycle through the list of endpoints from the end, checking for network cluster.
+            mEndpoint = mAllEndpoints.endpoints[--mAllEndpoints.numEndpoints];
+            return CommissioningStage::kCheckEndpointIsCommissionable;
+        }
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -196,8 +205,9 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 {
     // TODO: check that there is no commissioning in progress currently.
     mCommissioneeDeviceProxy = proxy;
-    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this, 0,
-                                            GetCommandTimeout(CommissioningStage::kArmFailsafe));
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy,
+                                            GetNextCommissioningStage(CommissioningStage::kSecurePairing, CHIP_NO_ERROR), mParams,
+                                            this, 0, GetCommandTimeout(CommissioningStage::kArmFailsafe));
 }
 
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
@@ -250,7 +260,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 {
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
+        if (report.stageCompleted == CommissioningStage::kCheckEndpointIsCommissionable && mEndpoint != 0)
+        {
+            ChipLogError(Controller, "No descriptor cluster found for endpoint %u, ignoring", mEndpoint);
+            err = CHIP_NO_ERROR;
+        }
+        else
+        {
+            ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
+        }
     }
     else
     {
@@ -258,6 +276,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         {
         case CommissioningStage::kGetPartsList:
             mAllEndpoints = report.Get<EndpointParts>();
+            break;
+        case CommissioningStage::kCheckEndpointIsCommissionable:
+            if (mEndpoint == 0 && !report.Get<EndpointCommissioningInfo>().isCommissionable)
+            {
+                ChipLogError(Controller, "Device endpoint is not commissionable");
+                return CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
+            }
+            if (report.Get<EndpointCommissioningInfo>().hasNetworkCluster)
+            {
+                mNetworkEndpoints.endpoints[mNetworkEndpoints.numEndpoints++] = mEndpoint;
+            }
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -300,6 +329,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mOperationalDeviceProxy  = nullptr;
             mParams                  = CommissioningParameters();
             mAllEndpoints            = EndpointParts();
+            mNetworkEndpoints        = EndpointParts();
             return CHIP_NO_ERROR;
         default:
             break;
@@ -327,7 +357,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
     mParams.SetCompletionStatus(err);
     // TODO: Get real endpoint
-    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
+    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, mEndpoint, GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }
 
