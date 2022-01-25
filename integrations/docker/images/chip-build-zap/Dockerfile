@@ -17,9 +17,9 @@ RUN apk add --no-cache \
   py3-pip=20.3.4-r1
 
 # Generator dependencies
-RUN pip3 install        \
-    click==8.0.3        \
-    coloredlogs==15.0.1 \
-    jinja2==3.0.3       \
-    lark==1.0.0         \
+RUN pip3 install --no-cache-dir \
+    click==8.0.3                \
+    coloredlogs==15.0.1         \
+    jinja2==3.0.3               \
+    lark==1.0.0                 \
     stringcase==1.2.0
