@@ -955,6 +955,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
+    // PASE session establishment failure.
     mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
     if (mPairingDelegate != nullptr)
@@ -967,6 +968,7 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void DeviceCommissioner::OnSessionEstablished()
 {
+    // PASE session established.
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
     PASESession * pairing = &mDeviceBeingCommissioned->GetPairing();
@@ -1493,14 +1495,6 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
 
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
-    {
-        // Let's release the device that's being paired, if pairing was successful,
-        // and the device is available on the operational network.
-        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-        mDeviceBeingCommissioned = nullptr;
-    }
-
     mDNSCache.Insert(nodeData);
 
     mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
@@ -1524,16 +1518,25 @@ void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHI
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
+    // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
     {
-        if (commissioner->mCommissioningDelegate != nullptr)
+        if (commissioner->mDeviceBeingCommissioned != nullptr &&
+            commissioner->mDeviceBeingCommissioned->GetDeviceId() == device->GetDeviceId())
         {
-            CommissioningDelegate::CommissioningReport report;
-            report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
-            commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+            // Let's release the device that's being paired, if pairing was successful,
+            // and the device is available on the operational network.
+            commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+            commissioner->mDeviceBeingCommissioned = nullptr;
+            if (commissioner->mCommissioningDelegate != nullptr)
+            {
+                CommissioningDelegate::CommissioningReport report;
+                report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
+                commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+            }
         }
     }
     else
@@ -1546,12 +1549,15 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
 {
+    // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
+
+    commissioner->mCASESessionManager->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
         commissioner->mCommissioningDelegate != nullptr)
     {
