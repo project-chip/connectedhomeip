@@ -133,8 +133,10 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If session requires MRP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    bool reliableTransmissionRequested = GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+    // If session requires MRP, NoAutoRequestAck send flag is not specified and is not a group exchange context, request reliable
+    // transmission.
+    bool reliableTransmissionRequested =
+        GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
@@ -226,8 +228,7 @@ void ExchangeContext::Close()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
-                  ChipLogValueExchange(this), __func__);
+    ChipLogDetail(ExchangeManager, "ec - close[" ChipLogFormatExchange "], %s", ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(false);
@@ -243,8 +244,7 @@ void ExchangeContext::Abort()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
-                  ChipLogValueExchange(this), __func__);
+    ChipLogDetail(ExchangeManager, "ec - abort[" ChipLogFormatExchange "], %s", ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(true);
