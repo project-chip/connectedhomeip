@@ -29,10 +29,10 @@ source_set("commands") {
 
   if (chip_device_platform != "none") {
     sources += [
+      "Case.cpp",
       "Config.cpp",
       "Device.cpp",
       "OnboardingCodes.cpp",
-      "Case.cpp",
     ]
   }
 
