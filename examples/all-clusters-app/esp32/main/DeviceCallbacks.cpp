@@ -44,7 +44,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 
-static const char *TAG = "app-devicecallbacks";
+static const char * TAG = "app-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -54,30 +54,32 @@ using namespace chip::app;
 
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
-void OnIdentifyTriggerEffect(Identify *identify) {
-  switch (identify->mCurrentEffectIdentifier) {
-  case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    statusLED1.Blink(kIdentifyTimerDelayMS * 2);
-    ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
-    break;
-  case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
-    break;
-  case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-    ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
-    break;
-  case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-    ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
-    break;
-  default:
-    ChipLogProgress(Zcl, "No identifier effect");
-    break;
-  }
-  return;
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        statusLED1.Blink(kIdentifyTimerDelayMS * 2);
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        break;
+    }
+    return;
 }
 
 Identify gIdentify0 = {
-    chip::EndpointId{0},
+    chip::EndpointId{ 0 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
@@ -85,209 +87,209 @@ Identify gIdentify0 = {
 };
 
 Identify gIdentify1 = {
-    chip::EndpointId{1},
+    chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnIdentifyTriggerEffect,
 };
 
-void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent *event,
-                                          intptr_t arg) {
-  switch (event->Type) {
-  case DeviceEventType::kInternetConnectivityChange:
-    OnInternetConnectivityChange(event);
-    break;
+void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kInternetConnectivityChange:
+        OnInternetConnectivityChange(event);
+        break;
 
-  case DeviceEventType::kSessionEstablished:
-    OnSessionEstablished(event);
-    break;
+    case DeviceEventType::kSessionEstablished:
+        OnSessionEstablished(event);
+        break;
 
-  case DeviceEventType::kCHIPoBLEConnectionEstablished:
-    ESP_LOGI(TAG, "CHIPoBLE connection established");
-    break;
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ESP_LOGI(TAG, "CHIPoBLE connection established");
+        break;
 
-  case DeviceEventType::kCHIPoBLEConnectionClosed:
-    ESP_LOGI(TAG, "CHIPoBLE disconnected");
-    break;
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ESP_LOGI(TAG, "CHIPoBLE disconnected");
+        break;
 
-  case DeviceEventType::kCommissioningComplete:
-    ESP_LOGI(TAG, "Commissioning complete");
-    break;
+    case DeviceEventType::kCommissioningComplete:
+        ESP_LOGI(TAG, "Commissioning complete");
+        break;
 
-  case DeviceEventType::kInterfaceIpAddressChanged:
-    if ((event->InterfaceIpAddressChanged.Type ==
-         InterfaceIpChangeType::kIpV4_Assigned) ||
-        (event->InterfaceIpAddressChanged.Type ==
-         InterfaceIpChangeType::kIpV6_Assigned)) {
-      // MDNS server restart on any ip assignment: if link local ipv6 is
-      // configured, that will not trigger a 'internet connectivity change' as
-      // there is no internet connectivity. MDNS still wants to refresh its
-      // listening interfaces to include the newly selected address.
-      chip::app::DnssdServer::Instance().StartServer();
+    case DeviceEventType::kInterfaceIpAddressChanged:
+        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+        {
+            // MDNS server restart on any ip assignment: if link local ipv6 is
+            // configured, that will not trigger a 'internet connectivity change' as
+            // there is no internet connectivity. MDNS still wants to refresh its
+            // listening interfaces to include the newly selected address.
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
+        }
+        break;
     }
-    if (event->InterfaceIpAddressChanged.Type ==
-        InterfaceIpChangeType::kIpV6_Assigned) {
-      ESP_ERROR_CHECK(
-          esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-    }
-    break;
-  }
 
-  ESP_LOGI(TAG, "Current free heap: %zu\n",
-           heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(
-    EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-    uint8_t mask, uint8_t type, uint16_t size, uint8_t *value) {
-  ESP_LOGI(TAG,
-           "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: "
-           "'0x%02x', Attribute ID: '0x%04x'",
-           clusterId, endpointId, attributeId);
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                  uint8_t type, uint16_t size, uint8_t * value)
+{
+    ESP_LOGI(TAG,
+             "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: "
+             "'0x%02x', Attribute ID: '0x%04x'",
+             clusterId, endpointId, attributeId);
 
-  switch (clusterId) {
-  case Clusters::OnOff::Id:
-    OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
-    break;
+    switch (clusterId)
+    {
+    case Clusters::OnOff::Id:
+        OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
+        break;
 
-  case Clusters::LevelControl::Id:
-    OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
-    break;
+    case Clusters::LevelControl::Id:
+        OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
+        break;
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-  case Clusters::ColorControl::Id:
-    OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
-    break;
+    case Clusters::ColorControl::Id:
+        OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
+        break;
 #endif
-  case Clusters::Identify::Id:
-    /*
-    if( size == 2 )
-      else
-    */
-    OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, size, value);
-    break;
-  default:
-    ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
-    break;
-  }
+    case Clusters::Identify::Id:
+        /*
+        if( size == 2 )
+          else
+        */
+        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, size, value);
+        break;
+    default:
+        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+        break;
+    }
 
-  ESP_LOGI(TAG, "Current free heap: %zu\n",
-           heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::OnInternetConnectivityChange(
-    const ChipDeviceEvent *event) {
-  if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established) {
-    ESP_LOGI(TAG, "Server ready at: %s:%d",
-             event->InternetConnectivityChange.address, CHIP_PORT);
-    wifiLED.Set(true);
-    chip::app::DnssdServer::Instance().StartServer();
-  } else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost) {
-    ESP_LOGE(TAG, "Lost IPv4 connectivity...");
-    wifiLED.Set(false);
-  }
-  if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established) {
-    ESP_LOGI(TAG, "IPv6 Server ready...");
-    chip::app::DnssdServer::Instance().StartServer();
-  } else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost) {
-    ESP_LOGE(TAG, "Lost IPv6 connectivity...");
-  }
+void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
+{
+    if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
+    {
+        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+        wifiLED.Set(true);
+        chip::app::DnssdServer::Instance().StartServer();
+    }
+    else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
+    {
+        ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+        wifiLED.Set(false);
+    }
+    if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+    {
+        ESP_LOGI(TAG, "IPv6 Server ready...");
+        chip::app::DnssdServer::Instance().StartServer();
+    }
+    else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+    {
+        ESP_LOGE(TAG, "Lost IPv6 connectivity...");
+    }
 }
 
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent *event) {
-  if (event->SessionEstablished.IsCommissioner) {
-    ESP_LOGI(TAG, "Commissioner detected!");
-  }
+void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
+{
+    if (event->SessionEstablished.IsCommissioner)
+    {
+        ESP_LOGI(TAG, "Commissioner detected!");
+    }
 }
 
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(
-    EndpointId endpointId, AttributeId attributeId, uint8_t *value) {
-  VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
-               ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-  VerifyOrExit(endpointId == 1 || endpointId == 2,
-               ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-  // At this point we can assume that value points to a bool value.
-  mEndpointOnOffState[endpointId - 1] = *value;
-  endpointId == 1 ? statusLED1.Set(*value) : statusLED2.Set(*value);
+    // At this point we can assume that value points to a bool value.
+    mEndpointOnOffState[endpointId - 1] = *value;
+    endpointId == 1 ? statusLED1.Set(*value) : statusLED2.Set(*value);
 
 exit:
-  return;
+    return;
 }
 
-void DeviceCallbacks::OnLevelControlAttributeChangeCallback(
-    EndpointId endpointId, AttributeId attributeId, uint8_t *value) {
-  bool onOffState = mEndpointOnOffState[endpointId - 1];
-  uint8_t brightness = onOffState ? *value : 0;
+void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    bool onOffState    = mEndpointOnOffState[endpointId - 1];
+    uint8_t brightness = onOffState ? *value : 0;
 
-  VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-               ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-  VerifyOrExit(endpointId == 1 || endpointId == 2,
-               ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-  // At this point we can assume that value points to a bool value.
-  endpointId == 1 ? statusLED1.SetBrightness(brightness)
-                  : statusLED2.SetBrightness(brightness);
+    // At this point we can assume that value points to a bool value.
+    endpointId == 1 ? statusLED1.SetBrightness(brightness) : statusLED2.SetBrightness(brightness);
 
 exit:
-  return;
+    return;
 }
 
 // Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has
 // an on-board RGB-LED
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-void DeviceCallbacks::OnColorControlAttributeChangeCallback(
-    EndpointId endpointId, AttributeId attributeId, uint8_t *value) {
-  VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
-                   attributeId ==
-                       ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-               ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
-  VerifyOrExit(endpointId == 1 || endpointId == 2,
-               ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-  if (endpointId == 1) {
-    uint8_t hue, saturation;
-    if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) {
-      hue = *value;
-      emberAfReadServerAttribute(
-          endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID,
-          ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &saturation,
-          sizeof(uint8_t));
-    } else {
-      saturation = *value;
-      emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                 ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                 &hue, sizeof(uint8_t));
+void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
+                     attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    if (endpointId == 1)
+    {
+        uint8_t hue, saturation;
+        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        {
+            hue = *value;
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                       &saturation, sizeof(uint8_t));
+        }
+        else
+        {
+            saturation = *value;
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
+                                       sizeof(uint8_t));
+        }
+        statusLED1.SetColor(hue, saturation);
     }
-    statusLED1.SetColor(hue, saturation);
-  }
 exit:
-  return;
+    return;
 }
 #endif
 
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(
-    EndpointId endpointId, AttributeId attributeId, uint16_t size,
-    uint8_t *value) {
-  if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id) {
-    uint16_t identifyTime;
-    size == 2 ? identifyTime = (value[1] << 8) + value[0]
-              : identifyTime = value[0];
-    if (identifyTime) {
-      // Currently we have no separate indicator LEDs on each endpoints.
-      // We are using LED1 for endpoint 0,1 and LED2 for endpoint 2
-      endpointId == 2 ? statusLED2.Blink(kIdentifyTimerDelayMS * 2)
-                      : statusLED1.Blink(kIdentifyTimerDelayMS * 2);
-    } else {
-      bool onOffState;
-      endpointId == 0 ? onOffState = mEndpointOnOffState[0]
-                      : onOffState = mEndpointOnOffState[endpointId - 1];
-      endpointId == 2 ? statusLED2.Set(onOffState) : statusLED1.Set(onOffState);
+void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size,
+                                                            uint8_t * value)
+{
+    if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
+    {
+        uint16_t identifyTime;
+        size == 2 ? identifyTime = (value[1] << 8) + value[0] : identifyTime = value[0];
+        if (identifyTime)
+        {
+            // Currently we have no separate indicator LEDs on each endpoints.
+            // We are using LED1 for endpoint 0,1 and LED2 for endpoint 2
+            endpointId == 2 ? statusLED2.Blink(kIdentifyTimerDelayMS * 2) : statusLED1.Blink(kIdentifyTimerDelayMS * 2);
+        }
+        else
+        {
+            bool onOffState;
+            endpointId == 0 ? onOffState = mEndpointOnOffState[0] : onOffState = mEndpointOnOffState[endpointId - 1];
+            endpointId == 2 ? statusLED2.Set(onOffState) : statusLED1.Set(onOffState);
+        }
     }
-  }
 }
 
-bool emberAfBasicClusterMfgSpecificPingCallback(
-    chip::app::CommandHandler *commandObj) {
-  emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-  return true;
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
+{
+    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
