@@ -35,6 +35,17 @@ if (current_os == "android") {
     script = "${chip_root}/scripts/codegen.py"
 
     _idl_file = "controller-clusters.matter"
+    _output_files = exec_script("${chip_root}/scripts/codegen.py",
+                                [
+                                  "--generator",
+                                  "java",
+                                  "--log-level",
+                                  "fatal",
+                                  "--name-only",
+                                  rebase_path("controller-clusters.matter"),
+                                ],
+                                "list lines",
+                                [ "controller-clusters.matter" ])
 
     args = [
       "--generator",
@@ -48,7 +59,11 @@ if (current_os == "android") {
 
     inputs = [ _idl_file ]
     sources = [ _idl_file ]
-    outputs = [ "$target_gen_dir/jni/CHIPClustersRead.cpp" ]
+    outputs = []
+
+    foreach(name, _output_files) {
+      outputs += [ "$target_gen_dir/${name}" ]
+    }
   }
 
   source_set("java-jni-sources") {
