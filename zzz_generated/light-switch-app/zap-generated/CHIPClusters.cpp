@@ -33,11 +33,17 @@ namespace Controller {
 // TODO(#4502): onCompletion is not used by IM for now.
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 
 // ColorControl Cluster Commands
 CHIP_ERROR ColorControlCluster::ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time,
                                              uint16_t startHue, uint8_t optionsMask, uint8_t optionsOverride)
+=======
+// AccountLogin Cluster Commands
+CHIP_ERROR AccountLoginCluster::GetSetupPINRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan tempAccountIdentifier)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -507,6 +513,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint16_t colorTemperature,
                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
@@ -666,6 +673,8 @@ exit:
     return err;
 }
 
+=======
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 // Channel Cluster Commands
 CHIP_ERROR ChannelCluster::ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint16_t majorNumber,
@@ -930,6 +939,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                         uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                         uint8_t optionsOverride)
@@ -939,6 +949,11 @@ CHIP_ERROR DoorLockCluster::GetCredentialStatusResponse(Callback::Cancelable * o
                                                         Callback::Cancelable * onFailureCallback, bool credentialExists,
                                                         uint16_t userIndex, uint16_t nextCredentialIndex)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+// KeypadInput Cluster Commands
+CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint8_t keyCode)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -951,11 +966,15 @@ CHIP_ERROR DoorLockCluster::GetCredentialStatusResponse(Callback::Cancelable * o
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ColorControl::Commands::StepHue::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
                                          DoorLock::Commands::GetCredentialStatusResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, KeypadInput::Commands::SendKeyRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -966,6 +985,7 @@ CHIP_ERROR DoorLockCluster::GetCredentialStatusResponse(Callback::Cancelable * o
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // stepMode: hueStepMode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
@@ -985,6 +1005,10 @@ CHIP_ERROR DoorLockCluster::GetCredentialStatusResponse(Callback::Cancelable * o
     // nextCredentialIndex: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nextCredentialIndex));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // keyCode: cecKeyCode
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), keyCode));
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1001,6 +1025,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                uint8_t optionsOverride)
@@ -1010,6 +1035,11 @@ CHIP_ERROR DoorLockCluster::GetUserResponse(Callback::Cancelable * onSuccessCall
                                             uint8_t userType, uint8_t credentialRule, chip::FabricIndex creatorFabricIndex,
                                             chip::FabricIndex lastModifiedFabricIndex, uint16_t nextUserIndex)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+// MediaInput Cluster Commands
+CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1022,10 +1052,14 @@ CHIP_ERROR DoorLockCluster::GetUserResponse(Callback::Cancelable * onSuccessCall
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ColorControl::Commands::StepSaturation::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetUserResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::HideInputStatusRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1035,6 +1069,7 @@ CHIP_ERROR DoorLockCluster::GetUserResponse(Callback::Cancelable * onSuccessCall
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // stepMode: saturationStepMode
@@ -1067,6 +1102,9 @@ CHIP_ERROR DoorLockCluster::GetUserResponse(Callback::Cancelable * onSuccessCall
     // nextUserIndex: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nextUserIndex));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // Command takes no arguments.
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1083,6 +1121,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 // Groups Cluster Commands
 CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    uint16_t groupId, chip::CharSpan groupName)
@@ -1091,6 +1130,10 @@ CHIP_ERROR DoorLockCluster::SetCredentialResponse(Callback::Cancelable * onSucce
                                                   Callback::Cancelable * onFailureCallback, uint8_t status, uint16_t userIndex,
                                                   uint16_t nextCredentialIndex)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t index, chip::CharSpan name)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1103,10 +1146,14 @@ CHIP_ERROR DoorLockCluster::SetCredentialResponse(Callback::Cancelable * onSucce
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::AddGroup::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetCredentialResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::RenameInputRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1117,6 +1164,7 @@ CHIP_ERROR DoorLockCluster::SetCredentialResponse(Callback::Cancelable * onSucce
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
@@ -1130,6 +1178,12 @@ CHIP_ERROR DoorLockCluster::SetCredentialResponse(Callback::Cancelable * onSucce
     // nextCredentialIndex: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nextCredentialIndex));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // index: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
+    // name: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), name));
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1146,6 +1200,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 uint16_t groupId, chip::CharSpan groupName)
 =======
@@ -1154,6 +1209,10 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafeResponse(Callback::Cancelable
                                                             Callback::Cancelable * onFailureCallback, uint8_t errorCode,
                                                             chip::CharSpan debugText)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaInputCluster::SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t index)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1166,11 +1225,15 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafeResponse(Callback::Cancelable
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::AddGroupIfIdentifying::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
                                          GeneralCommissioning::Commands::ArmFailSafeResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::SelectInputRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1181,6 +1244,7 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafeResponse(Callback::Cancelable
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
@@ -1192,6 +1256,10 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafeResponse(Callback::Cancelable
     // debugText: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // index: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1208,6 +1276,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t groupList)
 =======
@@ -1215,6 +1284,10 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningCompleteResponse(Callback::
                                                                       Callback::Cancelable * onFailureCallback, uint8_t errorCode,
                                                                       chip::CharSpan debugText)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaInputCluster::ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1227,11 +1300,15 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningCompleteResponse(Callback::
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::GetGroupMembership::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
                                          GeneralCommissioning::Commands::CommissioningCompleteResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::ShowInputStatusRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1241,6 +1318,7 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningCompleteResponse(Callback::
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupList: int16u
@@ -1251,6 +1329,9 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningCompleteResponse(Callback::
     // debugText: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // Command takes no arguments.
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1267,12 +1348,18 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 =======
 CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfigResponse(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t errorCode,
                                                                     chip::CharSpan debugText)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+// MediaPlayback Cluster Commands
+CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1285,11 +1372,15 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfigResponse(Callback::Ca
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::RemoveAllGroups::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
                                          GeneralCommissioning::Commands::SetRegulatoryConfigResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::FastForwardRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1299,11 +1390,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfigResponse(Callback::Ca
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // errorCode: generalCommissioningError
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), errorCode));
-    // debugText: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1319,6 +1406,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       uint16_t groupId)
@@ -1327,6 +1415,9 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, 
 CHIP_ERROR GroupsCluster::AddGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint8_t status, uint16_t groupId)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1339,10 +1430,14 @@ CHIP_ERROR GroupsCluster::AddGroupResponse(Callback::Cancelable * onSuccessCallb
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::RemoveGroup::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::AddGroupResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::NextRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1352,6 +1447,7 @@ CHIP_ERROR GroupsCluster::AddGroupResponse(Callback::Cancelable * onSuccessCallb
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 =======
@@ -1360,6 +1456,9 @@ CHIP_ERROR GroupsCluster::AddGroupResponse(Callback::Cancelable * onSuccessCallb
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+=======
+    // Command takes no arguments.
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1376,6 +1475,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                     uint16_t groupId)
 =======
@@ -1383,6 +1483,9 @@ CHIP_ERROR GroupsCluster::GetGroupMembershipResponse(Callback::Cancelable * onSu
                                                      Callback::Cancelable * onFailureCallback, uint8_t capacity,
                                                      /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1395,10 +1498,14 @@ CHIP_ERROR GroupsCluster::GetGroupMembershipResponse(Callback::Cancelable * onSu
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::ViewGroup::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::GetGroupMembershipResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PauseRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1408,6 +1515,7 @@ CHIP_ERROR GroupsCluster::GetGroupMembershipResponse(Callback::Cancelable * onSu
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
@@ -1511,6 +1619,9 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
     // groupList: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupList));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // Command takes no arguments.
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1526,6 +1637,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::VendorId vendorId,
@@ -1593,6 +1705,9 @@ exit:
 
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+=======
+CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1604,10 +1719,14 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Off::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::RemoveGroupResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PlayRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1617,11 +1736,7 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // status: enum8
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
-    // groupId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1637,12 +1752,16 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 =======
 CHIP_ERROR GroupsCluster::ViewGroupResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint8_t status, uint16_t groupId, chip::CharSpan groupName)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1655,10 +1774,14 @@ CHIP_ERROR GroupsCluster::ViewGroupResponse(Callback::Cancelable * onSuccessCall
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::On::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::ViewGroupResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PreviousRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1668,13 +1791,7 @@ CHIP_ERROR GroupsCluster::ViewGroupResponse(Callback::Cancelable * onSuccessCall
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // status: enum8
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
-    // groupId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
-    // groupName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName));
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1690,6 +1807,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 =======
@@ -1697,6 +1815,9 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
 CHIP_ERROR IasZoneCluster::ZoneEnrollRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t zoneType, uint16_t manufacturerCode)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1709,10 +1830,14 @@ CHIP_ERROR IasZoneCluster::ZoneEnrollRequest(Callback::Cancelable * onSuccessCal
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Toggle::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, IasZone::Commands::ZoneEnrollRequest::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::RewindRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1722,11 +1847,7 @@ CHIP_ERROR IasZoneCluster::ZoneEnrollRequest(Callback::Cancelable * onSuccessCal
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // zoneType: iasZoneType
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), zoneType));
-    // manufacturerCode: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), manufacturerCode));
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1742,6 +1863,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 // Scenes Cluster Commands
 CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1752,6 +1874,10 @@ CHIP_ERROR IasZoneCluster::ZoneStatusChangeNotification(Callback::Cancelable * o
                                                         Callback::Cancelable * onFailureCallback, uint16_t zoneStatus,
                                                         uint8_t extendedStatus, uint8_t zoneId, uint16_t delay)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint64_t position)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1764,11 +1890,15 @@ CHIP_ERROR IasZoneCluster::ZoneStatusChangeNotification(Callback::Cancelable * o
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::AddScene::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
                                          IasZone::Commands::ZoneStatusChangeNotification::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SeekRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1779,6 +1909,7 @@ CHIP_ERROR IasZoneCluster::ZoneStatusChangeNotification(Callback::Cancelable * o
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
@@ -1804,6 +1935,10 @@ CHIP_ERROR IasZoneCluster::ZoneStatusChangeNotification(Callback::Cancelable * o
     // delay: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), delay));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // position: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), position));
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1819,6 +1954,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t groupId)
@@ -1827,6 +1963,10 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCal
 CHIP_ERROR IdentifyCluster::IdentifyQueryResponse(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint16_t timeout)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1839,10 +1979,14 @@ CHIP_ERROR IdentifyCluster::IdentifyQueryResponse(Callback::Cancelable * onSucce
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::GetSceneMembership::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Identify::Commands::IdentifyQueryResponse::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipBackwardRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1854,12 +1998,17 @@ CHIP_ERROR IdentifyCluster::IdentifyQueryResponse(Callback::Cancelable * onSucce
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
 =======
     // timeout: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeout));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // deltaPositionMilliseconds: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), deltaPositionMilliseconds));
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1876,6 +2025,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
 =======
@@ -1883,6 +2033,10 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, 
 CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint8_t keyCode)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1895,10 +2049,14 @@ CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCa
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RecallScene::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, KeypadInput::Commands::SendKeyRequest::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipForwardRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1909,6 +2067,7 @@ CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCa
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
@@ -1920,6 +2079,10 @@ CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCa
     // keyCode: cecKeyCode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), keyCode));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // deltaPositionMilliseconds: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), deltaPositionMilliseconds));
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1936,6 +2099,7 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint16_t groupId)
 =======
@@ -1943,6 +2107,10 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallba
 CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1955,10 +2123,14 @@ CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSu
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RemoveAllScenes::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::HideInputStatusRequest::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StartOverRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1987,12 +2159,16 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       uint16_t groupId, uint8_t sceneId)
 =======
 CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint8_t index, chip::CharSpan name)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2005,10 +2181,14 @@ CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSucces
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RemoveScene::Id,
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::RenameInputRequest::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StopRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -2018,6 +2198,7 @@ CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSucces
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     // groupId: int16u
@@ -2030,6 +2211,9 @@ CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSucces
     // name: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), name));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    // Command takes no arguments.
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -2046,12 +2230,19 @@ exit:
 }
 
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t groupId, uint8_t sceneId)
 =======
 CHIP_ERROR MediaInputCluster::SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint8_t index)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+// TargetNavigator Cluster Commands
+CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint8_t target,
+                                                         chip::CharSpan data)
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2063,6 +2254,7 @@ CHIP_ERROR MediaInputCluster::SelectInputRequest(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::StoreScene::Id,
 =======
@@ -3300,6 +3492,10 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
                                          TargetNavigator::Commands::NavigateTargetRequest::Id,
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TargetNavigator::Commands::NavigateTargetRequest::Id,
+>>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -3314,100 +3510,6 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// TestCluster Cluster Commands
-CHIP_ERROR TestClusterCluster::TestSpecificResponse(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint8_t returnValue)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TestCluster::Commands::TestSpecificResponse::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // returnValue: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), returnValue));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// Thermostat Cluster Commands
-CHIP_ERROR ThermostatCluster::GetWeeklyScheduleResponse(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback,
-                                                        uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
-                                                        uint8_t modeForSequence,
-                                                        /* TYPE WARNING: array array defaults to */ uint8_t * payload)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         Thermostat::Commands::GetWeeklyScheduleResponse::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // numberOfTransitionsForSequence: enum8
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), numberOfTransitionsForSequence));
-    // dayOfWeekForSequence: dayOfWeek
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), dayOfWeekForSequence));
-    // modeForSequence: modeForSequence
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), modeForSequence));
-    // payload: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), payload));
 
     SuccessOrExit(err = sender->FinishCommand());
 

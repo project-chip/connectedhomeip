@@ -30,6 +30,7 @@
 namespace chip {
 namespace Controller {
 
+<<<<<<< HEAD
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
@@ -91,50 +92,13 @@ public:
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
+=======
+>>>>>>> - Generation for outgoing commands which originate from the client side only.
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
-};
-
-class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
-{
-public:
-    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
-    ~OperationalCredentialsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AttestationResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan attestationElements, chip::ByteSpan signature);
-    CHIP_ERROR CertificateChainResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan certificate);
-    CHIP_ERROR NOCResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t statusCode,
-                           uint8_t fabricIndex, chip::CharSpan debugText);
-    CHIP_ERROR OpCSRResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan NOCSRElements, chip::ByteSpan attestationSignature);
-};
-
-class DLL_EXPORT ScenesCluster : public ClusterBase
-{
-public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
-    ~ScenesCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
-                                uint16_t groupId, uint8_t sceneId);
-    CHIP_ERROR GetSceneMembershipResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-                                          /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
-    CHIP_ERROR RemoveAllScenesResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t status, uint16_t groupId);
-    CHIP_ERROR RemoveSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t status, uint16_t groupId, uint8_t sceneId);
-    CHIP_ERROR StoreSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t status, uint16_t groupId, uint8_t sceneId);
-    CHIP_ERROR ViewSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
-                                 uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName);
 };
 
 } // namespace Controller

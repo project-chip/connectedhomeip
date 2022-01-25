@@ -33,7 +33,6 @@ namespace Controller {
 // TODO(#4502): onCompletion is not used by IM for now.
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
-
 // AccountLogin Cluster Commands
 CHIP_ERROR AccountLoginCluster::GetSetupPINRequest(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan tempAccountIdentifier)
@@ -579,8 +578,6 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
 exit:
     return err;
 }
-
-// Basic Cluster Commands
 
 // Binding Cluster Commands
 CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,

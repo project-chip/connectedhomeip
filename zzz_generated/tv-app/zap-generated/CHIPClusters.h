@@ -30,28 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT AccountLoginCluster : public ClusterBase
-{
-public:
-    AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
-    ~AccountLoginCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR GetSetupPINResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::CharSpan setupPIN);
-};
-
-class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
-{
-public:
-    ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
-    ~ApplicationLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR LauncherResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
-                                chip::CharSpan data);
-};
-
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
@@ -59,58 +37,11 @@ public:
     ~BindingCluster() {}
 };
 
-class DLL_EXPORT ChannelCluster : public ClusterBase
-{
-public:
-    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
-    ~ChannelCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ChangeChannelResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t errorType);
-};
-
-class DLL_EXPORT ContentLauncherCluster : public ClusterBase
-{
-public:
-    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
-    ~ContentLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR LaunchResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status,
-                              chip::CharSpan data);
-};
-
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
     GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
     ~GeneralCommissioningCluster() {}
-};
-
-class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
-{
-public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
-    ~GeneralCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ArmFailSafeResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t errorCode, chip::CharSpan debugText);
-    CHIP_ERROR CommissioningCompleteResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t errorCode, chip::CharSpan debugText);
-    CHIP_ERROR SetRegulatoryConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint8_t errorCode, chip::CharSpan debugText);
-};
-
-class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
-{
-public:
-    MediaPlaybackCluster() : ClusterBase(app::Clusters::MediaPlayback::Id) {}
-    ~MediaPlaybackCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR PlaybackResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status);
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
@@ -120,69 +51,11 @@ public:
     ~NetworkCommissioningCluster() {}
 };
 
-class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
-{
-public:
-    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
-    ~NetworkCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ConnectNetworkResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint8_t networkingStatus, chip::CharSpan debugText, int32_t errorValue);
-    CHIP_ERROR NetworkConfigResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t networkingStatus, chip::CharSpan debugText);
-    CHIP_ERROR ScanNetworksResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t networkingStatus, chip::CharSpan debugText);
-};
-
-class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
-{
-public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
-    ~OtaSoftwareUpdateProviderCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ApplyUpdateResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t action, uint32_t delayedActionTime);
-    CHIP_ERROR QueryImageResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
-                                  chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
-                                  chip::ByteSpan metadataForRequestor);
-};
-
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
-};
-
-class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
-{
-public:
-    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
-    ~OperationalCredentialsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AttestationResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan attestationElements, chip::ByteSpan signature);
-    CHIP_ERROR CertificateChainResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan certificate);
-    CHIP_ERROR NOCResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t statusCode,
-                           uint8_t fabricIndex, chip::CharSpan debugText);
-    CHIP_ERROR OpCSRResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan NOCSRElements, chip::ByteSpan attestationSignature);
-};
-
-class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
-{
-public:
-    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
-    ~TargetNavigatorCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR NavigateTargetResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint8_t status, chip::CharSpan data);
 };
 
 } // namespace Controller

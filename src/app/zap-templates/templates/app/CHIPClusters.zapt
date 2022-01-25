@@ -16,6 +16,7 @@ namespace chip {
 namespace Controller {
 
 {{/first}}
+{{#if (is_client clusterSide)}}
 class DLL_EXPORT {{asUpperCamelCase clusterName}}Cluster : public ClusterBase
 {
 public:
@@ -23,6 +24,7 @@ public:
     ~{{asUpperCamelCase clusterName}}Cluster() {}
 };
 
+{{/if}}
 {{#last}}
 } // namespace Controller
 } // namespace chip
