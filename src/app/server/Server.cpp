@@ -92,8 +92,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage),
-    mAttributePersister(mServerStorage)
+    }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
+    mAttributePersister(mDeviceStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -121,10 +121,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     InitDataModelHandler(&mExchangeMgr);
 
-    err = mFabrics.Init(&mServerStorage);
+    err = mFabrics.Init(&mDeviceStorage);
     SuccessOrExit(err);
 
-    // Group data provider must be initialized after mServerStorage
+    // Group data provider must be initialized after mDeviceStorage
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);

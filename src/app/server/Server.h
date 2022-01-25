@@ -96,7 +96,7 @@ private:
 
     static Server sServer;
 
-    class ServerStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+    class DeviceStorageDelegate : public PersistentStorageDelegate, public FabricStorage
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
@@ -114,16 +114,12 @@ private:
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
-            ChipLogProgress(AppServer, "Saved into server storage: %s", key);
-            return CHIP_NO_ERROR;
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
         }
 
         CHIP_ERROR SyncDeleteKeyValue(const char * key) override
         {
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
-            ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
-            return CHIP_NO_ERROR;
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
         }
 
         CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
@@ -163,10 +159,13 @@ private:
 
     // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
     // See: https://github.com/project-chip/connectedhomeip/issues/12276
-    ServerStorageDelegate mServerStorage;
     // Currently, the GroupDataProvider cannot use KeyValueStoreMgr() due to
     // (https://github.com/project-chip/connectedhomeip/issues/12174)
-    TestPersistentStorageDelegate mGroupsStorage;
+#ifdef CHIP_USE_NON_PERSISTENT_STORAGE_DELEGATE
+    TestPersistentStorageDelegate mDeviceStorage;
+#else
+    DeviceStorageDelegate mDeviceStorage;
+#endif
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
 
