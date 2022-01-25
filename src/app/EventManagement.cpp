@@ -492,8 +492,8 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     // Create all event specific data
     // Timestamp; encoded as a delta time
 
-    opts.mUrgent = aEventOptions.mUrgent;
-    opts.mPath   = aEventOptions.mPath;
+    opts.mUrgent      = aEventOptions.mUrgent;
+    opts.mPath        = aEventOptions.mPath;
     opts.mFabricIndex = aEventOptions.mFabricIndex;
 
     ctxt.mCurrentEventNumber = mLastEventNumber;

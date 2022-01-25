@@ -280,10 +280,7 @@ private:
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -373,10 +370,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -531,10 +525,7 @@ private:
         (static_cast<Test_TC_BI_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_BI_2_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_BI_2_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -561,10 +552,7 @@ private:
         (static_cast<Test_TC_BI_2_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context)
-    {
-        (static_cast<Test_TC_BI_2_1 *>(context))->OnSuccessResponse_6();
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_BI_2_1 *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
     {
@@ -601,10 +589,7 @@ private:
         (static_cast<Test_TC_BI_2_1 *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<Test_TC_BI_2_1 *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_BI_2_1 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, CHIP_ERROR error)
     {
@@ -693,10 +678,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeOutOfService_4()
     {
@@ -765,10 +747,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributePresentValue_7()
     {
@@ -864,10 +843,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_10()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_10() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStatusFlags_11()
     {
@@ -1403,10 +1379,7 @@ private:
         (static_cast<Test_TC_BOOL_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -1496,10 +1469,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -1624,10 +1594,7 @@ private:
         (static_cast<Test_TC_BOOL_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_BOOL_2_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_BOOL_2_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -1717,10 +1684,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStateValue_4()
     {
@@ -1969,10 +1933,7 @@ private:
         (static_cast<Test_TC_CC_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_CC_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_CC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -2028,10 +1989,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_CC_2_1 : public TestCommand
@@ -2736,10 +2694,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -2776,10 +2731,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
@@ -2816,10 +2768,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_11(error);
     }
 
-    static void OnSuccessCallback_11(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_11();
-    }
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_11(); }
 
     static void OnFailureCallback_12(void * context, CHIP_ERROR error)
     {
@@ -2856,10 +2805,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_15(error);
     }
 
-    static void OnSuccessCallback_15(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_15();
-    }
+    static void OnSuccessCallback_15(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_15(); }
 
     static void OnFailureCallback_16(void * context, CHIP_ERROR error)
     {
@@ -2916,10 +2862,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_21(error);
     }
 
-    static void OnSuccessCallback_21(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_21();
-    }
+    static void OnSuccessCallback_21(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_21(); }
 
     static void OnFailureCallback_22(void * context, CHIP_ERROR error)
     {
@@ -2956,10 +2899,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_25(error);
     }
 
-    static void OnSuccessCallback_25(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_25();
-    }
+    static void OnSuccessCallback_25(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_25(); }
 
     static void OnFailureCallback_26(void * context, CHIP_ERROR error)
     {
@@ -3006,10 +2946,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_30(error);
     }
 
-    static void OnSuccessCallback_30(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_30();
-    }
+    static void OnSuccessCallback_30(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_30(); }
 
     static void OnFailureCallback_31(void * context, CHIP_ERROR error)
     {
@@ -3046,10 +2983,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_34(error);
     }
 
-    static void OnSuccessCallback_34(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_34();
-    }
+    static void OnSuccessCallback_34(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_34(); }
 
     static void OnFailureCallback_35(void * context, CHIP_ERROR error)
     {
@@ -3086,10 +3020,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_38(error);
     }
 
-    static void OnSuccessCallback_38(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_38();
-    }
+    static void OnSuccessCallback_38(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_38(); }
 
     static void OnFailureCallback_39(void * context, CHIP_ERROR error)
     {
@@ -3126,10 +3057,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_42(error);
     }
 
-    static void OnSuccessCallback_42(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_42();
-    }
+    static void OnSuccessCallback_42(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_42(); }
 
     static void OnFailureCallback_43(void * context, CHIP_ERROR error)
     {
@@ -3166,10 +3094,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_46(error);
     }
 
-    static void OnSuccessCallback_46(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_46();
-    }
+    static void OnSuccessCallback_46(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_46(); }
 
     static void OnFailureCallback_47(void * context, CHIP_ERROR error)
     {
@@ -3206,10 +3131,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_50(error);
     }
 
-    static void OnSuccessCallback_50(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_50();
-    }
+    static void OnSuccessCallback_50(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_50(); }
 
     static void OnFailureCallback_51(void * context, CHIP_ERROR error)
     {
@@ -3246,10 +3168,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_54(error);
     }
 
-    static void OnSuccessCallback_54(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_54();
-    }
+    static void OnSuccessCallback_54(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_54(); }
 
     static void OnFailureCallback_55(void * context, CHIP_ERROR error)
     {
@@ -3286,10 +3205,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_58(error);
     }
 
-    static void OnSuccessCallback_58(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_58();
-    }
+    static void OnSuccessCallback_58(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_58(); }
 
     static void OnFailureCallback_59(void * context, CHIP_ERROR error)
     {
@@ -3316,10 +3232,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_61(error);
     }
 
-    static void OnSuccessCallback_61(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_61();
-    }
+    static void OnSuccessCallback_61(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_61(); }
 
     static void OnFailureCallback_62(void * context, CHIP_ERROR error)
     {
@@ -3346,10 +3259,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_64(error);
     }
 
-    static void OnSuccessCallback_64(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_64();
-    }
+    static void OnSuccessCallback_64(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_64(); }
 
     static void OnFailureCallback_65(void * context, CHIP_ERROR error)
     {
@@ -3386,10 +3296,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_68(error);
     }
 
-    static void OnSuccessCallback_68(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_68();
-    }
+    static void OnSuccessCallback_68(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_68(); }
 
     static void OnFailureCallback_69(void * context, CHIP_ERROR error)
     {
@@ -3416,10 +3323,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_71(error);
     }
 
-    static void OnSuccessCallback_71(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_71();
-    }
+    static void OnSuccessCallback_71(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_71(); }
 
     static void OnFailureCallback_72(void * context, CHIP_ERROR error)
     {
@@ -3446,10 +3350,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_74(error);
     }
 
-    static void OnSuccessCallback_74(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_74();
-    }
+    static void OnSuccessCallback_74(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_74(); }
 
     static void OnFailureCallback_75(void * context, CHIP_ERROR error)
     {
@@ -3476,10 +3377,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_77(error);
     }
 
-    static void OnSuccessCallback_77(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_77();
-    }
+    static void OnSuccessCallback_77(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_77(); }
 
     static void OnFailureCallback_78(void * context, CHIP_ERROR error)
     {
@@ -3506,10 +3404,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_80(error);
     }
 
-    static void OnSuccessCallback_80(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_80();
-    }
+    static void OnSuccessCallback_80(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_80(); }
 
     static void OnFailureCallback_81(void * context, CHIP_ERROR error)
     {
@@ -3536,10 +3431,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_83(error);
     }
 
-    static void OnSuccessCallback_83(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_83();
-    }
+    static void OnSuccessCallback_83(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_83(); }
 
     static void OnFailureCallback_84(void * context, CHIP_ERROR error)
     {
@@ -3576,10 +3468,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_87(error);
     }
 
-    static void OnSuccessCallback_87(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_87();
-    }
+    static void OnSuccessCallback_87(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_87(); }
 
     static void OnFailureCallback_88(void * context, CHIP_ERROR error)
     {
@@ -3606,10 +3495,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_90(error);
     }
 
-    static void OnSuccessCallback_90(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_90();
-    }
+    static void OnSuccessCallback_90(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_90(); }
 
     static void OnFailureCallback_91(void * context, CHIP_ERROR error)
     {
@@ -3646,10 +3532,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_94(error);
     }
 
-    static void OnSuccessCallback_94(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_94();
-    }
+    static void OnSuccessCallback_94(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_94(); }
 
     static void OnFailureCallback_95(void * context, CHIP_ERROR error)
     {
@@ -3676,10 +3559,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_97(error);
     }
 
-    static void OnSuccessCallback_97(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_97();
-    }
+    static void OnSuccessCallback_97(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_97(); }
 
     static void OnFailureCallback_98(void * context, CHIP_ERROR error)
     {
@@ -3716,10 +3596,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_101(error);
     }
 
-    static void OnSuccessCallback_101(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_101();
-    }
+    static void OnSuccessCallback_101(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_101(); }
 
     static void OnFailureCallback_102(void * context, CHIP_ERROR error)
     {
@@ -3746,10 +3623,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_104(error);
     }
 
-    static void OnSuccessCallback_104(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_104();
-    }
+    static void OnSuccessCallback_104(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_104(); }
 
     static void OnFailureCallback_105(void * context, CHIP_ERROR error)
     {
@@ -3786,10 +3660,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_108(error);
     }
 
-    static void OnSuccessCallback_108(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_108();
-    }
+    static void OnSuccessCallback_108(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_108(); }
 
     static void OnFailureCallback_109(void * context, CHIP_ERROR error)
     {
@@ -3816,10 +3687,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_111(error);
     }
 
-    static void OnSuccessCallback_111(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_111();
-    }
+    static void OnSuccessCallback_111(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_111(); }
 
     static void OnFailureCallback_112(void * context, CHIP_ERROR error)
     {
@@ -3856,10 +3724,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_115(error);
     }
 
-    static void OnSuccessCallback_115(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_115();
-    }
+    static void OnSuccessCallback_115(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_115(); }
 
     static void OnFailureCallback_116(void * context, CHIP_ERROR error)
     {
@@ -3886,10 +3751,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_118(error);
     }
 
-    static void OnSuccessCallback_118(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_118();
-    }
+    static void OnSuccessCallback_118(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_118(); }
 
     static void OnFailureCallback_119(void * context, CHIP_ERROR error)
     {
@@ -3926,10 +3788,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_122(error);
     }
 
-    static void OnSuccessCallback_122(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_122();
-    }
+    static void OnSuccessCallback_122(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_122(); }
 
     static void OnFailureCallback_123(void * context, CHIP_ERROR error)
     {
@@ -3956,10 +3815,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_125(error);
     }
 
-    static void OnSuccessCallback_125(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_125();
-    }
+    static void OnSuccessCallback_125(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_125(); }
 
     static void OnFailureCallback_126(void * context, CHIP_ERROR error)
     {
@@ -3986,10 +3842,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_128(error);
     }
 
-    static void OnSuccessCallback_128(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_128();
-    }
+    static void OnSuccessCallback_128(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_128(); }
 
     static void OnFailureCallback_129(void * context, CHIP_ERROR error)
     {
@@ -4016,10 +3869,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_131(error);
     }
 
-    static void OnSuccessCallback_131(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_131();
-    }
+    static void OnSuccessCallback_131(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_131(); }
 
     static void OnFailureCallback_132(void * context, CHIP_ERROR error)
     {
@@ -4046,10 +3896,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_134(error);
     }
 
-    static void OnSuccessCallback_134(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_134();
-    }
+    static void OnSuccessCallback_134(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_134(); }
 
     static void OnFailureCallback_135(void * context, CHIP_ERROR error)
     {
@@ -4076,10 +3923,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_137(error);
     }
 
-    static void OnSuccessCallback_137(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_137();
-    }
+    static void OnSuccessCallback_137(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_137(); }
 
     static void OnFailureCallback_138(void * context, CHIP_ERROR error)
     {
@@ -4106,10 +3950,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_140(error);
     }
 
-    static void OnSuccessCallback_140(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_140();
-    }
+    static void OnSuccessCallback_140(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_140(); }
 
     static void OnFailureCallback_141(void * context, CHIP_ERROR error)
     {
@@ -4136,10 +3977,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_143(error);
     }
 
-    static void OnSuccessCallback_143(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_143();
-    }
+    static void OnSuccessCallback_143(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_143(); }
 
     static void OnFailureCallback_144(void * context, CHIP_ERROR error)
     {
@@ -4166,10 +4004,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_146(error);
     }
 
-    static void OnSuccessCallback_146(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_146();
-    }
+    static void OnSuccessCallback_146(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_146(); }
 
     static void OnFailureCallback_147(void * context, CHIP_ERROR error)
     {
@@ -4196,10 +4031,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_149(error);
     }
 
-    static void OnSuccessCallback_149(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_149();
-    }
+    static void OnSuccessCallback_149(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_149(); }
 
     static void OnFailureCallback_150(void * context, CHIP_ERROR error)
     {
@@ -4226,10 +4058,7 @@ private:
         (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_152(error);
     }
 
-    static void OnSuccessCallback_152(void * context)
-    {
-        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_152();
-    }
+    static void OnSuccessCallback_152(void * context) { (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_152(); }
 
     static void OnFailureCallback_153(void * context, CHIP_ERROR error)
     {
@@ -4321,10 +4150,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentHue_4()
     {
@@ -4420,10 +4246,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_7()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentSaturation_8()
     {
@@ -4519,10 +4342,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_11()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_11() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentX_12()
     {
@@ -4618,10 +4438,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_15()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_15() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentY_16()
     {
@@ -4764,10 +4581,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_21() { NextTest(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOptions_22()
     {
@@ -4861,10 +4675,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_25()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_25() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeEnhancedCurrentHue_26()
     {
@@ -4981,10 +4792,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_30()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_30() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopActive_31()
     {
@@ -5078,10 +4886,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_34()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_34() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopDirection_35()
     {
@@ -5175,10 +4980,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_38()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_38() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopTime_39()
     {
@@ -5275,10 +5077,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_42()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_42() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStartEnhancedHue_43()
     {
@@ -5376,10 +5175,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_46()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_46() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStoredEnhancedHue_47()
     {
@@ -5476,10 +5272,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_50()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_50() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorCapabilities_51()
     {
@@ -5575,10 +5368,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_54()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_54() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMinMireds_55()
     {
@@ -5674,10 +5464,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_58()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_58() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMaxMireds_59()
     {
@@ -5749,10 +5536,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_61()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_61() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackOptionalAttributeCoupleColorTempToLevelMinMireds_62()
     {
@@ -5826,10 +5610,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_64()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_64() { NextTest(); }
 
     CHIP_ERROR TestReadsBackOptionalAttributeStartUpColorTemperatureMireds_65()
     {
@@ -5926,10 +5707,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_68()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_68() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackOptionalAttributeRemainingTime_69()
     {
@@ -6001,10 +5779,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_71()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_71() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackOptionalAttributeDriftCompensation_72()
     {
@@ -6075,10 +5850,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_74()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_74() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackOptionalAttributeCompensationText_75()
     {
@@ -6150,10 +5922,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_77()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_77() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributeNumberOfPrimaries_78()
     {
@@ -6225,10 +5994,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_80()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_80() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1X_81()
     {
@@ -6300,10 +6066,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_83()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_83() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1Y_84()
     {
@@ -6398,10 +6161,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_87()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_87() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2X_88()
     {
@@ -6473,10 +6233,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_90()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_90() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2Y_91()
     {
@@ -6571,10 +6328,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_94()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_94() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3X_95()
     {
@@ -6646,10 +6400,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_97()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_97() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3Y_98()
     {
@@ -6744,10 +6495,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_101()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_101() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4X_102()
     {
@@ -6819,10 +6567,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_104()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_104() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4Y_105()
     {
@@ -6917,10 +6662,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_108()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_108() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5X_109()
     {
@@ -6992,10 +6734,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_111()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_111() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5Y_112()
     {
@@ -7090,10 +6829,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_115()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_115() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6X_116()
     {
@@ -7165,10 +6901,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_118()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_118() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6Y_119()
     {
@@ -7262,10 +6995,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_122()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_122() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointX_123()
     {
@@ -7336,10 +7066,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_125()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_125() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointY_126()
     {
@@ -7410,10 +7137,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_128()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_128() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRX_129()
     {
@@ -7484,10 +7208,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_131()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_131() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRY_132()
     {
@@ -7556,10 +7277,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_134()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_134() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRIntensity_135()
     {
@@ -7630,10 +7348,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_137()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_137() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGX_138()
     {
@@ -7704,10 +7419,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_140()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_140() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGY_141()
     {
@@ -7776,10 +7488,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_143()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_143() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGIntensity_144()
     {
@@ -7850,10 +7559,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_146()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_146() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBX_147()
     {
@@ -7924,10 +7630,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_149()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_149() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBY_150()
     {
@@ -7996,10 +7699,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_152()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_152() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBIntensity_153()
     {
@@ -8169,10 +7869,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -8228,10 +7925,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestMoveToHueLongestDistanceCommand_4()
     {
@@ -8263,10 +7957,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestMoveToHueUpCommand_5()
     {
@@ -8298,10 +7989,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestMoveToHueDownCommand_6()
     {
@@ -8333,10 +8021,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
@@ -8363,10 +8048,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
@@ -8536,10 +8218,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -8594,10 +8273,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestMoveHueStopCommand_4()
     {
@@ -8628,10 +8304,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestMoveHueDownCommand_5()
     {
@@ -8662,10 +8335,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestMoveHueStopCommand_6()
     {
@@ -8696,10 +8366,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
@@ -8726,10 +8393,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
@@ -8891,10 +8555,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -8950,10 +8611,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestStepHueDownCommand_4()
     {
@@ -8985,10 +8643,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
@@ -9015,10 +8670,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -9176,10 +8828,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -9234,10 +8883,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
@@ -9264,10 +8910,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
@@ -9445,10 +9088,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -9503,10 +9143,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestMoveSaturationDownCommand_4()
     {
@@ -9537,10 +9174,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestMoveSaturationUpCommand_5()
     {
@@ -9571,10 +9205,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestMoveSaturationStopCommand_6()
     {
@@ -9605,10 +9236,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestMoveSaturationDownCommand_7()
     {
@@ -9639,10 +9267,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestMoveSaturationStopCommand_8()
     {
@@ -9673,10 +9298,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
     {
@@ -9703,10 +9325,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
     {
@@ -9868,10 +9487,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -9927,10 +9543,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestStepSaturationDownCommand_4()
     {
@@ -9962,10 +9575,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
@@ -9992,10 +9602,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -10153,10 +9760,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -10212,10 +9816,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
@@ -10242,10 +9843,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
@@ -10403,10 +10001,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -10462,10 +10057,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
@@ -10492,10 +10084,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
@@ -10657,10 +10246,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -10715,10 +10301,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestStopMoveStepCommand_4()
     {
@@ -10747,10 +10330,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
@@ -10777,10 +10357,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -10938,10 +10515,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -10997,10 +10571,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
@@ -11027,10 +10598,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
@@ -11188,10 +10756,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -11246,10 +10811,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
@@ -11276,10 +10838,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
@@ -11445,10 +11004,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -11505,10 +11061,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestStopColorTemperatureCommand_4()
     {
@@ -11541,10 +11094,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestMoveDownColorTemperatureCommand_5()
     {
@@ -11577,10 +11127,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
@@ -11607,10 +11154,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_7()
     {
@@ -11772,10 +11316,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -11833,10 +11374,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestStepDownColorTemperatureCommand_4()
     {
@@ -11870,10 +11408,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
@@ -11900,10 +11435,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -12076,10 +11608,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -12135,10 +11664,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestCheckRemainingTimeAttributeValueMatchedTheValueSentByTheLastCommand_4()
     {
@@ -12189,10 +11715,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -12362,10 +11885,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -12420,10 +11940,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestEnhancedMoveHueStopCommand_4()
     {
@@ -12454,10 +11971,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestEnhancedMoveHueUpCommand_5()
     {
@@ -12488,10 +12002,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestEnhancedMoveHueStopCommand_6()
     {
@@ -12522,10 +12033,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
@@ -12552,10 +12060,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
@@ -12717,10 +12222,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -12776,10 +12278,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestEnhancedStepHueDownCommand_4()
     {
@@ -12811,10 +12310,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
@@ -12841,10 +12337,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -13002,10 +12495,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -13061,10 +12551,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
@@ -13091,10 +12578,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
@@ -13376,10 +12860,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -13437,10 +12918,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestCheckColorLoopDirectionValue_4()
     {
@@ -13571,10 +13049,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestCheckColorLoopActiveValue_9()
     {
@@ -13632,10 +13107,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestCheckColorLoopDirectionValue_11()
     {
@@ -13717,10 +13189,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_13() { NextTest(); }
 
     CHIP_ERROR TestCheckColorLoopDirectionValue_14()
     {
@@ -13771,10 +13240,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_16()
     {
@@ -14366,10 +13832,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -14427,10 +13890,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_4()
     {
@@ -14488,10 +13948,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_6()
     {
@@ -14549,10 +14006,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_8()
     {
@@ -14610,10 +14064,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_10()
     {
@@ -14672,10 +14123,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_12()
     {
@@ -14733,10 +14181,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_13() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_14()
     {
@@ -14794,10 +14239,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_16()
     {
@@ -14855,10 +14297,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_17() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_18()
     {
@@ -14916,10 +14355,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_19()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_19() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_20()
     {
@@ -14975,10 +14411,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_21() { NextTest(); }
 
     CHIP_ERROR TestWait2000ms_22()
     {
@@ -15042,10 +14475,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_24()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_24() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_25()
     {
@@ -15103,10 +14533,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_26()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_26() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_27()
     {
@@ -15164,10 +14591,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_28()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_28() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_29()
     {
@@ -15225,10 +14649,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_30()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_30() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_31()
     {
@@ -15286,10 +14707,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_32()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_32() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_33()
     {
@@ -15347,10 +14765,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_34()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_34() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_35()
     {
@@ -15401,10 +14816,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_36()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_36() { NextTest(); }
 };
 
 class Test_TC_CC_9_2 : public TestCommand
@@ -15689,10 +15101,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -15750,10 +15159,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_4()
     {
@@ -15884,10 +15290,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_9()
     {
@@ -15945,10 +15348,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_11()
     {
@@ -16006,10 +15406,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_13()
     {
@@ -16060,10 +15457,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 };
 
 class Test_TC_CC_9_3 : public TestCommand
@@ -16348,10 +15742,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
@@ -16409,10 +15800,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_4()
     {
@@ -16543,10 +15931,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_9()
     {
@@ -16604,10 +15989,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_11()
     {
@@ -16665,10 +16047,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_13()
     {
@@ -16719,10 +16098,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 };
 
 class Test_TC_DD_1_5 : public TestCommand
@@ -18320,10 +17696,7 @@ private:
         (static_cast<Test_TC_EMR_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -18416,10 +17789,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -18661,10 +18031,7 @@ private:
         (static_cast<Test_TC_FLW_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_FLW_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_FLW_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -18720,10 +18087,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_FLW_2_1 : public TestCommand
@@ -18869,30 +18233,21 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context)
-    {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_4();
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context)
-    {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6();
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
     {
@@ -18949,10 +18304,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -19064,10 +18416,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_4()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_5()
     {
@@ -19090,10 +18439,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_5()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_6()
     {
@@ -19116,10 +18462,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_6()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_7()
     {
@@ -19260,10 +18603,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_12()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_12() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadTheOptionalAttributeTolerance_13()
     {
@@ -19529,10 +18869,7 @@ private:
         (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -19625,10 +18962,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -19762,10 +19096,7 @@ private:
         (static_cast<Test_TC_LVL_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -19792,10 +19123,7 @@ private:
         (static_cast<Test_TC_LVL_1_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context)
-    {
-        (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_6();
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_6(); }
 
     //
     // Tests methods
@@ -19875,10 +19203,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -19948,10 +19273,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_6()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_LVL_2_1 : public TestCommand
@@ -20239,10 +19561,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_2()
     {
@@ -20689,10 +20008,7 @@ private:
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -20709,20 +20025,14 @@ private:
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_4();
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -20739,10 +20049,7 @@ private:
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
@@ -20759,10 +20066,7 @@ private:
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_9();
-    }
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_9(); }
 
     static void OnFailureCallback_10(void * context, CHIP_ERROR error)
     {
@@ -20789,10 +20093,7 @@ private:
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -20809,10 +20110,7 @@ private:
         (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context)
-    {
-        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_14();
-    }
+    static void OnSuccessCallback_14(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_14(); }
 
     static void OnFailureCallback_15(void * context, CHIP_ERROR error)
     {
@@ -20878,10 +20176,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestReadsTheOnOffTransitionTimeAttributeFromTheDut_3()
     {
@@ -20927,10 +20222,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestWritesTheOnLevelAttributeOnTheDut_5()
     {
@@ -20953,10 +20245,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestReadsTheOnLevelAttributeFromTheDut_6()
     {
@@ -21004,10 +20293,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestReadsTheOnTransitionTimeAttributeFromTheDut_8()
     {
@@ -21055,10 +20341,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestReadsTheOffTransitionTimeAttributeFromTheDut_10()
     {
@@ -21131,10 +20414,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadsTheDefaultMoveRateAttributeFromTheDut_13()
     {
@@ -21182,10 +20462,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR TestReadsTheStartUpCurrentLevelAttributeFromTheDut_15()
     {
@@ -21510,10 +20787,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_5()
     {
@@ -21574,10 +20848,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestWait200ms_8()
     {
@@ -21662,10 +20933,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 
     CHIP_ERROR TestWait10ms_12()
     {
@@ -21726,10 +20994,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_15()
     {
@@ -21913,10 +21178,7 @@ private:
         (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, CHIP_ERROR error)
     {
@@ -22025,10 +21287,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestWait3000ms_4()
     {
@@ -22113,10 +21372,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestWait3000ms_8()
     {
@@ -22169,10 +21425,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_11()
     {
@@ -22228,10 +21481,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_13()
     {
@@ -22292,10 +21542,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_16()
     {
@@ -22477,10 +21724,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_2()
     {
@@ -22512,10 +21756,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestWait3000ms_3()
     {
@@ -22577,10 +21818,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestWait3000ms_6()
     {
@@ -22642,10 +21880,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestWait3000ms_9()
     {
@@ -22706,10 +21941,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_12()
     {
@@ -22742,10 +21974,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_13() { NextTest(); }
 };
 
 class Test_TC_LVL_6_1 : public TestCommand
@@ -22903,10 +22132,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestPreconditionSetDutToLowestPoint_2()
     {
@@ -22937,10 +22163,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_3()
     {
@@ -23001,10 +22224,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestWait2000ms_6()
     {
@@ -23039,10 +22259,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
     {
@@ -23097,10 +22314,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestWait100ms_10()
     {
@@ -23133,10 +22347,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 };
 
 class Test_TC_MC_1_1 : public TestCommand
@@ -23219,10 +22430,7 @@ private:
         (static_cast<Test_TC_MC_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_MC_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_MC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -23278,10 +22486,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_MC_2_1 : public TestCommand
@@ -23379,10 +22584,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 };
 
 class Test_TC_MC_3_1 : public TestCommand
@@ -25722,10 +24924,7 @@ private:
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_3(); }
 
     //
     // Tests methods
@@ -25805,10 +25004,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_OCC_2_1 : public TestCommand
@@ -25922,10 +25118,7 @@ private:
         (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -25952,10 +25145,7 @@ private:
         (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -25982,10 +25172,7 @@ private:
         (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -26053,10 +25240,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancy_3()
     {
@@ -26130,10 +25314,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_5()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorType_6()
     {
@@ -26208,10 +25389,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorTypeBitmap_9()
     {
@@ -26508,10 +25686,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context)
-    {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4();
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
@@ -26548,10 +25723,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -26647,10 +25819,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_4()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_5()
     {
@@ -26744,10 +25913,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_9()
     {
@@ -26905,10 +26071,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -26965,40 +26128,28 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_9();
-    }
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_9(); }
 
     static void OnFailureCallback_10(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_11(error);
     }
 
-    static void OnSuccessCallback_11(void * context)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11();
-    }
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11(); }
 
     static void OnFailureCallback_12(void * context, CHIP_ERROR error)
     {
@@ -27095,10 +26246,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOnOff_3()
     {
@@ -27241,10 +26389,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOnTime_9()
     {
@@ -27266,10 +26411,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_10()
     {
@@ -27291,10 +26433,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_11()
     {
@@ -27316,10 +26455,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 
     CHIP_ERROR TestReadsBackLtAttributeGlobalSceneControl_12()
     {
@@ -27635,10 +26771,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_2()
     {
@@ -27689,10 +26822,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_4()
     {
@@ -27743,10 +26873,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
@@ -27797,10 +26924,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterToggleCommand_8()
     {
@@ -27851,10 +26975,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterToggleCommand_10()
     {
@@ -27905,10 +27026,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_12()
     {
@@ -27959,10 +27077,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_13() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_14()
     {
@@ -28809,10 +27924,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestWait1000ms_2()
     {
@@ -28893,10 +28005,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestWait1000ms_6()
     {
@@ -28977,10 +28086,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestWait1000ms_10()
     {
@@ -29109,10 +28215,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_16()
     {
@@ -29211,10 +28314,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_19()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_19() { NextTest(); }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_20()
     {
@@ -29361,10 +28461,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_25()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_25() { NextTest(); }
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_26()
     {
@@ -29439,10 +28536,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_28()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_28() { NextTest(); }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_29()
     {
@@ -29565,10 +28659,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_33()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_33() { NextTest(); }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_34()
     {
@@ -29667,10 +28758,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_37()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_37() { NextTest(); }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_38()
     {
@@ -29889,10 +28977,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_46()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_46() { NextTest(); }
 };
 
 class Test_TC_PS_1_1 : public TestCommand
@@ -29997,10 +29082,7 @@ private:
         (static_cast<Test_TC_PS_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -30100,10 +29182,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -30233,10 +29312,7 @@ private:
         (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -30293,10 +29369,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_PRS_2_1 : public TestCommand
@@ -30406,10 +29479,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -30436,10 +29506,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -30466,10 +29533,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -30535,10 +29599,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeMeasuredValue_3()
     {
@@ -30610,10 +29671,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_5()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeMinMeasuredValue_6()
     {
@@ -30686,10 +29744,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackMandatoryAttributeMaxMeasuredValue_9()
     {
@@ -30801,10 +29856,7 @@ private:
         (static_cast<Test_TC_PCC_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -30872,10 +29924,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_3()
     {
@@ -31459,10 +30508,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_31(error);
     }
 
-    static void OnSuccessCallback_31(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_31();
-    }
+    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_31(); }
 
     static void OnFailureCallback_32(void * context, CHIP_ERROR error)
     {
@@ -32399,10 +31445,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_31()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_31() { NextTest(); }
 
     CHIP_ERROR TestReadTheOptionalAttributeMinConstPressure_32()
     {
@@ -32930,30 +31973,21 @@ private:
         (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_1();
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_3(); }
 
     //
     // Tests methods
@@ -32986,10 +32020,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestWrite2ToTheOperationModeAttributeToDutOperationMode_2()
     {
@@ -33012,10 +32043,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestWrite3ToTheOperationModeAttributeToDutOperationMode_3()
     {
@@ -33038,10 +32066,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 };
 
 class Test_TC_PCC_2_3 : public TestCommand
@@ -33186,10 +32211,7 @@ private:
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_1();
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
@@ -33206,10 +32228,7 @@ private:
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -33226,50 +32245,35 @@ private:
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_6();
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context)
-    {
-        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_9();
-    }
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_9(); }
 
     //
     // Tests methods
@@ -33302,10 +32306,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_2()
     {
@@ -33353,10 +32354,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_4()
     {
@@ -33404,10 +32402,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_6()
     {
@@ -33430,10 +32425,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_7()
     {
@@ -33456,10 +32448,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_8()
     {
@@ -33482,10 +32471,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_9()
     {
@@ -33508,10 +32494,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 };
 
 class Test_TC_RH_1_1 : public TestCommand
@@ -33594,10 +32577,7 @@ private:
         (static_cast<Test_TC_RH_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_RH_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_RH_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -33655,10 +32635,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_RH_2_1 : public TestCommand
@@ -34924,10 +33901,7 @@ private:
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -35020,10 +33994,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -35432,10 +34403,7 @@ private:
         (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -35501,10 +34469,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_3()
     {
@@ -35907,10 +34872,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_4();
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
@@ -35947,10 +34909,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -35987,10 +34946,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -36027,10 +34983,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_16(error);
     }
 
-    static void OnSuccessCallback_16(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_16();
-    }
+    static void OnSuccessCallback_16(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_16(); }
 
     static void OnFailureCallback_17(void * context, CHIP_ERROR error)
     {
@@ -36067,10 +35020,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_20(error);
     }
 
-    static void OnSuccessCallback_20(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_20();
-    }
+    static void OnSuccessCallback_20(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_20(); }
 
     static void OnFailureCallback_21(void * context, CHIP_ERROR error)
     {
@@ -36107,10 +35057,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_24(error);
     }
 
-    static void OnSuccessCallback_24(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_24();
-    }
+    static void OnSuccessCallback_24(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_24(); }
 
     static void OnFailureCallback_25(void * context, CHIP_ERROR error)
     {
@@ -36147,10 +35094,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_28(error);
     }
 
-    static void OnSuccessCallback_28(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_28();
-    }
+    static void OnSuccessCallback_28(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_28(); }
 
     static void OnFailureCallback_29(void * context, CHIP_ERROR error)
     {
@@ -36187,10 +35131,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_32(error);
     }
 
-    static void OnSuccessCallback_32(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_32();
-    }
+    static void OnSuccessCallback_32(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_32(); }
 
     static void OnFailureCallback_33(void * context, CHIP_ERROR error)
     {
@@ -36227,10 +35168,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_36(error);
     }
 
-    static void OnSuccessCallback_36(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_36();
-    }
+    static void OnSuccessCallback_36(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_36(); }
 
     static void OnFailureCallback_37(void * context, CHIP_ERROR error)
     {
@@ -36267,10 +35205,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_40(error);
     }
 
-    static void OnSuccessCallback_40(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_40();
-    }
+    static void OnSuccessCallback_40(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_40(); }
 
     static void OnFailureCallback_41(void * context, CHIP_ERROR error)
     {
@@ -36307,10 +35242,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_44(error);
     }
 
-    static void OnSuccessCallback_44(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_44();
-    }
+    static void OnSuccessCallback_44(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_44(); }
 
     static void OnFailureCallback_45(void * context, CHIP_ERROR error)
     {
@@ -36347,10 +35279,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_48(error);
     }
 
-    static void OnSuccessCallback_48(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_48();
-    }
+    static void OnSuccessCallback_48(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_48(); }
 
     static void OnFailureCallback_49(void * context, CHIP_ERROR error)
     {
@@ -36387,10 +35316,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_52(error);
     }
 
-    static void OnSuccessCallback_52(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_52();
-    }
+    static void OnSuccessCallback_52(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_52(); }
 
     static void OnFailureCallback_53(void * context, CHIP_ERROR error)
     {
@@ -36417,10 +35343,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_55(error);
     }
 
-    static void OnSuccessCallback_55(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_55();
-    }
+    static void OnSuccessCallback_55(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_55(); }
 
     static void OnFailureCallback_56(void * context, CHIP_ERROR error)
     {
@@ -36447,10 +35370,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_58(error);
     }
 
-    static void OnSuccessCallback_58(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_58();
-    }
+    static void OnSuccessCallback_58(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_58(); }
 
     static void OnFailureCallback_59(void * context, CHIP_ERROR error)
     {
@@ -36467,10 +35387,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_60(error);
     }
 
-    static void OnSuccessCallback_60(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_60();
-    }
+    static void OnSuccessCallback_60(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_60(); }
 
     //
     // Tests methods
@@ -36575,10 +35492,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_4()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMinHeatSetpointLimit_5()
     {
@@ -36674,10 +35588,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_9()
     {
@@ -36773,10 +35684,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_12()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_12() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMinCoolSetpointLimit_13()
     {
@@ -36872,10 +35780,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_16()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_16() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_17()
     {
@@ -36970,10 +35875,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_20() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutOccupiedCoolingSetpoint_21()
     {
@@ -37068,10 +35970,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_24()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_24() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutOccupiedHeatingSetpoint_25()
     {
@@ -37166,10 +36065,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_28()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_28() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMinHeatSetpointLimit_29()
     {
@@ -37264,10 +36160,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_32()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_32() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMaxHeatSetpointLimit_33()
     {
@@ -37362,10 +36255,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_36()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_36() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMinCoolSetpointLimit_37()
     {
@@ -37460,10 +36350,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_40()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_40() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMaxCoolSetpointLimit_41()
     {
@@ -37561,10 +36448,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_44()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_44() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutControlSequenceOfOperation_45()
     {
@@ -37660,10 +36544,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_48()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_48() { NextTest(); }
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutSystemMode_49()
     {
@@ -37758,10 +36639,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_52()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_52() { NextTest(); }
 
     CHIP_ERROR TestReadBackOptionalAttributesFromDutMinSetpointDeadBand_53()
     {
@@ -37833,10 +36711,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_55()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_55() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadBackOptionalAttributesFromDutStartOfWeek_56()
     {
@@ -37908,10 +36783,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_58()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_58() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfDailyTransitions_59()
     {
@@ -37958,10 +36830,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_60()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_60() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_TSTAT_2_2 : public TestCommand
@@ -38543,10 +37412,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -38563,20 +37429,14 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_4();
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -38593,10 +37453,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
@@ -38613,20 +37470,14 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_9();
-    }
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_9(); }
 
     static void OnFailureCallback_10(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, CHIP_ERROR error)
     {
@@ -38643,10 +37494,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -38663,20 +37511,14 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_14();
-    }
+    static void OnSuccessCallback_14(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_14(); }
 
     static void OnFailureCallback_15(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_15(error);
     }
 
-    static void OnSuccessCallback_15(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_15();
-    }
+    static void OnSuccessCallback_15(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_15(); }
 
     static void OnFailureCallback_16(void * context, CHIP_ERROR error)
     {
@@ -38693,10 +37535,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_17(error);
     }
 
-    static void OnSuccessCallback_17(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_17();
-    }
+    static void OnSuccessCallback_17(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_17(); }
 
     static void OnFailureCallback_18(void * context, CHIP_ERROR error)
     {
@@ -38713,20 +37552,14 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_19(error);
     }
 
-    static void OnSuccessCallback_19(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_19();
-    }
+    static void OnSuccessCallback_19(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_19(); }
 
     static void OnFailureCallback_20(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_20(error);
     }
 
-    static void OnSuccessCallback_20(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_20();
-    }
+    static void OnSuccessCallback_20(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_20(); }
 
     static void OnFailureCallback_21(void * context, CHIP_ERROR error)
     {
@@ -38743,10 +37576,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_22(error);
     }
 
-    static void OnSuccessCallback_22(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_22();
-    }
+    static void OnSuccessCallback_22(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_22(); }
 
     static void OnFailureCallback_23(void * context, CHIP_ERROR error)
     {
@@ -38763,20 +37593,14 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_24(error);
     }
 
-    static void OnSuccessCallback_24(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_24();
-    }
+    static void OnSuccessCallback_24(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_24(); }
 
     static void OnFailureCallback_25(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_25(error);
     }
 
-    static void OnSuccessCallback_25(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_25();
-    }
+    static void OnSuccessCallback_25(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_25(); }
 
     static void OnFailureCallback_26(void * context, CHIP_ERROR error)
     {
@@ -38793,10 +37617,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_27(error);
     }
 
-    static void OnSuccessCallback_27(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_27();
-    }
+    static void OnSuccessCallback_27(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_27(); }
 
     static void OnFailureCallback_28(void * context, CHIP_ERROR error)
     {
@@ -38813,100 +37634,70 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_29(error);
     }
 
-    static void OnSuccessCallback_29(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_29();
-    }
+    static void OnSuccessCallback_29(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_29(); }
 
     static void OnFailureCallback_30(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_30(error);
     }
 
-    static void OnSuccessCallback_30(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_30();
-    }
+    static void OnSuccessCallback_30(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_30(); }
 
     static void OnFailureCallback_31(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_31(error);
     }
 
-    static void OnSuccessCallback_31(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_31();
-    }
+    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_31(); }
 
     static void OnFailureCallback_32(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_32(error);
     }
 
-    static void OnSuccessCallback_32(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_32();
-    }
+    static void OnSuccessCallback_32(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_32(); }
 
     static void OnFailureCallback_33(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_33(error);
     }
 
-    static void OnSuccessCallback_33(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_33();
-    }
+    static void OnSuccessCallback_33(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_33(); }
 
     static void OnFailureCallback_34(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_34(error);
     }
 
-    static void OnSuccessCallback_34(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_34();
-    }
+    static void OnSuccessCallback_34(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_34(); }
 
     static void OnFailureCallback_35(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_35(error);
     }
 
-    static void OnSuccessCallback_35(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_35();
-    }
+    static void OnSuccessCallback_35(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_35(); }
 
     static void OnFailureCallback_36(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_36(error);
     }
 
-    static void OnSuccessCallback_36(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_36();
-    }
+    static void OnSuccessCallback_36(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_36(); }
 
     static void OnFailureCallback_37(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_37(error);
     }
 
-    static void OnSuccessCallback_37(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_37();
-    }
+    static void OnSuccessCallback_37(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_37(); }
 
     static void OnFailureCallback_38(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_38(error);
     }
 
-    static void OnSuccessCallback_38(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_38();
-    }
+    static void OnSuccessCallback_38(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_38(); }
 
     static void OnFailureCallback_39(void * context, CHIP_ERROR error)
     {
@@ -38923,10 +37714,7 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_40(error);
     }
 
-    static void OnSuccessCallback_40(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_40();
-    }
+    static void OnSuccessCallback_40(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_40(); }
 
     static void OnFailureCallback_41(void * context, CHIP_ERROR error)
     {
@@ -38943,80 +37731,56 @@ private:
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_42(error);
     }
 
-    static void OnSuccessCallback_42(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_42();
-    }
+    static void OnSuccessCallback_42(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_42(); }
 
     static void OnFailureCallback_43(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_43(error);
     }
 
-    static void OnSuccessCallback_43(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_43();
-    }
+    static void OnSuccessCallback_43(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_43(); }
 
     static void OnFailureCallback_44(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_44(error);
     }
 
-    static void OnSuccessCallback_44(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_44();
-    }
+    static void OnSuccessCallback_44(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_44(); }
 
     static void OnFailureCallback_45(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_45(error);
     }
 
-    static void OnSuccessCallback_45(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_45();
-    }
+    static void OnSuccessCallback_45(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_45(); }
 
     static void OnFailureCallback_46(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_46(error);
     }
 
-    static void OnSuccessCallback_46(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_46();
-    }
+    static void OnSuccessCallback_46(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_46(); }
 
     static void OnFailureCallback_47(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_47(error);
     }
 
-    static void OnSuccessCallback_47(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_47();
-    }
+    static void OnSuccessCallback_47(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_47(); }
 
     static void OnFailureCallback_48(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_48(error);
     }
 
-    static void OnSuccessCallback_48(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_48();
-    }
+    static void OnSuccessCallback_48(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_48(); }
 
     static void OnFailureCallback_49(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_49(error);
     }
 
-    static void OnSuccessCallback_49(void * context)
-    {
-        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_49();
-    }
+    static void OnSuccessCallback_49(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_49(); }
 
     //
     // Tests methods
@@ -39074,10 +37838,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_3()
     {
@@ -39123,10 +37884,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_5()
     {
@@ -39148,10 +37906,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_6()
     {
@@ -39199,10 +37954,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_8()
     {
@@ -39248,10 +38000,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_10()
     {
@@ -39273,10 +38022,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_11()
     {
@@ -39324,10 +38070,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_13()
     {
@@ -39373,10 +38116,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_15()
     {
@@ -39398,10 +38138,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_16()
     {
@@ -39449,10 +38186,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_17() { NextTest(); }
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_18()
     {
@@ -39498,10 +38232,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_19()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_19() { NextTest(); }
 
     CHIP_ERROR TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_20()
     {
@@ -39523,10 +38254,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_20() { NextTest(); }
 
     CHIP_ERROR TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_21()
     {
@@ -39574,10 +38302,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_22()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_22() { NextTest(); }
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_23()
     {
@@ -39623,10 +38348,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_24()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_24() { NextTest(); }
 
     CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_25()
     {
@@ -39648,10 +38370,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_25()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_25() { NextTest(); }
 
     CHIP_ERROR TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_26()
     {
@@ -39699,10 +38418,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_27()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_27() { NextTest(); }
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_28()
     {
@@ -39748,10 +38464,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_29()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_29() { NextTest(); }
 
     CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_30()
     {
@@ -39773,10 +38486,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_30()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_30() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_31()
     {
@@ -39798,10 +38508,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_31()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_31() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_32()
     {
@@ -39823,10 +38530,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_32()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_32() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33()
     {
@@ -39848,10 +38552,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_33()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_33() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_34()
     {
@@ -39873,10 +38574,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_34()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_34() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_35()
     {
@@ -39898,10 +38596,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_35()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_35() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_36()
     {
@@ -39923,10 +38618,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_36()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_36() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37()
     {
@@ -39948,10 +38640,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_37()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_37() { NextTest(); }
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_38()
     {
@@ -39973,10 +38662,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_38()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_38() { NextTest(); }
 
     CHIP_ERROR TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_39()
     {
@@ -40026,10 +38712,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_40()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_40() { NextTest(); }
 
     CHIP_ERROR TestReadItBackAgainToConfirmTheSuccessfulWrite_41()
     {
@@ -40076,10 +38759,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_42()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_42() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_43()
     {
@@ -40101,10 +38781,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_43()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_43() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_44()
     {
@@ -40126,10 +38803,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_44()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_44() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_45()
     {
@@ -40151,10 +38825,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_45()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_45() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_46()
     {
@@ -40176,10 +38847,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_46()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_46() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_47()
     {
@@ -40201,10 +38869,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_47()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_47() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_48()
     {
@@ -40226,10 +38891,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_48()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_48() { NextTest(); }
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_49()
     {
@@ -40251,10 +38913,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_49()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_49() { NextTest(); }
 };
 
 class Test_TC_TSUIC_1_1 : public TestCommand
@@ -40337,10 +38996,7 @@ private:
         (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -40399,10 +39055,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_TSUIC_2_1 : public TestCommand
@@ -40546,10 +39199,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -40596,10 +39246,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -40646,10 +39293,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_13(error);
     }
 
-    static void OnSuccessCallback_13(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_13();
-    }
+    static void OnSuccessCallback_13(void * context) { (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_13(); }
 
     static void OnFailureCallback_14(void * context, CHIP_ERROR error)
     {
@@ -40754,10 +39398,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_4()
     {
@@ -40880,10 +39521,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_9()
     {
@@ -41007,10 +39645,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_13() { NextTest(); }
 
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_14()
     {
@@ -41217,100 +39852,70 @@ private:
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_1();
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_4();
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_6();
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_9();
-    }
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_9(); }
 
     static void OnFailureCallback_10(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnSuccessResponse_10(); }
 
     //
     // Tests methods
@@ -41344,10 +39949,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2()
     {
@@ -41371,10 +39973,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3()
     {
@@ -41397,10 +39996,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4()
     {
@@ -41423,10 +40019,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5()
     {
@@ -41449,10 +40042,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6()
     {
@@ -41475,10 +40065,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7()
     {
@@ -41501,10 +40088,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8()
     {
@@ -41527,10 +40111,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_8() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9()
     {
@@ -41554,10 +40135,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10()
     {
@@ -41581,10 +40159,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 };
 
 class Test_TC_DIAGTH_1_1 : public TestCommand
@@ -41685,10 +40260,7 @@ private:
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -41781,10 +40353,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_3()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
@@ -42120,10 +40689,7 @@ private:
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -42150,10 +40716,7 @@ private:
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -42221,10 +40784,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackGlobalAttributeClusterRevision_3()
     {
@@ -42297,10 +40857,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_5()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackGlobalAttributeFeatureMap_6()
     {
@@ -42648,10 +41205,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -42678,10 +41232,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -42708,10 +41259,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -42738,10 +41286,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_11(error);
     }
 
-    static void OnSuccessCallback_11(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_11();
-    }
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_11(); }
 
     static void OnFailureCallback_12(void * context, CHIP_ERROR error)
     {
@@ -42768,10 +41313,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_14();
-    }
+    static void OnSuccessCallback_14(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_14(); }
 
     static void OnFailureCallback_15(void * context, CHIP_ERROR error)
     {
@@ -42799,10 +41341,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_17(error);
     }
 
-    static void OnSuccessCallback_17(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_17();
-    }
+    static void OnSuccessCallback_17(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_17(); }
 
     static void OnFailureCallback_18(void * context, CHIP_ERROR error)
     {
@@ -42831,10 +41370,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_20(error);
     }
 
-    static void OnSuccessCallback_20(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_20();
-    }
+    static void OnSuccessCallback_20(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_20(); }
 
     static void OnFailureCallback_21(void * context, CHIP_ERROR error)
     {
@@ -42863,10 +41399,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_23(error);
     }
 
-    static void OnSuccessCallback_23(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_23();
-    }
+    static void OnSuccessCallback_23(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_23(); }
 
     static void OnFailureCallback_24(void * context, CHIP_ERROR error)
     {
@@ -42895,10 +41428,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_26(error);
     }
 
-    static void OnSuccessCallback_26(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_26();
-    }
+    static void OnSuccessCallback_26(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_26(); }
 
     static void OnFailureCallback_27(void * context, CHIP_ERROR error)
     {
@@ -42926,10 +41456,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_29(error);
     }
 
-    static void OnSuccessCallback_29(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_29();
-    }
+    static void OnSuccessCallback_29(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_29(); }
 
     static void OnFailureCallback_30(void * context, CHIP_ERROR error)
     {
@@ -42956,10 +41483,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_32(error);
     }
 
-    static void OnSuccessCallback_32(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_32();
-    }
+    static void OnSuccessCallback_32(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_32(); }
 
     static void OnFailureCallback_33(void * context, CHIP_ERROR error)
     {
@@ -42986,10 +41510,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_35(error);
     }
 
-    static void OnSuccessCallback_35(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_35();
-    }
+    static void OnSuccessCallback_35(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_35(); }
 
     static void OnFailureCallback_36(void * context, CHIP_ERROR error)
     {
@@ -43016,10 +41537,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_38(error);
     }
 
-    static void OnSuccessCallback_38(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_38();
-    }
+    static void OnSuccessCallback_38(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_38(); }
 
     static void OnFailureCallback_39(void * context, CHIP_ERROR error)
     {
@@ -43046,10 +41564,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_41(error);
     }
 
-    static void OnSuccessCallback_41(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_41();
-    }
+    static void OnSuccessCallback_41(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_41(); }
 
     static void OnFailureCallback_42(void * context, CHIP_ERROR error)
     {
@@ -43076,10 +41591,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_44(error);
     }
 
-    static void OnSuccessCallback_44(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_44();
-    }
+    static void OnSuccessCallback_44(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_44(); }
 
     static void OnFailureCallback_45(void * context, CHIP_ERROR error)
     {
@@ -43106,10 +41618,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_47(error);
     }
 
-    static void OnSuccessCallback_47(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_47();
-    }
+    static void OnSuccessCallback_47(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_47(); }
 
     static void OnFailureCallback_48(void * context, CHIP_ERROR error)
     {
@@ -43137,10 +41646,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_50(error);
     }
 
-    static void OnSuccessCallback_50(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_50();
-    }
+    static void OnSuccessCallback_50(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_50(); }
 
     static void OnFailureCallback_51(void * context, CHIP_ERROR error)
     {
@@ -43169,10 +41675,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_53(error);
     }
 
-    static void OnSuccessCallback_53(void * context)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_53();
-    }
+    static void OnSuccessCallback_53(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_53(); }
 
     static void OnFailureCallback_54(void * context, CHIP_ERROR error)
     {
@@ -43241,10 +41744,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeType_3()
     {
@@ -43317,10 +41817,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_5()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeConfigStatus_6()
     {
@@ -43393,10 +41890,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_9()
     {
@@ -43469,10 +41963,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_11()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_11() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeEndProductType_12()
     {
@@ -43544,10 +42035,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR Test3bReadsBackTheRwMandatoryAttributeMode_15()
     {
@@ -43624,10 +42112,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_17()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_17() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_18()
     {
@@ -43706,10 +42191,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_20()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_20() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_21()
     {
@@ -43788,10 +42270,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_23()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_23() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_24()
     {
@@ -43870,10 +42349,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_26()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_26() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_27()
     {
@@ -43949,10 +42425,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_29()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_29() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_30()
     {
@@ -44028,10 +42501,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_32()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_32() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_33()
     {
@@ -44107,10 +42577,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_35()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_35() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_36()
     {
@@ -44186,10 +42653,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_38()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_38() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_39()
     {
@@ -44263,10 +42727,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_41()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_41() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_42()
     {
@@ -44340,10 +42801,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_44()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_44() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_45()
     {
@@ -44417,10 +42875,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_47()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_47() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_48()
     {
@@ -44496,10 +42951,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_50()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_50() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_51()
     {
@@ -44576,10 +43028,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_53()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_53() { ThrowSuccessResponse(); }
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_54()
     {
@@ -45096,10 +43545,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_2()
     {
@@ -45126,10 +43572,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_3()
     {
@@ -45269,10 +43712,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_2()
     {
@@ -45299,10 +43739,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_3()
     {
@@ -45442,10 +43879,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR Test2aThSendsStopMotionCommandToDut_2()
     {
@@ -45472,10 +43906,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR Test2bThReadsOperationalStatusAttributeFromDut_3()
     {
@@ -45901,10 +44332,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestRenameOutputCommand_4()
     {
@@ -45933,10 +44361,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 };
 
 class TV_ApplicationLauncherCluster : public TestCommand
@@ -46420,10 +44845,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestLogoutCommand_3()
     {
@@ -46451,10 +44873,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 };
 
 class TV_WakeOnLanCluster : public TestCommand
@@ -47757,10 +46176,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestSkipChannelCommand_4()
     {
@@ -47788,10 +46204,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 };
 
 class TV_LowPowerCluster : public TestCommand
@@ -47889,10 +46302,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 };
 
 class TV_ContentLauncherCluster : public TestCommand
@@ -48370,10 +46780,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestHideInputStatusCommand_4()
     {
@@ -48400,10 +46807,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestShowInputStatusCommand_5()
     {
@@ -48430,10 +46834,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestRenameInputCommand_6()
     {
@@ -48462,10 +46863,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 };
 
 class TestCluster : public TestCommand
@@ -50559,10 +48957,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
@@ -50579,10 +48974,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_9();
-    }
+    static void OnSuccessCallback_9(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_9(); }
 
     static void OnFailureCallback_10(void * context, CHIP_ERROR error)
     {
@@ -50609,10 +49001,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -50629,10 +49018,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_14();
-    }
+    static void OnSuccessCallback_14(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_14(); }
 
     static void OnFailureCallback_15(void * context, CHIP_ERROR error)
     {
@@ -50659,10 +49045,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_17(error);
     }
 
-    static void OnSuccessCallback_17(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_17();
-    }
+    static void OnSuccessCallback_17(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_17(); }
 
     static void OnFailureCallback_18(void * context, CHIP_ERROR error)
     {
@@ -50679,10 +49062,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_19(error);
     }
 
-    static void OnSuccessCallback_19(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_19();
-    }
+    static void OnSuccessCallback_19(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_19(); }
 
     static void OnFailureCallback_20(void * context, CHIP_ERROR error)
     {
@@ -50709,10 +49089,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_22(error);
     }
 
-    static void OnSuccessCallback_22(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_22();
-    }
+    static void OnSuccessCallback_22(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_22(); }
 
     static void OnFailureCallback_23(void * context, CHIP_ERROR error)
     {
@@ -50729,10 +49106,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_24(error);
     }
 
-    static void OnSuccessCallback_24(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_24();
-    }
+    static void OnSuccessCallback_24(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_24(); }
 
     static void OnFailureCallback_25(void * context, CHIP_ERROR error)
     {
@@ -50759,10 +49133,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_27(error);
     }
 
-    static void OnSuccessCallback_27(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_27();
-    }
+    static void OnSuccessCallback_27(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_27(); }
 
     static void OnFailureCallback_28(void * context, CHIP_ERROR error)
     {
@@ -50779,10 +49150,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_29(error);
     }
 
-    static void OnSuccessCallback_29(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_29();
-    }
+    static void OnSuccessCallback_29(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_29(); }
 
     static void OnFailureCallback_30(void * context, CHIP_ERROR error)
     {
@@ -50809,10 +49177,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_32(error);
     }
 
-    static void OnSuccessCallback_32(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_32();
-    }
+    static void OnSuccessCallback_32(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_32(); }
 
     static void OnFailureCallback_33(void * context, CHIP_ERROR error)
     {
@@ -50829,10 +49194,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_34(error);
     }
 
-    static void OnSuccessCallback_34(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_34();
-    }
+    static void OnSuccessCallback_34(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_34(); }
 
     static void OnFailureCallback_35(void * context, CHIP_ERROR error)
     {
@@ -50859,10 +49221,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_37(error);
     }
 
-    static void OnSuccessCallback_37(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_37();
-    }
+    static void OnSuccessCallback_37(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_37(); }
 
     static void OnFailureCallback_38(void * context, CHIP_ERROR error)
     {
@@ -50879,10 +49238,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_39(error);
     }
 
-    static void OnSuccessCallback_39(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_39();
-    }
+    static void OnSuccessCallback_39(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_39(); }
 
     static void OnFailureCallback_40(void * context, CHIP_ERROR error)
     {
@@ -50909,10 +49265,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_42(error);
     }
 
-    static void OnSuccessCallback_42(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_42();
-    }
+    static void OnSuccessCallback_42(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_42(); }
 
     static void OnFailureCallback_43(void * context, CHIP_ERROR error)
     {
@@ -50929,10 +49282,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_44(error);
     }
 
-    static void OnSuccessCallback_44(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_44();
-    }
+    static void OnSuccessCallback_44(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_44(); }
 
     static void OnFailureCallback_45(void * context, CHIP_ERROR error)
     {
@@ -50959,10 +49309,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_47(error);
     }
 
-    static void OnSuccessCallback_47(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_47();
-    }
+    static void OnSuccessCallback_47(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_47(); }
 
     static void OnFailureCallback_48(void * context, CHIP_ERROR error)
     {
@@ -50979,10 +49326,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_49(error);
     }
 
-    static void OnSuccessCallback_49(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_49();
-    }
+    static void OnSuccessCallback_49(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_49(); }
 
     static void OnFailureCallback_50(void * context, CHIP_ERROR error)
     {
@@ -51009,10 +49353,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_52(error);
     }
 
-    static void OnSuccessCallback_52(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_52();
-    }
+    static void OnSuccessCallback_52(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_52(); }
 
     static void OnFailureCallback_53(void * context, CHIP_ERROR error)
     {
@@ -51029,10 +49370,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_54(error);
     }
 
-    static void OnSuccessCallback_54(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_54();
-    }
+    static void OnSuccessCallback_54(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_54(); }
 
     static void OnFailureCallback_55(void * context, CHIP_ERROR error)
     {
@@ -51049,10 +49387,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_56(error);
     }
 
-    static void OnSuccessCallback_56(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_56();
-    }
+    static void OnSuccessCallback_56(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_56(); }
 
     static void OnFailureCallback_57(void * context, CHIP_ERROR error)
     {
@@ -51079,10 +49414,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_59(error);
     }
 
-    static void OnSuccessCallback_59(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_59();
-    }
+    static void OnSuccessCallback_59(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_59(); }
 
     static void OnFailureCallback_60(void * context, CHIP_ERROR error)
     {
@@ -51099,10 +49431,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_61(error);
     }
 
-    static void OnSuccessCallback_61(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_61();
-    }
+    static void OnSuccessCallback_61(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_61(); }
 
     static void OnFailureCallback_62(void * context, CHIP_ERROR error)
     {
@@ -51119,10 +49448,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_63(error);
     }
 
-    static void OnSuccessCallback_63(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_63();
-    }
+    static void OnSuccessCallback_63(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_63(); }
 
     static void OnFailureCallback_64(void * context, CHIP_ERROR error)
     {
@@ -51149,10 +49475,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_66(error);
     }
 
-    static void OnSuccessCallback_66(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_66();
-    }
+    static void OnSuccessCallback_66(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_66(); }
 
     static void OnFailureCallback_67(void * context, CHIP_ERROR error)
     {
@@ -51169,10 +49492,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_68(error);
     }
 
-    static void OnSuccessCallback_68(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_68();
-    }
+    static void OnSuccessCallback_68(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_68(); }
 
     static void OnFailureCallback_69(void * context, CHIP_ERROR error)
     {
@@ -51189,10 +49509,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_70(error);
     }
 
-    static void OnSuccessCallback_70(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_70();
-    }
+    static void OnSuccessCallback_70(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_70(); }
 
     static void OnFailureCallback_71(void * context, CHIP_ERROR error)
     {
@@ -51219,10 +49536,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_73(error);
     }
 
-    static void OnSuccessCallback_73(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_73();
-    }
+    static void OnSuccessCallback_73(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_73(); }
 
     static void OnFailureCallback_74(void * context, CHIP_ERROR error)
     {
@@ -51239,10 +49553,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_75(error);
     }
 
-    static void OnSuccessCallback_75(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_75();
-    }
+    static void OnSuccessCallback_75(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_75(); }
 
     static void OnFailureCallback_76(void * context, CHIP_ERROR error)
     {
@@ -51259,10 +49570,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_77(error);
     }
 
-    static void OnSuccessCallback_77(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_77();
-    }
+    static void OnSuccessCallback_77(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_77(); }
 
     static void OnFailureCallback_78(void * context, CHIP_ERROR error)
     {
@@ -51289,10 +49597,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_80(error);
     }
 
-    static void OnSuccessCallback_80(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_80();
-    }
+    static void OnSuccessCallback_80(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_80(); }
 
     static void OnFailureCallback_81(void * context, CHIP_ERROR error)
     {
@@ -51309,10 +49614,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_82(error);
     }
 
-    static void OnSuccessCallback_82(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_82();
-    }
+    static void OnSuccessCallback_82(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_82(); }
 
     static void OnFailureCallback_83(void * context, CHIP_ERROR error)
     {
@@ -51329,10 +49631,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_84(error);
     }
 
-    static void OnSuccessCallback_84(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_84();
-    }
+    static void OnSuccessCallback_84(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_84(); }
 
     static void OnFailureCallback_85(void * context, CHIP_ERROR error)
     {
@@ -51349,10 +49648,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_86(error);
     }
 
-    static void OnSuccessCallback_86(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_86();
-    }
+    static void OnSuccessCallback_86(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_86(); }
 
     static void OnFailureCallback_87(void * context, CHIP_ERROR error)
     {
@@ -51379,10 +49675,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_89(error);
     }
 
-    static void OnSuccessCallback_89(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_89();
-    }
+    static void OnSuccessCallback_89(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_89(); }
 
     static void OnFailureCallback_90(void * context, CHIP_ERROR error)
     {
@@ -51399,10 +49692,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_91(error);
     }
 
-    static void OnSuccessCallback_91(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_91();
-    }
+    static void OnSuccessCallback_91(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_91(); }
 
     static void OnFailureCallback_92(void * context, CHIP_ERROR error)
     {
@@ -51419,10 +49709,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_93(error);
     }
 
-    static void OnSuccessCallback_93(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_93();
-    }
+    static void OnSuccessCallback_93(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_93(); }
 
     static void OnFailureCallback_94(void * context, CHIP_ERROR error)
     {
@@ -51439,10 +49726,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_95(error);
     }
 
-    static void OnSuccessCallback_95(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_95();
-    }
+    static void OnSuccessCallback_95(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_95(); }
 
     static void OnFailureCallback_96(void * context, CHIP_ERROR error)
     {
@@ -51469,10 +49753,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_98(error);
     }
 
-    static void OnSuccessCallback_98(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_98();
-    }
+    static void OnSuccessCallback_98(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_98(); }
 
     static void OnFailureCallback_99(void * context, CHIP_ERROR error)
     {
@@ -51489,10 +49770,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_100(error);
     }
 
-    static void OnSuccessCallback_100(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_100();
-    }
+    static void OnSuccessCallback_100(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_100(); }
 
     static void OnFailureCallback_101(void * context, CHIP_ERROR error)
     {
@@ -51519,10 +49797,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_103(error);
     }
 
-    static void OnSuccessCallback_103(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_103();
-    }
+    static void OnSuccessCallback_103(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_103(); }
 
     static void OnFailureCallback_104(void * context, CHIP_ERROR error)
     {
@@ -51539,10 +49814,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_105(error);
     }
 
-    static void OnSuccessCallback_105(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_105();
-    }
+    static void OnSuccessCallback_105(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_105(); }
 
     static void OnFailureCallback_106(void * context, CHIP_ERROR error)
     {
@@ -51569,10 +49841,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_108(error);
     }
 
-    static void OnSuccessCallback_108(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_108();
-    }
+    static void OnSuccessCallback_108(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_108(); }
 
     static void OnFailureCallback_109(void * context, CHIP_ERROR error)
     {
@@ -51589,10 +49858,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_110(error);
     }
 
-    static void OnSuccessCallback_110(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_110();
-    }
+    static void OnSuccessCallback_110(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_110(); }
 
     static void OnFailureCallback_111(void * context, CHIP_ERROR error)
     {
@@ -51609,10 +49875,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_112(error);
     }
 
-    static void OnSuccessCallback_112(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_112();
-    }
+    static void OnSuccessCallback_112(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_112(); }
 
     static void OnFailureCallback_113(void * context, CHIP_ERROR error)
     {
@@ -51629,10 +49892,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_114(error);
     }
 
-    static void OnSuccessCallback_114(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_114();
-    }
+    static void OnSuccessCallback_114(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_114(); }
 
     static void OnFailureCallback_115(void * context, CHIP_ERROR error)
     {
@@ -51649,10 +49909,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_116(error);
     }
 
-    static void OnSuccessCallback_116(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_116();
-    }
+    static void OnSuccessCallback_116(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_116(); }
 
     static void OnFailureCallback_117(void * context, CHIP_ERROR error)
     {
@@ -51669,10 +49926,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_118(error);
     }
 
-    static void OnSuccessCallback_118(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_118();
-    }
+    static void OnSuccessCallback_118(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_118(); }
 
     static void OnFailureCallback_119(void * context, CHIP_ERROR error)
     {
@@ -51689,10 +49943,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_120(error);
     }
 
-    static void OnSuccessCallback_120(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_120();
-    }
+    static void OnSuccessCallback_120(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_120(); }
 
     static void OnFailureCallback_121(void * context, CHIP_ERROR error)
     {
@@ -51709,10 +49960,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_122(error);
     }
 
-    static void OnSuccessCallback_122(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_122();
-    }
+    static void OnSuccessCallback_122(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_122(); }
 
     static void OnFailureCallback_123(void * context, CHIP_ERROR error)
     {
@@ -51729,10 +49977,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_124(error);
     }
 
-    static void OnSuccessCallback_124(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_124();
-    }
+    static void OnSuccessCallback_124(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_124(); }
 
     static void OnFailureCallback_125(void * context, CHIP_ERROR error)
     {
@@ -51749,10 +49994,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_126(error);
     }
 
-    static void OnSuccessCallback_126(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_126();
-    }
+    static void OnSuccessCallback_126(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_126(); }
 
     static void OnFailureCallback_127(void * context, CHIP_ERROR error)
     {
@@ -51769,10 +50011,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_128(error);
     }
 
-    static void OnSuccessCallback_128(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_128();
-    }
+    static void OnSuccessCallback_128(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_128(); }
 
     static void OnFailureCallback_129(void * context, CHIP_ERROR error)
     {
@@ -51789,10 +50028,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_130(error);
     }
 
-    static void OnSuccessCallback_130(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_130();
-    }
+    static void OnSuccessCallback_130(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_130(); }
 
     static void OnFailureCallback_131(void * context, CHIP_ERROR error)
     {
@@ -51820,10 +50056,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_133(error);
     }
 
-    static void OnSuccessCallback_133(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_133();
-    }
+    static void OnSuccessCallback_133(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_133(); }
 
     static void OnFailureCallback_134(void * context, CHIP_ERROR error)
     {
@@ -51840,10 +50073,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_135(error);
     }
 
-    static void OnSuccessCallback_135(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_135();
-    }
+    static void OnSuccessCallback_135(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_135(); }
 
     static void OnFailureCallback_136(void * context, CHIP_ERROR error)
     {
@@ -51870,10 +50100,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_138(error);
     }
 
-    static void OnSuccessCallback_138(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_138();
-    }
+    static void OnSuccessCallback_138(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_138(); }
 
     static void OnFailureCallback_139(void * context, CHIP_ERROR error)
     {
@@ -51890,10 +50117,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_140(error);
     }
 
-    static void OnSuccessCallback_140(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_140();
-    }
+    static void OnSuccessCallback_140(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_140(); }
 
     static void OnFailureCallback_141(void * context, CHIP_ERROR error)
     {
@@ -51920,10 +50144,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_143(error);
     }
 
-    static void OnSuccessCallback_143(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_143();
-    }
+    static void OnSuccessCallback_143(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_143(); }
 
     static void OnFailureCallback_146(void * context, CHIP_ERROR error)
     {
@@ -51940,10 +50161,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_147(error);
     }
 
-    static void OnSuccessCallback_147(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_147();
-    }
+    static void OnSuccessCallback_147(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_147(); }
 
     static void OnFailureCallback_148(void * context, CHIP_ERROR error)
     {
@@ -51960,20 +50178,14 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_149(error);
     }
 
-    static void OnSuccessCallback_149(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_149();
-    }
+    static void OnSuccessCallback_149(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_149(); }
 
     static void OnFailureCallback_166(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_166(error);
     }
 
-    static void OnSuccessCallback_166(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_166();
-    }
+    static void OnSuccessCallback_166(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_166(); }
 
     static void OnFailureCallback_167(void * context, CHIP_ERROR error)
     {
@@ -51990,10 +50202,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_168(error);
     }
 
-    static void OnSuccessCallback_168(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_168();
-    }
+    static void OnSuccessCallback_168(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_168(); }
 
     static void OnFailureCallback_169(void * context, CHIP_ERROR error)
     {
@@ -52010,10 +50219,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_170(error);
     }
 
-    static void OnSuccessCallback_170(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_170();
-    }
+    static void OnSuccessCallback_170(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_170(); }
 
     static void OnFailureCallback_171(void * context, CHIP_ERROR error)
     {
@@ -52046,10 +50252,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_175(error);
     }
 
-    static void OnSuccessCallback_175(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_175();
-    }
+    static void OnSuccessCallback_175(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_175(); }
 
     static void OnFailureCallback_176(void * context, CHIP_ERROR error)
     {
@@ -52069,10 +50272,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_177(error);
     }
 
-    static void OnSuccessCallback_177(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_177();
-    }
+    static void OnSuccessCallback_177(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_177(); }
 
     static void OnFailureCallback_178(void * context, CHIP_ERROR error)
     {
@@ -52089,10 +50289,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_179(error);
     }
 
-    static void OnSuccessCallback_179(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_179();
-    }
+    static void OnSuccessCallback_179(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_179(); }
 
     static void OnFailureCallback_180(void * context, CHIP_ERROR error)
     {
@@ -52109,10 +50306,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_181(error);
     }
 
-    static void OnSuccessCallback_181(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_181();
-    }
+    static void OnSuccessCallback_181(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_181(); }
 
     static void OnFailureCallback_182(void * context, CHIP_ERROR error)
     {
@@ -52129,10 +50323,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_183(error);
     }
 
-    static void OnSuccessCallback_183(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_183();
-    }
+    static void OnSuccessCallback_183(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_183(); }
 
     static void OnFailureCallback_184(void * context, CHIP_ERROR error)
     {
@@ -52149,10 +50340,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_185(error);
     }
 
-    static void OnSuccessCallback_185(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_185();
-    }
+    static void OnSuccessCallback_185(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_185(); }
 
     static void OnFailureCallback_186(void * context, CHIP_ERROR error)
     {
@@ -52169,10 +50357,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_187(error);
     }
 
-    static void OnSuccessCallback_187(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_187();
-    }
+    static void OnSuccessCallback_187(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_187(); }
 
     static void OnFailureCallback_188(void * context, CHIP_ERROR error)
     {
@@ -52189,10 +50374,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_189(error);
     }
 
-    static void OnSuccessCallback_189(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_189();
-    }
+    static void OnSuccessCallback_189(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_189(); }
 
     static void OnFailureCallback_190(void * context, CHIP_ERROR error)
     {
@@ -52209,10 +50391,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_191(error);
     }
 
-    static void OnSuccessCallback_191(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_191();
-    }
+    static void OnSuccessCallback_191(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_191(); }
 
     static void OnFailureCallback_192(void * context, CHIP_ERROR error)
     {
@@ -52229,10 +50408,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_193(error);
     }
 
-    static void OnSuccessCallback_193(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_193();
-    }
+    static void OnSuccessCallback_193(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_193(); }
 
     static void OnFailureCallback_194(void * context, CHIP_ERROR error)
     {
@@ -52249,10 +50425,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_195(error);
     }
 
-    static void OnSuccessCallback_195(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_195();
-    }
+    static void OnSuccessCallback_195(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_195(); }
 
     static void OnFailureCallback_196(void * context, CHIP_ERROR error)
     {
@@ -52269,10 +50442,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_197(error);
     }
 
-    static void OnSuccessCallback_197(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_197();
-    }
+    static void OnSuccessCallback_197(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_197(); }
 
     static void OnFailureCallback_198(void * context, CHIP_ERROR error)
     {
@@ -52289,10 +50459,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_199(error);
     }
 
-    static void OnSuccessCallback_199(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_199();
-    }
+    static void OnSuccessCallback_199(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_199(); }
 
     static void OnFailureCallback_200(void * context, CHIP_ERROR error)
     {
@@ -52309,10 +50476,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_201(error);
     }
 
-    static void OnSuccessCallback_201(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_201();
-    }
+    static void OnSuccessCallback_201(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_201(); }
 
     static void OnFailureCallback_202(void * context, CHIP_ERROR error)
     {
@@ -52329,10 +50493,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_203(error);
     }
 
-    static void OnSuccessCallback_203(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_203();
-    }
+    static void OnSuccessCallback_203(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_203(); }
 
     static void OnFailureCallback_204(void * context, CHIP_ERROR error)
     {
@@ -52349,10 +50510,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_205(error);
     }
 
-    static void OnSuccessCallback_205(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_205();
-    }
+    static void OnSuccessCallback_205(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_205(); }
 
     static void OnFailureCallback_206(void * context, CHIP_ERROR error)
     {
@@ -52369,10 +50527,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_207(error);
     }
 
-    static void OnSuccessCallback_207(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_207();
-    }
+    static void OnSuccessCallback_207(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_207(); }
 
     static void OnFailureCallback_208(void * context, CHIP_ERROR error)
     {
@@ -52389,10 +50544,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_209(error);
     }
 
-    static void OnSuccessCallback_209(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_209();
-    }
+    static void OnSuccessCallback_209(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_209(); }
 
     static void OnFailureCallback_210(void * context, CHIP_ERROR error)
     {
@@ -52419,10 +50571,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_212(error);
     }
 
-    static void OnSuccessCallback_212(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_212();
-    }
+    static void OnSuccessCallback_212(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_212(); }
 
     static void OnFailureCallback_213(void * context, CHIP_ERROR error)
     {
@@ -52459,10 +50608,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_216(error);
     }
 
-    static void OnSuccessCallback_216(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_216();
-    }
+    static void OnSuccessCallback_216(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_216(); }
 
     static void OnFailureCallback_217(void * context, CHIP_ERROR error)
     {
@@ -52489,10 +50635,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_219(error);
     }
 
-    static void OnSuccessCallback_219(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_219();
-    }
+    static void OnSuccessCallback_219(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_219(); }
 
     static void OnFailureCallback_220(void * context, CHIP_ERROR error)
     {
@@ -52509,10 +50652,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_221(error);
     }
 
-    static void OnSuccessCallback_221(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_221();
-    }
+    static void OnSuccessCallback_221(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_221(); }
 
     static void OnFailureCallback_222(void * context, CHIP_ERROR error)
     {
@@ -52529,10 +50669,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_223(error);
     }
 
-    static void OnSuccessCallback_223(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_223();
-    }
+    static void OnSuccessCallback_223(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_223(); }
 
     static void OnFailureCallback_224(void * context, CHIP_ERROR error)
     {
@@ -52549,10 +50686,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_225(error);
     }
 
-    static void OnSuccessCallback_225(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_225();
-    }
+    static void OnSuccessCallback_225(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_225(); }
 
     static void OnFailureCallback_226(void * context, CHIP_ERROR error)
     {
@@ -52589,10 +50723,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_229(error);
     }
 
-    static void OnSuccessCallback_229(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_229();
-    }
+    static void OnSuccessCallback_229(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_229(); }
 
     static void OnFailureCallback_230(void * context, CHIP_ERROR error)
     {
@@ -52619,10 +50750,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_232(error);
     }
 
-    static void OnSuccessCallback_232(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_232();
-    }
+    static void OnSuccessCallback_232(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_232(); }
 
     static void OnFailureCallback_233(void * context, CHIP_ERROR error)
     {
@@ -52639,10 +50767,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_234(error);
     }
 
-    static void OnSuccessCallback_234(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_234();
-    }
+    static void OnSuccessCallback_234(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_234(); }
 
     static void OnFailureCallback_235(void * context, CHIP_ERROR error)
     {
@@ -52659,10 +50784,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_236(error);
     }
 
-    static void OnSuccessCallback_236(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_236();
-    }
+    static void OnSuccessCallback_236(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_236(); }
 
     static void OnFailureCallback_237(void * context, CHIP_ERROR error)
     {
@@ -52679,10 +50801,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_238(error);
     }
 
-    static void OnSuccessCallback_238(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_238();
-    }
+    static void OnSuccessCallback_238(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_238(); }
 
     static void OnFailureCallback_239(void * context, CHIP_ERROR error)
     {
@@ -52719,10 +50838,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_242(error);
     }
 
-    static void OnSuccessCallback_242(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_242();
-    }
+    static void OnSuccessCallback_242(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_242(); }
 
     static void OnFailureCallback_243(void * context, CHIP_ERROR error)
     {
@@ -52749,10 +50865,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_245(error);
     }
 
-    static void OnSuccessCallback_245(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_245();
-    }
+    static void OnSuccessCallback_245(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_245(); }
 
     static void OnFailureCallback_246(void * context, CHIP_ERROR error)
     {
@@ -52769,10 +50882,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_247(error);
     }
 
-    static void OnSuccessCallback_247(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_247();
-    }
+    static void OnSuccessCallback_247(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_247(); }
 
     static void OnFailureCallback_248(void * context, CHIP_ERROR error)
     {
@@ -52789,10 +50899,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_249(error);
     }
 
-    static void OnSuccessCallback_249(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_249();
-    }
+    static void OnSuccessCallback_249(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_249(); }
 
     static void OnFailureCallback_250(void * context, CHIP_ERROR error)
     {
@@ -52809,10 +50916,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_251(error);
     }
 
-    static void OnSuccessCallback_251(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_251();
-    }
+    static void OnSuccessCallback_251(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_251(); }
 
     static void OnFailureCallback_252(void * context, CHIP_ERROR error)
     {
@@ -52849,10 +50953,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_255(error);
     }
 
-    static void OnSuccessCallback_255(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_255();
-    }
+    static void OnSuccessCallback_255(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_255(); }
 
     static void OnFailureCallback_256(void * context, CHIP_ERROR error)
     {
@@ -52879,10 +50980,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_258(error);
     }
 
-    static void OnSuccessCallback_258(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_258();
-    }
+    static void OnSuccessCallback_258(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_258(); }
 
     static void OnFailureCallback_259(void * context, CHIP_ERROR error)
     {
@@ -52899,10 +50997,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_260(error);
     }
 
-    static void OnSuccessCallback_260(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_260();
-    }
+    static void OnSuccessCallback_260(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_260(); }
 
     static void OnFailureCallback_261(void * context, CHIP_ERROR error)
     {
@@ -52919,10 +51014,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_262(error);
     }
 
-    static void OnSuccessCallback_262(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_262();
-    }
+    static void OnSuccessCallback_262(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_262(); }
 
     static void OnFailureCallback_263(void * context, CHIP_ERROR error)
     {
@@ -52959,10 +51051,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_266(error);
     }
 
-    static void OnSuccessCallback_266(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_266();
-    }
+    static void OnSuccessCallback_266(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_266(); }
 
     static void OnFailureCallback_267(void * context, CHIP_ERROR error)
     {
@@ -52989,10 +51078,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_269(error);
     }
 
-    static void OnSuccessCallback_269(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_269();
-    }
+    static void OnSuccessCallback_269(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_269(); }
 
     static void OnFailureCallback_270(void * context, CHIP_ERROR error)
     {
@@ -53009,10 +51095,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_271(error);
     }
 
-    static void OnSuccessCallback_271(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_271();
-    }
+    static void OnSuccessCallback_271(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_271(); }
 
     static void OnFailureCallback_272(void * context, CHIP_ERROR error)
     {
@@ -53029,10 +51112,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_273(error);
     }
 
-    static void OnSuccessCallback_273(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_273();
-    }
+    static void OnSuccessCallback_273(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_273(); }
 
     static void OnFailureCallback_274(void * context, CHIP_ERROR error)
     {
@@ -53069,10 +51149,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_277(error);
     }
 
-    static void OnSuccessCallback_277(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_277();
-    }
+    static void OnSuccessCallback_277(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_277(); }
 
     static void OnFailureCallback_278(void * context, CHIP_ERROR error)
     {
@@ -53099,10 +51176,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_280(error);
     }
 
-    static void OnSuccessCallback_280(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_280();
-    }
+    static void OnSuccessCallback_280(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_280(); }
 
     static void OnFailureCallback_281(void * context, CHIP_ERROR error)
     {
@@ -53119,10 +51193,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_282(error);
     }
 
-    static void OnSuccessCallback_282(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_282();
-    }
+    static void OnSuccessCallback_282(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_282(); }
 
     static void OnFailureCallback_283(void * context, CHIP_ERROR error)
     {
@@ -53139,10 +51210,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_284(error);
     }
 
-    static void OnSuccessCallback_284(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_284();
-    }
+    static void OnSuccessCallback_284(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_284(); }
 
     static void OnFailureCallback_285(void * context, CHIP_ERROR error)
     {
@@ -53179,10 +51247,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_288(error);
     }
 
-    static void OnSuccessCallback_288(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_288();
-    }
+    static void OnSuccessCallback_288(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_288(); }
 
     static void OnFailureCallback_289(void * context, CHIP_ERROR error)
     {
@@ -53209,10 +51274,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_291(error);
     }
 
-    static void OnSuccessCallback_291(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_291();
-    }
+    static void OnSuccessCallback_291(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_291(); }
 
     static void OnFailureCallback_292(void * context, CHIP_ERROR error)
     {
@@ -53229,10 +51291,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_293(error);
     }
 
-    static void OnSuccessCallback_293(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_293();
-    }
+    static void OnSuccessCallback_293(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_293(); }
 
     static void OnFailureCallback_294(void * context, CHIP_ERROR error)
     {
@@ -53249,10 +51308,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_295(error);
     }
 
-    static void OnSuccessCallback_295(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_295();
-    }
+    static void OnSuccessCallback_295(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_295(); }
 
     static void OnFailureCallback_296(void * context, CHIP_ERROR error)
     {
@@ -53289,10 +51345,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_299(error);
     }
 
-    static void OnSuccessCallback_299(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_299();
-    }
+    static void OnSuccessCallback_299(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_299(); }
 
     static void OnFailureCallback_300(void * context, CHIP_ERROR error)
     {
@@ -53319,10 +51372,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_302(error);
     }
 
-    static void OnSuccessCallback_302(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_302();
-    }
+    static void OnSuccessCallback_302(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_302(); }
 
     static void OnFailureCallback_303(void * context, CHIP_ERROR error)
     {
@@ -53339,10 +51389,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_304(error);
     }
 
-    static void OnSuccessCallback_304(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_304();
-    }
+    static void OnSuccessCallback_304(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_304(); }
 
     static void OnFailureCallback_305(void * context, CHIP_ERROR error)
     {
@@ -53359,10 +51406,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_306(error);
     }
 
-    static void OnSuccessCallback_306(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_306();
-    }
+    static void OnSuccessCallback_306(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_306(); }
 
     static void OnFailureCallback_307(void * context, CHIP_ERROR error)
     {
@@ -53379,10 +51423,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_308(error);
     }
 
-    static void OnSuccessCallback_308(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_308();
-    }
+    static void OnSuccessCallback_308(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_308(); }
 
     static void OnFailureCallback_309(void * context, CHIP_ERROR error)
     {
@@ -53399,10 +51440,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_310(error);
     }
 
-    static void OnSuccessCallback_310(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_310();
-    }
+    static void OnSuccessCallback_310(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_310(); }
 
     static void OnFailureCallback_311(void * context, CHIP_ERROR error)
     {
@@ -53419,10 +51457,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_312(error);
     }
 
-    static void OnSuccessCallback_312(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_312();
-    }
+    static void OnSuccessCallback_312(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_312(); }
 
     static void OnFailureCallback_313(void * context, CHIP_ERROR error)
     {
@@ -53439,10 +51474,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_314(error);
     }
 
-    static void OnSuccessCallback_314(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_314();
-    }
+    static void OnSuccessCallback_314(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_314(); }
 
     static void OnFailureCallback_315(void * context, CHIP_ERROR error)
     {
@@ -53459,10 +51491,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_316(error);
     }
 
-    static void OnSuccessCallback_316(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_316();
-    }
+    static void OnSuccessCallback_316(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_316(); }
 
     static void OnFailureCallback_317(void * context, CHIP_ERROR error)
     {
@@ -53479,10 +51508,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_318(error);
     }
 
-    static void OnSuccessCallback_318(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_318();
-    }
+    static void OnSuccessCallback_318(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_318(); }
 
     static void OnFailureCallback_319(void * context, CHIP_ERROR error)
     {
@@ -53499,10 +51525,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_320(error);
     }
 
-    static void OnSuccessCallback_320(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_320();
-    }
+    static void OnSuccessCallback_320(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_320(); }
 
     static void OnFailureCallback_321(void * context, CHIP_ERROR error)
     {
@@ -53519,10 +51542,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_322(error);
     }
 
-    static void OnSuccessCallback_322(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_322();
-    }
+    static void OnSuccessCallback_322(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_322(); }
 
     static void OnFailureCallback_323(void * context, CHIP_ERROR error)
     {
@@ -53539,10 +51559,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_324(error);
     }
 
-    static void OnSuccessCallback_324(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_324();
-    }
+    static void OnSuccessCallback_324(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_324(); }
 
     static void OnFailureCallback_325(void * context, CHIP_ERROR error)
     {
@@ -53559,10 +51576,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_326(error);
     }
 
-    static void OnSuccessCallback_326(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_326();
-    }
+    static void OnSuccessCallback_326(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_326(); }
 
     static void OnFailureCallback_327(void * context, CHIP_ERROR error)
     {
@@ -53579,10 +51593,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_328(error);
     }
 
-    static void OnSuccessCallback_328(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_328();
-    }
+    static void OnSuccessCallback_328(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_328(); }
 
     static void OnFailureCallback_329(void * context, CHIP_ERROR error)
     {
@@ -53599,10 +51610,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_330(error);
     }
 
-    static void OnSuccessCallback_330(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_330();
-    }
+    static void OnSuccessCallback_330(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_330(); }
 
     static void OnFailureCallback_331(void * context, CHIP_ERROR error)
     {
@@ -53619,10 +51627,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_332(error);
     }
 
-    static void OnSuccessCallback_332(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_332();
-    }
+    static void OnSuccessCallback_332(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_332(); }
 
     static void OnFailureCallback_333(void * context, CHIP_ERROR error)
     {
@@ -53639,10 +51644,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_334(error);
     }
 
-    static void OnSuccessCallback_334(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_334();
-    }
+    static void OnSuccessCallback_334(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_334(); }
 
     static void OnFailureCallback_335(void * context, CHIP_ERROR error)
     {
@@ -53659,10 +51661,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_336(error);
     }
 
-    static void OnSuccessCallback_336(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_336();
-    }
+    static void OnSuccessCallback_336(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_336(); }
 
     static void OnFailureCallback_337(void * context, CHIP_ERROR error)
     {
@@ -53679,10 +51678,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_338(error);
     }
 
-    static void OnSuccessCallback_338(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_338();
-    }
+    static void OnSuccessCallback_338(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_338(); }
 
     static void OnFailureCallback_339(void * context, CHIP_ERROR error)
     {
@@ -53701,10 +51697,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_340(error);
     }
 
-    static void OnSuccessCallback_340(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_340();
-    }
+    static void OnSuccessCallback_340(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_340(); }
 
     static void OnFailureCallback_341(void * context, CHIP_ERROR error)
     {
@@ -53723,10 +51716,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_342(error);
     }
 
-    static void OnSuccessCallback_342(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_342();
-    }
+    static void OnSuccessCallback_342(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_342(); }
 
     static void OnFailureCallback_343(void * context, CHIP_ERROR error)
     {
@@ -53745,10 +51735,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_344(error);
     }
 
-    static void OnSuccessCallback_344(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_344();
-    }
+    static void OnSuccessCallback_344(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_344(); }
 
     static void OnFailureCallback_345(void * context, CHIP_ERROR error)
     {
@@ -53777,10 +51764,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_347(error);
     }
 
-    static void OnSuccessCallback_347(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_347();
-    }
+    static void OnSuccessCallback_347(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_347(); }
 
     static void OnFailureCallback_348(void * context, CHIP_ERROR error)
     {
@@ -53797,10 +51781,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_349(error);
     }
 
-    static void OnSuccessCallback_349(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_349();
-    }
+    static void OnSuccessCallback_349(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_349(); }
 
     static void OnFailureCallback_350(void * context, CHIP_ERROR error)
     {
@@ -53817,10 +51798,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_351(error);
     }
 
-    static void OnSuccessCallback_351(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_351();
-    }
+    static void OnSuccessCallback_351(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_351(); }
 
     static void OnFailureCallback_352(void * context, CHIP_ERROR error)
     {
@@ -53847,10 +51825,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_354(error);
     }
 
-    static void OnSuccessCallback_354(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_354();
-    }
+    static void OnSuccessCallback_354(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_354(); }
 
     static void OnFailureCallback_355(void * context, CHIP_ERROR error)
     {
@@ -53867,10 +51842,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_356(error);
     }
 
-    static void OnSuccessCallback_356(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_356();
-    }
+    static void OnSuccessCallback_356(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_356(); }
 
     static void OnFailureCallback_357(void * context, CHIP_ERROR error)
     {
@@ -53887,10 +51859,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_358(error);
     }
 
-    static void OnSuccessCallback_358(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_358();
-    }
+    static void OnSuccessCallback_358(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_358(); }
 
     static void OnFailureCallback_359(void * context, CHIP_ERROR error)
     {
@@ -53954,10 +51923,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_366(error);
     }
 
-    static void OnSuccessCallback_366(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_366();
-    }
+    static void OnSuccessCallback_366(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_366(); }
 
     static void OnFailureCallback_367(void * context, CHIP_ERROR error)
     {
@@ -53986,40 +51952,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_369(error);
     }
 
-    static void OnSuccessCallback_369(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_369();
-    }
+    static void OnSuccessCallback_369(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_369(); }
 
     static void OnFailureCallback_370(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_370(error);
     }
 
-    static void OnSuccessCallback_370(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_370();
-    }
+    static void OnSuccessCallback_370(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_370(); }
 
     static void OnFailureCallback_371(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_371(error);
     }
 
-    static void OnSuccessCallback_371(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_371();
-    }
+    static void OnSuccessCallback_371(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_371(); }
 
     static void OnFailureCallback_372(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_372(error);
     }
 
-    static void OnSuccessCallback_372(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_372();
-    }
+    static void OnSuccessCallback_372(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_372(); }
 
     static void OnFailureCallback_373(void * context, CHIP_ERROR error)
     {
@@ -54036,10 +51990,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_374(error);
     }
 
-    static void OnSuccessCallback_374(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_374();
-    }
+    static void OnSuccessCallback_374(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_374(); }
 
     static void OnFailureCallback_375(void * context, CHIP_ERROR error)
     {
@@ -54056,10 +52007,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_376(error);
     }
 
-    static void OnSuccessCallback_376(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_376();
-    }
+    static void OnSuccessCallback_376(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_376(); }
 
     static void OnFailureCallback_377(void * context, CHIP_ERROR error)
     {
@@ -54076,10 +52024,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_378(error);
     }
 
-    static void OnSuccessCallback_378(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_378();
-    }
+    static void OnSuccessCallback_378(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_378(); }
 
     static void OnFailureCallback_379(void * context, CHIP_ERROR error)
     {
@@ -54106,40 +52051,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_381(error);
     }
 
-    static void OnSuccessCallback_381(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_381();
-    }
+    static void OnSuccessCallback_381(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_381(); }
 
     static void OnFailureCallback_382(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_382(error);
     }
 
-    static void OnSuccessCallback_382(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_382();
-    }
+    static void OnSuccessCallback_382(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_382(); }
 
     static void OnFailureCallback_383(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_383(error);
     }
 
-    static void OnSuccessCallback_383(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_383();
-    }
+    static void OnSuccessCallback_383(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_383(); }
 
     static void OnFailureCallback_384(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_384(error);
     }
 
-    static void OnSuccessCallback_384(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_384();
-    }
+    static void OnSuccessCallback_384(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_384(); }
 
     static void OnFailureCallback_385(void * context, CHIP_ERROR error)
     {
@@ -54156,10 +52089,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_386(error);
     }
 
-    static void OnSuccessCallback_386(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_386();
-    }
+    static void OnSuccessCallback_386(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_386(); }
 
     static void OnFailureCallback_387(void * context, CHIP_ERROR error)
     {
@@ -54176,10 +52106,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_388(error);
     }
 
-    static void OnSuccessCallback_388(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_388();
-    }
+    static void OnSuccessCallback_388(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_388(); }
 
     static void OnFailureCallback_389(void * context, CHIP_ERROR error)
     {
@@ -54196,10 +52123,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_390(error);
     }
 
-    static void OnSuccessCallback_390(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_390();
-    }
+    static void OnSuccessCallback_390(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_390(); }
 
     static void OnFailureCallback_391(void * context, CHIP_ERROR error)
     {
@@ -54226,40 +52150,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_393(error);
     }
 
-    static void OnSuccessCallback_393(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_393();
-    }
+    static void OnSuccessCallback_393(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_393(); }
 
     static void OnFailureCallback_394(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_394(error);
     }
 
-    static void OnSuccessCallback_394(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_394();
-    }
+    static void OnSuccessCallback_394(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_394(); }
 
     static void OnFailureCallback_395(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_395(error);
     }
 
-    static void OnSuccessCallback_395(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_395();
-    }
+    static void OnSuccessCallback_395(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_395(); }
 
     static void OnFailureCallback_396(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_396(error);
     }
 
-    static void OnSuccessCallback_396(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_396();
-    }
+    static void OnSuccessCallback_396(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_396(); }
 
     static void OnFailureCallback_397(void * context, CHIP_ERROR error)
     {
@@ -54276,10 +52188,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_398(error);
     }
 
-    static void OnSuccessCallback_398(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_398();
-    }
+    static void OnSuccessCallback_398(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_398(); }
 
     static void OnFailureCallback_399(void * context, CHIP_ERROR error)
     {
@@ -54296,10 +52205,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_400(error);
     }
 
-    static void OnSuccessCallback_400(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_400();
-    }
+    static void OnSuccessCallback_400(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_400(); }
 
     static void OnFailureCallback_401(void * context, CHIP_ERROR error)
     {
@@ -54316,10 +52222,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_402(error);
     }
 
-    static void OnSuccessCallback_402(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_402();
-    }
+    static void OnSuccessCallback_402(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_402(); }
 
     static void OnFailureCallback_403(void * context, CHIP_ERROR error)
     {
@@ -54346,40 +52249,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_405(error);
     }
 
-    static void OnSuccessCallback_405(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_405();
-    }
+    static void OnSuccessCallback_405(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_405(); }
 
     static void OnFailureCallback_406(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_406(error);
     }
 
-    static void OnSuccessCallback_406(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_406();
-    }
+    static void OnSuccessCallback_406(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_406(); }
 
     static void OnFailureCallback_407(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_407(error);
     }
 
-    static void OnSuccessCallback_407(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_407();
-    }
+    static void OnSuccessCallback_407(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_407(); }
 
     static void OnFailureCallback_408(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_408(error);
     }
 
-    static void OnSuccessCallback_408(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_408();
-    }
+    static void OnSuccessCallback_408(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_408(); }
 
     static void OnFailureCallback_409(void * context, CHIP_ERROR error)
     {
@@ -54396,10 +52287,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_410(error);
     }
 
-    static void OnSuccessCallback_410(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_410();
-    }
+    static void OnSuccessCallback_410(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_410(); }
 
     static void OnFailureCallback_411(void * context, CHIP_ERROR error)
     {
@@ -54416,10 +52304,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_412(error);
     }
 
-    static void OnSuccessCallback_412(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_412();
-    }
+    static void OnSuccessCallback_412(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_412(); }
 
     static void OnFailureCallback_413(void * context, CHIP_ERROR error)
     {
@@ -54436,10 +52321,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_414(error);
     }
 
-    static void OnSuccessCallback_414(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_414();
-    }
+    static void OnSuccessCallback_414(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_414(); }
 
     static void OnFailureCallback_415(void * context, CHIP_ERROR error)
     {
@@ -54466,40 +52348,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_417(error);
     }
 
-    static void OnSuccessCallback_417(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_417();
-    }
+    static void OnSuccessCallback_417(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_417(); }
 
     static void OnFailureCallback_418(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_418(error);
     }
 
-    static void OnSuccessCallback_418(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_418();
-    }
+    static void OnSuccessCallback_418(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_418(); }
 
     static void OnFailureCallback_419(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_419(error);
     }
 
-    static void OnSuccessCallback_419(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_419();
-    }
+    static void OnSuccessCallback_419(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_419(); }
 
     static void OnFailureCallback_420(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_420(error);
     }
 
-    static void OnSuccessCallback_420(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_420();
-    }
+    static void OnSuccessCallback_420(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_420(); }
 
     static void OnFailureCallback_421(void * context, CHIP_ERROR error)
     {
@@ -54516,10 +52386,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_422(error);
     }
 
-    static void OnSuccessCallback_422(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_422();
-    }
+    static void OnSuccessCallback_422(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_422(); }
 
     static void OnFailureCallback_423(void * context, CHIP_ERROR error)
     {
@@ -54536,10 +52403,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_424(error);
     }
 
-    static void OnSuccessCallback_424(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_424();
-    }
+    static void OnSuccessCallback_424(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_424(); }
 
     static void OnFailureCallback_425(void * context, CHIP_ERROR error)
     {
@@ -54556,10 +52420,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_426(error);
     }
 
-    static void OnSuccessCallback_426(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_426();
-    }
+    static void OnSuccessCallback_426(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_426(); }
 
     static void OnFailureCallback_427(void * context, CHIP_ERROR error)
     {
@@ -54576,10 +52437,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_428(error);
     }
 
-    static void OnSuccessCallback_428(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_428();
-    }
+    static void OnSuccessCallback_428(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_428(); }
 
     static void OnFailureCallback_429(void * context, CHIP_ERROR error)
     {
@@ -54607,40 +52465,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_431(error);
     }
 
-    static void OnSuccessCallback_431(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_431();
-    }
+    static void OnSuccessCallback_431(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_431(); }
 
     static void OnFailureCallback_432(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_432(error);
     }
 
-    static void OnSuccessCallback_432(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_432();
-    }
+    static void OnSuccessCallback_432(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_432(); }
 
     static void OnFailureCallback_433(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_433(error);
     }
 
-    static void OnSuccessCallback_433(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_433();
-    }
+    static void OnSuccessCallback_433(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_433(); }
 
     static void OnFailureCallback_434(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_434(error);
     }
 
-    static void OnSuccessCallback_434(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_434();
-    }
+    static void OnSuccessCallback_434(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_434(); }
 
     static void OnFailureCallback_435(void * context, CHIP_ERROR error)
     {
@@ -54658,10 +52504,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_436(error);
     }
 
-    static void OnSuccessCallback_436(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_436();
-    }
+    static void OnSuccessCallback_436(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_436(); }
 
     static void OnFailureCallback_437(void * context, CHIP_ERROR error)
     {
@@ -54679,10 +52522,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_438(error);
     }
 
-    static void OnSuccessCallback_438(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_438();
-    }
+    static void OnSuccessCallback_438(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_438(); }
 
     static void OnFailureCallback_439(void * context, CHIP_ERROR error)
     {
@@ -54700,10 +52540,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_440(error);
     }
 
-    static void OnSuccessCallback_440(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_440();
-    }
+    static void OnSuccessCallback_440(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_440(); }
 
     static void OnFailureCallback_441(void * context, CHIP_ERROR error)
     {
@@ -54721,10 +52558,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_442(error);
     }
 
-    static void OnSuccessCallback_442(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_442();
-    }
+    static void OnSuccessCallback_442(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_442(); }
 
     static void OnFailureCallback_443(void * context, CHIP_ERROR error)
     {
@@ -54752,40 +52586,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_445(error);
     }
 
-    static void OnSuccessCallback_445(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_445();
-    }
+    static void OnSuccessCallback_445(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_445(); }
 
     static void OnFailureCallback_446(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_446(error);
     }
 
-    static void OnSuccessCallback_446(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_446();
-    }
+    static void OnSuccessCallback_446(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_446(); }
 
     static void OnFailureCallback_447(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_447(error);
     }
 
-    static void OnSuccessCallback_447(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_447();
-    }
+    static void OnSuccessCallback_447(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_447(); }
 
     static void OnFailureCallback_448(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_448(error);
     }
 
-    static void OnSuccessCallback_448(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_448();
-    }
+    static void OnSuccessCallback_448(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_448(); }
 
     static void OnFailureCallback_449(void * context, CHIP_ERROR error)
     {
@@ -54802,10 +52624,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_450(error);
     }
 
-    static void OnSuccessCallback_450(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_450();
-    }
+    static void OnSuccessCallback_450(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_450(); }
 
     static void OnFailureCallback_451(void * context, CHIP_ERROR error)
     {
@@ -54822,10 +52641,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_452(error);
     }
 
-    static void OnSuccessCallback_452(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_452();
-    }
+    static void OnSuccessCallback_452(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_452(); }
 
     static void OnFailureCallback_453(void * context, CHIP_ERROR error)
     {
@@ -54842,10 +52658,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_454(error);
     }
 
-    static void OnSuccessCallback_454(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_454();
-    }
+    static void OnSuccessCallback_454(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_454(); }
 
     static void OnFailureCallback_455(void * context, CHIP_ERROR error)
     {
@@ -54862,10 +52675,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_456(error);
     }
 
-    static void OnSuccessCallback_456(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_456();
-    }
+    static void OnSuccessCallback_456(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_456(); }
 
     static void OnFailureCallback_457(void * context, CHIP_ERROR error)
     {
@@ -54892,40 +52702,28 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_459(error);
     }
 
-    static void OnSuccessCallback_459(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_459();
-    }
+    static void OnSuccessCallback_459(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_459(); }
 
     static void OnFailureCallback_460(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_460(error);
     }
 
-    static void OnSuccessCallback_460(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_460();
-    }
+    static void OnSuccessCallback_460(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_460(); }
 
     static void OnFailureCallback_461(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_461(error);
     }
 
-    static void OnSuccessCallback_461(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_461();
-    }
+    static void OnSuccessCallback_461(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_461(); }
 
     static void OnFailureCallback_462(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_462(error);
     }
 
-    static void OnSuccessCallback_462(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_462();
-    }
+    static void OnSuccessCallback_462(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_462(); }
 
     static void OnFailureCallback_463(void * context, CHIP_ERROR error)
     {
@@ -54942,10 +52740,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_464(error);
     }
 
-    static void OnSuccessCallback_464(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_464();
-    }
+    static void OnSuccessCallback_464(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_464(); }
 
     static void OnFailureCallback_465(void * context, CHIP_ERROR error)
     {
@@ -54962,10 +52757,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_466(error);
     }
 
-    static void OnSuccessCallback_466(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_466();
-    }
+    static void OnSuccessCallback_466(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_466(); }
 
     static void OnFailureCallback_467(void * context, CHIP_ERROR error)
     {
@@ -54982,10 +52774,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_468(error);
     }
 
-    static void OnSuccessCallback_468(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_468();
-    }
+    static void OnSuccessCallback_468(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_468(); }
 
     static void OnFailureCallback_469(void * context, CHIP_ERROR error)
     {
@@ -55002,10 +52791,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_470(error);
     }
 
-    static void OnSuccessCallback_470(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_470();
-    }
+    static void OnSuccessCallback_470(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_470(); }
 
     static void OnFailureCallback_471(void * context, CHIP_ERROR error)
     {
@@ -55022,20 +52808,14 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_472(error);
     }
 
-    static void OnSuccessCallback_472(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_472();
-    }
+    static void OnSuccessCallback_472(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_472(); }
 
     static void OnFailureCallback_473(void * context, CHIP_ERROR error)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_473(error);
     }
 
-    static void OnSuccessCallback_473(void * context)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_473();
-    }
+    static void OnSuccessCallback_473(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_473(); }
 
     static void OnFailureCallback_474(void * context, CHIP_ERROR error)
     {
@@ -55090,10 +52870,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestSendTestNotHandledCommand_2()
     {
@@ -55119,10 +52896,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestSendTestSpecificCommand_3()
     {
@@ -55212,10 +52986,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_5(uint8_t returnValue)
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_5(uint8_t returnValue) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeBooleanDefaultValue_6()
     {
@@ -55261,10 +53032,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBooleanTrue_8()
     {
@@ -55310,10 +53078,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_9() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBooleanFalse_10()
     {
@@ -55383,10 +53148,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap8MaxValue_13()
     {
@@ -55432,10 +53194,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap8MinValue_15()
     {
@@ -55505,10 +53264,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_17() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap16MaxValue_18()
     {
@@ -55554,10 +53310,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_19()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_19() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap16MinValue_20()
     {
@@ -55627,10 +53380,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_22()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_22() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap32MaxValue_23()
     {
@@ -55676,10 +53426,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_24()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_24() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap32MinValue_25()
     {
@@ -55749,10 +53496,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_27()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_27() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap64MaxValue_28()
     {
@@ -55798,10 +53542,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_29()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_29() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap64MinValue_30()
     {
@@ -55871,10 +53612,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_32()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_32() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8uMaxValue_33()
     {
@@ -55920,10 +53658,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_34()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_34() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8uMinValue_35()
     {
@@ -55993,10 +53728,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_37()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_37() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16uMaxValue_38()
     {
@@ -56042,10 +53774,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_39()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_39() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16uMinValue_40()
     {
@@ -56115,10 +53844,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_42()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_42() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uMaxValue_43()
     {
@@ -56164,10 +53890,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_44()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_44() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uMinValue_45()
     {
@@ -56237,10 +53960,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_47()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_47() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64uMaxValue_48()
     {
@@ -56286,10 +54006,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_49()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_49() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64uMinValue_50()
     {
@@ -56359,10 +54076,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_52()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_52() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sMaxValue_53()
     {
@@ -56408,10 +54122,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_54()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_54() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sMinValue_55()
     {
@@ -56457,10 +54168,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_56()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_56() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_57()
     {
@@ -56530,10 +54238,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_59()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_59() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sMaxValue_60()
     {
@@ -56579,10 +54284,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_61()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_61() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sMinValue_62()
     {
@@ -56628,10 +54330,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_63()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_63() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_64()
     {
@@ -56701,10 +54400,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_66()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_66() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sMaxValue_67()
     {
@@ -56750,10 +54446,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_68()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_68() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sMinValue_69()
     {
@@ -56799,10 +54492,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_70()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_70() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_71()
     {
@@ -56872,10 +54562,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_73()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_73() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sMaxValue_74()
     {
@@ -56921,10 +54608,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_75()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_75() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sMinValue_76()
     {
@@ -56970,10 +54654,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_77()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_77() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_78()
     {
@@ -57043,10 +54724,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_80()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_80() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeSingleMediumValue_81()
     {
@@ -57092,10 +54770,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_82()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_82() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeSingleLargeValue_83()
     {
@@ -57141,10 +54816,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_84()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_84() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeSingleSmallValue_85()
     {
@@ -57190,10 +54862,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_86()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_86() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeSingleDefaultValue_87()
     {
@@ -57263,10 +54932,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_89()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_89() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeDoubleMediumValue_90()
     {
@@ -57312,10 +54978,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_91()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_91() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeDoubleLargeValue_92()
     {
@@ -57361,10 +55024,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_93()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_93() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeDoubleSmallValue_94()
     {
@@ -57410,10 +55070,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_95()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_95() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeDoubleDefaultValue_96()
     {
@@ -57483,10 +55140,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_98()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_98() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum8MaxValue_99()
     {
@@ -57532,10 +55186,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_100()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_100() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum8MinValue_101()
     {
@@ -57605,10 +55256,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_103()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_103() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum16MaxValue_104()
     {
@@ -57654,10 +55302,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_105()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_105() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum16MinValue_106()
     {
@@ -57727,10 +55372,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_108()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_108() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetStringWithEmbeddedNull_109()
     {
@@ -57778,10 +55420,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_110()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_110() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetStringWithWeirdChars_111()
     {
@@ -57828,10 +55467,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_112()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_112() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetString_113()
     {
@@ -57880,10 +55516,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_114()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_114() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeOctetString_115()
     {
@@ -57930,10 +55563,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_116()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_116() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_117()
     {
@@ -57984,10 +55614,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_118()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_118() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongOctetString_119()
     {
@@ -58040,10 +55667,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_120()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_120() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringDefaultValue_121()
     {
@@ -58089,10 +55713,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_122()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_122() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharString_123()
     {
@@ -58139,10 +55760,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_124()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_124() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeCharString_125()
     {
@@ -58188,10 +55806,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_126()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_126() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_127()
     {
@@ -58241,10 +55856,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_128()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_128() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongCharString_129()
     {
@@ -58295,10 +55907,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_130()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_130() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeListLongOctetString_131()
     {
@@ -58415,10 +56024,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_133()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_133() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochUsMaxValue_134()
     {
@@ -58464,10 +56070,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_135()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_135() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochUsMinValue_136()
     {
@@ -58537,10 +56140,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_138()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_138() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochSMaxValue_139()
     {
@@ -58586,10 +56186,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_140()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_140() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochSMinValue_141()
     {
@@ -58659,10 +56256,7 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_143()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_143() { NextTest(); }
 
     CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_144()
     {
@@ -58690,10 +56284,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_144()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_144() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestSendTestCommandToUnsupportedCluster_145()
     {
@@ -58721,10 +56312,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_145()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_145() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeVendorIdDefaultValue_146()
     {
@@ -58770,10 +56358,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_147()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_147() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeVendorId_148()
     {
@@ -58819,10 +56404,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_149()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_149() { NextTest(); }
 
     CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_150()
     {
@@ -59743,10 +57325,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_166()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_166() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeListWithListOfInt8u_167()
     {
@@ -59809,10 +57388,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_168()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_168() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeListWithListOfOctetString_169()
     {
@@ -59893,10 +57469,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_170()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_170() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeListWithListOfListStructOctetString_171()
     {
@@ -60096,10 +57669,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_175()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_175() { NextTest(); }
 
     CHIP_ERROR TestReadListOfStructsContainingNullablesAndOptionalsAfterWriting_176()
     {
@@ -60169,10 +57739,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_177()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_177() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBooleanNull_178()
     {
@@ -60219,10 +57786,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_179()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_179() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBooleanTrue_180()
     {
@@ -60270,10 +57834,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_181()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_181() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap8MaxValue_182()
     {
@@ -60322,10 +57883,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_183()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_183() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap8UnchangedValue_184()
     {
@@ -60372,10 +57930,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_185()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_185() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap8NullValue_186()
     {
@@ -60422,10 +57977,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_187()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_187() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap16MaxValue_188()
     {
@@ -60474,10 +58026,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_189()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_189() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap16UnchangedValue_190()
     {
@@ -60524,10 +58073,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_191()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_191() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap16NullValue_192()
     {
@@ -60574,10 +58120,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_193()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_193() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap32MaxValue_194()
     {
@@ -60626,10 +58169,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_195()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_195() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap32UnchangedValue_196()
     {
@@ -60676,10 +58216,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_197()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_197() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap32NullValue_198()
     {
@@ -60726,10 +58263,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_199()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_199() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap64MaxValue_200()
     {
@@ -60778,10 +58312,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_201()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_201() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap64UnchangedValue_202()
     {
@@ -60828,10 +58359,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_203()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_203() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableBitmap64NullValue_204()
     {
@@ -60878,10 +58406,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_205()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_205() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8uMinValue_206()
     {
@@ -60929,10 +58454,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_207()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_207() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8uMaxValue_208()
     {
@@ -60981,10 +58503,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_209()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_209() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8uUnchangedValue_210()
     {
@@ -61055,10 +58574,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_212()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_212() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8uNullValue_213()
     {
@@ -61153,10 +58669,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_216()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_216() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8uValueInRange_217()
     {
@@ -61227,10 +58740,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_219()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_219() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16uMinValue_220()
     {
@@ -61278,10 +58788,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_221()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_221() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16uMaxValue_222()
     {
@@ -61330,10 +58837,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_223()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_223() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16uUnchangedValue_224()
     {
@@ -61380,10 +58884,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_225()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_225() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16uNullValue_226()
     {
@@ -61478,10 +58979,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_229()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_229() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16uValueInRange_230()
     {
@@ -61552,10 +59050,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_232()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_232() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32uMinValue_233()
     {
@@ -61603,10 +59098,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_234()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_234() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32uMaxValue_235()
     {
@@ -61655,10 +59147,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_236()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_236() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32uUnchangedValue_237()
     {
@@ -61705,10 +59194,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_238()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_238() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32uNullValue_239()
     {
@@ -61803,10 +59289,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_242()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_242() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32uValueInRange_243()
     {
@@ -61877,10 +59360,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_245()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_245() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64uMinValue_246()
     {
@@ -61928,10 +59408,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_247()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_247() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64uMaxValue_248()
     {
@@ -61980,10 +59457,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_249()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_249() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64uUnchangedValue_250()
     {
@@ -62030,10 +59504,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_251()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_251() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64uNullValue_252()
     {
@@ -62128,10 +59599,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_255()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_255() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64uValueInRange_256()
     {
@@ -62202,10 +59670,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_258()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_258() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8sMinValue_259()
     {
@@ -62254,10 +59719,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_260()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_260() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8sUnchangedValue_261()
     {
@@ -62304,10 +59766,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_262()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_262() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8sNullValue_263()
     {
@@ -62402,10 +59861,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_266()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_266() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt8sValueInRange_267()
     {
@@ -62476,10 +59932,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_269()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_269() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16sMinValue_270()
     {
@@ -62528,10 +59981,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_271()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_271() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16sUnchangedValue_272()
     {
@@ -62578,10 +60028,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_273()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_273() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16sNullValue_274()
     {
@@ -62676,10 +60123,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_277()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_277() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt16sValueInRange_278()
     {
@@ -62750,10 +60194,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_280()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_280() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32sMinValue_281()
     {
@@ -62802,10 +60243,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_282()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_282() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32sUnchangedValue_283()
     {
@@ -62852,10 +60290,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_284()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_284() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32sNullValue_285()
     {
@@ -62950,10 +60385,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_288()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_288() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt32sValueInRange_289()
     {
@@ -63024,10 +60456,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_291()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_291() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64sMinValue_292()
     {
@@ -63076,10 +60505,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_293()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_293() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64sUnchangedValue_294()
     {
@@ -63126,10 +60552,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_295()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_295() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64sNullValue_296()
     {
@@ -63224,10 +60647,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_299()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_299() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableInt64sValueInRange_300()
     {
@@ -63298,10 +60718,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_302()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_302() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSingleMediumValue_303()
     {
@@ -63349,10 +60766,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_304()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_304() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSingleLargestValue_305()
     {
@@ -63400,10 +60814,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_306()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_306() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSingleSmallestValue_307()
     {
@@ -63450,10 +60861,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_308()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_308() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSingleNullValue_309()
     {
@@ -63500,10 +60908,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_310()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_310() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSingle0Value_311()
     {
@@ -63551,10 +60956,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_312()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_312() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableDoubleMediumValue_313()
     {
@@ -63602,10 +61004,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_314()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_314() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableDoubleLargestValue_315()
     {
@@ -63653,10 +61052,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_316()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_316() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableDoubleSmallestValue_317()
     {
@@ -63703,10 +61099,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_318()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_318() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableDoubleNullValue_319()
     {
@@ -63753,10 +61146,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_320()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_320() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableDouble0Value_321()
     {
@@ -63804,10 +61194,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_322()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_322() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum8MinValue_323()
     {
@@ -63855,10 +61242,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_324()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_324() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum8MaxValue_325()
     {
@@ -63907,10 +61291,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_326()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_326() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum8UnchangedValue_327()
     {
@@ -63957,10 +61338,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_328()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_328() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum8NullValue_329()
     {
@@ -64007,10 +61385,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_330()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_330() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum16MinValue_331()
     {
@@ -64058,10 +61433,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_332()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_332() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum16MaxValue_333()
     {
@@ -64110,10 +61482,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_334()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_334() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum16UnchangedValue_335()
     {
@@ -64160,10 +61529,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_336()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_336() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableEnum16NullValue_337()
     {
@@ -64210,10 +61576,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_338()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_338() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumMinValue_339()
     {
@@ -64262,10 +61625,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_340()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_340() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumMaxValue_341()
     {
@@ -64315,10 +61675,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_342()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_342() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumUnchangedValue_343()
     {
@@ -64366,10 +61723,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_344()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_344() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumNullValue_345()
     {
@@ -64444,10 +61798,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_347()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_347() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableOctetString_348()
     {
@@ -64495,10 +61846,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_349()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_349() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableOctetString_350()
     {
@@ -64545,10 +61893,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_351()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_351() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableOctetString_352()
     {
@@ -64622,10 +61967,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_354()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_354() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableCharString_355()
     {
@@ -64672,10 +62014,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_356()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_356() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableCharString_357()
     {
@@ -64722,10 +62061,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_358()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_358() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeNullableCharString_359()
     {
@@ -64770,10 +62106,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_360(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_360(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeFromNonexistentCluster_361()
     {
@@ -64793,10 +62126,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_361(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_361(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_362()
     {
@@ -64824,10 +62154,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_362()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_362() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_363()
     {
@@ -64856,10 +62183,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_363()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_363() { NextTest(); }
 
     CHIP_ERROR TestReportSubscribeToListAttribute_364()
     {
@@ -64960,10 +62284,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_366()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_366() { NextTest(); }
 
     CHIP_ERROR TestCheckForListAttributeReport_367()
     {
@@ -65046,10 +62367,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_369()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_369() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedUnsigned8BitInteger_370()
     {
@@ -65072,10 +62390,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_370()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_370() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedUnsigned8BitInteger_371()
     {
@@ -65098,10 +62413,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_371()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_371() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedUnsigned8BitInteger_372()
     {
@@ -65124,10 +62436,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_372()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_372() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueHasNotChanged_373()
     {
@@ -65173,10 +62482,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_374()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_374() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueIsAtMinValid_375()
     {
@@ -65222,10 +62528,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_376()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_376() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueIsAtMaxValid_377()
     {
@@ -65271,10 +62574,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_378()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_378() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueIsAtMidValid_379()
     {
@@ -65345,10 +62645,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_381()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_381() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedUnsigned16BitInteger_382()
     {
@@ -65371,10 +62668,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_382()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_382() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedUnsigned16BitInteger_383()
     {
@@ -65397,10 +62691,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_383()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_383() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedUnsigned16BitInteger_384()
     {
@@ -65423,10 +62714,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_384()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_384() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueHasNotChanged_385()
     {
@@ -65472,10 +62760,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_386()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_386() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueIsAtMinValid_387()
     {
@@ -65521,10 +62806,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_388()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_388() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueIsAtMaxValid_389()
     {
@@ -65570,10 +62852,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_390()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_390() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueIsAtMidValid_391()
     {
@@ -65644,10 +62923,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_393()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_393() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedSigned8BitInteger_394()
     {
@@ -65670,10 +62946,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_394()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_394() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedSigned8BitInteger_395()
     {
@@ -65696,10 +62969,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_395()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_395() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedSigned8BitInteger_396()
     {
@@ -65722,10 +62992,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_396()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_396() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueHasNotChanged_397()
     {
@@ -65771,10 +63038,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_398()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_398() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueIsAtMinValid_399()
     {
@@ -65820,10 +63084,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_400()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_400() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueIsAtMaxValid_401()
     {
@@ -65869,10 +63130,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_402()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_402() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueIsAtMidValid_403()
     {
@@ -65943,10 +63201,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_405()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_405() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedSigned16BitInteger_406()
     {
@@ -65969,10 +63224,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_406()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_406() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedSigned16BitInteger_407()
     {
@@ -65995,10 +63247,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_407()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_407() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedSigned16BitInteger_408()
     {
@@ -66021,10 +63270,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_408()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_408() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueHasNotChanged_409()
     {
@@ -66070,10 +63316,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_410()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_410() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueIsAtMinValid_411()
     {
@@ -66119,10 +63362,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_412()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_412() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueIsAtMaxValid_413()
     {
@@ -66168,10 +63408,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_414()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_414() { NextTest(); }
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueIsAtMidValid_415()
     {
@@ -66246,10 +63483,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_417()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_417() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedUnsigned8BitInteger_418()
     {
@@ -66274,10 +63508,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_418()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_418() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedUnsigned8BitInteger_419()
     {
@@ -66302,10 +63533,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_419()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_419() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedUnsigned8BitInteger_420()
     {
@@ -66330,10 +63558,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_420()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_420() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueHasNotChanged_421()
     {
@@ -66383,10 +63608,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_422()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_422() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsAtMinValid_423()
     {
@@ -66436,10 +63658,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_424()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_424() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsAtMaxValid_425()
     {
@@ -66489,10 +63708,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_426()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_426() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsAtMidValid_427()
     {
@@ -66541,10 +63757,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_428()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_428() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsNull_429()
     {
@@ -66620,10 +63833,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_431()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_431() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedUnsigned16BitInteger_432()
     {
@@ -66648,10 +63858,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_432()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_432() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedUnsigned16BitInteger_433()
     {
@@ -66676,10 +63883,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_433()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_433() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedUnsigned16BitInteger_434()
     {
@@ -66704,10 +63908,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_434()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_434() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueHasNotChanged_435()
     {
@@ -66757,10 +63958,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_436()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_436() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsAtMinValid_437()
     {
@@ -66810,10 +64008,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_438()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_438() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsAtMaxValid_439()
     {
@@ -66863,10 +64058,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_440()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_440() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsAtMidValid_441()
     {
@@ -66915,10 +64107,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_442()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_442() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsNull_443()
     {
@@ -66994,10 +64183,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_445()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_445() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedSigned8BitInteger_446()
     {
@@ -67022,10 +64208,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_446()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_446() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedSigned8BitInteger_447()
     {
@@ -67050,10 +64233,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_447()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_447() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedSigned8BitInteger_448()
     {
@@ -67078,10 +64258,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_448()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_448() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueHasNotChanged_449()
     {
@@ -67131,10 +64308,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_450()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_450() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtMinValid_451()
     {
@@ -67184,10 +64358,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_452()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_452() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtMaxValid_453()
     {
@@ -67237,10 +64408,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_454()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_454() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtMidValid_455()
     {
@@ -67289,10 +64457,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_456()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_456() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtNull_457()
     {
@@ -67368,10 +64533,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_459()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_459() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedSigned16BitInteger_460()
     {
@@ -67396,10 +64558,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_460()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_460() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedSigned16BitInteger_461()
     {
@@ -67424,10 +64583,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_461()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_461() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedSigned16BitInteger_462()
     {
@@ -67452,10 +64608,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_462()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_462() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueHasNotChanged_463()
     {
@@ -67505,10 +64658,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_464()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_464() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsAtMinValid_465()
     {
@@ -67558,10 +64708,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_466()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_466() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsAtMaxValid_467()
     {
@@ -67611,10 +64758,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_468()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_468() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsAtMidValid_469()
     {
@@ -67663,10 +64807,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_470()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_470() { NextTest(); }
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsNull_471()
     {
@@ -67714,10 +64855,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_472()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_472() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteAttributeThatReturnsClusterSpecificStatusOnWrite_473()
     {
@@ -67740,10 +64878,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_473()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_473() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeThatReturnsGeneralStatusOnRead_474()
     {
@@ -67763,10 +64898,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_474(bool generalErrorBoolean)
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_474(bool generalErrorBoolean) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeThatReturnsClusterSpecificStatusOnRead_475()
     {
@@ -67786,10 +64918,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_475(bool clusterErrorBoolean)
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_475(bool clusterErrorBoolean) { ThrowSuccessResponse(); }
 };
 
 class TestClusterComplexTypes : public TestCommand
@@ -67956,10 +65085,7 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8();
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
@@ -67976,10 +65102,7 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, CHIP_ERROR error)
     {
@@ -67996,10 +65119,7 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -68016,10 +65136,7 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_14();
-    }
+    static void OnSuccessCallback_14(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_14(); }
 
     static void OnFailureCallback_15(void * context, CHIP_ERROR error)
     {
@@ -68036,10 +65153,7 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_16(error);
     }
 
-    static void OnSuccessCallback_16(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_16();
-    }
+    static void OnSuccessCallback_16(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_16(); }
 
     static void OnFailureCallback_17(void * context, CHIP_ERROR error)
     {
@@ -68056,10 +65170,7 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_18(error);
     }
 
-    static void OnSuccessCallback_18(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_18();
-    }
+    static void OnSuccessCallback_18(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_18(); }
 
     static void OnFailureCallback_19(void * context, CHIP_ERROR error)
     {
@@ -68076,20 +65187,14 @@ private:
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_20(error);
     }
 
-    static void OnSuccessCallback_20(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_20();
-    }
+    static void OnSuccessCallback_20(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_20(); }
 
     static void OnFailureCallback_21(void * context, CHIP_ERROR error)
     {
         (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_21(error);
     }
 
-    static void OnSuccessCallback_21(void * context)
-    {
-        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_21();
-    }
+    static void OnSuccessCallback_21(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_21(); }
 
     static void OnFailureCallback_22(void * context, CHIP_ERROR error)
     {
@@ -68181,10 +65286,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_2()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithALongTimeoutValue_3()
     {
@@ -68212,10 +65314,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
     CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithATooShortTimeoutValue_4()
     {
@@ -68252,10 +65351,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_4()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestSendCommandThatDoesNotNeedTimedInvokeWithALongTimeoutValue_5()
     {
@@ -68283,10 +65379,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestSendCommandThatDoesNotNeedTimedInvokeWithATooShortTimeoutValue_6()
     {
@@ -68323,10 +65416,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_6()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteInitialState_7()
     {
@@ -68373,10 +65463,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateUnchanged1_9()
     {
@@ -68431,10 +65518,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_10()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_10() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateUnchanged2_11()
     {
@@ -68480,10 +65564,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateChanged_13()
     {
@@ -68529,10 +65610,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteInitialValue_15()
     {
@@ -68587,10 +65665,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_16()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_16() { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteUnchangedValue_17()
     {
@@ -68636,10 +65711,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_18() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteChangedValue_19()
     {
@@ -68685,10 +65757,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_20() { NextTest(); }
 
     CHIP_ERROR TestWriteStructTypedAttribute_21()
     {
@@ -68718,10 +65787,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_21() { NextTest(); }
 
     CHIP_ERROR TestReadStructTypedAttribute_22()
     {
@@ -68903,10 +65969,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_1();
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
@@ -68943,20 +66006,14 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
         (static_cast<TestConstraints *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_6();
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
     {
@@ -69003,10 +66060,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_11(error);
     }
 
-    static void OnSuccessCallback_11(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_11();
-    }
+    static void OnSuccessCallback_11(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_11(); }
 
     static void OnFailureCallback_12(void * context, CHIP_ERROR error)
     {
@@ -69023,10 +66077,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_13(error);
     }
 
-    static void OnSuccessCallback_13(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_13();
-    }
+    static void OnSuccessCallback_13(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_13(); }
 
     static void OnFailureCallback_14(void * context, CHIP_ERROR error)
     {
@@ -69043,10 +66094,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_15(error);
     }
 
-    static void OnSuccessCallback_15(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_15();
-    }
+    static void OnSuccessCallback_15(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_15(); }
 
     static void OnFailureCallback_16(void * context, CHIP_ERROR error)
     {
@@ -69063,10 +66111,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_17(error);
     }
 
-    static void OnSuccessCallback_17(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_17();
-    }
+    static void OnSuccessCallback_17(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_17(); }
 
     static void OnFailureCallback_18(void * context, CHIP_ERROR error)
     {
@@ -69083,10 +66128,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_19(error);
     }
 
-    static void OnSuccessCallback_19(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_19();
-    }
+    static void OnSuccessCallback_19(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_19(); }
 
     static void OnFailureCallback_20(void * context, CHIP_ERROR error)
     {
@@ -69103,10 +66145,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_21(error);
     }
 
-    static void OnSuccessCallback_21(void * context)
-    {
-        (static_cast<TestConstraints *>(context))->OnSuccessResponse_21();
-    }
+    static void OnSuccessCallback_21(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_21(); }
 
     //
     // Tests methods
@@ -69138,10 +66177,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uValueMinValueConstraints_2()
     {
@@ -69233,10 +66269,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestWriteAttributeCharStringValue_6()
     {
@@ -69258,10 +66291,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringValueMinLengthConstraints_7()
     {
@@ -69375,10 +66405,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_12()
     {
@@ -69424,10 +66451,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_13() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_14()
     {
@@ -69473,10 +66497,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_16()
     {
@@ -69522,10 +66543,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_17() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringValueIsHexStringConstraints_18()
     {
@@ -69570,10 +66588,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_19()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_19() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringValueIsHexStringConstraints_20()
     {
@@ -69618,10 +66633,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_21() { NextTest(); }
 };
 
 class TestDelayCommands : public TestCommand
@@ -70351,10 +67363,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -70371,10 +67380,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_7();
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
@@ -70401,10 +67407,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_10(error);
     }
 
-    static void OnSuccessCallback_10(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_10();
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, CHIP_ERROR error)
     {
@@ -70421,10 +67424,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_12(error);
     }
 
-    static void OnSuccessCallback_12(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_12();
-    }
+    static void OnSuccessCallback_12(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_12(); }
 
     static void OnFailureCallback_13(void * context, CHIP_ERROR error)
     {
@@ -70451,10 +67451,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_15(error);
     }
 
-    static void OnSuccessCallback_15(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_15();
-    }
+    static void OnSuccessCallback_15(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_15(); }
 
     static void OnFailureCallback_16(void * context, CHIP_ERROR error)
     {
@@ -70471,10 +67468,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_17(error);
     }
 
-    static void OnSuccessCallback_17(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_17();
-    }
+    static void OnSuccessCallback_17(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_17(); }
 
     static void OnFailureCallback_18(void * context, CHIP_ERROR error)
     {
@@ -70501,10 +67495,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_20(error);
     }
 
-    static void OnSuccessCallback_20(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_20();
-    }
+    static void OnSuccessCallback_20(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_20(); }
 
     static void OnFailureCallback_21(void * context, CHIP_ERROR error)
     {
@@ -70521,10 +67512,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_22(error);
     }
 
-    static void OnSuccessCallback_22(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_22();
-    }
+    static void OnSuccessCallback_22(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_22(); }
 
     static void OnFailureCallback_23(void * context, CHIP_ERROR error)
     {
@@ -70551,10 +67539,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_25(error);
     }
 
-    static void OnSuccessCallback_25(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_25();
-    }
+    static void OnSuccessCallback_25(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_25(); }
 
     static void OnFailureCallback_26(void * context, CHIP_ERROR error)
     {
@@ -70571,10 +67556,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_27(error);
     }
 
-    static void OnSuccessCallback_27(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_27();
-    }
+    static void OnSuccessCallback_27(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_27(); }
 
     static void OnFailureCallback_28(void * context, CHIP_ERROR error)
     {
@@ -70601,10 +67583,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_30(error);
     }
 
-    static void OnSuccessCallback_30(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_30();
-    }
+    static void OnSuccessCallback_30(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_30(); }
 
     static void OnFailureCallback_31(void * context, CHIP_ERROR error)
     {
@@ -70621,10 +67600,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_32(error);
     }
 
-    static void OnSuccessCallback_32(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_32();
-    }
+    static void OnSuccessCallback_32(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_32(); }
 
     static void OnFailureCallback_33(void * context, CHIP_ERROR error)
     {
@@ -70651,10 +67627,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_35(error);
     }
 
-    static void OnSuccessCallback_35(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_35();
-    }
+    static void OnSuccessCallback_35(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_35(); }
 
     static void OnFailureCallback_36(void * context, CHIP_ERROR error)
     {
@@ -70671,10 +67644,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_37(error);
     }
 
-    static void OnSuccessCallback_37(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_37();
-    }
+    static void OnSuccessCallback_37(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_37(); }
 
     static void OnFailureCallback_38(void * context, CHIP_ERROR error)
     {
@@ -70701,10 +67671,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_40(error);
     }
 
-    static void OnSuccessCallback_40(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_40();
-    }
+    static void OnSuccessCallback_40(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_40(); }
 
     static void OnFailureCallback_41(void * context, CHIP_ERROR error)
     {
@@ -70721,10 +67688,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_42(error);
     }
 
-    static void OnSuccessCallback_42(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_42();
-    }
+    static void OnSuccessCallback_42(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_42(); }
 
     static void OnFailureCallback_43(void * context, CHIP_ERROR error)
     {
@@ -70751,10 +67715,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_45(error);
     }
 
-    static void OnSuccessCallback_45(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_45();
-    }
+    static void OnSuccessCallback_45(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_45(); }
 
     static void OnFailureCallback_46(void * context, CHIP_ERROR error)
     {
@@ -70771,10 +67732,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_47(error);
     }
 
-    static void OnSuccessCallback_47(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_47();
-    }
+    static void OnSuccessCallback_47(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_47(); }
 
     static void OnFailureCallback_48(void * context, CHIP_ERROR error)
     {
@@ -70801,10 +67759,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_50(error);
     }
 
-    static void OnSuccessCallback_50(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_50();
-    }
+    static void OnSuccessCallback_50(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_50(); }
 
     static void OnFailureCallback_51(void * context, CHIP_ERROR error)
     {
@@ -70821,10 +67776,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_52(error);
     }
 
-    static void OnSuccessCallback_52(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_52();
-    }
+    static void OnSuccessCallback_52(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_52(); }
 
     static void OnFailureCallback_53(void * context, CHIP_ERROR error)
     {
@@ -70851,10 +67803,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_55(error);
     }
 
-    static void OnSuccessCallback_55(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_55();
-    }
+    static void OnSuccessCallback_55(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_55(); }
 
     static void OnFailureCallback_56(void * context, CHIP_ERROR error)
     {
@@ -70871,10 +67820,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_57(error);
     }
 
-    static void OnSuccessCallback_57(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_57();
-    }
+    static void OnSuccessCallback_57(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_57(); }
 
     static void OnFailureCallback_58(void * context, CHIP_ERROR error)
     {
@@ -70901,10 +67847,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_60(error);
     }
 
-    static void OnSuccessCallback_60(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_60();
-    }
+    static void OnSuccessCallback_60(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_60(); }
 
     static void OnFailureCallback_61(void * context, CHIP_ERROR error)
     {
@@ -70921,10 +67864,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_62(error);
     }
 
-    static void OnSuccessCallback_62(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_62();
-    }
+    static void OnSuccessCallback_62(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_62(); }
 
     static void OnFailureCallback_63(void * context, CHIP_ERROR error)
     {
@@ -70951,10 +67891,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_65(error);
     }
 
-    static void OnSuccessCallback_65(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_65();
-    }
+    static void OnSuccessCallback_65(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_65(); }
 
     static void OnFailureCallback_66(void * context, CHIP_ERROR error)
     {
@@ -70971,10 +67908,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_67(error);
     }
 
-    static void OnSuccessCallback_67(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_67();
-    }
+    static void OnSuccessCallback_67(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_67(); }
 
     static void OnFailureCallback_68(void * context, CHIP_ERROR error)
     {
@@ -71001,10 +67935,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_70(error);
     }
 
-    static void OnSuccessCallback_70(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_70();
-    }
+    static void OnSuccessCallback_70(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_70(); }
 
     static void OnFailureCallback_71(void * context, CHIP_ERROR error)
     {
@@ -71021,10 +67952,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_72(error);
     }
 
-    static void OnSuccessCallback_72(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_72();
-    }
+    static void OnSuccessCallback_72(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_72(); }
 
     static void OnFailureCallback_73(void * context, CHIP_ERROR error)
     {
@@ -71051,10 +67979,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_75(error);
     }
 
-    static void OnSuccessCallback_75(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_75();
-    }
+    static void OnSuccessCallback_75(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_75(); }
 
     static void OnFailureCallback_76(void * context, CHIP_ERROR error)
     {
@@ -71071,10 +67996,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_77(error);
     }
 
-    static void OnSuccessCallback_77(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_77();
-    }
+    static void OnSuccessCallback_77(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_77(); }
 
     static void OnFailureCallback_78(void * context, CHIP_ERROR error)
     {
@@ -71101,10 +68023,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_80(error);
     }
 
-    static void OnSuccessCallback_80(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_80();
-    }
+    static void OnSuccessCallback_80(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_80(); }
 
     static void OnFailureCallback_81(void * context, CHIP_ERROR error)
     {
@@ -71121,10 +68040,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_82(error);
     }
 
-    static void OnSuccessCallback_82(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_82();
-    }
+    static void OnSuccessCallback_82(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_82(); }
 
     static void OnFailureCallback_83(void * context, CHIP_ERROR error)
     {
@@ -71151,10 +68067,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_85(error);
     }
 
-    static void OnSuccessCallback_85(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_85();
-    }
+    static void OnSuccessCallback_85(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_85(); }
 
     static void OnFailureCallback_86(void * context, CHIP_ERROR error)
     {
@@ -71171,10 +68084,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_87(error);
     }
 
-    static void OnSuccessCallback_87(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_87();
-    }
+    static void OnSuccessCallback_87(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_87(); }
 
     static void OnFailureCallback_88(void * context, CHIP_ERROR error)
     {
@@ -71201,10 +68111,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_90(error);
     }
 
-    static void OnSuccessCallback_90(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_90();
-    }
+    static void OnSuccessCallback_90(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_90(); }
 
     static void OnFailureCallback_91(void * context, CHIP_ERROR error)
     {
@@ -71221,10 +68128,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_92(error);
     }
 
-    static void OnSuccessCallback_92(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_92();
-    }
+    static void OnSuccessCallback_92(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_92(); }
 
     static void OnFailureCallback_93(void * context, CHIP_ERROR error)
     {
@@ -71261,10 +68165,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_96(error);
     }
 
-    static void OnSuccessCallback_96(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_96();
-    }
+    static void OnSuccessCallback_96(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_96(); }
 
     static void OnFailureCallback_97(void * context, CHIP_ERROR error)
     {
@@ -71291,10 +68192,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_99(error);
     }
 
-    static void OnSuccessCallback_99(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_99();
-    }
+    static void OnSuccessCallback_99(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_99(); }
 
     static void OnFailureCallback_100(void * context, CHIP_ERROR error)
     {
@@ -71311,10 +68209,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_101(error);
     }
 
-    static void OnSuccessCallback_101(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_101();
-    }
+    static void OnSuccessCallback_101(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_101(); }
 
     static void OnFailureCallback_102(void * context, CHIP_ERROR error)
     {
@@ -71341,10 +68236,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_104(error);
     }
 
-    static void OnSuccessCallback_104(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_104();
-    }
+    static void OnSuccessCallback_104(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_104(); }
 
     static void OnFailureCallback_105(void * context, CHIP_ERROR error)
     {
@@ -71371,10 +68263,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_107(error);
     }
 
-    static void OnSuccessCallback_107(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_107();
-    }
+    static void OnSuccessCallback_107(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_107(); }
 
     static void OnFailureCallback_108(void * context, CHIP_ERROR error)
     {
@@ -71391,10 +68280,7 @@ private:
         (static_cast<TestSaveAs *>(context))->OnFailureResponse_109(error);
     }
 
-    static void OnSuccessCallback_109(void * context)
-    {
-        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_109();
-    }
+    static void OnSuccessCallback_109(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_109(); }
 
     //
     // Tests methods
@@ -71548,10 +68434,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBooleanNotDefaultValue_6()
     {
@@ -71597,10 +68480,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBooleanFalse_8()
     {
@@ -71671,10 +68551,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_10() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap8NotDefaultValue_11()
     {
@@ -71720,10 +68597,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_12() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap8DefaultValue_13()
     {
@@ -71794,10 +68668,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_15() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap16NotDefaultValue_16()
     {
@@ -71843,10 +68714,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_17() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap16DefaultValue_18()
     {
@@ -71917,10 +68785,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_20() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap32NotDefaultValue_21()
     {
@@ -71966,10 +68831,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_22()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_22() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap32DefaultValue_23()
     {
@@ -72040,10 +68902,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_25()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_25() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_26()
     {
@@ -72089,10 +68948,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_27()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_27() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_28()
     {
@@ -72163,10 +69019,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_30()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_30() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8uNotDefaultValue_31()
     {
@@ -72212,10 +69065,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_32()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_32() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8uDefaultValue_33()
     {
@@ -72286,10 +69136,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_35()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_35() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16uNotDefaultValue_36()
     {
@@ -72335,10 +69182,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_37()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_37() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16uDefaultValue_38()
     {
@@ -72409,10 +69253,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_40()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_40() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uNotDefaultValue_41()
     {
@@ -72458,10 +69299,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_42()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_42() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uDefaultValue_43()
     {
@@ -72532,10 +69370,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_45()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_45() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64uNotDefaultValue_46()
     {
@@ -72581,10 +69416,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_47()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_47() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64uDefaultValue_48()
     {
@@ -72655,10 +69487,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_50()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_50() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sNotDefaultValue_51()
     {
@@ -72704,10 +69533,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_52()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_52() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_53()
     {
@@ -72778,10 +69604,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_55()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_55() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sNotDefaultValue_56()
     {
@@ -72827,10 +69650,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_57()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_57() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_58()
     {
@@ -72901,10 +69721,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_60()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_60() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sNotDefaultValue_61()
     {
@@ -72950,10 +69767,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_62()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_62() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_63()
     {
@@ -73024,10 +69838,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_65()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_65() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sNotDefaultValue_66()
     {
@@ -73073,10 +69884,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_67()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_67() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_68()
     {
@@ -73147,10 +69955,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_70()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_70() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum8NotDefaultValue_71()
     {
@@ -73196,10 +70001,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_72()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_72() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum8DefaultValue_73()
     {
@@ -73270,10 +70072,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_75()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_75() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum16NotDefaultValue_76()
     {
@@ -73319,10 +70118,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_77()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_77() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum16DefaultValue_78()
     {
@@ -73393,10 +70189,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_80()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_80() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochUsNotDefaultValue_81()
     {
@@ -73442,10 +70235,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_82()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_82() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochUsDefaultValue_83()
     {
@@ -73516,10 +70306,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_85()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_85() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochSNotDefaultValue_86()
     {
@@ -73565,10 +70352,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_87()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_87() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochSDefaultValue_88()
     {
@@ -73639,10 +70423,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_90()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_90() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeVendorIdNotDefaultValue_91()
     {
@@ -73688,10 +70469,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_92()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_92() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeVendorIdDefaultValue_93()
     {
@@ -73792,10 +70570,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_96()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_96() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringNotDefaultValue_97()
     {
@@ -73874,10 +70649,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_99()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_99() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringNotDefaultValueAndCompareToExpectedValue_100()
     {
@@ -73923,10 +70695,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_101()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_101() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetStringDefaultValue_102()
     {
@@ -74003,10 +70772,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_104()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_104() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetStringNotDefaultValue_105()
     {
@@ -74086,10 +70852,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_107()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_107() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetStringNotDefaultValueAndCompareToExpectedValue_108()
     {
@@ -74136,10 +70899,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_109()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_109() { NextTest(); }
 };
 
 class TestConfigVariables : public TestCommand
@@ -74656,20 +71416,14 @@ private:
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context)
-    {
-        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1();
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context)
-    {
-        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_2();
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
@@ -74711,10 +71465,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestRestoreInitialLocationValue_2()
     {
@@ -74736,10 +71487,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_2() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeListValue_3()
     {
@@ -74907,10 +71655,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 };
 
 class TestGroupsCluster : public TestCommand
@@ -75555,10 +72300,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_14() { NextTest(); }
 
     CHIP_ERROR TestViewGroup1Removed_15()
     {
@@ -76365,10 +73107,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestVerifyCurrentModeChange_7()
     {
@@ -76421,10 +73160,7 @@ private:
         NextTest();
     }
 
-    void OnSuccessResponse_8()
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 };
 
 class TestGroupMessaging : public TestCommand
@@ -76516,20 +73252,14 @@ private:
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    static void OnDoneCallback_3(void * context)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_3();
-    }
+    static void OnDoneCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_3(); }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3();
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
@@ -76541,20 +73271,14 @@ private:
         (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
     }
 
-    static void OnDoneCallback_5(void * context)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5();
-    }
+    static void OnDoneCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5();
-    }
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
@@ -76678,15 +73402,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_3() { NextTest(); }
 
-    void OnDoneResponse_3()
-    {
-        NextTest();
-    }
+    void OnDoneResponse_3() { NextTest(); }
 
     CHIP_ERROR TestReadBackAttribute_4()
     {
@@ -76732,15 +73450,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_5() { NextTest(); }
 
-    void OnDoneResponse_5()
-    {
-        NextTest();
-    }
+    void OnDoneResponse_5() { NextTest(); }
 
     CHIP_ERROR TestReadBackAttribute_6()
     {
@@ -76794,15 +73506,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_7() { NextTest(); }
 
-    void OnDoneResponse_7()
-    {
-        NextTest();
-    }
+    void OnDoneResponse_7() { NextTest(); }
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8()
     {
@@ -77053,7 +73759,8 @@ public:
         // but before our function call returns, we won't end up with an
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++)
-        {}
+        {
+        }
 
         if (CHIP_NO_ERROR != err)
         {
@@ -77401,10 +74108,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_1() { NextTest(); }
 
     CHIP_ERROR TestReportSubscribeOnOffAttribute_2()
     {
@@ -77492,10 +74196,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_4() { NextTest(); }
 
     CHIP_ERROR TestCheckForAttributeReport_5()
     {
@@ -77547,10 +74248,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6()
-    {
-        NextTest();
-    }
+    void OnSuccessResponse_6() { NextTest(); }
 
     CHIP_ERROR TestCheckForAttributeReport_7()
     {

@@ -5118,10 +5118,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("AccessControl.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("AccessControl.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -5199,10 +5196,7 @@ private:
 class AccountLoginLogoutRequest : public ModelCommand
 {
 public:
-    AccountLoginLogoutRequest() : ModelCommand("logout-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    AccountLoginLogoutRequest() : ModelCommand("logout-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -5349,10 +5343,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("AccountLogin.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("AccountLogin.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -5437,10 +5428,7 @@ private:
 class AdministratorCommissioningRevokeCommissioning : public ModelCommand
 {
 public:
-    AdministratorCommissioningRevokeCommissioning() : ModelCommand("revoke-commissioning")
-    {
-        ModelCommand::AddArguments();
-    }
+    AdministratorCommissioningRevokeCommissioning() : ModelCommand("revoke-commissioning") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -5895,10 +5883,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("ApplicationBasic.VendorName report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ApplicationBasic.VendorName report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -5967,10 +5952,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ApplicationBasic.VendorId report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.VendorId report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -6111,10 +6093,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ApplicationBasic.ProductId report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.ProductId report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -6471,10 +6450,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ApplicationBasic.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -6776,10 +6752,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ApplicationLauncher.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationLauncher.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -6989,10 +6962,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("AudioOutput.CurrentAudioOutput report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("AudioOutput.CurrentAudioOutput report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7133,10 +7103,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("AudioOutput.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("AudioOutput.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7192,10 +7159,7 @@ private:
 class BarrierControlBarrierControlStop : public ModelCommand
 {
 public:
-    BarrierControlBarrierControlStop() : ModelCommand("barrier-control-stop")
-    {
-        ModelCommand::AddArguments();
-    }
+    BarrierControlBarrierControlStop() : ModelCommand("barrier-control-stop") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -7270,10 +7234,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("BarrierControl.BarrierMovingState report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("BarrierControl.BarrierMovingState report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7342,10 +7303,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("BarrierControl.BarrierSafetyStatus report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BarrierControl.BarrierSafetyStatus report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7414,10 +7372,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("BarrierControl.BarrierCapabilities report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("BarrierControl.BarrierCapabilities report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7486,10 +7441,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("BarrierControl.BarrierPosition report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("BarrierControl.BarrierPosition report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7630,10 +7582,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("BarrierControl.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BarrierControl.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -7683,10 +7632,7 @@ private:
 class BasicMfgSpecificPing : public ModelCommand
 {
 public:
-    BasicMfgSpecificPing() : ModelCommand("mfg-specific-ping")
-    {
-        ModelCommand::AddArguments();
-    }
+    BasicMfgSpecificPing() : ModelCommand("mfg-specific-ping") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -8045,10 +7991,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Basic.InteractionModelVersion report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.InteractionModelVersion report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8117,10 +8060,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.VendorName report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.VendorName report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8189,10 +8129,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::VendorId value)
-    {
-        LogValue("Basic.VendorID report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::VendorId value) { LogValue("Basic.VendorID report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8261,10 +8198,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.ProductName report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ProductName report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8333,10 +8267,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Basic.ProductID report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.ProductID report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8431,10 +8362,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.NodeLabel report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.NodeLabel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8529,10 +8457,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.Location report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.Location report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8601,10 +8526,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Basic.HardwareVersion report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.HardwareVersion report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8673,10 +8595,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.HardwareVersionString report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.HardwareVersionString report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8745,10 +8664,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("Basic.SoftwareVersion report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("Basic.SoftwareVersion report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8817,10 +8733,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.SoftwareVersionString report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.SoftwareVersionString report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8889,10 +8802,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.ManufacturingDate report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ManufacturingDate report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8961,10 +8871,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.PartNumber report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.PartNumber report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9033,10 +8940,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.ProductURL report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ProductURL report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9105,10 +9009,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.ProductLabel report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ProductLabel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9177,10 +9078,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.SerialNumber report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.SerialNumber report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9275,10 +9173,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("Basic.LocalConfigDisabled report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("Basic.LocalConfigDisabled report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9347,10 +9242,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("Basic.Reachable report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("Basic.Reachable report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9419,10 +9311,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("Basic.UniqueID report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.UniqueID report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9563,10 +9452,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Basic.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9676,10 +9562,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("BinaryInputBasic.OutOfService report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("BinaryInputBasic.OutOfService report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9774,10 +9657,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("BinaryInputBasic.PresentValue report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("BinaryInputBasic.PresentValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9846,10 +9726,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("BinaryInputBasic.StatusFlags report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("BinaryInputBasic.StatusFlags report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9990,10 +9867,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("BinaryInputBasic.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BinaryInputBasic.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -10202,10 +10076,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Binding.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Binding.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -10360,10 +10231,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("BooleanState.StateValue report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("BooleanState.StateValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -10504,10 +10372,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("BooleanState.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BooleanState.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -11209,10 +11074,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("BridgedActions.SetupUrl report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedActions.SetupUrl report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -11353,10 +11215,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("BridgedActions.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedActions.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -11509,10 +11368,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("BridgedDeviceBasic.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedDeviceBasic.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -11818,10 +11674,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Channel.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Channel.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12515,10 +12368,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.CurrentHue report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.CurrentHue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12587,10 +12437,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.CurrentSaturation report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.CurrentSaturation report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12659,10 +12506,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.RemainingTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.RemainingTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12731,10 +12575,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.CurrentX report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.CurrentX report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12803,10 +12644,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.CurrentY report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.CurrentY report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12875,10 +12713,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.DriftCompensation report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.DriftCompensation report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -12947,10 +12782,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("ColorControl.CompensationText report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ColorControl.CompensationText report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13019,10 +12851,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorTemperature report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorTemperature report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13091,10 +12920,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13189,10 +13015,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorControlOptions report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorControlOptions report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13261,10 +13084,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.NumberOfPrimaries report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.NumberOfPrimaries report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13333,10 +13153,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary1X report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary1X report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13405,10 +13222,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary1Y report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary1Y report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13477,10 +13291,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.Primary1Intensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary1Intensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13549,10 +13360,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary2X report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary2X report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13621,10 +13429,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary2Y report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary2Y report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13693,10 +13498,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.Primary2Intensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary2Intensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13765,10 +13567,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary3X report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary3X report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13837,10 +13636,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary3Y report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary3Y report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13909,10 +13705,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.Primary3Intensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary3Intensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13981,10 +13774,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary4X report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary4X report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14053,10 +13843,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary4Y report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary4Y report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14125,10 +13912,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.Primary4Intensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary4Intensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14197,10 +13981,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary5X report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary5X report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14269,10 +14050,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary5Y report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary5Y report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14341,10 +14119,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.Primary5Intensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary5Intensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14413,10 +14188,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary6X report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary6X report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14485,10 +14257,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.Primary6Y report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary6Y report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14557,10 +14326,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.Primary6Intensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary6Intensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14655,10 +14421,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.WhitePointX report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.WhitePointX report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14753,10 +14516,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.WhitePointY report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.WhitePointY report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14851,10 +14611,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorPointRX report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointRX report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -14949,10 +14706,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorPointRY report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointRY report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15047,10 +14801,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorPointRIntensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorPointRIntensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15145,10 +14896,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorPointGX report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointGX report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15243,10 +14991,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorPointGY report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointGY report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15341,10 +15086,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorPointGIntensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorPointGIntensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15439,10 +15181,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorPointBX report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointBX report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15537,10 +15276,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorPointBY report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointBY report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15635,10 +15371,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorPointBIntensity report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorPointBIntensity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15707,10 +15440,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.EnhancedCurrentHue report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.EnhancedCurrentHue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15779,10 +15509,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.EnhancedColorMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.EnhancedColorMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15851,10 +15578,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorLoopActive report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorLoopActive report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15923,10 +15647,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ColorControl.ColorLoopDirection report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorLoopDirection report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15995,10 +15716,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorLoopTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorLoopTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -16211,10 +15929,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorCapabilities report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorCapabilities report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -16283,10 +15998,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorTempPhysicalMin report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorTempPhysicalMin report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -16355,10 +16067,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ColorTempPhysicalMax report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorTempPhysicalMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -16669,10 +16378,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ColorControl.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -17051,10 +16757,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ContentLauncher.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ContentLauncher.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -17503,10 +17206,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Descriptor.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Descriptor.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18438,10 +18138,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("DoorLock.ActuatorEnabled report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.ActuatorEnabled report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18584,10 +18281,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("DoorLock.NumberOfTotalUsersSupported report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfTotalUsersSupported report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18656,10 +18350,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("DoorLock.NumberOfPINUsersSupported report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfPINUsersSupported report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18728,10 +18419,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("DoorLock.MaxPINCodeLength report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MaxPINCodeLength report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18800,10 +18488,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("DoorLock.MinPINCodeLength report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MinPINCodeLength report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18898,10 +18583,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("DoorLock.Language report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("DoorLock.Language report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18996,10 +18678,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("DoorLock.AutoRelockTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("DoorLock.AutoRelockTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19094,10 +18773,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("DoorLock.SoundVolume report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.SoundVolume report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19264,10 +18940,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("DoorLock.SupportedOperatingModes report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.SupportedOperatingModes report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19362,10 +19035,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("DoorLock.EnableOneTouchLocking report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnableOneTouchLocking report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19460,10 +19130,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("DoorLock.EnablePrivacyModeButton report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnablePrivacyModeButton report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19558,10 +19225,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("DoorLock.WrongCodeEntryLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.WrongCodeEntryLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19702,10 +19366,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("DoorLock.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -19941,10 +19602,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ElectricalMeasurement.RmsVoltage report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsVoltage report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20013,10 +19671,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ElectricalMeasurement.RmsVoltageMin report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsVoltageMin report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20085,10 +19740,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ElectricalMeasurement.RmsVoltageMax report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsVoltageMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20157,10 +19809,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ElectricalMeasurement.RmsCurrent report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsCurrent report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20229,10 +19878,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ElectricalMeasurement.RmsCurrentMin report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsCurrentMin report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20301,10 +19947,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ElectricalMeasurement.RmsCurrentMax report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsCurrentMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20373,10 +20016,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("ElectricalMeasurement.ActivePower report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("ElectricalMeasurement.ActivePower report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20445,10 +20085,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("ElectricalMeasurement.ActivePowerMin report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("ElectricalMeasurement.ActivePowerMin report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20517,10 +20154,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("ElectricalMeasurement.ActivePowerMax report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("ElectricalMeasurement.ActivePowerMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20701,10 +20335,7 @@ private:
 class EthernetNetworkDiagnosticsResetCounts : public ModelCommand
 {
 public:
-    EthernetNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts")
-    {
-        ModelCommand::AddArguments();
-    }
+    EthernetNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -20779,10 +20410,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("EthernetNetworkDiagnostics.PHYRate report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("EthernetNetworkDiagnostics.PHYRate report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -20851,10 +20479,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("EthernetNetworkDiagnostics.FullDuplex report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("EthernetNetworkDiagnostics.FullDuplex report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -21283,10 +20908,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("EthernetNetworkDiagnostics.CarrierDetect report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("EthernetNetworkDiagnostics.CarrierDetect report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -21804,10 +21426,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("FixedLabel.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("FixedLabel.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -21892,10 +21511,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("FlowMeasurement.MeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("FlowMeasurement.MeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -21964,10 +21580,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("FlowMeasurement.MinMeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("FlowMeasurement.MinMeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22036,10 +21649,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("FlowMeasurement.MaxMeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("FlowMeasurement.MaxMeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22108,10 +21718,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("FlowMeasurement.Tolerance report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("FlowMeasurement.Tolerance report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22252,10 +21859,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("FlowMeasurement.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("FlowMeasurement.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22314,10 +21918,7 @@ private:
 class GeneralCommissioningCommissioningComplete : public ModelCommand
 {
 public:
-    GeneralCommissioningCommissioningComplete() : ModelCommand("commissioning-complete")
-    {
-        ModelCommand::AddArguments();
-    }
+    GeneralCommissioningCommissioningComplete() : ModelCommand("commissioning-complete") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -22446,10 +22047,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("GeneralCommissioning.Breadcrumb report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("GeneralCommissioning.Breadcrumb report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22597,10 +22195,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("GeneralCommissioning.RegulatoryConfig report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("GeneralCommissioning.RegulatoryConfig report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22813,10 +22408,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("GeneralCommissioning.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("GeneralCommissioning.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -23277,10 +22869,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("GeneralDiagnostics.RebootCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("GeneralDiagnostics.RebootCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -23349,10 +22938,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("GeneralDiagnostics.UpTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("GeneralDiagnostics.UpTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -23493,10 +23079,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("GeneralDiagnostics.BootReasons report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("GeneralDiagnostics.BootReasons report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -23853,10 +23436,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("GeneralDiagnostics.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("GeneralDiagnostics.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -24413,10 +23993,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("GroupKeyManagement.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("GroupKeyManagement.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -24523,10 +24100,7 @@ private:
 class GroupsRemoveAllGroups : public ModelCommand
 {
 public:
-    GroupsRemoveAllGroups() : ModelCommand("remove-all-groups")
-    {
-        ModelCommand::AddArguments();
-    }
+    GroupsRemoveAllGroups() : ModelCommand("remove-all-groups") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24649,10 +24223,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Groups.NameSupport report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Groups.NameSupport report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -24793,10 +24364,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Groups.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Groups.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -24851,10 +24419,7 @@ private:
 class IdentifyIdentifyQuery : public ModelCommand
 {
 public:
-    IdentifyIdentifyQuery() : ModelCommand("identify-query")
-    {
-        ModelCommand::AddArguments();
-    }
+    IdentifyIdentifyQuery() : ModelCommand("identify-query") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24982,10 +24547,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Identify.IdentifyTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Identify.IdentifyTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -25054,10 +24616,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Identify.IdentifyType report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Identify.IdentifyType report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -25198,10 +24757,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Identify.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Identify.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -25503,10 +25059,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("IlluminanceMeasurement.Tolerance report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("IlluminanceMeasurement.Tolerance report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -25901,10 +25454,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("KeypadInput.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("KeypadInput.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26140,10 +25690,7 @@ private:
 class LevelControlStopWithOnOff : public ModelCommand
 {
 public:
-    LevelControlStopWithOnOff() : ModelCommand("stop-with-on-off")
-    {
-        ModelCommand::AddArguments();
-    }
+    LevelControlStopWithOnOff() : ModelCommand("stop-with-on-off") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -26218,10 +25765,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("LevelControl.CurrentLevel report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.CurrentLevel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26290,10 +25834,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LevelControl.RemainingTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.RemainingTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26362,10 +25903,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("LevelControl.MinLevel report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.MinLevel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26434,10 +25972,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("LevelControl.MaxLevel report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.MaxLevel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26506,10 +26041,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LevelControl.CurrentFrequency report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.CurrentFrequency report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26578,10 +26110,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LevelControl.MinFrequency report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.MinFrequency report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26650,10 +26179,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LevelControl.MaxFrequency report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.MaxFrequency report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26748,10 +26274,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("LevelControl.Options report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.Options report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26846,10 +26369,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LevelControl.OnOffTransitionTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.OnOffTransitionTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -27480,10 +27000,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("LevelControl.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("LevelControl.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -27552,10 +27069,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LevelControl.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -27837,10 +27351,7 @@ private:
 class LowPowerSleep : public ModelCommand
 {
 public:
-    LowPowerSleep() : ModelCommand("sleep")
-    {
-        ModelCommand::AddArguments();
-    }
+    LowPowerSleep() : ModelCommand("sleep") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -27987,10 +27498,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("LowPower.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("LowPower.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -28022,10 +27530,7 @@ private:
 class MediaInputHideInputStatusRequest : public ModelCommand
 {
 public:
-    MediaInputHideInputStatusRequest() : ModelCommand("hide-input-status-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaInputHideInputStatusRequest() : ModelCommand("hide-input-status-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28094,10 +27599,7 @@ private:
 class MediaInputShowInputStatusRequest : public ModelCommand
 {
 public:
-    MediaInputShowInputStatusRequest() : ModelCommand("show-input-status-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaInputShowInputStatusRequest() : ModelCommand("show-input-status-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28248,10 +27750,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("MediaInput.CurrentMediaInput report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("MediaInput.CurrentMediaInput report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -28392,10 +27891,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("MediaInput.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("MediaInput.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -28438,10 +27934,7 @@ private:
 class MediaPlaybackFastForwardRequest : public ModelCommand
 {
 public:
-    MediaPlaybackFastForwardRequest() : ModelCommand("fast-forward-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackFastForwardRequest() : ModelCommand("fast-forward-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28461,10 +27954,7 @@ private:
 class MediaPlaybackNextRequest : public ModelCommand
 {
 public:
-    MediaPlaybackNextRequest() : ModelCommand("next-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackNextRequest() : ModelCommand("next-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28484,10 +27974,7 @@ private:
 class MediaPlaybackPauseRequest : public ModelCommand
 {
 public:
-    MediaPlaybackPauseRequest() : ModelCommand("pause-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPauseRequest() : ModelCommand("pause-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28507,10 +27994,7 @@ private:
 class MediaPlaybackPlayRequest : public ModelCommand
 {
 public:
-    MediaPlaybackPlayRequest() : ModelCommand("play-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPlayRequest() : ModelCommand("play-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28530,10 +28014,7 @@ private:
 class MediaPlaybackPreviousRequest : public ModelCommand
 {
 public:
-    MediaPlaybackPreviousRequest() : ModelCommand("previous-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPreviousRequest() : ModelCommand("previous-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28553,10 +28034,7 @@ private:
 class MediaPlaybackRewindRequest : public ModelCommand
 {
 public:
-    MediaPlaybackRewindRequest() : ModelCommand("rewind-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackRewindRequest() : ModelCommand("rewind-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28648,10 +28126,7 @@ private:
 class MediaPlaybackStartOverRequest : public ModelCommand
 {
 public:
-    MediaPlaybackStartOverRequest() : ModelCommand("start-over-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackStartOverRequest() : ModelCommand("start-over-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28671,10 +28146,7 @@ private:
 class MediaPlaybackStopRequest : public ModelCommand
 {
 public:
-    MediaPlaybackStopRequest() : ModelCommand("stop-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackStopRequest() : ModelCommand("stop-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28821,10 +28293,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("MediaPlayback.StartTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.StartTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -28893,10 +28362,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("MediaPlayback.Duration report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.Duration report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -28965,10 +28431,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, float value)
-    {
-        LogValue("MediaPlayback.PlaybackSpeed report", 0, value);
-    }
+    static void OnValueReport(void * context, float value) { LogValue("MediaPlayback.PlaybackSpeed report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29037,10 +28500,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("MediaPlayback.SeekRangeEnd report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.SeekRangeEnd report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29109,10 +28569,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("MediaPlayback.SeekRangeStart report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.SeekRangeStart report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29253,10 +28710,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("MediaPlayback.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("MediaPlayback.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29367,10 +28821,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ModeSelect.CurrentMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ModeSelect.CurrentMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29543,10 +28994,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ModeSelect.OnMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ModeSelect.OnMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29615,10 +29063,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ModeSelect.StartUpMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ModeSelect.StartUpMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29687,10 +29132,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("ModeSelect.Description report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ModeSelect.Description report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29831,10 +29273,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ModeSelect.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ModeSelect.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -30081,10 +29520,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("NetworkCommissioning.MaxNetworks report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("NetworkCommissioning.MaxNetworks report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -30401,10 +29837,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("NetworkCommissioning.InterfaceEnabled report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("NetworkCommissioning.InterfaceEnabled report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -30689,10 +30122,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("NetworkCommissioning.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("NetworkCommissioning.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -30761,10 +30191,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("NetworkCommissioning.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("NetworkCommissioning.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -31798,10 +31225,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("OccupancySensing.Occupancy report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("OccupancySensing.Occupancy report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -31870,10 +31294,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("OccupancySensing.OccupancySensorType report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("OccupancySensing.OccupancySensorType report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32086,10 +31507,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("OccupancySensing.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("OccupancySensing.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32127,10 +31545,7 @@ private:
 class OnOffOff : public ModelCommand
 {
 public:
-    OnOffOff() : ModelCommand("off")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffOff() : ModelCommand("off") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -32177,10 +31592,7 @@ private:
 class OnOffOn : public ModelCommand
 {
 public:
-    OnOffOn() : ModelCommand("on")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffOn() : ModelCommand("on") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -32200,10 +31612,7 @@ private:
 class OnOffOnWithRecallGlobalScene : public ModelCommand
 {
 public:
-    OnOffOnWithRecallGlobalScene() : ModelCommand("on-with-recall-global-scene")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffOnWithRecallGlobalScene() : ModelCommand("on-with-recall-global-scene") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -32250,10 +31659,7 @@ private:
 class OnOffToggle : public ModelCommand
 {
 public:
-    OnOffToggle() : ModelCommand("toggle")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffToggle() : ModelCommand("toggle") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -32328,10 +31734,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("OnOff.OnOff report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("OnOff.OnOff report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32400,10 +31803,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("OnOff.GlobalSceneControl report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("OnOff.GlobalSceneControl report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32498,10 +31898,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("OnOff.OnTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("OnOff.OnTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32596,10 +31993,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("OnOff.OffWaitTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("OnOff.OffWaitTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32694,10 +32088,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("OnOff.StartUpOnOff report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("OnOff.StartUpOnOff report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32838,10 +32229,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("OnOff.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("OnOff.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32910,10 +32298,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("OnOff.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("OnOff.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32996,10 +32381,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("OnOffSwitchConfiguration.SwitchType report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("OnOffSwitchConfiguration.SwitchType report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34168,10 +33550,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("PowerSource.Status report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.Status report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34240,10 +33619,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("PowerSource.Order report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.Order report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34312,10 +33688,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("PowerSource.Description report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("PowerSource.Description report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34384,10 +33757,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("PowerSource.BatteryVoltage report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("PowerSource.BatteryVoltage report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34456,10 +33826,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("PowerSource.BatteryPercentRemaining report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.BatteryPercentRemaining report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34528,10 +33895,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("PowerSource.BatteryTimeRemaining report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("PowerSource.BatteryTimeRemaining report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34600,10 +33964,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("PowerSource.BatteryChargeLevel report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.BatteryChargeLevel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34744,10 +34105,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("PowerSource.BatteryChargeState report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.BatteryChargeState report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34888,10 +34246,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("PowerSource.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("PowerSource.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -34960,10 +34315,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("PowerSource.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("PowerSource.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -35276,10 +34628,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("PressureMeasurement.MeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("PressureMeasurement.MeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -35348,10 +34697,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("PressureMeasurement.MinMeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("PressureMeasurement.MinMeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -35420,10 +34766,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("PressureMeasurement.MaxMeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("PressureMeasurement.MaxMeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -35564,10 +34907,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("PressureMeasurement.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("PressureMeasurement.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -37017,10 +36357,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("PumpConfigurationAndControl.MaxSpeed report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("PumpConfigurationAndControl.MaxSpeed report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -37089,10 +36426,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("PumpConfigurationAndControl.MaxFlow report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("PumpConfigurationAndControl.MaxFlow report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -38100,10 +37434,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("PumpConfigurationAndControl.Capacity report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("PumpConfigurationAndControl.Capacity report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -38172,10 +37503,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("PumpConfigurationAndControl.Speed report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("PumpConfigurationAndControl.Speed report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -38343,10 +37671,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("PumpConfigurationAndControl.Power report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("PumpConfigurationAndControl.Power report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39649,10 +38974,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Scenes.SceneCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.SceneCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39721,10 +39043,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Scenes.CurrentScene report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.CurrentScene report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39793,10 +39112,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Scenes.CurrentGroup report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Scenes.CurrentGroup report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39865,10 +39181,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("Scenes.SceneValid report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("Scenes.SceneValid report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39937,10 +39250,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Scenes.NameSupport report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.NameSupport report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40081,10 +39391,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Scenes.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Scenes.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40117,10 +39424,7 @@ private:
 class SoftwareDiagnosticsResetWatermarks : public ModelCommand
 {
 public:
-    SoftwareDiagnosticsResetWatermarks() : ModelCommand("reset-watermarks")
-    {
-        ModelCommand::AddArguments();
-    }
+    SoftwareDiagnosticsResetWatermarks() : ModelCommand("reset-watermarks") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -40346,10 +39650,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("SoftwareDiagnostics.CurrentHeapFree report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("SoftwareDiagnostics.CurrentHeapFree report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40418,10 +39719,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("SoftwareDiagnostics.CurrentHeapUsed report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("SoftwareDiagnostics.CurrentHeapUsed report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40634,10 +39932,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("SoftwareDiagnostics.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("SoftwareDiagnostics.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40706,10 +40001,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("SoftwareDiagnostics.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("SoftwareDiagnostics.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41299,10 +40591,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Switch.NumberOfPositions report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Switch.NumberOfPositions report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41371,10 +40660,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Switch.CurrentPosition report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Switch.CurrentPosition report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41443,10 +40729,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Switch.MultiPressMax report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Switch.MultiPressMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41587,10 +40870,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("Switch.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("Switch.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41659,10 +40939,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Switch.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Switch.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41991,10 +41268,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TargetNavigator.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TargetNavigator.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42079,10 +41353,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("TemperatureMeasurement.MeasuredValue report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("TemperatureMeasurement.MeasuredValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42295,10 +41566,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TemperatureMeasurement.Tolerance report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TemperatureMeasurement.Tolerance report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42593,10 +41861,7 @@ private:
 class TestClusterTest : public ModelCommand
 {
 public:
-    TestClusterTest() : ModelCommand("test")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTest() : ModelCommand("test") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -42836,10 +42101,7 @@ private:
 class TestClusterTestNotHandled : public ModelCommand
 {
 public:
-    TestClusterTestNotHandled() : ModelCommand("test-not-handled")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTestNotHandled() : ModelCommand("test-not-handled") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -42907,10 +42169,7 @@ private:
 class TestClusterTestSpecific : public ModelCommand
 {
 public:
-    TestClusterTestSpecific() : ModelCommand("test-specific")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTestSpecific() : ModelCommand("test-specific") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -42954,10 +42213,7 @@ private:
 class TestClusterTestUnknownCommand : public ModelCommand
 {
 public:
-    TestClusterTestUnknownCommand() : ModelCommand("test-unknown-command")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTestUnknownCommand() : ModelCommand("test-unknown-command") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -42977,10 +42233,7 @@ private:
 class TestClusterTimedInvokeRequest : public ModelCommand
 {
 public:
-    TestClusterTimedInvokeRequest() : ModelCommand("timed-invoke-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTimedInvokeRequest() : ModelCommand("timed-invoke-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -43298,10 +42551,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("TestCluster.Boolean report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.Boolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43396,10 +42646,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("TestCluster.Bitmap8 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.Bitmap8 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43494,10 +42741,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TestCluster.Bitmap16 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.Bitmap16 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43592,10 +42836,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("TestCluster.Bitmap32 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.Bitmap32 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43690,10 +42931,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("TestCluster.Bitmap64 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Bitmap64 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43788,10 +43026,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("TestCluster.Int8u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.Int8u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43886,10 +43121,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TestCluster.Int16u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.Int16u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43984,10 +43216,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("TestCluster.Int24u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.Int24u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44082,10 +43311,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("TestCluster.Int32u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.Int32u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44180,10 +43406,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("TestCluster.Int40u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int40u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44278,10 +43501,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("TestCluster.Int48u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int48u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44376,10 +43596,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("TestCluster.Int56u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int56u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44474,10 +43691,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("TestCluster.Int64u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int64u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44572,10 +43786,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value)
-    {
-        LogValue("TestCluster.Int8s report", 0, value);
-    }
+    static void OnValueReport(void * context, int8_t value) { LogValue("TestCluster.Int8s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44670,10 +43881,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("TestCluster.Int16s report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("TestCluster.Int16s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44768,10 +43976,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int32_t value)
-    {
-        LogValue("TestCluster.Int24s report", 0, value);
-    }
+    static void OnValueReport(void * context, int32_t value) { LogValue("TestCluster.Int24s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44866,10 +44071,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int32_t value)
-    {
-        LogValue("TestCluster.Int32s report", 0, value);
-    }
+    static void OnValueReport(void * context, int32_t value) { LogValue("TestCluster.Int32s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44964,10 +44166,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        LogValue("TestCluster.Int40s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int40s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45062,10 +44261,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        LogValue("TestCluster.Int48s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int48s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45160,10 +44356,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        LogValue("TestCluster.Int56s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int56s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45258,10 +44451,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        LogValue("TestCluster.Int64s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int64s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45356,10 +44546,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("TestCluster.Enum8 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.Enum8 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45454,10 +44641,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TestCluster.Enum16 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.Enum16 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45552,10 +44736,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, float value)
-    {
-        LogValue("TestCluster.FloatSingle report", 0, value);
-    }
+    static void OnValueReport(void * context, float value) { LogValue("TestCluster.FloatSingle report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45650,10 +44831,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, double value)
-    {
-        LogValue("TestCluster.FloatDouble report", 0, value);
-    }
+    static void OnValueReport(void * context, double value) { LogValue("TestCluster.FloatDouble report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45748,10 +44926,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value)
-    {
-        LogValue("TestCluster.OctetString report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TestCluster.OctetString report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46068,10 +45243,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value)
-    {
-        LogValue("TestCluster.LongOctetString report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TestCluster.LongOctetString report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46166,10 +45338,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("TestCluster.CharString report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("TestCluster.CharString report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46264,10 +45433,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("TestCluster.LongCharString report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("TestCluster.LongCharString report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46362,10 +45528,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("TestCluster.EpochUs report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.EpochUs report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46460,10 +45623,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("TestCluster.EpochS report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.EpochS report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46558,10 +45718,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::VendorId value)
-    {
-        LogValue("TestCluster.VendorId report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::VendorId value) { LogValue("TestCluster.VendorId report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46831,10 +45988,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("TestCluster.RangeRestrictedInt8u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.RangeRestrictedInt8u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46929,10 +46083,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value)
-    {
-        LogValue("TestCluster.RangeRestrictedInt8s report", 0, value);
-    }
+    static void OnValueReport(void * context, int8_t value) { LogValue("TestCluster.RangeRestrictedInt8s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47027,10 +46178,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TestCluster.RangeRestrictedInt16u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.RangeRestrictedInt16u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47125,10 +46273,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("TestCluster.RangeRestrictedInt16s report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("TestCluster.RangeRestrictedInt16s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47295,10 +46440,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("TestCluster.TimedWriteBoolean report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.TimedWriteBoolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47393,10 +46535,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("TestCluster.GeneralErrorBoolean report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.GeneralErrorBoolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47491,10 +46630,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("TestCluster.ClusterErrorBoolean report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.ClusterErrorBoolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47589,10 +46725,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        LogValue("TestCluster.Unsupported report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.Unsupported report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -50871,10 +50004,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("TestCluster.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -50923,10 +50053,7 @@ private:
 class ThermostatClearWeeklySchedule : public ModelCommand
 {
 public:
-    ThermostatClearWeeklySchedule() : ModelCommand("clear-weekly-schedule")
-    {
-        ModelCommand::AddArguments();
-    }
+    ThermostatClearWeeklySchedule() : ModelCommand("clear-weekly-schedule") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -50946,10 +50073,7 @@ private:
 class ThermostatGetRelayStatusLog : public ModelCommand
 {
 public:
-    ThermostatGetRelayStatusLog() : ModelCommand("get-relay-status-log")
-    {
-        ModelCommand::AddArguments();
-    }
+    ThermostatGetRelayStatusLog() : ModelCommand("get-relay-status-log") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -51108,10 +50232,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.LocalTemperature report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.LocalTemperature report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51180,10 +50301,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.AbsMinHeatSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMinHeatSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51252,10 +50370,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.AbsMaxHeatSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMaxHeatSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51324,10 +50439,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.AbsMinCoolSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMinCoolSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51396,10 +50508,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.AbsMaxCoolSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMaxCoolSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51494,10 +50603,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.OccupiedCoolingSetpoint report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.OccupiedCoolingSetpoint report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51592,10 +50698,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.OccupiedHeatingSetpoint report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.OccupiedHeatingSetpoint report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51690,10 +50793,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.MinHeatSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MinHeatSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51788,10 +50888,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.MaxHeatSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MaxHeatSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51886,10 +50983,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.MinCoolSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MinCoolSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -51984,10 +51078,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        LogValue("Thermostat.MaxCoolSetpointLimit report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MaxCoolSetpointLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52082,10 +51173,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value)
-    {
-        LogValue("Thermostat.MinSetpointDeadBand report", 0, value);
-    }
+    static void OnValueReport(void * context, int8_t value) { LogValue("Thermostat.MinSetpointDeadBand report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52180,10 +51268,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Thermostat.ControlSequenceOfOperation report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.ControlSequenceOfOperation report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52278,10 +51363,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Thermostat.SystemMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.SystemMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52350,10 +51432,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Thermostat.StartOfWeek report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.StartOfWeek report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52422,10 +51501,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Thermostat.NumberOfWeeklyTransitions report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.NumberOfWeeklyTransitions report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52494,10 +51570,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("Thermostat.NumberOfDailyTransitions report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.NumberOfDailyTransitions report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52638,10 +51711,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("Thermostat.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("Thermostat.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -52710,10 +51780,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("Thermostat.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Thermostat.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -53272,10 +52339,7 @@ private:
 class ThreadNetworkDiagnosticsResetCounts : public ModelCommand
 {
 public:
-    ThreadNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts")
-    {
-        ModelCommand::AddArguments();
-    }
+    ThreadNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -53424,10 +52488,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.Channel report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ThreadNetworkDiagnostics.Channel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -53496,10 +52557,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.RoutingRole report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ThreadNetworkDiagnostics.RoutingRole report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -53640,10 +52698,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.PanId report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("ThreadNetworkDiagnostics.PanId report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -54081,10 +53136,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.PartitionId report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.PartitionId report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -54153,10 +53205,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.Weighting report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ThreadNetworkDiagnostics.Weighting report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -54225,10 +53274,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.DataVersion report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ThreadNetworkDiagnostics.DataVersion report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -55453,10 +54499,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.TxDataCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.TxDataCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -56467,10 +55510,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.RxDataCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.RxDataCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -57625,10 +56665,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.Delay report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.Delay report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -58075,10 +57112,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("ThreadNetworkDiagnostics.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -58666,10 +57700,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("UserLabel.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("UserLabel.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -58751,10 +57782,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value)
-    {
-        LogValue("WakeOnLan.WakeOnLanMacAddress report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("WakeOnLan.WakeOnLanMacAddress report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -58895,10 +57923,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("WakeOnLan.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("WakeOnLan.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -58942,10 +57967,7 @@ private:
 class WiFiNetworkDiagnosticsResetCounts : public ModelCommand
 {
 public:
-    WiFiNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts")
-    {
-        ModelCommand::AddArguments();
-    }
+    WiFiNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -59240,10 +58262,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value)
-    {
-        LogValue("WiFiNetworkDiagnostics.Bssid report", 0, value);
-    }
+    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("WiFiNetworkDiagnostics.Bssid report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -59312,10 +58331,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.SecurityType report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WiFiNetworkDiagnostics.SecurityType report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -59384,10 +58400,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.WiFiVersion report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WiFiNetworkDiagnostics.WiFiVersion report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -59456,10 +58469,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.ChannelNumber report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("WiFiNetworkDiagnostics.ChannelNumber report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -59528,10 +58538,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.Rssi report", 0, value);
-    }
+    static void OnValueReport(void * context, int8_t value) { LogValue("WiFiNetworkDiagnostics.Rssi report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -59672,10 +58679,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.BeaconRxCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("WiFiNetworkDiagnostics.BeaconRxCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -60106,10 +59110,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.OverrunCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { LogValue("WiFiNetworkDiagnostics.OverrunCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -60250,10 +59251,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("WiFiNetworkDiagnostics.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("WiFiNetworkDiagnostics.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -60377,10 +59375,7 @@ private:
 class WindowCoveringDownOrClose : public ModelCommand
 {
 public:
-    WindowCoveringDownOrClose() : ModelCommand("down-or-close")
-    {
-        ModelCommand::AddArguments();
-    }
+    WindowCoveringDownOrClose() : ModelCommand("down-or-close") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -60498,10 +59493,7 @@ private:
 class WindowCoveringStopMotion : public ModelCommand
 {
 public:
-    WindowCoveringStopMotion() : ModelCommand("stop-motion")
-    {
-        ModelCommand::AddArguments();
-    }
+    WindowCoveringStopMotion() : ModelCommand("stop-motion") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -60521,10 +59513,7 @@ private:
 class WindowCoveringUpOrOpen : public ModelCommand
 {
 public:
-    WindowCoveringUpOrOpen() : ModelCommand("up-or-open")
-    {
-        ModelCommand::AddArguments();
-    }
+    WindowCoveringUpOrOpen() : ModelCommand("up-or-open") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -60599,10 +59588,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WindowCovering.Type report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.Type report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -60815,10 +59801,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WindowCovering.ConfigStatus report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.ConfigStatus report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -61031,10 +60014,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WindowCovering.OperationalStatus report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.OperationalStatus report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -61249,10 +60229,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WindowCovering.EndProductType report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.EndProductType report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -61781,10 +60758,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("WindowCovering.Mode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.Mode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -61853,10 +60827,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("WindowCovering.SafetyStatus report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("WindowCovering.SafetyStatus report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -61997,10 +60968,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        LogValue("WindowCovering.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { LogValue("WindowCovering.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -62069,10 +61037,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("WindowCovering.ClusterRevision report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { LogValue("WindowCovering.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;

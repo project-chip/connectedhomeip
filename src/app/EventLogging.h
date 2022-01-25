@@ -55,9 +55,9 @@ private:
  * context tags to be interpreted within the schema identified by
  * `ClusterID` and `EventId`.
  *
- * LogEvent has 3 variant, for aEventData that have method GetFabricIndex with return type FabricIndex or DataModel::Nullable<chip::FabricIndex>,
- * it would use first two logEvent function twhich can process the fabric index, for aEventData that don't have GetFabricIndex, it would use tird
- * LogEvent function.
+ * LogEvent has 3 variant, for aEventData that have method GetFabricIndex with return type FabricIndex or
+ * DataModel::Nullable<chip::FabricIndex>, it would use first two logEvent function twhich can process the fabric index, for
+ * aEventData that don't have GetFabricIndex, it would use tird LogEvent function.
  * @param[in] aEventData  The event cluster object
  * @param[in] aEndpoint    The current cluster's Endpoint Id
  * @param[in] aUrgent    The EventOption Type, kUrgent or kNotUrgent

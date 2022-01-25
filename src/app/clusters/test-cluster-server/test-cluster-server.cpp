@@ -588,8 +588,8 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 }
 
 bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
     Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
@@ -604,8 +604,8 @@ bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
 }
 
 bool emberAfTestClusterClusterTestEmitTestNullableFabricScopedEventRequestCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Commands::TestEmitTestNullableFabricScopedEventRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestNullableFabricScopedEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestNullableFabricScopedEventResponse::Type responseData;
     DataModel::Nullable<chip::FabricIndex> fabric;
