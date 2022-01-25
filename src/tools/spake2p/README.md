@@ -25,9 +25,9 @@ Example command that generates spake2p verifier for a given PIN code:
 ./spake2p gen-verifier --pin-code 45502684 --iteration-count 1000 --salt "SPAKE2P Key Salt 1" --out spake2p-provisioning-data.csv
 ```
 
-Example command that generates 100 sets of spake2p parameters (random PIN Codes
-with corresponding Verifiers):
+Example command that generates 100 sets of spake2p parameters (random PIN Codes,
+random Salts and corresponding Verifiers):
 
 ```
-./spake2p gen-verifier --count 100 --iteration-count 1000 --salt "SPAKE2P Key Salt 2" --out spake2p-provisioning-data.csv
+./spake2p gen-verifier --count 100 --iteration-count 15000 --salt-len 32 --out spake2p-provisioning-data.csv
 ```

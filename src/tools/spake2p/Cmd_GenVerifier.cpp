@@ -50,6 +50,7 @@ OptionDef gCmdOptionDefs[] =
     { "count",           kArgumentRequired, 'c' },
     { "pin-code",        kArgumentRequired, 'p' },
     { "iteration-count", kArgumentRequired, 'i' },
+    { "salt-len",        kArgumentRequired, 'l' },
     { "salt",            kArgumentRequired, 's' },
     { "out",             kArgumentRequired, 'o' },
     { }
@@ -85,13 +86,27 @@ const char * const gCmdOptionHelp =
     "\n"
     "       SPAKE2P PBKDF iteration count. The value should be positive integer in range [1000..100000].\n"
     "\n"
+    "   -l, --salt-len <int>\n"
+    "\n"
+    "       SPAKE2P PBKDF salt input length. The value should be in range [16..32].\n"
+    "       If not specified, the 'salt' input should be specified and the length will be\n"
+    "       extracted from 'salt'. When both 'salt-len' and 'salt' are specified, the length\n"
+    "       should match the length of the specified 'salt' string.\n"
+    "\n"
     "   -s, --salt <string>\n"
     "\n"
-    "       SPAKE2P PBKDF salt input value. Legth of salt string should be in range [16..32].\n"
+    "       SPAKE2P PBKDF salt input value. Length of salt string should be in range [16..32].\n"
+    "       If not specified, the 'salt-len' input should be specified and the 'salt' velue will be\n"
+    "       randomly generated. When 'count' is more than one, only first set will use the specified\n"
+    "       'salt' value and others will be randomly generated.\n"
     "\n"
     "   -o, --out <file>\n"
     "\n"
-    "       File to contain the new certificate. Specify '-' for stdout.\n"
+    "       File to contain the generated SPAKE2P PBKDF parameters. Specify '-' for stdout.\n"
+    "       The format of the output file is:\n"
+    "           Index,PIN Code,Iteration Count,Salt,Verifier\n"
+    "           index of the parameter set in the list,'pin-code','iteration-count','salt'(Base-64 encoded),'verifier'(Base-64 encoded)\n"
+    "           ....\n"
     "\n"
     ;
 
@@ -121,6 +136,7 @@ OptionSet *gCmdOptionSets[] =
 uint32_t gCount           = 1;
 uint32_t gPinCode         = 0;
 uint32_t gIterationCount  = 0;
+uint8_t gSaltLen          = 0;
 const char * gSalt        = nullptr;
 const char * gOutFileName = nullptr;
 
@@ -156,6 +172,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
 
+    case 'l':
+        if (!ParseInt(arg, gSaltLen) || !(gSaltLen >= chip::kPBKDFMinimumSaltLen && gSaltLen <= chip::kPBKDFMaximumSaltLen))
+        {
+            PrintArgError("%s: Invalid value specified for salt length parameter: %s\n", progName, arg);
+            return false;
+        }
+        break;
+
     case 's':
         gSalt = arg;
         if (!(strlen(gSalt) >= chip::kPBKDFMinimumSaltLen && strlen(gSalt) <= chip::kPBKDFMaximumSaltLen))
@@ -164,9 +188,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             return false;
         }
         break;
+
     case 'o':
         gOutFileName = arg;
         break;
+
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
         return false;
@@ -196,10 +222,19 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         return false;
     }
 
-    if (gSalt == nullptr)
+    if (gSalt == nullptr && gSaltLen == 0)
     {
-        fprintf(stderr, "Please specify the salt parameter.\n");
+        fprintf(stderr, "Please specify at least one of the 'salt' or 'salt-len' parameters.\n");
         return false;
+    }
+    else if (gSalt != nullptr && gSaltLen != 0 && gSaltLen != strlen(gSalt))
+    {
+        fprintf(stderr, "The specified 'salt-len' doesn't match the length of 'salt' parameter.\n");
+        return false;
+    }
+    else if (gSaltLen == 0)
+    {
+        gSaltLen = static_cast<uint8_t>(strlen(gSalt));
     }
 
     if (gOutFileName == nullptr)
@@ -222,7 +257,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         outFile = stdout;
     }
 
-    if (fprintf(outFile, "Index,Iteration Count, Salt, PIN Code, Verifier\n") < 0 || ferror(outFile))
+    if (fprintf(outFile, "Index,PIN Code,Iteration Count,Salt,Verifier\n") < 0 || ferror(outFile))
     {
         fprintf(stderr, "Error writing to output file: %s\n", strerror(errno));
         return false;
@@ -230,29 +265,48 @@ bool Cmd_GenVerifier(int argc, char * argv[])
 
     for (uint32_t i = 0; i < gCount; i++)
     {
+        uint8_t salt[chip::kPBKDFMaximumSaltLen];
+        if (gSalt == nullptr)
+        {
+            CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(salt, gSaltLen);
+            if (err != CHIP_NO_ERROR)
+            {
+                fprintf(stderr, "DRBG_get_bytes() failed.\n");
+                return false;
+            }
+        }
+        else
+        {
+            memcpy(salt, gSalt, gSaltLen);
+        }
+
         chip::PASEVerifier verifier;
-        CHIP_ERROR err = chip::PASESession::GeneratePASEVerifier(
-            verifier, gIterationCount, chip::ByteSpan(reinterpret_cast<const uint8_t *>(gSalt), strlen(gSalt)), (gPinCode == 0),
-            gPinCode);
+        CHIP_ERROR err = chip::PASESession::GeneratePASEVerifier(verifier, gIterationCount, chip::ByteSpan(salt, gSaltLen),
+                                                                 (gPinCode == 0), gPinCode);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "GeneratePASEVerifier() failed.\n");
             return false;
         }
 
+        char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1];
+        uint32_t saltB64Len = chip::Base64Encode32(salt, gSaltLen, saltB64);
+        saltB64[saltB64Len] = 0;
+
         char verifierB64[BASE64_ENCODED_LEN(sizeof(chip::PASEVerifier)) + 1];
         uint32_t verifierB64Len =
             chip::Base64Encode32(reinterpret_cast<uint8_t *>(&verifier), sizeof(chip::PASEVerifier), verifierB64);
         verifierB64[verifierB64Len] = 0;
 
-        if (fprintf(outFile, "%d,%d,%s,%08d,%s\n", i, gIterationCount, gSalt, gPinCode, verifierB64) < 0 || ferror(outFile))
+        if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))
         {
             fprintf(stderr, "Error writing to output file: %s\n", strerror(errno));
             return false;
         }
 
-        // On the next iteration the PIN Code will be randomly generated.
+        // On the next iteration the PIN Code and Salt will be randomly generated.
         gPinCode = 0;
+        gSalt    = nullptr;
     }
 
     return true;
