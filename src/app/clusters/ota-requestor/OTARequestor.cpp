@@ -123,13 +123,27 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-        CopySpanToMutableSpan(update.updateToken, updateToken);
-        requestorCore->mTargetVersion = update.softwareVersion;
-        requestorCore->mUpdateToken   = updateToken;
+        if (update.softwareVersion > requestorCore->mCurrentVersion)
+        {
+            ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
+                          requestorCore->mCurrentVersion, update.softwareVersion);
+            MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
+            CopySpanToMutableSpan(update.updateToken, updateToken);
+            requestorCore->mTargetVersion = update.softwareVersion;
+            requestorCore->mUpdateToken   = updateToken;
 
-        requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
-                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+            requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
+                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+        else
+        {
+            ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
+                          update.softwareVersion, requestorCore->mCurrentVersion);
+
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
+                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+
         break;
     }
     case OTAQueryStatus::kBusy:
@@ -148,13 +162,13 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     }
 }
 
-void OTARequestor::OnQueryImageFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
 }
 
 void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
@@ -180,24 +194,24 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
     }
 }
 
-void OTARequestor::OnApplyUpdateFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, error);
 }
 
 void OTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) {}
 
-void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, error);
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
@@ -554,6 +568,8 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
     update.softwareVersion = response.softwareVersion.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(response.updateToken.Value().size() >= 8 && response.updateToken.Value().size() <= 32,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
 
     update.userConsentNeeded    = response.userConsentNeeded.ValueOr(false);

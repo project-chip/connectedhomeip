@@ -95,7 +95,7 @@ class PythonInteractionModelDelegate : public chip::Controller::DeviceController
 public:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                     TLV::TLVReader * aData) override;
-    void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
 
     static PythonInteractionModelDelegate & Instance();
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,10 +71,7 @@ using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;
 using PBKDF2_sha256_crypto = PBKDF2_sha256;
 #endif
 
-PASESession::PASESession()
-{
-    SetSecureSessionType(Transport::SecureSession::Type::kPASE);
-}
+PASESession::PASESession() : PairingSession(Transport::SecureSession::Type::kPASE) {}
 
 PASESession::~PASESession()
 {

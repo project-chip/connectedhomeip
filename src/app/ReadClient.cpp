@@ -254,9 +254,8 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        StatusIB status;
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
     else

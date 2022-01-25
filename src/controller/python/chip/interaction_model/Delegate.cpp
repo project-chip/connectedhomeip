@@ -58,16 +58,12 @@ void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSe
     }
 }
 
-void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus,
-                                             CHIP_ERROR aError)
+void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError)
 {
-    CommandStatus status{ aStatus.mStatus,
-                          aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value()
-                                                            : chip::python::kUndefinedClusterStatus,
-                          0,
-                          0,
-                          0,
-                          1 };
+    StatusIB serverStatus(aError);
+    CommandStatus status{
+        serverStatus.mStatus, serverStatus.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus), 0, 0, 0, 1
+    };
 
     if (commandResponseStatusFunct != nullptr)
     {
@@ -78,7 +74,7 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
     {
         commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
     }
-    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
+    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aError);
 }
 
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
