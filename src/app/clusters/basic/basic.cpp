@@ -54,6 +54,12 @@ private:
 
 BasicAttrAccess gAttrAccess;
 
+CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+{
+    ReturnErrorOnFailure(status);
+    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
+}
+
 CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != Basic::Id)
@@ -62,7 +68,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR status = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR status = CHIP_NO_ERROR;
 
     switch (aPath.mAttributeId)
     {
@@ -74,10 +80,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxVendorNameLength;
         char vendorName[kMaxLen + 1] = { 0 };
         status                       = ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName));
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(vendorName, strnlen(vendorName, kMaxLen)));
-        }
+        status                       = EncodeStringOnSuccess(status, aEncoder, vendorName, kMaxLen);
         break;
     }
 
@@ -94,11 +97,8 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case ProductName::Id: {
         constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
         char productName[kMaxLen + 1] = { 0 };
-        status                        = ConfigurationMgr().GetProductName(productName, sizeof(productName));
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(productName, strnlen(productName, kMaxLen)));
-        }
+        status                        = ConfigurationMgr().GetVendorName(productName, sizeof(productName));
+        status                        = EncodeStringOnSuccess(status, aEncoder, productName, kMaxLen);
         break;
     }
 
@@ -126,10 +126,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength;
         char hardwareVersionString[kMaxLen + 1] = { 0 };
         status = ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString));
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(hardwareVersionString, strnlen(hardwareVersionString, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, hardwareVersionString, kMaxLen);
         break;
     }
 
@@ -147,10 +144,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
         char softwareVersionString[kMaxLen + 1] = { 0 };
         status = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(softwareVersionString, strnlen(softwareVersionString, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, softwareVersionString, kMaxLen);
         break;
     }
 
@@ -178,7 +172,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
                      manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
             status = aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
         }
-        ChipLogError(Zcl, "MAAAAANNNNUFFF: %s, err: %" CHIP_ERROR_FORMAT, manufacturingDateString, status.Format());
         break;
     }
 
@@ -194,10 +187,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
             status        = CHIP_NO_ERROR;
         }
 
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(partNumber, strnlen(partNumber, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, partNumber, kMaxLen);
         break;
     }
 
@@ -213,10 +203,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
             status        = CHIP_NO_ERROR;
         }
 
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(productUrl, strnlen(productUrl, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, productUrl, kMaxLen);
         break;
     }
 
@@ -232,10 +219,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
             status          = CHIP_NO_ERROR;
         }
 
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(productLabel, strnlen(productLabel, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, productLabel, kMaxLen);
         break;
     }
 
@@ -251,10 +235,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
             status                = CHIP_NO_ERROR;
         }
 
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(serialNumberString, strnlen(serialNumberString, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, serialNumberString, kMaxLen);
         break;
     }
 
@@ -270,25 +251,13 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
             status      = CHIP_NO_ERROR;
         }
 
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(chip::CharSpan(uniqueId, strnlen(uniqueId, kMaxLen)));
-        }
+        status = EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
         break;
     }
 
     default:
         // We did not find a processing path, the caller will delegate elsewhere.
-        status = CHIP_ERROR_NOT_FOUND;
         break;
-    }
-
-    if (status == CHIP_ERROR_NOT_FOUND)
-    {
-        // Somehow attribute support not handled by custom logic. Until all such
-        // paths are resolved, allow fallback to attribute store or other heuristics
-        // which may be done by callers of this method.
-        status = CHIP_NO_ERROR;
     }
 
     return status;
@@ -389,6 +358,27 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan(nodeLabel, strlen(nodeLabel)));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
+    }
+
+    // TODO: Remove this processing once we have resolved issues related to location attribute handling
+    char location[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
+    size_t codeLen = 0;
+    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
+    {
+        if (codeLen == 0)
+        {
+            status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+        }
+        else
+        {
+            status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
+        }
+        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
+    }
+    else
+    {
+        status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
     }
 
     bool localConfigDisabled;
