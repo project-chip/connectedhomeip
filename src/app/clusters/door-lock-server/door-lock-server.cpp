@@ -25,6 +25,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/EventLogging.h>
+#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <cinttypes>
 
@@ -35,6 +38,7 @@
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::DoorLock;
 
@@ -61,23 +65,48 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
     emberAfDoorLockClusterPrintln("Door Lock cluster initialized at endpoint #%" PRIu16, endpointId);
 
-    SetLockState(endpointId, DlLockState::kLocked);
+    SetLockState(endpointId, DlLockState::kLocked, DlOperationSource::kUnspecified);
     SetActuatorEnabled(endpointId, true);
 }
 
-bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
+bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, DlOperationSource opSource)
 {
     auto lockState = chip::to_underlying(newLockState);
 
     emberAfDoorLockClusterPrintln("Setting LockState to '%" PRIu8 "'", lockState);
     EmberAfStatus status = Attributes::LockState::Set(endpointId, newLockState);
+    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
 
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    if (!success)
     {
         ChipLogError(Zcl, "Unable to set LockState attribute: status=0x%" PRIx8, status);
     }
 
-    return (EMBER_ZCL_STATUS_SUCCESS == status);
+    // Remote operations are handled separately as they use more data unavailable here
+    VerifyOrReturnError(DlOperationSource::kRemote != opSource, success);
+
+    // DlLockState::kNotFullyLocked has no appropriate event to send. Also it is unclear whether
+    // it should schedule auto-relocking. So skip it here. Check for supported states explicitly
+    // to handle possible enum extending in future.
+    VerifyOrReturnError(DlLockState::kLocked == newLockState || DlLockState::kUnlocked == newLockState, success);
+
+    // Send LockOperation event
+    auto opType = (DlLockState::kLocked == newLockState) ? DlLockOperationType::kLock : DlLockOperationType::kUnlock;
+
+    SendLockOperationEvent(endpointId, opType, opSource, DlOperationError::kUnspecified, Nullable<uint16_t>(),
+                           Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), nullptr, 0, success);
+
+    // Schedule auto-relocking
+    if (success && DlLockOperationType::kUnlock == opType)
+    {
+        uint32_t autoRelockTime;
+
+        status  = Attributes::AutoRelockTime::Get(endpointId, &autoRelockTime);
+        success = (EMBER_ZCL_STATUS_SUCCESS == status);
+        // TODO: Handle AutoRelockTime here
+    }
+
+    return success;
 }
 
 bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState)
@@ -105,6 +134,11 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDo
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         ChipLogError(Zcl, "Unable to set DoorState attribute: status=0x%" PRIx8, status);
+    }
+    else
+    {
+        Events::DoorStateChange::Type event{ newDoorState };
+        SendEvent(endpointId, event);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -711,85 +745,6 @@ void DoorLockServer::ClearCredentialCommandHandler(
 
     emberAfSendImmediateDefaultResponse(
         clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, false));
-}
-
-void DoorLockServer::LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath,
-                                                  DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode)
-{
-    chip::EndpointId endpoint = commandPath.mEndpointId;
-
-    VerifyOrDie(DlLockOperationType::kLock == operationType || DlLockOperationType::kUnlock == operationType);
-
-    EmberAfDoorLockLockUnlockCommand appCommandHandler = emberAfPluginDoorLockOnDoorLockCommand;
-    const char * commandNameStr                        = "LockDoor";
-    auto newLockState                                  = DlLockState::kLocked;
-    if (DlLockOperationType::kUnlock == operationType)
-    {
-        newLockState      = DlLockState::kUnlocked;
-        commandNameStr    = "UnlockDoor";
-        appCommandHandler = emberAfPluginDoorLockOnDoorUnlockCommand;
-    }
-    VerifyOrDie(nullptr != commandNameStr);
-    VerifyOrDie(nullptr != appCommandHandler);
-
-    emberAfDoorLockClusterPrintln("[%s] Received Lock Door command [endpointId=%d]", commandNameStr, endpoint);
-
-    bool require_pin = false;
-    auto status      = Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        emberAfDoorLockClusterPrintln(
-            "[%s] Unable to get value of RequirePINforRemoteOperation attribute, defaulting to 'true' [endpointId=%d,status=%d]",
-            commandNameStr, endpoint, status);
-
-        require_pin = true;
-    }
-
-    if (pinCode.HasValue() && !(SupportsPIN(endpoint) && SupportsUSR(endpoint)))
-    {
-        emberAfDoorLockClusterPrintln(
-            "[%s] PIN is supplied but USR and PIN features are disabled - ignoring command [endpointId=%d]", commandNameStr,
-            endpoint);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-    }
-
-    if (require_pin && !pinCode.HasValue())
-    {
-        emberAfDoorLockClusterPrintln("[%s] PIN is required but not provided - ignoring command [endpointId=%d]", commandNameStr,
-                                      endpoint);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-
-        return;
-    }
-
-    // Look up the user index and credential index -- it should be used in the Lock Operation event. However, I don't think we
-    // should prevent door lock/unlocking if we couldn't find credential associated with user - I think if the app thinks that PIN
-    // is correct the door should be unlocked.
-    uint16_t associatedUserIndex = 0;
-    uint16_t usedCredentialIndex = 0;
-    if (pinCode.HasValue())
-    {
-        if (!findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), associatedUserIndex, usedCredentialIndex))
-        {
-            emberAfDoorLockClusterPrintln("[%s] Provided credential is not associated with any user [endpointId=%d]",
-                                          commandNameStr, endpoint);
-        }
-    }
-
-    // The app is responsible to search through the list of PIN codes internally
-    if (!appCommandHandler(endpoint, pinCode))
-    {
-        ChipLogError(Zcl, "[%s] Unable to change the door state - internal error [endpointId=%d]", commandNameStr, endpoint);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-
-        return;
-    }
-
-    // TODO: Send lock operation change event
-    SetLockState(endpoint, newLockState);
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
 bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
@@ -2013,6 +1968,146 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
 
     return DlLockDataType::kUnspecified;
 }
+
+bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
+                                               const chip::app::ConcreteCommandPath & commandPath, DlLockOperationType opType,
+                                               RemoteLockOpHandler opHandler, const chip::Optional<chip::ByteSpan> & pinCode)
+{
+    VerifyOrDie(DlLockOperationType::kLock == opType || DlLockOperationType::kUnlock == opType);
+    VerifyOrDie(nullptr != opHandler);
+
+    DlLockState newLockState = (DlLockOperationType::kLock == opType) ? DlLockState::kLocked : DlLockState::kUnlocked;
+    EndpointId endpoint      = commandPath.mEndpointId;
+    DlOperationError reason  = DlOperationError::kUnspecified;
+    uint16_t pinUserIdx      = 0;
+    uint16_t pinCredIdx      = 0;
+    bool credentialsOk       = false;
+    bool operationOk         = false;
+
+    // appclusters.pdf 5.3.4.1:
+    // When the PINCode field is provided an invalid PIN will count towards the WrongCodeEntryLimit and the
+    // UserCodeTemporaryDisableTime will be triggered if the WrongCodeEntryLimit is exceeded. The lock SHALL ignore any attempts to
+    // lock/unlock the door until the UserCodeTemporaryDisableTime expires.
+    // TODO: check whether UserCodeTemporaryDisableTime expired or not.
+
+    if (pinCode.HasValue())
+    {
+        // appclusters.pdf 5.3.4.1:
+        // If the PINCode field is provided, the door lock SHALL verify PINCode before granting access regardless of the value of
+        // RequirePINForRemoteOperation attribute.
+        VerifyOrExit(!SupportsPIN(endpoint) || !SupportsUSR(endpoint),
+                     emberAfDoorLockClusterPrintln(
+                         "PIN code is supplied while USR/PIN features are disabled. Exiting [endpoint=%d, lock_op=%d]", endpoint,
+                         chip::to_underlying(opType)));
+
+        // Look up the user index and credential index -- it should be used in the Lock Operation event
+        findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
+
+        // [EM]: I don't think we should prevent door lock/unlocking if we couldn't find credential associated with user. I
+        // think if the app thinks that PIN is correct the door should be unlocked.
+        //
+        // [DV]: let's app decide on PIN correctness, we will fail only if 'opHandler' returns false.
+        credentialsOk =
+            true; // findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
+    }
+    else
+    {
+        // appclusters.pdf 5.3.4.1:
+        // If the RequirePINforRemoteOperation attribute is True then PINCode field SHALL be provided and the door lock SHALL NOT
+        // grant access if it is not provided.
+        bool requirePin = false;
+        auto err        = Attributes::RequirePINforRemoteOperation::Get(endpoint, &requirePin);
+
+        VerifyOrExit(
+            EMBER_ZCL_STATUS_SUCCESS == err,
+            emberAfDoorLockClusterPrintln("Failed to read 'RequirePINforRemoteOperations' attribute: status=0x%" PRIx8, err));
+        credentialsOk = !requirePin;
+    }
+
+    // TODO: increase WrongCodeEntryLimit if credentialsOk == false.
+    // TODO: If limit is exceeded, lock remote operations for UserCodeTemporaryDisableTime.
+    VerifyOrExit(credentialsOk, {
+        reason = DlOperationError::kInvalidCredential;
+        emberAfDoorLockClusterPrintln("Checking credentials failed: either PIN is invalid or not provided");
+    });
+
+    // credentials check succeeded, try to lock/unlock door
+    operationOk = opHandler(endpoint, pinCode, reason);
+    VerifyOrExit(operationOk, /* reason is set by the above call */);
+
+    // door locked, set cluster attribute
+    VerifyOrDie(SetLockState(endpoint, newLockState, DlOperationSource::kRemote));
+
+exit:
+    bool success = credentialsOk && operationOk;
+
+    // Send command response
+    emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+
+    // Send LockOperation/LockOperationError event
+    LockOpCredentials foundCred[] = { { DlCredentialType::kPin, pinCredIdx } };
+    LockOpCredentials * credList  = nullptr;
+    size_t credListSize           = 0;
+
+    // appclusters.pdf 5.3.5.3, 5.3.5.4:
+    // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
+    if (pinCode.HasValue())
+    {
+        credList     = foundCred;
+        credListSize = 1;
+    }
+
+    SendLockOperationEvent(endpoint, opType, DlOperationSource::kRemote, reason, Nullable<uint16_t>(pinUserIdx),
+                           Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
+                           credList, credListSize, success);
+    return success;
+}
+
+void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, DlLockOperationType opType, DlOperationSource opSource,
+                                            DlOperationError opErr, Nullable<uint16_t> userId,
+                                            Nullable<chip::FabricIndex> fabricIdx, Nullable<chip::NodeId> nodeId,
+                                            LockOpCredentials * credList, size_t credListSize, bool opSuccess)
+{
+    Nullable<List<const Structs::DlCredential::Type>> credentials{};
+
+    // appclusters.pdf 5.3.5.3, 5.3.5.4:
+    // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
+    if (nullptr == credList || 0 == credListSize)
+    {
+        credentials.SetNull();
+    }
+    else
+    {
+        credentials.SetNonNull(List<const Structs::DlCredential::Type>(credList, credListSize));
+    }
+
+    // TODO: if [USR] feature is not supported then credentials should be omitted (Optional.HasValue()==false)?
+    // Spec just says that it should be NULL if no PIN were provided.
+
+    if (opSuccess)
+    {
+        Events::LockOperation::Type event{ opType, opSource, userId, fabricIdx, nodeId, MakeOptional(credentials) };
+        SendEvent(endpointId, event);
+    }
+    else
+    {
+        Events::LockOperationError::Type event{ opType, opSource, opErr, userId, fabricIdx, nodeId, MakeOptional(credentials) };
+        SendEvent(endpointId, event);
+    }
+}
+
+template <typename T>
+void DoorLockServer::SendEvent(chip::EndpointId endpointId, T & event)
+{
+    EventNumber eventNumber;
+    auto err = chip::app::LogEvent(event, endpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "Failed to log event: err=0x%" PRIx32 ", event_id=0x%" PRIx32, err.AsInteger(), event.GetEventId());
+    }
+}
+
 // =============================================================================
 // Cluster commands callbacks
 // =============================================================================
@@ -2021,8 +2116,9 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
                                             const chip::app::ConcreteCommandPath & commandPath,
                                             const chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & commandData)
 {
-    DoorLockServer::Instance().LockUnlockDoorCommandHandler(commandObj, commandPath, DlLockOperationType::kLock,
-                                                            commandData.pinCode);
+    emberAfDoorLockClusterPrintln("Received command: LockDoor");
+    DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, DlLockOperationType::kLock,
+                                                         emberAfPluginDoorLockOnDoorLockCommand, commandData.pinCode);
     return true;
 }
 
@@ -2030,8 +2126,14 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & commandData)
 {
-    DoorLockServer::Instance().LockUnlockDoorCommandHandler(commandObj, commandPath, DlLockOperationType::kUnlock,
-                                                            commandData.pinCode);
+    emberAfDoorLockClusterPrintln("Received command: UnlockDoor");
+
+    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, DlLockOperationType::kUnlock,
+                                                             emberAfPluginDoorLockOnDoorUnlockCommand, commandData.pinCode))
+    {
+        // TODO: if AutoRelockTime is set, schedule automatic door locking
+    }
+
     return true;
 }
 
@@ -2039,10 +2141,14 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("UnlockWithTimeout: command not implemented");
+    emberAfDoorLockClusterPrintln("Received command: UnlockWithTimeout");
 
-    // TODO: Implement door unlocking with timeout
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, DlLockOperationType::kUnlock,
+                                                             emberAfPluginDoorLockOnDoorUnlockCommand, commandData.pinCode))
+    {
+        // TODO: Implement door locking with given timeout
+    }
+
     return true;
 }
 
@@ -2316,20 +2422,34 @@ void MatterDoorLockPluginServerInitCallback()
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
+// =============================================================================
+// 'Default' callbacks for cluster commands
+// =============================================================================
+
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
+emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode, DlOperationError & err)
 {
+    err = DlOperationError::kUnspecified;
+    return false;
+}
+
+bool __attribute__((weak)) emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId,
+                                                                    chip::Optional<chip::ByteSpan> pinCode, DlOperationError & err)
+{
+    err = DlOperationError::kUnspecified;
     return false;
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
+emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode,
+                                                    uint16_t timeout, chip::app::Clusters::DoorLock::DlOperationError & err)
 {
+    err = DlOperationError::kUnspecified;
     return false;
 }
 
 // =============================================================================
-// Pre-change callbacks for cluster attributes
+// 'Default' pre-change callbacks for cluster attributes
 // =============================================================================
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
