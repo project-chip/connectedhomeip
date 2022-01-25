@@ -118,7 +118,7 @@ public:
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
 
         Optional<SessionHandle> session =
-            exchangeManager->GetSessionManager()->CreateGroupSession(groupId, exchangeManager->GetFabricIndex());
+            exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabric);
         if (!session.HasValue())
         {
             return CHIP_ERROR_NO_MEMORY;
