@@ -231,6 +231,12 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     err = mCASESessionManager.Init();
+
+    // This code is necessary to restart listening to existing groups after a reboot
+    // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
+    //
+    // This is disabled for thread device because the same code is already present for thread devices in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     {
         ChipLogProgress(AppServer, "Adding Multicast groups");
