@@ -134,11 +134,8 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusIB status;
-
-    err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+    err            = StatusResponse::ProcessStatusResponse(std::move(aPayload));
     SuccessOrExit(err);
-
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:

@@ -153,11 +153,7 @@ public:
         }
     }
 
-    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError,
-                 chip::Protocols::InteractionModel::Status aIMStatus) override
-    {
-        mReadError = true;
-    }
+    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override { mReadError = true; }
 
     void OnDone(chip::app::ReadClient * apReadClient) override {}
 

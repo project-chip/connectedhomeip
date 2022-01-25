@@ -138,8 +138,9 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR_IM_STATUS_CODE_RECEIVED: A StatusResponse containing an IM status code was received from the server. The
-         * actual IM status code is embedded in the 'aStatus' argument.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
@@ -148,7 +149,7 @@ public:
          * @param[in] apReadClient The read client object that initiated the attribute read transaction.
          * @param[in] aError       A system error code that conveys the overall error code.
          */
-        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aStatus) {}
+        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
@@ -298,7 +299,8 @@ private:
      * If aError != CHIP_NO_ERROR, it is delivered to the application through the OnError callback first.
      *
      */
-    void Close(CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus = Protocols::InteractionModel::Status::Failure);
+    void Close(CHIP_ERROR aError);
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback & mpCallback;

@@ -40,14 +40,14 @@ namespace Controller {
 
 template <typename T>
 using CommandResponseSuccessCallback = void(void * context, const T & responseObject);
-using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
+using CommandResponseFailureCallback = void(void * context, CHIP_ERROR err);
 using CommandResponseDoneCallback    = void();
 using WriteResponseSuccessCallback   = void (*)(void * context);
-using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
+using WriteResponseFailureCallback   = void (*)(void * context, CHIP_ERROR err);
 using WriteResponseDoneCallback      = void (*)(void * context);
 template <typename T>
 using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
-using ReadResponseFailureCallback     = void (*)(void * context, EmberAfStatus status);
+using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err);
 using SubscriptionEstablishedCallback = void (*)(void * context);
 
 class DLL_EXPORT ClusterBase
@@ -78,14 +78,12 @@ public:
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
+        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                                 const typename RequestDataT::ResponseType & responseData) {
             successCb(context, responseData);
         };
 
-        auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
-            failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
-        };
+        auto onFailureCb = [context, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
 
         return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
                                     onSuccessCb, onFailureCb, timedInvokeTimeoutMs, mTimeout);
@@ -122,18 +120,17 @@ public:
         CHIP_ERROR err = CHIP_NO_ERROR;
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & aPath) {
             if (successCb != nullptr)
             {
                 successCb(context);
             }
         };
 
-        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
-                                                CHIP_ERROR aError) {
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+                failureCb(context, aError);
             }
         };
 
@@ -202,18 +199,17 @@ public:
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath, const DecodableType & aData) {
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & aPath, const DecodableType & aData) {
             if (successCb != nullptr)
             {
                 successCb(context, aData);
             }
         };
 
-        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
-                                                CHIP_ERROR aError) {
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+                failureCb(context, aError);
             }
         };
 
@@ -244,18 +240,17 @@ public:
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto onReportCb = [context, reportCb](const app::ConcreteAttributePath & commandPath, const DecodableType & aData) {
+        auto onReportCb = [context, reportCb](const app::ConcreteAttributePath & aPath, const DecodableType & aData) {
             if (reportCb != nullptr)
             {
                 reportCb(context, aData);
             }
         };
 
-        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
-                                                CHIP_ERROR aError) {
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+                failureCb(context, aError);
             }
         };
 
@@ -280,18 +275,17 @@ public:
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto onSuccessCb = [context, successCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
+        auto onSuccessCb = [context, successCb](const app::EventHeader & aEventHeader, const DecodableType & aData) {
             if (successCb != nullptr)
             {
                 successCb(context, aData);
             }
         };
 
-        auto onFailureCb = [context, failureCb](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status status,
-                                                CHIP_ERROR error) {
+        auto onFailureCb = [context, failureCb](const app::EventHeader * aEventHeader, CHIP_ERROR aError) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status));
+                failureCb(context, aError);
             }
         };
 
@@ -307,18 +301,17 @@ public:
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto onReportCb = [context, reportCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
+        auto onReportCb = [context, reportCb](const app::EventHeader & aEventHeader, const DecodableType & aData) {
             if (reportCb != nullptr)
             {
                 reportCb(context, aData);
             }
         };
 
-        auto onFailureCb = [context, failureCb](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status status,
-                                                CHIP_ERROR aError) {
+        auto onFailureCb = [context, failureCb](const app::EventHeader * aEventHeader, CHIP_ERROR aError) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status));
+                failureCb(context, aError);
             }
         };
 

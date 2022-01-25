@@ -41,56 +41,6 @@ namespace Messaging {
 
 ReliableMessageContext::ReliableMessageContext() : mNextAckTime(0), mPendingPeerAckMessageCounter(0) {}
 
-bool ReliableMessageContext::AutoRequestAck() const
-{
-    return mFlags.Has(Flags::kFlagAutoRequestAck);
-}
-
-bool ReliableMessageContext::IsAckPending() const
-{
-    return mFlags.Has(Flags::kFlagAckPending);
-}
-
-bool ReliableMessageContext::HasRcvdMsgFromPeer() const
-{
-    return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
-}
-
-void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
-{
-    mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
-}
-
-void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
-{
-    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
-}
-
-void ReliableMessageContext::SetAckPending(bool inAckPending)
-{
-    mFlags.Set(Flags::kFlagAckPending, inAckPending);
-}
-
-void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
-{
-    mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
-}
-
-bool ReliableMessageContext::IsMessageNotAcked() const
-{
-    return mFlags.Has(Flags::kFlagMesageNotAcked);
-}
-
-void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
-{
-    mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
-}
-
-bool ReliableMessageContext::ShouldDropAckDebug() const
-{
-    return mFlags.Has(Flags::kFlagDropAckDebug);
-}
-
 ExchangeContext * ReliableMessageContext::GetExchangeContext()
 {
     return static_cast<ExchangeContext *>(this);
@@ -119,11 +69,6 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     }
 
     return err;
-}
-
-bool ReliableMessageContext::HasPiggybackAckPending() const
-{
-    return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
 
 /**

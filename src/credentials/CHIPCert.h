@@ -799,6 +799,24 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
+ * Extract Node ID, Fabric ID and Compressed Fabric ID from an operational
+ * certificate and its associated root certificate.
+ *
+ * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                              FabricId & fabricId, NodeId & nodeId);
+
+/**
+ * Extract Node ID and Compressed Fabric ID from an operational certificate
+ * and its associated root certificate.
+ *
+ * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ExtractNodeIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                      NodeId & nodeId);
+
+/**
  * Extract CASE Authenticated Tags from an operational certificate in ByteSpan TLV-encoded form.
  *
  * All values in the 'cats' struct will be set either to a valid CAT value or zero (undefined) value.

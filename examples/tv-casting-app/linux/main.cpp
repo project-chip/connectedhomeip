@@ -204,9 +204,9 @@ void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::Deco
     ChipLogProgress(AppServer, "ContentLauncher: Default Success Response");
 }
 
-void OnContentLauncherFailureResponse(void * context, EmberAfStatus status)
+void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" PRIu8, status);
+    ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)

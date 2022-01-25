@@ -68,7 +68,7 @@ ReadClient::~ReadClient()
     }
 }
 
-void ReadClient::Close(CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus)
+void ReadClient::Close(CHIP_ERROR aError)
 {
     // OnDone below can destroy us before we unwind all the way back into the
     // exchange code and it tries to close itself.  Make sure that it doesn't
@@ -84,7 +84,7 @@ void ReadClient::Close(CHIP_ERROR aError, Protocols::InteractionModel::Status aI
 
     if (aError != CHIP_NO_ERROR)
     {
-        mpCallback.OnError(this, aError, aIMStatus);
+        mpCallback.OnError(this, aError);
     }
 
     mpCallback.OnDone(this);
@@ -232,8 +232,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err                                    = CHIP_NO_ERROR;
-    Protocols::InteractionModel::Status imErrorStatus = Protocols::InteractionModel::Status::Failure;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(!IsIdle(), err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -255,15 +254,9 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        StatusIB status;
-
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
-        if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
-        {
-            imErrorStatus = status.mStatus;
-        }
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+        SuccessOrExit(err);
     }
     else
     {
@@ -273,7 +266,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
     {
-        Close(err, imErrorStatus);
+        Close(err);
     }
 
     return err;

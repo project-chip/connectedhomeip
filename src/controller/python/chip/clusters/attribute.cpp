@@ -101,7 +101,7 @@ public:
             CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
-                this->OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
+                this->OnError(apReadClient, err);
                 return;
             }
             size = writer.GetLengthWritten();
@@ -134,7 +134,7 @@ public:
             err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
-                this->OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
+                this->OnError(apReadClient, err);
                 return;
             }
             size = writer.GetLengthWritten();
@@ -142,7 +142,7 @@ public:
         else
         {
             err = CHIP_ERROR_INCORRECT_STATE;
-            this->OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
+            this->OnError(apReadClient, err);
         }
 
         gOnReadEventDataCallback(mAppContext, aEventHeader.mPath.mEndpointId, aEventHeader.mPath.mClusterId,
@@ -150,7 +150,7 @@ public:
                                  aEventHeader.mTimestamp.mValue, to_underlying(aEventHeader.mTimestamp.mType), buffer, size);
     }
 
-    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus) override
+    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         gOnReadErrorCallback(mAppContext, aError.AsInteger());
     }
@@ -211,7 +211,7 @@ public:
                                  to_underlying(aStatus.mStatus));
     }
 
-    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR aProtocolError) override
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override
     {
         gOnWriteErrorCallback(mAppContext, aProtocolError.AsInteger());
     }

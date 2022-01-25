@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,8 @@ using namespace chip::System::Clock;
 class TestPairingSession : public PairingSession
 {
 public:
+    TestPairingSession(Transport::SecureSession::Type secureSessionType) : PairingSession(secureSessionType) {}
+
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
@@ -51,7 +53,7 @@ public:
 
 void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext)
 {
-    TestPairingSession session;
+    TestPairingSession session(Transport::SecureSession::Type::kCASE);
 
     ReliableMessageProtocolConfig config(Milliseconds32(100), Milliseconds32(200));
 
@@ -84,7 +86,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
 
 void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inContext)
 {
-    TestPairingSession session;
+    TestPairingSession session(Transport::SecureSession::Type::kPASE);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(64, 0);
     System::PacketBufferTLVWriter writer;

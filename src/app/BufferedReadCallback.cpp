@@ -39,7 +39,7 @@ void BufferedReadCallback::OnReportEnd(const ReadClient * apReadClient)
     CHIP_ERROR err = DispatchBufferedData(apReadClient, mBufferedPath, StatusIB(), true);
     if (err != CHIP_NO_ERROR)
     {
-        mCallback.OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
+        mCallback.OnError(apReadClient, err);
     }
 
     mCallback.OnReportEnd(apReadClient);
@@ -258,7 +258,7 @@ void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, cons
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        mCallback.OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
+        mCallback.OnError(apReadClient, err);
     }
 }
 

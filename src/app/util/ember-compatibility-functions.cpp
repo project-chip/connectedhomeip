@@ -658,21 +658,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             }
             break;
         }
-        case ZCL_ARRAY_ATTRIBUTE_TYPE: {
-            // We only get here for attributes of list type that have no override
-            // registered.  There should not be any nonempty lists like that.
-            uint16_t length = emberAfGetInt16u(attributeData, 0, 2);
-            if (length != 0)
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-
-            // Just encode an empty array.
-            TLV::TLVType containerType;
-            ReturnErrorOnFailure(writer->StartContainer(tag, TLV::kTLVType_Array, containerType));
-            ReturnErrorOnFailure(writer->EndContainer(containerType));
-            break;
-        }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
             emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
