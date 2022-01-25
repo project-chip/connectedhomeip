@@ -31,19 +31,27 @@
 
   {{/zcl_events}}
   {{#chip_server_cluster_attributes}}
-  attribute(
-    {{~#if isWritableAttribute~}}
-      writable
-    {{~else~}}
-      readonly
-    {{~/if~}}
-    {{~#if isReportableAttribute~}}
-      , reportable
-    {{~/if~}}
-    ) {{type}} {{asLowerCamelCase name~}}
-    {{~#if isList~}}
-      []
-    {{~/if}} = {{code}};
+  {{! ensure indent }}{{#unless isWritableAttribute~}}
+    readonly {{!marker to place a space even with whitespace removal~}}
+  {{~/unless~}}{{#if isGlobalAttribute~}}
+    global {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
+  {{~!TODO: write only attributes should also be supported~}}
+  {{~#unless isReportableAttribute~}}
+    nosubscribe {{!marker to place a space even with whitespace removal~}}
+  {{~/unless~}}
+  {{~!Removes spaces~}} attribute {{!ensure space}}
+    {{~#if isNullable~}}
+      nullable {{!marker to place a space even with whitespace removal~}}
+    {{~/if~}} {{type}}
+    {{~#unless isArray~}}
+      {{~#if (isString type)~}}
+        {{~#if maxLength~}} 
+          <{{maxLength}}> 
+        {{~/if~}}
+      {{~/if~}}
+    {{/unless}} {{asLowerCamelCase name~}}
+    {{~#if isList~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
   {{#chip_cluster_commands}}
   {{#if arguments}}
@@ -79,9 +87,12 @@
 
 {{/all_user_clusters}}
 
-{{#user_endpoints}}
+{{#chip_endpoints}}
 endpoint {{endpointId}} {
-    {{!TODO: report device types and cluster instantionation. }}
+  {{#chip_endpoint_clusters}}
+  {{#if (isServer side)~}} server  {{else~}} binding {{/if~}}
+  cluster {{asUpperCamelCase name}};
+  {{/chip_endpoint_clusters}}
 }
 
-{{/user_endpoints}}
+{{/chip_endpoints}}

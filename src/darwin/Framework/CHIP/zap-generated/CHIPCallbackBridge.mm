@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -3480,6 +3480,49 @@ void CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
+void CHIPOperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+        value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPOperationalCredentialsClusterNOCStruct * newElement_0;
+        newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
+        newElement_0.icac = [NSData dataWithBytes:entry_0.icac.data() length:entry_0.icac.size()];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
@@ -4918,6 +4961,46 @@ void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuc
 void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -6711,6 +6794,58 @@ void CHIPNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessF
 void CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

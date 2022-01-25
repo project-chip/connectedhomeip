@@ -71,6 +71,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -96,6 +97,7 @@ executable("chip-tool") {
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   cflags = [ "-Wconversion" ]

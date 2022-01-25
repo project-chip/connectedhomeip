@@ -99,6 +99,4 @@ unset _PW_BANNER_FUNC
 unset _PW_TEXT
 unset PW_DOCTOR_SKIP_CIPD_CHECKS
 
-unset -f pw_cleanup
-unset -f _pw_hello
 unset -f _chip_bootstrap_banner

@@ -29,21 +29,16 @@ scripts/examples/gn_build_example.sh examples/chip-tool SOME-PATH/
 
 which puts the binary at `SOME-PATH/chip-tool`.
 
-### Building with message tracing
+### Using message tracing
 
 Message tracing allows capture of the secure messages which can be used for test
 automation.
 
-```
-gn gen out/with_trace/ --args='import("//with_pw_trace.gni")'
-ninja -C out/with_trace chip-tool
-```
-
-This enables tracing and adds additional flags to chip-tool to control where the
-traces should go:
+There are additional flags to chip-tool to control where the traces should go:
 
 -   --trace_file <file> Outputs trace data to the specified file.
--   --trace_log Outputs trace data to the chip log stream.
+-   --trace_log <0/1> Outputs trace data to the console with automation logs if
+    set to 1
 
 For example:
 
@@ -72,7 +67,7 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 0 20202021 3840
+    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 20202021 3840
 
 where:
 
@@ -81,16 +76,14 @@ where:
 -   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
     where the bytes of the SSID are encoded as two-digit hex numbers.
 -   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
--   The 0 is the fabric id, until more complete support for multiple fabrics is
-    implemented in our commissioning process.
 
 For example:
 
-    $ chip-tool pairing ble-wifi 0x11 xyz secret 0 20202021 3840
+    $ chip-tool pairing ble-wifi 0x11 xyz secret 20202021 3840
 
 or equivalently:
 
-    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 0 20202021 3840
+    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 20202021 3840
 
 #### Pair a device over IP
 

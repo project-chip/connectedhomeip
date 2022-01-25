@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Events.h>
 #include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
@@ -43,8 +44,8 @@ namespace Structs {
 namespace LabelStruct {
 enum class Fields
 {
-    kLabel = 1,
-    kValue = 2,
+    kLabel = 0,
+    kValue = 1,
 };
 
 struct Type
@@ -1791,17 +1792,17 @@ namespace Structs {
 namespace SceneExtensionFieldSet {
 enum class Fields
 {
-    kClusterId = 1,
-    kLength    = 2,
-    kValue     = 3,
+    kClusterId = 0,
+    kLength    = 1,
+    kValue     = 2,
 };
 
 struct Type
 {
 public:
-    chip::ClusterId clusterId;
-    uint8_t length;
-    uint8_t value;
+    chip::ClusterId clusterId = static_cast<chip::ClusterId>(0);
+    uint8_t length            = static_cast<uint8_t>(0);
+    uint8_t value             = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4534,19 +4535,19 @@ namespace Structs {
 namespace PowerProfileRecord {
 enum class Fields
 {
-    kPowerProfileId            = 1,
-    kEnergyPhaseId             = 2,
-    kPowerProfileRemoteControl = 3,
-    kPowerProfileState         = 4,
+    kPowerProfileId            = 0,
+    kEnergyPhaseId             = 1,
+    kPowerProfileRemoteControl = 2,
+    kPowerProfileState         = 3,
 };
 
 struct Type
 {
 public:
-    uint8_t powerProfileId;
-    uint8_t energyPhaseId;
-    bool powerProfileRemoteControl;
-    uint8_t powerProfileState;
+    uint8_t powerProfileId         = static_cast<uint8_t>(0);
+    uint8_t energyPhaseId          = static_cast<uint8_t>(0);
+    bool powerProfileRemoteControl = static_cast<bool>(0);
+    uint8_t powerProfileState      = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4558,15 +4559,15 @@ using DecodableType = Type;
 namespace ScheduledPhase {
 enum class Fields
 {
-    kEnergyPhaseId = 1,
-    kScheduledTime = 2,
+    kEnergyPhaseId = 0,
+    kScheduledTime = 1,
 };
 
 struct Type
 {
 public:
-    uint8_t energyPhaseId;
-    uint16_t scheduledTime;
+    uint8_t energyPhaseId  = static_cast<uint8_t>(0);
+    uint16_t scheduledTime = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4578,23 +4579,23 @@ using DecodableType = Type;
 namespace TransferredPhase {
 enum class Fields
 {
-    kEnergyPhaseId      = 1,
-    kMacroPhaseId       = 2,
-    kExpectedDuration   = 3,
-    kPeakPower          = 4,
-    kEnergy             = 5,
-    kMaxActivationDelay = 6,
+    kEnergyPhaseId      = 0,
+    kMacroPhaseId       = 1,
+    kExpectedDuration   = 2,
+    kPeakPower          = 3,
+    kEnergy             = 4,
+    kMaxActivationDelay = 5,
 };
 
 struct Type
 {
 public:
-    uint8_t energyPhaseId;
-    uint8_t macroPhaseId;
-    uint16_t expectedDuration;
-    uint16_t peakPower;
-    uint16_t energy;
-    uint16_t maxActivationDelay;
+    uint8_t energyPhaseId       = static_cast<uint8_t>(0);
+    uint8_t macroPhaseId        = static_cast<uint8_t>(0);
+    uint16_t expectedDuration   = static_cast<uint16_t>(0);
+    uint16_t peakPower          = static_cast<uint16_t>(0);
+    uint16_t energy             = static_cast<uint16_t>(0);
+    uint16_t maxActivationDelay = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6112,15 +6113,15 @@ namespace Structs {
 namespace DeviceType {
 enum class Fields
 {
-    kType     = 1,
-    kRevision = 2,
+    kType     = 0,
+    kRevision = 1,
 };
 
 struct Type
 {
 public:
-    chip::DeviceTypeId type;
-    uint16_t revision;
+    chip::DeviceTypeId type = static_cast<chip::DeviceTypeId>(0);
+    uint16_t revision       = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6402,6 +6403,13 @@ enum class AuthMode : uint8_t
     kCase  = 0x02,
     kGroup = 0x03,
 };
+// Enum for ChangeTypeEnum
+enum class ChangeTypeEnum : uint8_t
+{
+    kChanged = 0x00,
+    kAdded   = 0x01,
+    kRemoved = 0x02,
+};
 // Enum for Privilege
 enum class Privilege : uint8_t
 {
@@ -6448,9 +6456,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
-    Privilege privilege;
-    AuthMode authMode;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Privilege privilege           = static_cast<Privilege>(0);
+    AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
 
@@ -6461,9 +6469,9 @@ public:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex;
-    Privilege privilege;
-    AuthMode authMode;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Privilege privilege           = static_cast<Privilege>(0);
+    AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6480,7 +6488,7 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6576,6 +6584,96 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace AccessControlEntryChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kAdminFabricIndex = 0,
+    kAdminNodeID      = 1,
+    kAdminPasscodeID  = 2,
+    kChangeType       = 3,
+    kLatestValue      = 4,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AccessControlEntryChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AccessControlEntryChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::AccessControlEntry::DecodableType> latestValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AccessControlEntryChanged
+namespace AccessControlExtensionChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kAdminFabricIndex = 0,
+    kAdminNodeID      = 1,
+    kAdminPasscodeID  = 2,
+    kChangeType       = 3,
+    kLatestValue      = 4,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AccessControlExtensionChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AccessControlExtensionChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::ExtensionEntry::DecodableType> latestValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AccessControlExtensionChanged
+} // namespace Events
 } // namespace AccessControl
 namespace PollControl {
 
@@ -6967,23 +7065,23 @@ namespace Structs {
 namespace ActionStruct {
 enum class Fields
 {
-    kActionID          = 1,
-    kName              = 2,
-    kType              = 3,
-    kEndpointListID    = 4,
-    kSupportedCommands = 5,
-    kStatus            = 6,
+    kActionID          = 0,
+    kName              = 1,
+    kType              = 2,
+    kEndpointListID    = 3,
+    kSupportedCommands = 4,
+    kStatus            = 5,
 };
 
 struct Type
 {
 public:
-    uint16_t actionID;
+    uint16_t actionID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    ActionTypeEnum type;
-    uint16_t endpointListID;
-    uint16_t supportedCommands;
-    ActionStateEnum status;
+    ActionTypeEnum type        = static_cast<ActionTypeEnum>(0);
+    uint16_t endpointListID    = static_cast<uint16_t>(0);
+    uint16_t supportedCommands = static_cast<uint16_t>(0);
+    ActionStateEnum status     = static_cast<ActionStateEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6995,18 +7093,18 @@ using DecodableType = Type;
 namespace EndpointListStruct {
 enum class Fields
 {
-    kEndpointListID = 1,
-    kName           = 2,
-    kType           = 3,
-    kEndpoints      = 4,
+    kEndpointListID = 0,
+    kName           = 1,
+    kType           = 2,
+    kEndpoints      = 3,
 };
 
 struct Type
 {
 public:
-    uint16_t endpointListID;
+    uint16_t endpointListID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    EndpointListTypeEnum type;
+    EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -7015,9 +7113,9 @@ public:
 struct DecodableType
 {
 public:
-    uint16_t endpointListID;
+    uint16_t endpointListID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    EndpointListTypeEnum type;
+    EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -7627,7 +7725,6 @@ struct TypeInfo
 namespace Events {
 namespace StateChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -7640,7 +7737,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StateChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
 
     uint16_t actionID        = static_cast<uint16_t>(0);
@@ -7654,7 +7751,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StateChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
 
     uint16_t actionID        = static_cast<uint16_t>(0);
@@ -7666,7 +7763,6 @@ public:
 } // namespace StateChanged
 namespace ActionFailed {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -7680,7 +7776,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ActionFailed::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
 
     uint16_t actionID        = static_cast<uint16_t>(0);
@@ -7695,7 +7791,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ActionFailed::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
 
     uint16_t actionID        = static_cast<uint16_t>(0);
@@ -8054,7 +8150,6 @@ struct TypeInfo
 namespace Events {
 namespace StartUp {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -8065,7 +8160,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StartUp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
@@ -8077,7 +8172,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StartUp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
@@ -8087,7 +8182,6 @@ public:
 } // namespace StartUp
 namespace ShutDown {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -8097,7 +8191,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -8107,7 +8201,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -8115,7 +8209,6 @@ public:
 } // namespace ShutDown
 namespace Leave {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -8125,7 +8218,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -8135,7 +8228,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -8143,7 +8236,6 @@ public:
 } // namespace Leave
 namespace ReachableChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000003;
 
 enum class Fields
 {
@@ -8154,7 +8246,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     bool reachableNewValue = static_cast<bool>(0);
@@ -8166,7 +8258,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     bool reachableNewValue = static_cast<bool>(0);
@@ -8542,9 +8634,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
-    chip::NodeId providerNodeID;
-    chip::EndpointId endpoint;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId providerNodeID   = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpoint     = static_cast<chip::EndpointId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -8712,7 +8804,8 @@ struct TypeInfo
 
         Attributes::DefaultOtaProviders::TypeInfo::DecodableType defaultOtaProviders;
         Attributes::UpdatePossible::TypeInfo::DecodableType updatePossible = static_cast<bool>(0);
-        Attributes::UpdateState::TypeInfo::DecodableType updateState       = static_cast<OTAUpdateStateEnum>(0);
+        Attributes::UpdateState::TypeInfo::DecodableType updateState =
+            static_cast<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum>(0);
         Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
@@ -8723,7 +8816,6 @@ struct TypeInfo
 namespace Events {
 namespace StateTransition {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -8737,7 +8829,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     DataModel::Nullable<OTAUpdateStateEnum> previousState;
@@ -8752,7 +8844,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     DataModel::Nullable<OTAUpdateStateEnum> previousState;
@@ -8765,7 +8857,6 @@ public:
 } // namespace StateTransition
 namespace VersionApplied {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -8777,7 +8868,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::VersionApplied::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
@@ -8790,7 +8881,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::VersionApplied::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
@@ -8801,7 +8892,6 @@ public:
 } // namespace VersionApplied
 namespace DownloadError {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -8815,12 +8905,12 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DownloadError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint64_t bytesDownloaded = static_cast<uint64_t>(0);
-    uint8_t progressPercent  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint8_t> progressPercent;
     DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -8830,12 +8920,12 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DownloadError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint64_t bytesDownloaded = static_cast<uint64_t>(0);
-    uint8_t progressPercent  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint8_t> progressPercent;
     DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -8954,27 +9044,27 @@ namespace Attributes {
 namespace HourFormat {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::HourFormat;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::HourFormat;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::HourFormat;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HourFormat
-namespace CalendarType {
+namespace ActiveCalendarType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::CalendarType;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::CalendarType;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::CalendarType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarType::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCalendarType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CalendarType
+} // namespace ActiveCalendarType
 namespace SupportedCalendarTypes {
 struct TypeInfo
 {
@@ -9032,8 +9122,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::HourFormat::TypeInfo::DecodableType hourFormat     = static_cast<uint8_t>(0);
-        Attributes::CalendarType::TypeInfo::DecodableType calendarType = static_cast<uint8_t>(0);
+        Attributes::HourFormat::TypeInfo::DecodableType hourFormat =
+            static_cast<chip::app::Clusters::TimeFormatLocalization::HourFormat>(0);
+        Attributes::ActiveCalendarType::TypeInfo::DecodableType activeCalendarType =
+            static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarType>(0);
         Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
@@ -9600,13 +9692,13 @@ namespace Structs {
 namespace BasicCommissioningInfoType {
 enum class Fields
 {
-    kFailSafeExpiryLengthMs = 1,
+    kFailSafeExpiryLengthMs = 0,
 };
 
 struct Type
 {
 public:
-    uint32_t failSafeExpiryLengthMs;
+    uint32_t failSafeExpiryLengthMs = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10004,19 +10096,27 @@ enum class WiFiBand : uint8_t
     k60g  = 0x04,
 };
 
+// Bitmap for NetworkCommissioningFeature
+enum class NetworkCommissioningFeature : uint32_t
+{
+    kWiFiNetworkInterface     = 0x1,
+    kThreadNetworkInterface   = 0x2,
+    kEthernetNetworkInterface = 0x4,
+};
+
 namespace Structs {
 namespace NetworkInfo {
 enum class Fields
 {
-    kNetworkID = 1,
-    kConnected = 2,
+    kNetworkID = 0,
+    kConnected = 1,
 };
 
 struct Type
 {
 public:
     chip::ByteSpan networkID;
-    bool connected;
+    bool connected = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10028,27 +10128,27 @@ using DecodableType = Type;
 namespace ThreadInterfaceScanResult {
 enum class Fields
 {
-    kPanId           = 1,
-    kExtendedPanId   = 2,
-    kNetworkName     = 3,
-    kChannel         = 4,
-    kVersion         = 5,
-    kExtendedAddress = 6,
-    kRssi            = 7,
-    kLqi             = 8,
+    kPanId           = 0,
+    kExtendedPanId   = 1,
+    kNetworkName     = 2,
+    kChannel         = 3,
+    kVersion         = 4,
+    kExtendedAddress = 5,
+    kRssi            = 6,
+    kLqi             = 7,
 };
 
 struct Type
 {
 public:
-    uint64_t panId;
-    uint64_t extendedPanId;
+    uint64_t panId         = static_cast<uint64_t>(0);
+    uint64_t extendedPanId = static_cast<uint64_t>(0);
     chip::CharSpan networkName;
-    uint16_t channel;
-    uint8_t version;
-    uint64_t extendedAddress;
-    int8_t rssi;
-    uint8_t lqi;
+    uint16_t channel         = static_cast<uint16_t>(0);
+    uint8_t version          = static_cast<uint8_t>(0);
+    uint64_t extendedAddress = static_cast<uint64_t>(0);
+    int8_t rssi              = static_cast<int8_t>(0);
+    uint8_t lqi              = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10060,23 +10160,23 @@ using DecodableType = Type;
 namespace WiFiInterfaceScanResult {
 enum class Fields
 {
-    kSecurity = 1,
-    kSsid     = 2,
-    kBssid    = 3,
-    kChannel  = 4,
-    kWiFiBand = 5,
-    kRssi     = 6,
+    kSecurity = 0,
+    kSsid     = 1,
+    kBssid    = 2,
+    kChannel  = 3,
+    kWiFiBand = 4,
+    kRssi     = 5,
 };
 
 struct Type
 {
 public:
-    uint8_t security;
+    uint8_t security = static_cast<uint8_t>(0);
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint16_t channel;
-    WiFiBand wiFiBand;
-    int8_t rssi;
+    uint16_t channel  = static_cast<uint16_t>(0);
+    WiFiBand wiFiBand = static_cast<WiFiBand>(0);
+    int8_t rssi       = static_cast<int8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10620,7 +10720,8 @@ struct TypeInfo
         Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType scanMaxTimeSeconds       = static_cast<uint8_t>(0);
         Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType connectMaxTimeSeconds = static_cast<uint8_t>(0);
         Attributes::InterfaceEnabled::TypeInfo::DecodableType interfaceEnabled           = static_cast<bool>(0);
-        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus = static_cast<NetworkCommissioningStatus>(0);
+        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus =
+            static_cast<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(0);
         Attributes::LastNetworkID::TypeInfo::DecodableType lastNetworkID;
         Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue = static_cast<uint32_t>(0);
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -10895,23 +10996,23 @@ namespace Structs {
 namespace NetworkInterfaceType {
 enum class Fields
 {
-    kName                            = 1,
-    kFabricConnected                 = 2,
-    kOffPremiseServicesReachableIPv4 = 3,
-    kOffPremiseServicesReachableIPv6 = 4,
-    kHardwareAddress                 = 5,
-    kType                            = 6,
+    kName                            = 0,
+    kFabricConnected                 = 1,
+    kOffPremiseServicesReachableIPv4 = 2,
+    kOffPremiseServicesReachableIPv6 = 3,
+    kHardwareAddress                 = 4,
+    kType                            = 5,
 };
 
 struct Type
 {
 public:
     chip::CharSpan name;
-    bool fabricConnected;
-    bool offPremiseServicesReachableIPv4;
-    bool offPremiseServicesReachableIPv6;
+    bool fabricConnected                 = static_cast<bool>(0);
+    bool offPremiseServicesReachableIPv4 = static_cast<bool>(0);
+    bool offPremiseServicesReachableIPv6 = static_cast<bool>(0);
     chip::ByteSpan hardwareAddress;
-    InterfaceType type;
+    InterfaceType type = static_cast<InterfaceType>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11084,7 +11185,6 @@ struct TypeInfo
 namespace Events {
 namespace HardwareFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -11096,7 +11196,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::HardwareFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const HardwareFaultType> current;
@@ -11109,7 +11209,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::HardwareFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::DecodableList<HardwareFaultType> current;
@@ -11120,7 +11220,6 @@ public:
 } // namespace HardwareFaultChange
 namespace RadioFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -11132,7 +11231,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::RadioFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const RadioFaultType> current;
@@ -11145,7 +11244,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::RadioFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::DecodableList<RadioFaultType> current;
@@ -11156,7 +11255,6 @@ public:
 } // namespace RadioFaultChange
 namespace NetworkFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -11168,7 +11266,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const NetworkFaultType> current;
@@ -11181,7 +11279,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::DecodableList<NetworkFaultType> current;
@@ -11192,7 +11290,6 @@ public:
 } // namespace NetworkFaultChange
 namespace BootReason {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000003;
 
 enum class Fields
 {
@@ -11203,7 +11300,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::BootReason::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     BootReasonType bootReason = static_cast<BootReasonType>(0);
@@ -11215,7 +11312,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::BootReason::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     BootReasonType bootReason = static_cast<BootReasonType>(0);
@@ -11231,15 +11328,15 @@ namespace Structs {
 namespace SoftwareFault {
 enum class Fields
 {
-    kId             = 1,
-    kName           = 2,
-    kFaultRecording = 3,
+    kId             = 0,
+    kName           = 1,
+    kFaultRecording = 2,
 };
 
 struct Type
 {
 public:
-    uint64_t id;
+    uint64_t id = static_cast<uint64_t>(0);
     chip::CharSpan name;
     chip::ByteSpan faultRecording;
 
@@ -11253,21 +11350,21 @@ using DecodableType = Type;
 namespace ThreadMetrics {
 enum class Fields
 {
-    kId               = 1,
-    kName             = 2,
-    kStackFreeCurrent = 3,
-    kStackFreeMinimum = 4,
-    kStackSize        = 5,
+    kId               = 0,
+    kName             = 1,
+    kStackFreeCurrent = 2,
+    kStackFreeMinimum = 3,
+    kStackSize        = 4,
 };
 
 struct Type
 {
 public:
-    uint64_t id;
+    uint64_t id = static_cast<uint64_t>(0);
     chip::CharSpan name;
-    uint32_t stackFreeCurrent;
-    uint32_t stackFreeMinimum;
-    uint32_t stackSize;
+    uint32_t stackFreeCurrent = static_cast<uint32_t>(0);
+    uint32_t stackFreeMinimum = static_cast<uint32_t>(0);
+    uint32_t stackSize        = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11429,7 +11526,6 @@ struct TypeInfo
 namespace Events {
 namespace SoftwareFault {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -11440,7 +11536,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     Structs::SoftwareFault::Type softwareFault;
@@ -11452,7 +11548,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     Structs::SoftwareFault::DecodableType softwareFault;
@@ -11499,39 +11595,39 @@ namespace Structs {
 namespace NeighborTable {
 enum class Fields
 {
-    kExtAddress       = 1,
-    kAge              = 2,
-    kRloc16           = 3,
-    kLinkFrameCounter = 4,
-    kMleFrameCounter  = 5,
-    kLqi              = 6,
-    kAverageRssi      = 7,
-    kLastRssi         = 8,
-    kFrameErrorRate   = 9,
-    kMessageErrorRate = 10,
-    kRxOnWhenIdle     = 11,
-    kFullThreadDevice = 12,
-    kFullNetworkData  = 13,
-    kIsChild          = 14,
+    kExtAddress       = 0,
+    kAge              = 1,
+    kRloc16           = 2,
+    kLinkFrameCounter = 3,
+    kMleFrameCounter  = 4,
+    kLqi              = 5,
+    kAverageRssi      = 6,
+    kLastRssi         = 7,
+    kFrameErrorRate   = 8,
+    kMessageErrorRate = 9,
+    kRxOnWhenIdle     = 10,
+    kFullThreadDevice = 11,
+    kFullNetworkData  = 12,
+    kIsChild          = 13,
 };
 
 struct Type
 {
 public:
-    uint64_t extAddress;
-    uint32_t age;
-    uint16_t rloc16;
-    uint32_t linkFrameCounter;
-    uint32_t mleFrameCounter;
-    uint8_t lqi;
-    int8_t averageRssi;
-    int8_t lastRssi;
-    uint8_t frameErrorRate;
-    uint8_t messageErrorRate;
-    bool rxOnWhenIdle;
-    bool fullThreadDevice;
-    bool fullNetworkData;
-    bool isChild;
+    uint64_t extAddress       = static_cast<uint64_t>(0);
+    uint32_t age              = static_cast<uint32_t>(0);
+    uint16_t rloc16           = static_cast<uint16_t>(0);
+    uint32_t linkFrameCounter = static_cast<uint32_t>(0);
+    uint32_t mleFrameCounter  = static_cast<uint32_t>(0);
+    uint8_t lqi               = static_cast<uint8_t>(0);
+    int8_t averageRssi        = static_cast<int8_t>(0);
+    int8_t lastRssi           = static_cast<int8_t>(0);
+    uint8_t frameErrorRate    = static_cast<uint8_t>(0);
+    uint8_t messageErrorRate  = static_cast<uint8_t>(0);
+    bool rxOnWhenIdle         = static_cast<bool>(0);
+    bool fullThreadDevice     = static_cast<bool>(0);
+    bool fullNetworkData      = static_cast<bool>(0);
+    bool isChild              = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11543,35 +11639,35 @@ using DecodableType = Type;
 namespace OperationalDatasetComponents {
 enum class Fields
 {
-    kActiveTimestampPresent  = 1,
-    kPendingTimestampPresent = 2,
-    kMasterKeyPresent        = 3,
-    kNetworkNamePresent      = 4,
-    kExtendedPanIdPresent    = 5,
-    kMeshLocalPrefixPresent  = 6,
-    kDelayPresent            = 7,
-    kPanIdPresent            = 8,
-    kChannelPresent          = 9,
-    kPskcPresent             = 10,
-    kSecurityPolicyPresent   = 11,
-    kChannelMaskPresent      = 12,
+    kActiveTimestampPresent  = 0,
+    kPendingTimestampPresent = 1,
+    kMasterKeyPresent        = 2,
+    kNetworkNamePresent      = 3,
+    kExtendedPanIdPresent    = 4,
+    kMeshLocalPrefixPresent  = 5,
+    kDelayPresent            = 6,
+    kPanIdPresent            = 7,
+    kChannelPresent          = 8,
+    kPskcPresent             = 9,
+    kSecurityPolicyPresent   = 10,
+    kChannelMaskPresent      = 11,
 };
 
 struct Type
 {
 public:
-    bool activeTimestampPresent;
-    bool pendingTimestampPresent;
-    bool masterKeyPresent;
-    bool networkNamePresent;
-    bool extendedPanIdPresent;
-    bool meshLocalPrefixPresent;
-    bool delayPresent;
-    bool panIdPresent;
-    bool channelPresent;
-    bool pskcPresent;
-    bool securityPolicyPresent;
-    bool channelMaskPresent;
+    bool activeTimestampPresent  = static_cast<bool>(0);
+    bool pendingTimestampPresent = static_cast<bool>(0);
+    bool masterKeyPresent        = static_cast<bool>(0);
+    bool networkNamePresent      = static_cast<bool>(0);
+    bool extendedPanIdPresent    = static_cast<bool>(0);
+    bool meshLocalPrefixPresent  = static_cast<bool>(0);
+    bool delayPresent            = static_cast<bool>(0);
+    bool panIdPresent            = static_cast<bool>(0);
+    bool channelPresent          = static_cast<bool>(0);
+    bool pskcPresent             = static_cast<bool>(0);
+    bool securityPolicyPresent   = static_cast<bool>(0);
+    bool channelMaskPresent      = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11583,31 +11679,31 @@ using DecodableType = Type;
 namespace RouteTable {
 enum class Fields
 {
-    kExtAddress      = 1,
-    kRloc16          = 2,
-    kRouterId        = 3,
-    kNextHop         = 4,
-    kPathCost        = 5,
-    kLQIIn           = 6,
-    kLQIOut          = 7,
-    kAge             = 8,
-    kAllocated       = 9,
-    kLinkEstablished = 10,
+    kExtAddress      = 0,
+    kRloc16          = 1,
+    kRouterId        = 2,
+    kNextHop         = 3,
+    kPathCost        = 4,
+    kLQIIn           = 5,
+    kLQIOut          = 6,
+    kAge             = 7,
+    kAllocated       = 8,
+    kLinkEstablished = 9,
 };
 
 struct Type
 {
 public:
-    uint64_t extAddress;
-    uint16_t rloc16;
-    uint8_t routerId;
-    uint8_t nextHop;
-    uint8_t pathCost;
-    uint8_t LQIIn;
-    uint8_t LQIOut;
-    uint8_t age;
-    bool allocated;
-    bool linkEstablished;
+    uint64_t extAddress  = static_cast<uint64_t>(0);
+    uint16_t rloc16      = static_cast<uint16_t>(0);
+    uint8_t routerId     = static_cast<uint8_t>(0);
+    uint8_t nextHop      = static_cast<uint8_t>(0);
+    uint8_t pathCost     = static_cast<uint8_t>(0);
+    uint8_t LQIIn        = static_cast<uint8_t>(0);
+    uint8_t LQIOut       = static_cast<uint8_t>(0);
+    uint8_t age          = static_cast<uint8_t>(0);
+    bool allocated       = static_cast<bool>(0);
+    bool linkEstablished = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11619,15 +11715,15 @@ using DecodableType = Type;
 namespace SecurityPolicy {
 enum class Fields
 {
-    kRotationTime = 1,
-    kFlags        = 2,
+    kRotationTime = 0,
+    kFlags        = 1,
 };
 
 struct Type
 {
 public:
-    uint16_t rotationTime;
-    uint16_t flags;
+    uint16_t rotationTime = static_cast<uint16_t>(0);
+    uint16_t flags        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12565,7 +12661,6 @@ struct TypeInfo
 namespace Events {
 namespace ConnectionStatus {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -12576,7 +12671,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     ThreadConnectionStatus connectionStatus = static_cast<ThreadConnectionStatus>(0);
@@ -12588,7 +12683,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     ThreadConnectionStatus connectionStatus = static_cast<ThreadConnectionStatus>(0);
@@ -12912,7 +13007,6 @@ struct TypeInfo
 namespace Events {
 namespace Disconnection {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -12923,7 +13017,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::Disconnection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     uint16_t reasonCode = static_cast<uint16_t>(0);
@@ -12935,7 +13029,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::Disconnection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     uint16_t reasonCode = static_cast<uint16_t>(0);
@@ -12945,7 +13039,6 @@ public:
 } // namespace Disconnection
 namespace AssociationFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -12957,7 +13050,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     AssociationFailureCause associationFailure = static_cast<AssociationFailureCause>(0);
@@ -12970,7 +13063,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     AssociationFailureCause associationFailure = static_cast<AssociationFailureCause>(0);
@@ -12981,7 +13074,6 @@ public:
 } // namespace AssociationFailure
 namespace ConnectionStatus {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -12992,7 +13084,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     WiFiConnectionStatus connectionStatus = static_cast<WiFiConnectionStatus>(0);
@@ -13004,7 +13096,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     WiFiConnectionStatus connectionStatus = static_cast<WiFiConnectionStatus>(0);
@@ -13792,7 +13884,6 @@ struct TypeInfo
 namespace Events {
 namespace SwitchLatched {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -13803,7 +13894,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SwitchLatched::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition = static_cast<uint8_t>(0);
@@ -13815,7 +13906,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SwitchLatched::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition = static_cast<uint8_t>(0);
@@ -13825,7 +13916,6 @@ public:
 } // namespace SwitchLatched
 namespace InitialPress {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -13836,7 +13926,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::InitialPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition = static_cast<uint8_t>(0);
@@ -13848,7 +13938,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::InitialPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition = static_cast<uint8_t>(0);
@@ -13858,7 +13948,6 @@ public:
 } // namespace InitialPress
 namespace LongPress {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -13869,7 +13958,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LongPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition = static_cast<uint8_t>(0);
@@ -13881,7 +13970,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LongPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition = static_cast<uint8_t>(0);
@@ -13891,7 +13980,6 @@ public:
 } // namespace LongPress
 namespace ShortRelease {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000003;
 
 enum class Fields
 {
@@ -13902,7 +13990,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ShortRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
@@ -13914,7 +14002,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ShortRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
@@ -13924,7 +14012,6 @@ public:
 } // namespace ShortRelease
 namespace LongRelease {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000004;
 
 enum class Fields
 {
@@ -13935,7 +14022,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LongRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
@@ -13947,7 +14034,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LongRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
@@ -13957,7 +14044,6 @@ public:
 } // namespace LongRelease
 namespace MultiPressOngoing {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000005;
 
 enum class Fields
 {
@@ -13969,7 +14055,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::MultiPressOngoing::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition                   = static_cast<uint8_t>(0);
@@ -13982,7 +14068,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::MultiPressOngoing::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition                   = static_cast<uint8_t>(0);
@@ -13993,7 +14079,6 @@ public:
 } // namespace MultiPressOngoing
 namespace MultiPressComplete {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000006;
 
 enum class Fields
 {
@@ -14005,7 +14090,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::MultiPressComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition                 = static_cast<uint8_t>(0);
@@ -14018,7 +14103,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::MultiPressComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
     uint8_t newPosition                 = static_cast<uint8_t>(0);
@@ -14300,26 +14385,27 @@ namespace Structs {
 namespace FabricDescriptor {
 enum class Fields
 {
-    kFabricIndex   = 1,
-    kRootPublicKey = 2,
-    kVendorId      = 3,
-    kFabricId      = 4,
-    kNodeId        = 5,
-    kLabel         = 6,
+    kFabricIndex   = 0,
+    kRootPublicKey = 1,
+    kVendorId      = 2,
+    kFabricId      = 3,
+    kNodeId        = 4,
+    kLabel         = 5,
 };
 
 struct Type
 {
 public:
-    uint8_t fabricIndex;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan rootPublicKey;
-    uint16_t vendorId;
-    chip::FabricId fabricId;
-    chip::NodeId nodeId;
+    uint16_t vendorId       = static_cast<uint16_t>(0);
+    chip::FabricId fabricId = static_cast<chip::FabricId>(0);
+    chip::NodeId nodeId     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14328,18 +14414,21 @@ using DecodableType = Type;
 namespace NOCStruct {
 enum class Fields
 {
-    kFabricIndex = 1,
-    kNoc         = 2,
+    kFabricIndex = 0,
+    kNoc         = 1,
+    kIcac        = 2,
 };
 
 struct Type
 {
 public:
-    uint8_t fabricIndex;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
+    chip::ByteSpan icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14865,6 +14954,20 @@ public:
 
 namespace Attributes {
 
+namespace NOCs {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NOCs::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NOCs
 namespace FabricsList {
 struct TypeInfo
 {
@@ -14972,6 +15075,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::NOCs::TypeInfo::DecodableType NOCs;
         Attributes::FabricsList::TypeInfo::DecodableType fabricsList;
         Attributes::SupportedFabrics::TypeInfo::DecodableType supportedFabrics       = static_cast<uint8_t>(0);
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
@@ -15005,8 +15109,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t fabricIndex;
-    uint16_t groupId;
+    uint16_t fabricIndex = static_cast<uint16_t>(0);
+    uint16_t groupId     = static_cast<uint16_t>(0);
     DataModel::List<const uint16_t> endpoints;
     chip::CharSpan groupName;
 
@@ -15016,8 +15120,8 @@ public:
 struct DecodableType
 {
 public:
-    uint16_t fabricIndex;
-    uint16_t groupId;
+    uint16_t fabricIndex = static_cast<uint16_t>(0);
+    uint16_t groupId     = static_cast<uint16_t>(0);
     DataModel::DecodableList<uint16_t> endpoints;
     chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15035,9 +15139,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
-    uint16_t groupId;
-    uint16_t groupKeySetID;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    uint16_t groupId              = static_cast<uint16_t>(0);
+    uint16_t groupKeySetID        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15063,14 +15167,14 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t groupKeySetID;
-    GroupKeySecurityPolicy securityPolicy;
+    uint16_t groupKeySetID                = static_cast<uint16_t>(0);
+    GroupKeySecurityPolicy securityPolicy = static_cast<GroupKeySecurityPolicy>(0);
     chip::ByteSpan epochKey0;
-    uint64_t epochStartTime0;
+    uint64_t epochStartTime0 = static_cast<uint64_t>(0);
     chip::ByteSpan epochKey1;
-    uint64_t epochStartTime1;
+    uint64_t epochStartTime1 = static_cast<uint64_t>(0);
     chip::ByteSpan epochKey2;
-    uint64_t epochStartTime2;
+    uint64_t epochStartTime2 = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15808,7 +15912,6 @@ struct TypeInfo
 namespace Events {
 namespace StateChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -15819,7 +15922,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue = static_cast<bool>(0);
@@ -15831,7 +15934,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::StateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue = static_cast<bool>(0);
@@ -15847,17 +15950,17 @@ namespace Structs {
 namespace ModeOptionStruct {
 enum class Fields
 {
-    kLabel       = 1,
-    kMode        = 2,
-    kSemanticTag = 3,
+    kLabel       = 0,
+    kMode        = 1,
+    kSemanticTag = 2,
 };
 
 struct Type
 {
 public:
     chip::CharSpan label;
-    uint8_t mode;
-    uint32_t semanticTag;
+    uint8_t mode         = static_cast<uint8_t>(0);
+    uint32_t semanticTag = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15869,15 +15972,15 @@ using DecodableType = Type;
 namespace SemanticTag {
 enum class Fields
 {
-    kMfgCode = 1,
-    kValue   = 2,
+    kMfgCode = 0,
+    kValue   = 1,
 };
 
 struct Type
 {
 public:
-    uint16_t mfgCode;
-    uint16_t value;
+    uint16_t mfgCode = static_cast<uint16_t>(0);
+    uint16_t value   = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16576,15 +16679,15 @@ namespace Structs {
 namespace DlCredential {
 enum class Fields
 {
-    kCredentialType  = 1,
-    kCredentialIndex = 2,
+    kCredentialType  = 0,
+    kCredentialIndex = 1,
 };
 
 struct Type
 {
 public:
-    DlCredentialType credentialType;
-    uint16_t credentialIndex;
+    DlCredentialType credentialType = static_cast<DlCredentialType>(0);
+    uint16_t credentialIndex        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -19078,7 +19181,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::LockState::TypeInfo::DecodableType lockState;
-        Attributes::LockType::TypeInfo::DecodableType lockType               = static_cast<DlLockType>(0);
+        Attributes::LockType::TypeInfo::DecodableType lockType = static_cast<chip::app::Clusters::DoorLock::DlLockType>(0);
         Attributes::ActuatorEnabled::TypeInfo::DecodableType actuatorEnabled = static_cast<bool>(0);
         Attributes::DoorState::TypeInfo::DecodableType doorState;
         Attributes::DoorOpenEvents::TypeInfo::DecodableType doorOpenEvents                           = static_cast<uint32_t>(0);
@@ -19101,11 +19204,12 @@ struct TypeInfo
         Attributes::CredentialRulesSupport::TypeInfo::DecodableType credentialRulesSupport = static_cast<uint8_t>(0);
         Attributes::EnableLogging::TypeInfo::DecodableType enableLogging                   = static_cast<bool>(0);
         Attributes::Language::TypeInfo::DecodableType language;
-        Attributes::LEDSettings::TypeInfo::DecodableType LEDSettings                         = static_cast<uint8_t>(0);
-        Attributes::AutoRelockTime::TypeInfo::DecodableType autoRelockTime                   = static_cast<uint32_t>(0);
-        Attributes::SoundVolume::TypeInfo::DecodableType soundVolume                         = static_cast<uint8_t>(0);
-        Attributes::OperatingMode::TypeInfo::DecodableType operatingMode                     = static_cast<DlOperatingMode>(0);
-        Attributes::SupportedOperatingModes::TypeInfo::DecodableType supportedOperatingModes = static_cast<uint16_t>(0);
+        Attributes::LEDSettings::TypeInfo::DecodableType LEDSettings       = static_cast<uint8_t>(0);
+        Attributes::AutoRelockTime::TypeInfo::DecodableType autoRelockTime = static_cast<uint32_t>(0);
+        Attributes::SoundVolume::TypeInfo::DecodableType soundVolume       = static_cast<uint8_t>(0);
+        Attributes::OperatingMode::TypeInfo::DecodableType operatingMode =
+            static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+        Attributes::SupportedOperatingModes::TypeInfo::DecodableType supportedOperatingModes           = static_cast<uint16_t>(0);
         Attributes::DefaultConfigurationRegister::TypeInfo::DecodableType defaultConfigurationRegister = static_cast<uint16_t>(0);
         Attributes::EnableLocalProgramming::TypeInfo::DecodableType enableLocalProgramming             = static_cast<bool>(0);
         Attributes::EnableOneTouchLocking::TypeInfo::DecodableType enableOneTouchLocking               = static_cast<bool>(0);
@@ -19134,7 +19238,6 @@ struct TypeInfo
 namespace Events {
 namespace DoorLockAlarm {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -19145,7 +19248,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DoorLockAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlAlarmCode alarmCode = static_cast<DlAlarmCode>(0);
@@ -19157,7 +19260,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DoorLockAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlAlarmCode alarmCode = static_cast<DlAlarmCode>(0);
@@ -19167,7 +19270,6 @@ public:
 } // namespace DoorLockAlarm
 namespace DoorStateChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -19178,7 +19280,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DoorStateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlDoorState doorState = static_cast<DlDoorState>(0);
@@ -19190,7 +19292,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DoorStateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlDoorState doorState = static_cast<DlDoorState>(0);
@@ -19200,7 +19302,6 @@ public:
 } // namespace DoorStateChange
 namespace LockOperation {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -19216,7 +19317,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
@@ -19233,7 +19334,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
@@ -19248,7 +19349,6 @@ public:
 } // namespace LockOperation
 namespace LockOperationError {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000003;
 
 enum class Fields
 {
@@ -19265,7 +19365,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
@@ -19283,7 +19383,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
@@ -19299,7 +19399,6 @@ public:
 } // namespace LockOperationError
 namespace LockUserChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000004;
 
 enum class Fields
 {
@@ -19316,7 +19415,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
@@ -19334,7 +19433,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
@@ -20675,7 +20774,6 @@ struct TypeInfo
 namespace Events {
 namespace SupplyVoltageLow {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000000;
 
 enum class Fields
 {
@@ -20685,7 +20783,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SupplyVoltageLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20695,7 +20793,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SupplyVoltageLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20703,7 +20801,6 @@ public:
 } // namespace SupplyVoltageLow
 namespace SupplyVoltageHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -20713,7 +20810,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SupplyVoltageHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20723,7 +20820,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SupplyVoltageHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20731,7 +20828,6 @@ public:
 } // namespace SupplyVoltageHigh
 namespace PowerMissingPhase {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000002;
 
 enum class Fields
 {
@@ -20741,7 +20837,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::PowerMissingPhase::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20751,7 +20847,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::PowerMissingPhase::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20759,7 +20855,6 @@ public:
 } // namespace PowerMissingPhase
 namespace SystemPressureLow {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000003;
 
 enum class Fields
 {
@@ -20769,7 +20864,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SystemPressureLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20779,7 +20874,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SystemPressureLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20787,7 +20882,6 @@ public:
 } // namespace SystemPressureLow
 namespace SystemPressureHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000004;
 
 enum class Fields
 {
@@ -20797,7 +20891,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SystemPressureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20807,7 +20901,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SystemPressureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20815,7 +20909,6 @@ public:
 } // namespace SystemPressureHigh
 namespace DryRunning {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000005;
 
 enum class Fields
 {
@@ -20825,7 +20918,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DryRunning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20835,7 +20928,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::DryRunning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20843,7 +20936,6 @@ public:
 } // namespace DryRunning
 namespace MotorTemperatureHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000006;
 
 enum class Fields
 {
@@ -20853,7 +20945,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::MotorTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20863,7 +20955,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::MotorTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20871,7 +20963,6 @@ public:
 } // namespace MotorTemperatureHigh
 namespace PumpMotorFatalFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000007;
 
 enum class Fields
 {
@@ -20881,7 +20972,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::PumpMotorFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20891,7 +20982,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::PumpMotorFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20899,7 +20990,6 @@ public:
 } // namespace PumpMotorFatalFailure
 namespace ElectronicTemperatureHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000008;
 
 enum class Fields
 {
@@ -20909,7 +20999,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ElectronicTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20919,7 +21009,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ElectronicTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20927,7 +21017,6 @@ public:
 } // namespace ElectronicTemperatureHigh
 namespace PumpBlocked {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x00000009;
 
 enum class Fields
 {
@@ -20937,7 +21026,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::PumpBlocked::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20947,7 +21036,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::PumpBlocked::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20955,7 +21044,6 @@ public:
 } // namespace PumpBlocked
 namespace SensorFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x0000000A;
 
 enum class Fields
 {
@@ -20965,7 +21053,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SensorFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20975,7 +21063,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::SensorFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20983,7 +21071,6 @@ public:
 } // namespace SensorFailure
 namespace ElectronicNonFatalFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x0000000B;
 
 enum class Fields
 {
@@ -20993,7 +21080,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ElectronicNonFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21003,7 +21090,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ElectronicNonFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21011,7 +21098,6 @@ public:
 } // namespace ElectronicNonFatalFailure
 namespace ElectronicFatalFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-static constexpr EventId kEventId             = 0x0000000C;
 
 enum class Fields
 {
@@ -21021,7 +21107,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ElectronicFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21031,7 +21117,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::ElectronicFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21039,7 +21125,6 @@ public:
 } // namespace ElectronicFatalFailure
 namespace GeneralFault {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x0000000D;
 
 enum class Fields
 {
@@ -21049,7 +21134,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::GeneralFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21059,7 +21144,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::GeneralFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21067,7 +21152,6 @@ public:
 } // namespace GeneralFault
 namespace Leakage {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x0000000E;
 
 enum class Fields
 {
@@ -21077,7 +21161,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::Leakage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21087,7 +21171,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::Leakage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21095,7 +21179,6 @@ public:
 } // namespace Leakage
 namespace AirDetection {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x0000000F;
 
 enum class Fields
 {
@@ -21105,7 +21188,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::AirDetection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21115,7 +21198,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::AirDetection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21123,7 +21206,6 @@ public:
 } // namespace AirDetection
 namespace TurbineOperation {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000010;
 
 enum class Fields
 {
@@ -21133,7 +21215,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::TurbineOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21143,7 +21225,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::TurbineOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -29159,15 +29241,15 @@ namespace Structs {
 namespace IasAceZoneStatusResult {
 enum class Fields
 {
-    kZoneId     = 1,
-    kZoneStatus = 2,
+    kZoneId     = 0,
+    kZoneStatus = 1,
 };
 
 struct Type
 {
 public:
-    uint8_t zoneId;
-    chip::BitFlags<IasZoneStatus> zoneStatus;
+    uint8_t zoneId                           = static_cast<uint8_t>(0);
+    chip::BitFlags<IasZoneStatus> zoneStatus = static_cast<chip::BitFlags<IasZoneStatus>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30295,18 +30377,18 @@ namespace Structs {
 namespace ChannelInfo {
 enum class Fields
 {
-    kMajorNumber       = 1,
-    kMinorNumber       = 2,
-    kName              = 3,
-    kCallSign          = 4,
-    kAffiliateCallSign = 5,
+    kMajorNumber       = 0,
+    kMinorNumber       = 1,
+    kName              = 2,
+    kCallSign          = 3,
+    kAffiliateCallSign = 4,
 };
 
 struct Type
 {
 public:
-    uint16_t majorNumber;
-    uint16_t minorNumber;
+    uint16_t majorNumber = static_cast<uint16_t>(0);
+    uint16_t minorNumber = static_cast<uint16_t>(0);
     chip::CharSpan name;
     chip::CharSpan callSign;
     chip::CharSpan affiliateCallSign;
@@ -30321,10 +30403,10 @@ using DecodableType = Type;
 namespace LineupInfo {
 enum class Fields
 {
-    kOperatorName   = 1,
-    kLineupName     = 2,
-    kPostalCode     = 3,
-    kLineupInfoType = 4,
+    kOperatorName   = 0,
+    kLineupName     = 1,
+    kPostalCode     = 2,
+    kLineupInfoType = 3,
 };
 
 struct Type
@@ -30333,7 +30415,7 @@ public:
     chip::CharSpan operatorName;
     chip::CharSpan lineupName;
     chip::CharSpan postalCode;
-    LineupInfoTypeEnum lineupInfoType;
+    LineupInfoTypeEnum lineupInfoType = static_cast<LineupInfoTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30613,14 +30695,14 @@ namespace Structs {
 namespace TargetInfo {
 enum class Fields
 {
-    kIdentifier = 1,
-    kName       = 2,
+    kIdentifier = 0,
+    kName       = 1,
 };
 
 struct Type
 {
 public:
-    uint8_t identifier;
+    uint8_t identifier = static_cast<uint8_t>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -30826,15 +30908,15 @@ namespace Structs {
 namespace PlaybackPosition {
 enum class Fields
 {
-    kUpdatedAt = 1,
-    kPosition  = 2,
+    kUpdatedAt = 0,
+    kPosition  = 1,
 };
 
 struct Type
 {
 public:
-    uint64_t updatedAt;
-    uint64_t position;
+    uint64_t updatedAt = static_cast<uint64_t>(0);
+    uint64_t position  = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -31396,9 +31478,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PlaybackState::TypeInfo::DecodableType playbackState = static_cast<PlaybackStateEnum>(0);
-        Attributes::StartTime::TypeInfo::DecodableType startTime         = static_cast<uint64_t>(0);
-        Attributes::Duration::TypeInfo::DecodableType duration           = static_cast<uint64_t>(0);
+        Attributes::PlaybackState::TypeInfo::DecodableType playbackState =
+            static_cast<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>(0);
+        Attributes::StartTime::TypeInfo::DecodableType startTime = static_cast<uint64_t>(0);
+        Attributes::Duration::TypeInfo::DecodableType duration   = static_cast<uint64_t>(0);
         Attributes::Position::TypeInfo::DecodableType position;
         Attributes::PlaybackSpeed::TypeInfo::DecodableType playbackSpeed   = static_cast<float>(0);
         Attributes::SeekRangeEnd::TypeInfo::DecodableType seekRangeEnd     = static_cast<uint64_t>(0);
@@ -31438,17 +31521,17 @@ namespace Structs {
 namespace InputInfo {
 enum class Fields
 {
-    kIndex       = 1,
-    kInputType   = 2,
-    kName        = 3,
-    kDescription = 4,
+    kIndex       = 0,
+    kInputType   = 1,
+    kName        = 2,
+    kDescription = 3,
 };
 
 struct Type
 {
 public:
-    uint8_t index;
-    InputTypeEnum inputType;
+    uint8_t index           = static_cast<uint8_t>(0);
+    InputTypeEnum inputType = static_cast<InputTypeEnum>(0);
     chip::CharSpan name;
     chip::CharSpan description;
 
@@ -32083,17 +32166,17 @@ namespace Structs {
 namespace Dimension {
 enum class Fields
 {
-    kWidth  = 1,
-    kHeight = 2,
-    kMetric = 3,
+    kWidth  = 0,
+    kHeight = 1,
+    kMetric = 2,
 };
 
 struct Type
 {
 public:
-    double width;
-    double height;
-    MetricTypeEnum metric;
+    double width          = static_cast<double>(0);
+    double height         = static_cast<double>(0);
+    MetricTypeEnum metric = static_cast<MetricTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32105,8 +32188,8 @@ using DecodableType = Type;
 namespace AdditionalInfo {
 enum class Fields
 {
-    kName  = 1,
-    kValue = 2,
+    kName  = 0,
+    kValue = 1,
 };
 
 struct Type
@@ -32125,15 +32208,15 @@ using DecodableType = Type;
 namespace Parameter {
 enum class Fields
 {
-    kType           = 1,
-    kValue          = 2,
-    kExternalIDList = 3,
+    kType           = 0,
+    kValue          = 1,
+    kExternalIDList = 2,
 };
 
 struct Type
 {
 public:
-    ParameterEnum type;
+    ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
     DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
 
@@ -32143,7 +32226,7 @@ public:
 struct DecodableType
 {
 public:
-    ParameterEnum type;
+    ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
     DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32153,7 +32236,7 @@ public:
 namespace ContentSearch {
 enum class Fields
 {
-    kParameterList = 1,
+    kParameterList = 0,
 };
 
 struct Type
@@ -32175,9 +32258,9 @@ public:
 namespace StyleInformation {
 enum class Fields
 {
-    kImageUrl = 1,
-    kColor    = 2,
-    kSize     = 3,
+    kImageUrl = 0,
+    kColor    = 1,
+    kSize     = 2,
 };
 
 struct Type
@@ -32197,12 +32280,12 @@ using DecodableType = Type;
 namespace BrandingInformation {
 enum class Fields
 {
-    kProviderName = 1,
-    kBackground   = 2,
-    kLogo         = 3,
-    kProgressBar  = 4,
-    kSplash       = 5,
-    kWaterMark    = 6,
+    kProviderName = 0,
+    kBackground   = 1,
+    kLogo         = 2,
+    kProgressBar  = 3,
+    kSplash       = 4,
+    kWaterMark    = 5,
 };
 
 struct Type
@@ -32460,16 +32543,16 @@ namespace Structs {
 namespace OutputInfo {
 enum class Fields
 {
-    kIndex      = 1,
-    kOutputType = 2,
-    kName       = 3,
+    kIndex      = 0,
+    kOutputType = 1,
+    kName       = 2,
 };
 
 struct Type
 {
 public:
-    uint8_t index;
-    OutputTypeEnum outputType;
+    uint8_t index             = static_cast<uint8_t>(0);
+    OutputTypeEnum outputType = static_cast<OutputTypeEnum>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32673,14 +32756,14 @@ namespace Structs {
 namespace ApplicationLauncherApplication {
 enum class Fields
 {
-    kCatalogVendorId = 1,
-    kApplicationId   = 2,
+    kCatalogVendorId = 0,
+    kApplicationId   = 1,
 };
 
 struct Type
 {
 public:
-    uint16_t catalogVendorId;
+    uint16_t catalogVendorId = static_cast<uint16_t>(0);
     chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32693,8 +32776,8 @@ using DecodableType = Type;
 namespace ApplicationEP {
 enum class Fields
 {
-    kApplication = 1,
-    kEndpoint    = 2,
+    kApplication = 0,
+    kEndpoint    = 1,
 };
 
 struct Type
@@ -32968,14 +33051,14 @@ namespace Structs {
 namespace ApplicationBasicApplication {
 enum class Fields
 {
-    kCatalogVendorId = 1,
-    kApplicationId   = 2,
+    kCatalogVendorId = 0,
+    kApplicationId   = 1,
 };
 
 struct Type
 {
 public:
-    uint16_t catalogVendorId;
+    uint16_t catalogVendorId = static_cast<uint16_t>(0);
     chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33135,7 +33218,8 @@ struct TypeInfo
         Attributes::ApplicationName::TypeInfo::DecodableType applicationName;
         Attributes::ProductId::TypeInfo::DecodableType productId = static_cast<uint16_t>(0);
         Attributes::ApplicationApp::TypeInfo::DecodableType applicationApp;
-        Attributes::ApplicationStatus::TypeInfo::DecodableType applicationStatus = static_cast<ApplicationStatusEnum>(0);
+        Attributes::ApplicationStatus::TypeInfo::DecodableType applicationStatus =
+            static_cast<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>(0);
         Attributes::ApplicationVersion::TypeInfo::DecodableType applicationVersion;
         Attributes::AllowedVendorList::TypeInfo::DecodableType allowedVendorList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -33378,27 +33462,27 @@ namespace Structs {
 namespace SimpleStruct {
 enum class Fields
 {
-    kA = 1,
-    kB = 2,
-    kC = 3,
-    kD = 4,
-    kE = 5,
-    kF = 6,
-    kG = 7,
-    kH = 8,
+    kA = 0,
+    kB = 1,
+    kC = 2,
+    kD = 3,
+    kE = 4,
+    kF = 5,
+    kG = 6,
+    kH = 7,
 };
 
 struct Type
 {
 public:
-    uint8_t a;
-    bool b;
-    SimpleEnum c;
+    uint8_t a    = static_cast<uint8_t>(0);
+    bool b       = static_cast<bool>(0);
+    SimpleEnum c = static_cast<SimpleEnum>(0);
     chip::ByteSpan d;
     chip::CharSpan e;
-    chip::BitFlags<SimpleBitmap> f;
-    float g;
-    double h;
+    chip::BitFlags<SimpleBitmap> f = static_cast<chip::BitFlags<SimpleBitmap>>(0);
+    float g                        = static_cast<float>(0);
+    double h                       = static_cast<double>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -33410,18 +33494,18 @@ using DecodableType = Type;
 namespace NullablesAndOptionalsStruct {
 enum class Fields
 {
-    kNullableInt            = 1,
-    kOptionalInt            = 2,
-    kNullableOptionalInt    = 3,
-    kNullableString         = 4,
-    kOptionalString         = 5,
-    kNullableOptionalString = 6,
-    kNullableStruct         = 7,
-    kOptionalStruct         = 8,
-    kNullableOptionalStruct = 9,
-    kNullableList           = 10,
-    kOptionalList           = 11,
-    kNullableOptionalList   = 12,
+    kNullableInt            = 0,
+    kOptionalInt            = 1,
+    kNullableOptionalInt    = 2,
+    kNullableString         = 3,
+    kOptionalString         = 4,
+    kNullableOptionalString = 5,
+    kNullableStruct         = 6,
+    kOptionalStruct         = 7,
+    kNullableOptionalStruct = 8,
+    kNullableList           = 9,
+    kOptionalList           = 10,
+    kNullableOptionalList   = 11,
 };
 
 struct Type
@@ -33465,16 +33549,16 @@ public:
 namespace NestedStruct {
 enum class Fields
 {
-    kA = 1,
-    kB = 2,
-    kC = 3,
+    kA = 0,
+    kB = 1,
+    kC = 2,
 };
 
 struct Type
 {
 public:
-    uint8_t a;
-    bool b;
+    uint8_t a = static_cast<uint8_t>(0);
+    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::Type c;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33487,20 +33571,20 @@ using DecodableType = Type;
 namespace NestedStructList {
 enum class Fields
 {
-    kA = 1,
-    kB = 2,
-    kC = 3,
-    kD = 4,
-    kE = 5,
-    kF = 6,
-    kG = 7,
+    kA = 0,
+    kB = 1,
+    kC = 2,
+    kD = 3,
+    kE = 4,
+    kF = 5,
+    kG = 6,
 };
 
 struct Type
 {
 public:
-    uint8_t a;
-    bool b;
+    uint8_t a = static_cast<uint8_t>(0);
+    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::Type c;
     DataModel::List<const Structs::SimpleStruct::Type> d;
     DataModel::List<const uint32_t> e;
@@ -33513,8 +33597,8 @@ public:
 struct DecodableType
 {
 public:
-    uint8_t a;
-    bool b;
+    uint8_t a = static_cast<uint8_t>(0);
+    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::DecodableType c;
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
@@ -33527,7 +33611,7 @@ public:
 namespace DoubleNestedStructList {
 enum class Fields
 {
-    kA = 1,
+    kA = 0,
 };
 
 struct Type
@@ -33546,17 +33630,36 @@ public:
 };
 
 } // namespace DoubleNestedStructList
-namespace TestListStructOctet {
+namespace TestFabricScoped {
 enum class Fields
 {
-    kFabricIndex     = 1,
-    kOperationalCert = 2,
+    kFabricIndex = 0,
 };
 
 struct Type
 {
 public:
-    uint64_t fabricIndex;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
+};
+
+using DecodableType = Type;
+
+} // namespace TestFabricScoped
+namespace TestListStructOctet {
+enum class Fields
+{
+    kFabricIndex     = 0,
+    kOperationalCert = 1,
+};
+
+struct Type
+{
+public:
+    uint64_t fabricIndex = static_cast<uint64_t>(0);
     chip::ByteSpan operationalCert;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -35430,6 +35533,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ListLongOctetString
+namespace ListFabricScoped {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListFabricScoped::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ListFabricScoped
 namespace TimedWriteBoolean {
 struct TypeInfo
 {
@@ -35932,13 +36049,14 @@ struct TypeInfo
         Attributes::EpochS::TypeInfo::DecodableType epochS     = static_cast<uint32_t>(0);
         Attributes::VendorId::TypeInfo::DecodableType vendorId = static_cast<chip::VendorId>(0);
         Attributes::ListNullablesAndOptionalsStruct::TypeInfo::DecodableType listNullablesAndOptionalsStruct;
-        Attributes::EnumAttr::TypeInfo::DecodableType enumAttr = static_cast<SimpleEnum>(0);
+        Attributes::EnumAttr::TypeInfo::DecodableType enumAttr = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(0);
         Attributes::StructAttr::TypeInfo::DecodableType structAttr;
         Attributes::RangeRestrictedInt8u::TypeInfo::DecodableType rangeRestrictedInt8u   = static_cast<uint8_t>(0);
         Attributes::RangeRestrictedInt8s::TypeInfo::DecodableType rangeRestrictedInt8s   = static_cast<int8_t>(0);
         Attributes::RangeRestrictedInt16u::TypeInfo::DecodableType rangeRestrictedInt16u = static_cast<uint16_t>(0);
         Attributes::RangeRestrictedInt16s::TypeInfo::DecodableType rangeRestrictedInt16s = static_cast<int16_t>(0);
         Attributes::ListLongOctetString::TypeInfo::DecodableType listLongOctetString;
+        Attributes::ListFabricScoped::TypeInfo::DecodableType listFabricScoped;
         Attributes::TimedWriteBoolean::TypeInfo::DecodableType timedWriteBoolean = static_cast<bool>(0);
         Attributes::Unsupported::TypeInfo::DecodableType unsupported             = static_cast<bool>(0);
         Attributes::NullableBoolean::TypeInfo::DecodableType nullableBoolean;
@@ -35983,7 +36101,6 @@ struct TypeInfo
 namespace Events {
 namespace TestEvent {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
 {
@@ -35999,7 +36116,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::TestEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1    = static_cast<uint8_t>(0);
@@ -36016,7 +36133,7 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::TestEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1    = static_cast<uint8_t>(0);

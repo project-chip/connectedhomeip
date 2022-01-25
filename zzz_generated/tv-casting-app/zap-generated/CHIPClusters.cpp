@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ CHIP_ERROR AccountLoginCluster::GetSetupPINRequest(Callback::Cancelable * onSucc
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -110,7 +110,7 @@ CHIP_ERROR AccountLoginCluster::LoginRequest(Callback::Cancelable * onSuccessCal
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -148,7 +148,7 @@ CHIP_ERROR AccountLoginCluster::LogoutRequest(Callback::Cancelable * onSuccessCa
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -195,7 +195,7 @@ CHIP_ERROR ApplicationLauncherCluster::HideAppRequest(Callback::Cancelable * onS
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -242,7 +242,7 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * o
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -286,7 +286,7 @@ CHIP_ERROR ApplicationLauncherCluster::StopAppRequest(Callback::Cancelable * onS
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -330,7 +330,7 @@ CHIP_ERROR AudioOutputCluster::RenameOutputRequest(Callback::Cancelable * onSucc
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -371,7 +371,7 @@ CHIP_ERROR AudioOutputCluster::SelectOutputRequest(Callback::Cancelable * onSucc
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -417,7 +417,7 @@ CHIP_ERROR ChannelCluster::ChangeChannelByNumberRequest(Callback::Cancelable * o
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -458,7 +458,7 @@ CHIP_ERROR ChannelCluster::ChangeChannelRequest(Callback::Cancelable * onSuccess
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -499,7 +499,7 @@ CHIP_ERROR ChannelCluster::SkipChannelRequest(Callback::Cancelable * onSuccessCa
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -545,7 +545,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchContentRequest(Callback::Cancelable * o
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -591,7 +591,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchURLRequest(Callback::Cancelable * onSuc
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -633,7 +633,7 @@ CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCa
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -673,7 +673,7 @@ CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSu
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -716,7 +716,7 @@ CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSucces
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -757,7 +757,7 @@ CHIP_ERROR MediaInputCluster::SelectInputRequest(Callback::Cancelable * onSucces
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -796,7 +796,7 @@ CHIP_ERROR MediaInputCluster::ShowInputStatusRequest(Callback::Cancelable * onSu
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -836,7 +836,7 @@ CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuc
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -874,7 +874,7 @@ CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCal
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -912,7 +912,7 @@ CHIP_ERROR MediaPlaybackCluster::PauseRequest(Callback::Cancelable * onSuccessCa
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -950,7 +950,7 @@ CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCal
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -988,7 +988,7 @@ CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSucces
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1026,7 +1026,7 @@ CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessC
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1067,7 +1067,7 @@ CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCal
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1108,7 +1108,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSu
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1149,7 +1149,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1188,7 +1188,7 @@ CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSucce
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1226,7 +1226,7 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.
@@ -1272,7 +1272,7 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
     // now.

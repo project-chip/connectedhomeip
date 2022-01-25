@@ -136,20 +136,30 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::ChannelLineup::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadLineupAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::CurrentChannel::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentChannelAttribute(aEncoder, delegate);
     }
     default: {

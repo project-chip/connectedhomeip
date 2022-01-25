@@ -147,6 +147,10 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
     if (isDelegateNull(delegate, endpoint))
     {
+        if (aPath.mAttributeId == Attributes::AllowedVendorList::Id)
+        {
+            return aEncoder.EncodeEmptyList();
+        }
         return CHIP_NO_ERROR;
     }
 

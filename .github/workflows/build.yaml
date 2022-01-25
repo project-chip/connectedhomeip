@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.48
+            image: connectedhomeip/chip-build:0.5.50
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -90,6 +90,11 @@ jobs:
             - name: Run Build Without Progress Logging
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Setup Build Without Error Logging
+              run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
+            - name: Run Build Without Error Logging
+              timeout-minutes: 20
+              run: scripts/run_in_build_env.sh "ninja -C ./out"
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, mbedtls, simulated)
         timeout-minutes: 90
@@ -98,7 +103,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.48
+            image: connectedhomeip/chip-build:0.5.50
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -118,11 +123,11 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/init@v1
-              with:
-                 languages: "cpp"
+            # - name: Initialize CodeQL
+            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #   uses: github/codeql-action/init@v1
+            #   with:
+            #      languages: "cpp"
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -187,15 +192,15 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove dbus binaries for CodeQL Analysis
-              run: find out -type d -name "dbus" -exec rm -rf {} +
-            - name: Remove nrfxlib binaries for CodeQL Analysis
-              run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/analyze@v1
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find out -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove dbus binaries for CodeQL Analysis
+            #   run: find out -type d -name "dbus" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #   uses: github/codeql-action/analyze@v1
     build_linux_python_lib:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
@@ -204,7 +209,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.48
+            image: connectedhomeip/chip-build:0.5.50
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -249,11 +254,11 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/init@v1
-              with:
-                 languages: "cpp"
+            #- name: Initialize CodeQL
+            #  if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #  uses: github/codeql-action/init@v1
+            #  with:
+            #     languages: "cpp"
             - name: Setup Environment
               run: brew install openssl pkg-config
             - name: Try to ensure the directory for diagnostic log collection exists
@@ -308,9 +313,9 @@ jobs:
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/analyze@v1
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #   uses: github/codeql-action/analyze@v1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

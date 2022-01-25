@@ -187,8 +187,11 @@ JNI_METHOD(void, commissionDevice)
     ChipLogProgress(Controller, "commissionDevice() called");
 
     CommissioningParameters commissioningParams = CommissioningParameters();
-    err                                         = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    if (networkCredentials != nullptr)
+    {
+        err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     if (csrNonce != nullptr)
     {
@@ -239,7 +242,7 @@ JNI_METHOD(void, pairDevice)
 }
 
 JNI_METHOD(void, pairDeviceWithAddress)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jint pinCode,
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jlong pinCode,
  jbyteArray csrNonce)
 {
     chip::DeviceLayer::StackLock lock;

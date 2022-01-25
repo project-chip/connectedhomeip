@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2372,6 +2372,43 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeThreadNetworkDiagnosticsInteractionInfo =
         new LinkedHashMap<>();
     writeAttributeMap.put("threadNetworkDiagnostics", writeThreadNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeTimeFormatLocalizationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeTimeFormatLocalizationHourFormatCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo timeFormatLocalizationhourFormatCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeTimeFormatLocalizationHourFormatCommandParams.put(
+        "value", timeFormatLocalizationhourFormatCommandParameterInfo);
+    InteractionInfo writeTimeFormatLocalizationHourFormatAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .writeHourFormatAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTimeFormatLocalizationHourFormatCommandParams);
+    writeTimeFormatLocalizationInteractionInfo.put(
+        "writeHourFormatAttribute", writeTimeFormatLocalizationHourFormatAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTimeFormatLocalizationActiveCalendarTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo timeFormatLocalizationactiveCalendarTypeCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeTimeFormatLocalizationActiveCalendarTypeCommandParams.put(
+        "value", timeFormatLocalizationactiveCalendarTypeCommandParameterInfo);
+    InteractionInfo writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeFormatLocalizationCluster) cluster)
+                  .writeActiveCalendarTypeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTimeFormatLocalizationActiveCalendarTypeCommandParams);
+    writeTimeFormatLocalizationInteractionInfo.put(
+        "writeActiveCalendarTypeAttribute",
+        writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo);
+    writeAttributeMap.put("timeFormatLocalization", writeTimeFormatLocalizationInteractionInfo);
     Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();

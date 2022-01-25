@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public:
         printf("Test_TC_BI_2_2\n");
         printf("Test_TC_BOOL_1_1\n");
         printf("Test_TC_BOOL_2_1\n");
+        printf("Test_TC_BRAC_1_1\n");
         printf("Test_TC_CC_1_1\n");
         printf("Test_TC_CC_2_1\n");
         printf("Test_TC_CC_3_1\n");
@@ -69,6 +70,8 @@ public:
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_2_2\n");
         printf("Test_TC_EMR_1_1\n");
+        printf("Test_TC_ETHDIAG_1_1\n");
+        printf("Test_TC_ETHDIAG_2_1\n");
         printf("Test_TC_FLW_1_1\n");
         printf("Test_TC_FLW_2_1\n");
         printf("Test_TC_FLW_2_2\n");
@@ -111,6 +114,7 @@ public:
         printf("Test_TC_OO_2_1\n");
         printf("Test_TC_OO_2_2\n");
         printf("Test_TC_OO_2_3\n");
+        printf("Test_TC_PS_1_1\n");
         printf("Test_TC_PRS_1_1\n");
         printf("Test_TC_PRS_2_1\n");
         printf("Test_TC_PCC_1_1\n");
@@ -120,6 +124,8 @@ public:
         printf("Test_TC_RH_1_1\n");
         printf("Test_TC_RH_2_1\n");
         printf("Test_TC_RH_2_2\n");
+        printf("Test_TC_SWTCH_2_1\n");
+        printf("Test_TC_SWTCH_2_2\n");
         printf("Test_TC_TM_1_1\n");
         printf("Test_TC_TM_2_1\n");
         printf("Test_TC_TM_2_2\n");
@@ -130,6 +136,8 @@ public:
         printf("Test_TC_TSUIC_2_1\n");
         printf("Test_TC_TSUIC_2_2\n");
         printf("Test_TC_DIAGTH_1_1\n");
+        printf("Test_TC_WIFIDIAG_1_1\n");
+        printf("Test_TC_WIFIDIAG_3_1\n");
         printf("Test_TC_WNCV_1_1\n");
         printf("Test_TC_WNCV_2_1\n");
         printf("Test_TC_WNCV_2_2\n");
@@ -1587,6 +1595,140 @@ private:
     {
         VerifyOrReturn(CheckValue("stateValue", stateValue, 0));
 
+        NextTest();
+    }
+};
+
+class Test_TC_BRAC_1_1 : public TestCommand
+{
+public:
+    Test_TC_BRAC_1_1() : TestCommand("Test_TC_BRAC_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BRAC_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BRAC_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BRAC_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_BRAC_1_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_BRAC_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_BRAC_1_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_BRAC_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BridgedActionsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BridgedActionsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
         NextTest();
     }
 };
@@ -16065,7 +16207,7 @@ private:
             VerifyOrReturn(CheckValueAsString("fabricsList[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(fabricsList)>("fabricsList", iter_0, 1));
         }
-
+        VerifyOrReturn(CheckConstraintType("fabricsList", "", "list"));
         NextTest();
     }
 
@@ -16086,7 +16228,7 @@ private:
     void OnSuccessResponse_2(uint8_t supportedFabrics)
     {
         VerifyOrReturn(CheckValue("supportedFabrics", supportedFabrics, 16));
-
+        VerifyOrReturn(CheckConstraintType("supportedFabrics", "", "uint8"));
         NextTest();
     }
 
@@ -16107,7 +16249,7 @@ private:
     void OnSuccessResponse_3(uint8_t commissionedFabrics)
     {
         VerifyOrReturn(CheckValue("commissionedFabrics", commissionedFabrics, 1));
-
+        VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
         NextTest();
     }
 
@@ -16335,6 +16477,140 @@ private:
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 3U));
 
         NextTest();
+    }
+};
+
+class Test_TC_ETHDIAG_1_1 : public TestCommand
+{
+public:
+    Test_TC_ETHDIAG_1_1() : TestCommand("Test_TC_ETHDIAG_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_ETHDIAG_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ETHDIAG_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ETHDIAG_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+};
+
+class Test_TC_ETHDIAG_2_1 : public TestCommand
+{
+public:
+    Test_TC_ETHDIAG_2_1() : TestCommand("Test_TC_ETHDIAG_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_ETHDIAG_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ETHDIAG_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ETHDIAG_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
     }
 };
 
@@ -17893,7 +18169,7 @@ private:
     void OnSuccessResponse_3(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
-
+        VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
         NextTest();
     }
 
@@ -17913,7 +18189,7 @@ private:
     void OnSuccessResponse_4(uint16_t remainingTime)
     {
         VerifyOrReturn(CheckValue("remainingTime", remainingTime, 0U));
-
+        VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
         NextTest();
     }
 
@@ -17933,7 +18209,7 @@ private:
     void OnSuccessResponse_5(uint8_t minLevel)
     {
         VerifyOrReturn(CheckValue("minLevel", minLevel, 0));
-
+        VerifyOrReturn(CheckConstraintType("minLevel", "", "uint8"));
         NextTest();
     }
 
@@ -17972,7 +18248,7 @@ private:
     void OnSuccessResponse_7(uint16_t currentFrequency)
     {
         VerifyOrReturn(CheckValue("currentFrequency", currentFrequency, 0U));
-
+        VerifyOrReturn(CheckConstraintType("currentFrequency", "", "uint16"));
         NextTest();
     }
 
@@ -17992,7 +18268,7 @@ private:
     void OnSuccessResponse_8(uint16_t minFrequency)
     {
         VerifyOrReturn(CheckValue("minFrequency", minFrequency, 0U));
-
+        VerifyOrReturn(CheckConstraintType("minFrequency", "", "uint16"));
         NextTest();
     }
 
@@ -18012,7 +18288,7 @@ private:
     void OnSuccessResponse_9(uint16_t maxFrequency)
     {
         VerifyOrReturn(CheckValue("maxFrequency", maxFrequency, 0U));
-
+        VerifyOrReturn(CheckConstraintType("maxFrequency", "", "uint16"));
         NextTest();
     }
 
@@ -18032,7 +18308,7 @@ private:
     void OnSuccessResponse_10(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
-
+        VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18128,7 +18404,7 @@ private:
     void OnSuccessResponse_15(uint8_t options)
     {
         VerifyOrReturn(CheckValue("options", options, 0));
-
+        VerifyOrReturn(CheckConstraintType("options", "", "map8"));
         NextTest();
     }
 };
@@ -18404,7 +18680,7 @@ private:
     void OnSuccessResponse_1(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
-
+        VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18442,7 +18718,7 @@ private:
     void OnSuccessResponse_3(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 10U));
-
+        VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18500,7 +18776,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("onLevel", onLevel));
         VerifyOrReturn(CheckValue("onLevel.Value()", onLevel.Value(), 254));
-
+        VerifyOrReturn(CheckConstraintType("onLevel", "", "uint8"));
         NextTest();
     }
 
@@ -18540,7 +18816,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("onTransitionTime", onTransitionTime));
         VerifyOrReturn(CheckValue("onTransitionTime.Value()", onTransitionTime.Value(), 100U));
-
+        VerifyOrReturn(CheckConstraintType("onTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18580,7 +18856,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("offTransitionTime", offTransitionTime));
         VerifyOrReturn(CheckValue("offTransitionTime.Value()", offTransitionTime.Value(), 100U));
-
+        VerifyOrReturn(CheckConstraintType("offTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18601,7 +18877,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
         VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 0));
-
+        VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
         NextTest();
     }
 
@@ -18641,7 +18917,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
         VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 100));
-
+        VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
         NextTest();
     }
 
@@ -18681,7 +18957,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("startUpCurrentLevel", startUpCurrentLevel));
         VerifyOrReturn(CheckValue("startUpCurrentLevel.Value()", startUpCurrentLevel.Value(), 254));
-
+        VerifyOrReturn(CheckConstraintType("startUpCurrentLevel", "", "uint8"));
         NextTest();
     }
 };
@@ -22717,7 +22993,7 @@ private:
     void OnSuccessResponse_3(uint16_t vendorId)
     {
         VerifyOrReturn(CheckValue("vendorId", vendorId, 0U));
-
+        VerifyOrReturn(CheckConstraintType("vendorId", "", "vendor-id"));
         NextTest();
     }
 
@@ -26599,6 +26875,241 @@ private:
     void OnSuccessResponse_46() { NextTest(); }
 };
 
+class Test_TC_PS_1_1 : public TestCommand
+{
+public:
+    Test_TC_PS_1_1() : TestCommand("Test_TC_PS_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_PS_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PS_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PS_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    {
+        (static_cast<Test_TC_PS_1_1 *>(context))->OnSuccessResponse_5(attributeList);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PowerSourceClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PowerSourceClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PowerSourceClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PowerSourceClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PowerSourceClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::AttributeList::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    {
+        VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+        NextTest();
+    }
+};
+
 class Test_TC_PRS_1_1 : public TestCommand
 {
 public:
@@ -30179,6 +30690,762 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
+    }
+};
+
+class Test_TC_SWTCH_2_1 : public TestCommand
+{
+public:
+    Test_TC_SWTCH_2_1() : TestCommand("Test_TC_SWTCH_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SWTCH_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWTCH_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWTCH_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read NumberOfPositions attribute\n");
+            err = TestReadNumberOfPositionsAttribute_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read NumberOfPositions attribute\n");
+            err = TestReadNumberOfPositionsAttribute_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read CurrentPosition attribute\n");
+            err = TestReadCurrentPositionAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read CurrentPosition attribute\n");
+            err = TestReadCurrentPositionAttribute_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read MultiPressMax attribute\n");
+            err = TestReadMultiPressMaxAttribute_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read MultiPressMax attribute\n");
+            err = TestReadMultiPressMaxAttribute_6();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 7;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t numberOfPositions)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnSuccessResponse_1(numberOfPositions);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t numberOfPositions)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnSuccessResponse_2(numberOfPositions);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t currentPosition)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnSuccessResponse_3(currentPosition);
+    }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t currentPosition)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnSuccessResponse_4(currentPosition);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint8_t multiPressMax)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnSuccessResponse_5(multiPressMax);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t multiPressMax)
+    {
+        (static_cast<Test_TC_SWTCH_2_1 *>(context))->OnSuccessResponse_6(multiPressMax);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadNumberOfPositionsAttribute_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t numberOfPositions)
+    {
+        VerifyOrReturn(CheckValue("numberOfPositions", numberOfPositions, 2));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadNumberOfPositionsAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t numberOfPositions)
+    {
+        VerifyOrReturn(CheckConstraintType("numberOfPositions", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numberOfPositions", numberOfPositions, 2));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadCurrentPositionAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t currentPosition)
+    {
+        VerifyOrReturn(CheckValue("currentPosition", currentPosition, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadCurrentPositionAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t currentPosition)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPosition", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentPosition", currentPosition, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadMultiPressMaxAttribute_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::MultiPressMax::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t multiPressMax)
+    {
+        VerifyOrReturn(CheckValue("multiPressMax", multiPressMax, 2));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadMultiPressMaxAttribute_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::MultiPressMax::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t multiPressMax)
+    {
+        VerifyOrReturn(CheckConstraintType("multiPressMax", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("multiPressMax", multiPressMax, 2));
+        NextTest();
+    }
+};
+
+class Test_TC_SWTCH_2_2 : public TestCommand
+{
+public:
+    Test_TC_SWTCH_2_2() : TestCommand("Test_TC_SWTCH_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SWTCH_2_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWTCH_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWTCH_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : User interaction needed\n");
+            err = TestUserInteractionNeeded_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : User interaction needed\n");
+            err = TestUserInteractionNeeded_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read CurrentPosition attribute\n");
+            err = TestReadCurrentPositionAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : User interaction needed\n");
+            err = TestUserInteractionNeeded_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : User interaction needed\n");
+            err = TestUserInteractionNeeded_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : User interaction needed\n");
+            err = TestUserInteractionNeeded_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read CurrentPosition attribute\n");
+            err = TestReadCurrentPositionAttribute_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : User interaction needed\n");
+            err = TestUserInteractionNeeded_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : User interaction needed\n");
+            err = TestUserInteractionNeeded_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : User interaction needed\n");
+            err = TestUserInteractionNeeded_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : User interaction needed\n");
+            err = TestUserInteractionNeeded_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : User interaction needed\n");
+            err = TestUserInteractionNeeded_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : User interaction needed\n");
+            err = TestUserInteractionNeeded_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : User interaction needed\n");
+            err = TestUserInteractionNeeded_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Wait 3000ms\n");
+            err = TestWait3000ms_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : User interaction needed\n");
+            err = TestUserInteractionNeeded_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : User interaction needed\n");
+            err = TestUserInteractionNeeded_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : User interaction needed\n");
+            err = TestUserInteractionNeeded_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : User interaction needed\n");
+            err = TestUserInteractionNeeded_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : User interaction needed\n");
+            err = TestUserInteractionNeeded_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : User interaction needed\n");
+            err = TestUserInteractionNeeded_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Wait 3000ms\n");
+            err = TestWait3000ms_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : User interaction needed\n");
+            err = TestUserInteractionNeeded_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : User interaction needed\n");
+            err = TestUserInteractionNeeded_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : User interaction needed\n");
+            err = TestUserInteractionNeeded_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : User interaction needed\n");
+            err = TestUserInteractionNeeded_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : User interaction needed\n");
+            err = TestUserInteractionNeeded_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : User interaction needed\n");
+            err = TestUserInteractionNeeded_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : User interaction needed\n");
+            err = TestUserInteractionNeeded_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : User interaction needed\n");
+            err = TestUserInteractionNeeded_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : User interaction needed\n");
+            err = TestUserInteractionNeeded_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : User interaction needed\n");
+            err = TestUserInteractionNeeded_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : User interaction needed\n");
+            err = TestUserInteractionNeeded_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : User interaction needed\n");
+            err = TestUserInteractionNeeded_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : User interaction needed\n");
+            err = TestUserInteractionNeeded_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : User interaction needed\n");
+            err = TestUserInteractionNeeded_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : User interaction needed\n");
+            err = TestUserInteractionNeeded_37();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 38;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_2 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t currentPosition)
+    {
+        (static_cast<Test_TC_SWTCH_2_2 *>(context))->OnSuccessResponse_3(currentPosition);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_SWTCH_2_2 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint8_t currentPosition)
+    {
+        (static_cast<Test_TC_SWTCH_2_2 *>(context))->OnSuccessResponse_7(currentPosition);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Set up subscription to SwitchLatched event");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator sets switch to first position");
+    }
+
+    CHIP_ERROR TestReadCurrentPositionAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t currentPosition)
+    {
+        VerifyOrReturn(CheckValue("currentPosition", currentPosition, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator sets switch to second position");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Set up subscription to InitialPress event");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator does not operate switch");
+    }
+
+    CHIP_ERROR TestReadCurrentPositionAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SwitchClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint8_t currentPosition)
+    {
+        VerifyOrReturn(CheckValue("currentPosition", currentPosition, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator sets switch to second position");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_9()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator does not operate switch (release switch)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Set up subscription to InitialPress and ShortRelease events");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_11()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator does not operate switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_13()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch for 5 seconds");
+    }
+
+    CHIP_ERROR TestWait3000ms_15()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_16()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_17()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Set up subscription to InitialPress, LongPress, ShortRelease, LongRelease events");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_18()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator does not operate switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_19()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_21()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch for 5 seconds");
+    }
+
+    CHIP_ERROR TestWait3000ms_22()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_23()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_24()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Set up subscription to InitialPress, ShortRelease, MultiPressOngoing, MultiPressComplete events");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_25()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator does not operate switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_26()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_27()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_28()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_29()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_30()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch again (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_31()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_32()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch again (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_33()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_34()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch again (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_35()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_36()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator operates switch again (press briefly)");
+    }
+
+    CHIP_ERROR TestUserInteractionNeeded_37()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Operator releases switch");
     }
 };
 
@@ -33957,7 +35224,9 @@ private:
     void OnSuccessResponse_1(int16_t occupiedCoolingSetpoint)
     {
         VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
-
+        VerifyOrReturn(CheckConstraintType("occupiedCoolingSetpoint", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
         NextTest();
     }
 
@@ -34051,7 +35320,9 @@ private:
     void OnSuccessResponse_6(int16_t occupiedHeatingSetpoint)
     {
         VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2000));
-
+        VerifyOrReturn(CheckConstraintType("occupiedHeatingSetpoint", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 700));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 3000));
         NextTest();
     }
 
@@ -34145,7 +35416,9 @@ private:
     void OnSuccessResponse_11(int16_t minHeatSetpointLimit)
     {
         VerifyOrReturn(CheckValue("minHeatSetpointLimit", minHeatSetpointLimit, 700));
-
+        VerifyOrReturn(CheckConstraintType("minHeatSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -34239,7 +35512,9 @@ private:
     void OnSuccessResponse_16(int16_t maxHeatSetpointLimit)
     {
         VerifyOrReturn(CheckValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
-
+        VerifyOrReturn(CheckConstraintType("maxHeatSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -34333,7 +35608,9 @@ private:
     void OnSuccessResponse_21(int16_t minCoolSetpointLimit)
     {
         VerifyOrReturn(CheckValue("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
-
+        VerifyOrReturn(CheckConstraintType("minCoolSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -34427,7 +35704,9 @@ private:
     void OnSuccessResponse_26(int16_t maxCoolSetpointLimit)
     {
         VerifyOrReturn(CheckValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
-
+        VerifyOrReturn(CheckConstraintType("maxCoolSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -34666,7 +35945,9 @@ private:
     void OnSuccessResponse_39(uint8_t controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckValue("controlSequenceOfOperation", controlSequenceOfOperation, 4));
-
+        VerifyOrReturn(CheckConstraintType("controlSequenceOfOperation", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 5));
         NextTest();
     }
 
@@ -36199,6 +37480,215 @@ private:
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
 
         NextTest();
+    }
+};
+
+class Test_TC_WIFIDIAG_1_1 : public TestCommand
+{
+public:
+    Test_TC_WIFIDIAG_1_1() : TestCommand("Test_TC_WIFIDIAG_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WIFIDIAG_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WIFIDIAG_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WIFIDIAG_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentMaxRate attribute from DUT\n");
+            err = TestReadsCurrentMaxRateAttributeFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentMaxRate attribute constraints\n");
+            err = TestReadsCurrentMaxRateAttributeConstraints_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint64_t currentMaxRate)
+    {
+        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnSuccessResponse_1(currentMaxRate);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint64_t currentMaxRate)
+    {
+        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnSuccessResponse_2(currentMaxRate);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsCurrentMaxRateAttributeFromDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WiFiNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint64_t currentMaxRate)
+    {
+        VerifyOrReturn(CheckValue("currentMaxRate", currentMaxRate, 0ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentMaxRateAttributeConstraints_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WiFiNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint64_t currentMaxRate)
+    {
+        VerifyOrReturn(CheckConstraintType("currentMaxRate", "", "uint64"));
+        NextTest();
+    }
+};
+
+class Test_TC_WIFIDIAG_3_1 : public TestCommand
+{
+public:
+    Test_TC_WIFIDIAG_3_1() : TestCommand("Test_TC_WIFIDIAG_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WIFIDIAG_3_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WIFIDIAG_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WIFIDIAG_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
     }
 };
 
@@ -58369,6 +59859,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 20 : Write attribute that does not need timed write reset to default\n");
             err = TestWriteAttributeThatDoesNotNeedTimedWriteResetToDefault_20();
             break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Write struct-typed attribute\n");
+            err = TestWriteStructTypedAttribute_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Read struct-typed attribute\n");
+            err = TestReadStructTypedAttribute_22();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -58380,7 +59878,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 21;
+    const uint16_t mTestCount = 23;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -58503,6 +60001,24 @@ private:
     }
 
     static void OnSuccessCallback_20(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_20(); }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_21(); }
+
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_22(status);
+    }
+
+    static void OnSuccessCallback_22(void * context,
+                                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & structAttr)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_22(structAttr);
+    }
 
     //
     // Tests methods
@@ -58993,6 +60509,59 @@ private:
     void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_20() { NextTest(); }
+
+    CHIP_ERROR TestWriteStructTypedAttribute_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type structAttrArgument;
+
+        structAttrArgument.a = 5;
+        structAttrArgument.b = true;
+        structAttrArgument.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
+        structAttrArgument.d = chip::ByteSpan(chip::Uint8::from_const_char("abcgarbage: not in length on purpose"), 3);
+        structAttrArgument.e = chip::Span<const char>("garbage: not in length on purpose", 0);
+        structAttrArgument.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(17);
+        structAttrArgument.g = 1.5f;
+        structAttrArgument.h = 3.14159265358979;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(
+            structAttrArgument, this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21() { NextTest(); }
+
+    CHIP_ERROR TestReadStructTypedAttribute_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(
+            this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_22(const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & structAttr)
+    {
+        VerifyOrReturn(CheckValue("structAttr.a", structAttr.a, 5));
+        VerifyOrReturn(CheckValue("structAttr.b", structAttr.b, true));
+        VerifyOrReturn(CheckValue("structAttr.c", structAttr.c, 2));
+        VerifyOrReturn(CheckValueAsString("structAttr.d", structAttr.d, chip::ByteSpan(chip::Uint8::from_const_char("abc"), 3)));
+        VerifyOrReturn(CheckValueAsString("structAttr.e", structAttr.e, chip::CharSpan("", 0)));
+        VerifyOrReturn(CheckValue("structAttr.f", structAttr.f, 17));
+        VerifyOrReturn(CheckValue("structAttr.g", structAttr.g, 1.5f));
+        VerifyOrReturn(CheckValue("structAttr.h", structAttr.h, 3.14159265358979));
+
+        NextTest();
+    }
 };
 
 class TestConstraints : public TestCommand
@@ -63300,6 +64869,7 @@ private:
     void OnSuccessResponse_97(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("NotDefault", 10)));
+        VerifyOrReturn(CheckConstraintNotValue("charString", charString, readAttributeCharStringDefaultValue));
 
         if (readAttributeCharStringNotDefaultValueBuffer != nullptr)
         {
@@ -63327,6 +64897,7 @@ private:
     void OnSuccessResponse_98(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, readAttributeCharStringNotDefaultValue));
+        VerifyOrReturn(CheckConstraintNotValue("charString", charString, readAttributeCharStringDefaultValue));
 
         NextTest();
     }
@@ -63469,6 +65040,7 @@ private:
     {
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("NotDefault"), 10)));
+        VerifyOrReturn(CheckConstraintNotValue("octetString", octetString, readAttributeOctetStringDefaultValue));
 
         if (readAttributeOctetStringNotDefaultValueBuffer != nullptr)
         {
@@ -63496,6 +65068,7 @@ private:
     void OnSuccessResponse_106(chip::ByteSpan octetString)
     {
         VerifyOrReturn(CheckValueAsString("octetString", octetString, readAttributeOctetStringNotDefaultValue));
+        VerifyOrReturn(CheckConstraintNotValue("octetString", octetString, readAttributeOctetStringDefaultValue));
 
         NextTest();
     }
@@ -63885,36 +65458,38 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 7));
             VerifyOrReturn(CheckValue("serverList[7]", iter_0.GetValue(), 43UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 8));
-            VerifyOrReturn(CheckValue("serverList[8]", iter_0.GetValue(), 46UL));
+            VerifyOrReturn(CheckValue("serverList[8]", iter_0.GetValue(), 44UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 9));
-            VerifyOrReturn(CheckValue("serverList[9]", iter_0.GetValue(), 48UL));
+            VerifyOrReturn(CheckValue("serverList[9]", iter_0.GetValue(), 46UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 10));
-            VerifyOrReturn(CheckValue("serverList[10]", iter_0.GetValue(), 49UL));
+            VerifyOrReturn(CheckValue("serverList[10]", iter_0.GetValue(), 48UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 11));
-            VerifyOrReturn(CheckValue("serverList[11]", iter_0.GetValue(), 50UL));
+            VerifyOrReturn(CheckValue("serverList[11]", iter_0.GetValue(), 49UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 12));
-            VerifyOrReturn(CheckValue("serverList[12]", iter_0.GetValue(), 51UL));
+            VerifyOrReturn(CheckValue("serverList[12]", iter_0.GetValue(), 50UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 13));
-            VerifyOrReturn(CheckValue("serverList[13]", iter_0.GetValue(), 52UL));
+            VerifyOrReturn(CheckValue("serverList[13]", iter_0.GetValue(), 51UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 14));
-            VerifyOrReturn(CheckValue("serverList[14]", iter_0.GetValue(), 53UL));
+            VerifyOrReturn(CheckValue("serverList[14]", iter_0.GetValue(), 52UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 15));
-            VerifyOrReturn(CheckValue("serverList[15]", iter_0.GetValue(), 54UL));
+            VerifyOrReturn(CheckValue("serverList[15]", iter_0.GetValue(), 53UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 16));
-            VerifyOrReturn(CheckValue("serverList[16]", iter_0.GetValue(), 55UL));
+            VerifyOrReturn(CheckValue("serverList[16]", iter_0.GetValue(), 54UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 17));
-            VerifyOrReturn(CheckValue("serverList[17]", iter_0.GetValue(), 60UL));
+            VerifyOrReturn(CheckValue("serverList[17]", iter_0.GetValue(), 55UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 18));
-            VerifyOrReturn(CheckValue("serverList[18]", iter_0.GetValue(), 62UL));
+            VerifyOrReturn(CheckValue("serverList[18]", iter_0.GetValue(), 60UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 19));
-            VerifyOrReturn(CheckValue("serverList[19]", iter_0.GetValue(), 63UL));
+            VerifyOrReturn(CheckValue("serverList[19]", iter_0.GetValue(), 62UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 20));
-            VerifyOrReturn(CheckValue("serverList[20]", iter_0.GetValue(), 64UL));
+            VerifyOrReturn(CheckValue("serverList[20]", iter_0.GetValue(), 63UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 21));
-            VerifyOrReturn(CheckValue("serverList[21]", iter_0.GetValue(), 65UL));
+            VerifyOrReturn(CheckValue("serverList[21]", iter_0.GetValue(), 64UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 22));
-            VerifyOrReturn(CheckValue("serverList[22]", iter_0.GetValue(), 1029UL));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter_0, 23));
+            VerifyOrReturn(CheckValue("serverList[22]", iter_0.GetValue(), 65UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 23));
+            VerifyOrReturn(CheckValue("serverList[23]", iter_0.GetValue(), 1029UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter_0, 24));
         }
 
         NextTest();
@@ -65712,6 +67287,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
             err = TestReadBackAttribute_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is true after on command\n");
+            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -65723,7 +67306,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -65764,6 +67347,16 @@ private:
     static void OnSuccessCallback_4(void * context, chip::CharSpan location)
     {
         (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, bool onOff)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(onOff);
     }
 
     //
@@ -65852,6 +67445,54 @@ private:
     void OnSuccessResponse_4(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    {
+        const chip::GroupId groupId = 1234;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(status);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(bool onOff)
+    {
+        VerifyOrReturn(CheckValue("onOff", onOff, 1));
 
         NextTest();
     }
@@ -66576,6 +68217,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_BI_2_2>(),
         make_unique<Test_TC_BOOL_1_1>(),
         make_unique<Test_TC_BOOL_2_1>(),
+        make_unique<Test_TC_BRAC_1_1>(),
         make_unique<Test_TC_CC_1_1>(),
         make_unique<Test_TC_CC_2_1>(),
         make_unique<Test_TC_CC_3_1>(),
@@ -66608,6 +68250,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_DM_3_1>(),
         make_unique<Test_TC_DM_2_2>(),
         make_unique<Test_TC_EMR_1_1>(),
+        make_unique<Test_TC_ETHDIAG_1_1>(),
+        make_unique<Test_TC_ETHDIAG_2_1>(),
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_FLW_2_1>(),
         make_unique<Test_TC_FLW_2_2>(),
@@ -66650,6 +68294,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_OO_2_1>(),
         make_unique<Test_TC_OO_2_2>(),
         make_unique<Test_TC_OO_2_3>(),
+        make_unique<Test_TC_PS_1_1>(),
         make_unique<Test_TC_PRS_1_1>(),
         make_unique<Test_TC_PRS_2_1>(),
         make_unique<Test_TC_PCC_1_1>(),
@@ -66659,6 +68304,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_RH_1_1>(),
         make_unique<Test_TC_RH_2_1>(),
         make_unique<Test_TC_RH_2_2>(),
+        make_unique<Test_TC_SWTCH_2_1>(),
+        make_unique<Test_TC_SWTCH_2_2>(),
         make_unique<Test_TC_TM_1_1>(),
         make_unique<Test_TC_TM_2_1>(),
         make_unique<Test_TC_TM_2_2>(),
@@ -66669,6 +68316,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_TSUIC_2_1>(),
         make_unique<Test_TC_TSUIC_2_2>(),
         make_unique<Test_TC_DIAGTH_1_1>(),
+        make_unique<Test_TC_WIFIDIAG_1_1>(),
+        make_unique<Test_TC_WIFIDIAG_3_1>(),
         make_unique<Test_TC_WNCV_1_1>(),
         make_unique<Test_TC_WNCV_2_1>(),
         make_unique<Test_TC_WNCV_2_2>(),

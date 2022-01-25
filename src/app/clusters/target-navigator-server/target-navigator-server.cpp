@@ -120,17 +120,22 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadTargetListAttribute(aEncoder, delegate);
     }
     case app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentTargetAttribute(aEncoder, delegate);
     }
     default: {

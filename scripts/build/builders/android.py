@@ -66,6 +66,7 @@ class AndroidApp(Enum):
     CHIP_TOOL = auto()
     CHIP_TEST = auto()
     CHIP_TVServer = auto()
+    CHIP_TV_CASTING_APP = auto()
 
     def AppName(self):
         if self == AndroidApp.CHIP_TOOL:
@@ -74,6 +75,8 @@ class AndroidApp(Enum):
             return "CHIPTest"
         elif self == AndroidApp.CHIP_TVServer:
             return "CHIPTVServer"
+        elif self == AndroidApp.CHIP_TV_CASTING_APP:
+            return "CHIPTVCastingApp"
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -81,11 +84,15 @@ class AndroidApp(Enum):
         gn_args = {}
         if self == AndroidApp.CHIP_TVServer:
             gn_args['chip_config_network_layer_ble'] = False
+        elif self == AndroidApp.CHIP_TV_CASTING_APP:
+            gn_args['chip_config_network_layer_ble'] = False
         return gn_args
 
     def ExampleName(self):
         if self == AndroidApp.CHIP_TVServer:
             return "tv-app"
+        elif self == AndroidApp.CHIP_TV_CASTING_APP:
+            return "tv-casting-app"
         else:
             return None
 
@@ -175,17 +182,27 @@ class AndroidBuilder(Builder):
         self._Execute(['mkdir', '-p', jnilibs_dir],
                       title='Prepare Native libs ' + self.identifier)
 
-        for libName in ['libSetupPayloadParser.so', 'libc++_shared.so', 'libTvApp.so']:
+        if self.app.ExampleName() == 'tv-casting-app':
+            libs = ['libc++_shared.so']
+        else:
+            libs = ['libSetupPayloadParser.so',
+                    'libc++_shared.so', 'libTvApp.so']
+        for libName in libs:
             self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
             ), libName), os.path.join(jnilibs_dir, libName)])
 
-        jars = {
-            'SetupPayloadParser.jar': 'third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar',
-            'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
-            'CHIPAppServer.jar': 'third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar',
-            'TvApp.jar': 'TvApp.jar',
-        }
-
+        if self.app.ExampleName() == 'tv-casting-app':
+            jars = {
+                'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
+                'TvCastingApp.jar': 'TvCastingApp.jar',
+            }
+        else:
+            jars = {
+                'SetupPayloadParser.jar': 'third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar',
+                'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
+                'CHIPAppServer.jar': 'third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar',
+                'TvApp.jar': 'TvApp.jar',
+            }
         for jarName in jars.keys():
             self._Execute(['cp', os.path.join(
                 self.output_dir, 'lib', jars[jarName]), os.path.join(libs_dir, jarName)])

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -533,6 +533,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestLocalizationConfiguration : CHIPLocalizationConfiguration
 
 - (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end
 
@@ -686,6 +687,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestOperationalCredentials : CHIPOperationalCredentials
 
+- (void)writeAttributeNOCsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFabricsListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSupportedFabricsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCommissionedFabricsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1006,6 +1008,18 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
+ * Cluster Time Format Localization
+ *
+ */
+@interface CHIPTestTimeFormatLocalization : CHIPTimeFormatLocalization
+
+- (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

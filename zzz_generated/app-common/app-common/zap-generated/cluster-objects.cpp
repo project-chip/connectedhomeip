@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -4635,6 +4635,106 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 } // namespace Attributes
 
 namespace Events {
+namespace AccessControlEntryChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminNodeID)), adminNodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)), adminPasscodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), latestValue));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kAdminFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
+            break;
+        case to_underlying(Fields::kAdminNodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
+            break;
+        case to_underlying(Fields::kAdminPasscodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
+            break;
+        case to_underlying(Fields::kChangeType):
+            ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
+            break;
+        case to_underlying(Fields::kLatestValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace AccessControlEntryChanged.
+namespace AccessControlExtensionChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminNodeID)), adminNodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)), adminPasscodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), latestValue));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kAdminFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
+            break;
+        case to_underlying(Fields::kAdminNodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
+            break;
+        case to_underlying(Fields::kAdminPasscodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
+            break;
+        case to_underlying(Fields::kChangeType):
+            ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
+            break;
+        case to_underlying(Fields::kLatestValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace AccessControlExtensionChanged.
 } // namespace Events
 
 } // namespace AccessControl
@@ -6409,8 +6509,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::HourFormat::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, hourFormat));
         break;
-    case Attributes::CalendarType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, calendarType));
+    case Attributes::ActiveCalendarType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeCalendarType));
         break;
     case Attributes::SupportedCalendarTypes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedCalendarTypes));
@@ -9685,6 +9785,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNoc)), noc));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIcac)), icac));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -9706,6 +9807,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kNoc):
             ReturnErrorOnFailure(DataModel::Decode(reader, noc));
+            break;
+        case to_underlying(Fields::kIcac):
+            ReturnErrorOnFailure(DataModel::Decode(reader, icac));
             break;
         default:
             break;
@@ -10209,6 +10313,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
+    case Attributes::NOCs::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, NOCs));
+        break;
     case Attributes::FabricsList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, fabricsList));
         break;
@@ -21836,6 +21943,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace DoubleNestedStructList
+namespace TestFabricScoped {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace TestFabricScoped
 namespace TestListStructOctet {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -23334,6 +23477,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::ListLongOctetString::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, listLongOctetString));
+        break;
+    case Attributes::ListFabricScoped::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, listFabricScoped));
         break;
     case Attributes::TimedWriteBoolean::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, timedWriteBoolean));

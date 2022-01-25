@@ -106,9 +106,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-otarequester</name>
+        <name>MA-otarequestor</name>
         <domain>CHIP</domain>
-        <typeName>Matter OTA Requester</typeName>
+        <typeName>Matter OTA Requestor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0012</deviceId>
         <clusters lockOthers="true">
@@ -129,7 +129,7 @@ limitations under the License.
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="OTA Software Update Requestor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="OTA Software Update Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="OTA Software Update Provider" client="true" server="false" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -156,6 +156,7 @@ limitations under the License.
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="OTA Software Update Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="OTA Software Update Requestor" client="true" server="false" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>

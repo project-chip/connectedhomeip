@@ -42,3 +42,8 @@ config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	help
 	  Configures size of the buffer used by OTA Requestor when downloading and
 	  writing a new firmware image to flash.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_IMAGE_BUILD
+	bool
+	depends on SIGN_IMAGES

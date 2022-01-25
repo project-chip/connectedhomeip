@@ -294,7 +294,6 @@ void MatterPressureMeasurementPluginServerInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
-void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
 void MatterPowerConfigurationPluginServerInitCallback() {}
@@ -304,8 +303,7 @@ void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
-void MatterLocalizationUnitPluginServerInitCallback() {}
-void MatterLocalizationTimeFormatPluginServerInitCallback() {}
+void MatterUnitLocalizationPluginServerInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}

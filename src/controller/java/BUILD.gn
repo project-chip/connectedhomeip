@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
@@ -33,7 +32,7 @@ shared_library("jni") {
     "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",
     "zap-generated/CHIPClusters-JNI.cpp",
-    "zap-generated/CHIPClustersRead-JNI.cpp",
+    "zap-generated/CHIPClustersWrite-JNI.cpp",
     "zap-generated/CHIPInvokeCallbacks.cpp",
     "zap-generated/CHIPInvokeCallbacks.h",
     "zap-generated/CHIPReadCallbacks.cpp",
@@ -42,6 +41,7 @@ shared_library("jni") {
 
   deps = [
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/data_model:java-jni-sources",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",

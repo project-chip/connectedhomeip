@@ -37,6 +37,7 @@
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
+#include <controller/CHIPCluster.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
@@ -580,7 +581,22 @@ public:
     void RendezvousCleanup(CHIP_ERROR status);
 
     void PerformCommissioningStep(DeviceProxy * device, CommissioningStage step, CommissioningParameters & params,
-                                  CommissioningDelegate * delegate);
+                                  CommissioningDelegate * delegate, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
+
+    /**
+     * @brief
+     *   This function validates the Attestation Information sent by the device.
+     *
+     * @param[in] attestationElements Attestation Elements TLV.
+     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
+     * @param[in] attestationNonce    Attestation nonce
+     * @param[in] pai                 PAI certificate
+     * @param[in] dac                 DAC certificates
+     * @param[in] proxy               device proxy that is being attested.
+     */
+    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
+                                       const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
+                                       DeviceProxy * proxy);
 
     void CommissioningStageComplete(CHIP_ERROR err);
 
@@ -660,8 +676,6 @@ private:
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
 
-    Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
-
     /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
        workaround-like flag and should be removed in the future.
        When using IP rendezvous, we need to disable network provisioning. In the future, network
@@ -685,6 +699,8 @@ private:
     uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+    void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
+
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
@@ -696,24 +712,23 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(CommissioneeDeviceProxy * device, Credentials::CertificateType certificateType);
+    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce);
+    CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device);
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
     /* This function sends the operational credentials to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
-                                          const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendTrustedRootCertificate(CommissioneeDeviceProxy * device, const ByteSpan & rcac);
+    CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
@@ -764,25 +779,20 @@ private:
      *   This function processes the CSR sent by the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
+     * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
      * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
+    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                            ByteSpan dac, ByteSpan csrNonce);
 
     /**
      * @brief
      *   This function processes the DAC or PAI certificate sent by the device.
      */
     CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
-
-    /**
-     * @brief
-     *   This function validates the Attestation Information sent by the device.
-     *
-     * @param[in] attestationElements Attestation Elements TLV.
-     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
-     */
-    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature);
 
     void HandleAttestationResult(CHIP_ERROR err);
 

@@ -61,6 +61,7 @@
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <binding-handler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
@@ -507,6 +508,12 @@ void SetupPretendDevices()
     AddEndpoint("Door 2");
     AddCluster("Door");
     AddAttribute("State", "Closed");
+
+    AddDevice("Occupancy Sensor");
+    AddEndpoint("External");
+    AddCluster("Occupancy Sensor");
+    AddAttribute("Occupancy", "1");
+    app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
 }
 
 WiFiWidget pairingWindowLED;
@@ -537,6 +544,7 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
     SetupPretendDevices();
+    InitBindingHandlers();
 }
 
 static void InitOTARequestor(void)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -234,6 +234,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterNOCStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull noc;
+@property (strong, nonatomic) NSData * _Nonnull icac;
 - (instancetype)init;
 @end
 
@@ -453,6 +454,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPTestClusterClusterDoubleNestedStructList : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull a;
+- (instancetype)init;
+@end
+
+@interface CHIPTestClusterClusterTestFabricScoped : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 

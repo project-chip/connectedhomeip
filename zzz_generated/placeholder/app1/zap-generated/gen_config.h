@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #define EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -97,6 +98,10 @@
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF
+
+// Use this macro to check if the client side of the Operational Credentials cluster is included
+#define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_CLIENT
 
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER

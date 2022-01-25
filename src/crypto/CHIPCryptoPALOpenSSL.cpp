@@ -97,6 +97,7 @@ static void _logSSLError()
     unsigned long ssl_err_code = ERR_get_error();
     while (ssl_err_code != 0)
     {
+#if CHIP_ERROR_LOGGING
         const char * err_str_lib     = ERR_lib_error_string(ssl_err_code);
         const char * err_str_routine = ERR_func_error_string(ssl_err_code);
         const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
@@ -104,6 +105,7 @@ static void _logSSLError()
         {
             ChipLogError(Crypto, " ssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
         }
+#endif // CHIP_ERROR_LOGGING
         ssl_err_code = ERR_get_error();
     }
 }

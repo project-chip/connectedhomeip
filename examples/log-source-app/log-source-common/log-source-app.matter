@@ -75,12 +75,12 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 1;
+    INT32U failSafeExpiryLengthMs = 0;
   }
 
-  attribute(writable) int64u breadcrumb = 0;
-  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute int64u breadcrumb = 0;
+  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -141,26 +141,26 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct WiFiInterfaceScanResult {
-    BITMAP8 security = 1;
-    OCTET_STRING ssid = 2;
-    OCTET_STRING bssid = 3;
-    INT16U channel = 4;
-    WiFiBand wiFiBand = 5;
-    INT8S rssi = 6;
+    BITMAP8 security = 0;
+    OCTET_STRING ssid = 1;
+    OCTET_STRING bssid = 2;
+    INT16U channel = 3;
+    WiFiBand wiFiBand = 4;
+    INT8S rssi = 5;
   }
 
   struct ThreadInterfaceScanResult {
-    INT64U panId = 1;
-    INT64U extendedPanId = 2;
-    CHAR_STRING networkName = 3;
-    INT16U channel = 4;
-    INT8U version = 5;
-    INT64U extendedAddress = 6;
-    INT8S rssi = 7;
-    INT8U lqi = 8;
+    INT64U panId = 0;
+    INT64U extendedPanId = 1;
+    CHAR_STRING networkName = 2;
+    INT16U channel = 3;
+    INT8U version = 4;
+    INT64U extendedAddress = 5;
+    INT8S rssi = 6;
+    INT8U lqi = 7;
   }
 
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -235,19 +235,19 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    INT8U fabricIndex = 1;
-    OCTET_STRING rootPublicKey = 2;
-    INT16U vendorId = 3;
-    FABRIC_ID fabricId = 4;
-    NODE_ID nodeId = 5;
-    CHAR_STRING label = 6;
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING<65> rootPublicKey = 1;
+    INT16U vendorId = 2;
+    FABRIC_ID fabricId = 3;
+    NODE_ID nodeId = 4;
+    CHAR_STRING<32> label = 5;
   }
 
-  attribute(readonly) FabricDescriptor fabricsList[] = 1;
-  attribute(readonly) int8u supportedFabrics = 2;
-  attribute(readonly) int8u commissionedFabrics = 3;
-  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute int8u supportedFabrics = 2;
+  readonly attribute int8u commissionedFabrics = 3;
+  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
@@ -312,5 +312,10 @@ server cluster OperationalCredentials = 62 {
 
 
 endpoint 0 {
+  binding cluster DiagnosticLogs;
+  server  cluster DiagnosticLogs;
+  server  cluster GeneralCommissioning;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
 }
 

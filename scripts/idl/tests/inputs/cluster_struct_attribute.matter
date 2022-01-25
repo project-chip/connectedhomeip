@@ -1,0 +1,11 @@
+client cluster DemoCluster = 10 {
+  request struct ArmFailSafeRequest {
+    INT16U expiryLengthSeconds = 0;
+    INT64U breadcrumb = 1;
+    INT32U timeoutMs = 2;
+  }
+
+  attribute ArmFailSafeRequest singleFailSafe = 5;
+  attribute ArmFailSafeRequest armFailsafes[] = 100;
+}
+

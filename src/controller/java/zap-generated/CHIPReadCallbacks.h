@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2825,6 +2825,39 @@ private:
     bool keepAlive;
 };
 
+class CHIPOperationalCredentialsNOCsAttributeCallback
+    : public chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCsAttributeCallbackType>
+{
+public:
+    CHIPOperationalCredentialsNOCsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPOperationalCredentialsNOCsAttributeCallback();
+
+    static void maybeDestroy(CHIPOperationalCredentialsNOCsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPOperationalCredentialsNOCsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPOperationalCredentialsNOCsAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPOperationalCredentialsFabricsListAttributeCallback
     : public chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType>
 {
@@ -4852,6 +4885,38 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback
+    : public chip::Callback::Callback<CHIPTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallbackType>
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback();
+
+    static void maybeDestroy(CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback>(callback);
+        }
+    }
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
