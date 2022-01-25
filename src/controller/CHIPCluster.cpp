@@ -52,7 +52,8 @@ CHIP_ERROR ClusterBase::AssociateWithGroup(DeviceProxy * device, GroupId groupId
     if (mDevice->GetSecureSession().HasValue())
     {
         // Local copy to preserve original SessionHandle for future Unicast communication.
-        Optional<SessionHandle> session = mDevice->GetExchangeManager()->GetSessionManager()->CreateGroupSession(groupId);
+        Optional<SessionHandle> session = mDevice->GetExchangeManager()->GetSessionManager()->CreateGroupSession(
+            groupId, mDevice->GetSecureSession().Value()->AsSecureSession()->GetFabricIndex());
         // Sanity check
         if (!session.HasValue() || !session.Value()->IsGroupSession())
         {

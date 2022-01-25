@@ -135,6 +135,37 @@ private:
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
+    class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
+    {
+    public:
+        GroupDataProviderListener() {}
+
+        CHIP_ERROR Init(ServerTransportMgr * transports)
+        {
+            VerifyOrReturnError(transports != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mTransports = transports;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
+        {
+            if (mTransports->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(fabric_index, new_group.group_id), true) !=
+                CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Unable to listen to group");
+            }
+        };
+
+        void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
+        {
+            mTransports->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(fabric_index, old_group.group_id), false);
+        };
+
+    private:
+        ServerTransportMgr * mTransports;
+    };
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -168,6 +199,7 @@ private:
 #endif
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
+    GroupDataProviderListener mListener;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;
