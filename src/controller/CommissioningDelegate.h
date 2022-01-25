@@ -230,7 +230,7 @@ public:
 
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData>
     {
-        CommissioningReport(CommissioningStage stage) : stageCompleted(stage) {}
+        CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
         // TODO: Add other things the delegate needs to know.
     };
