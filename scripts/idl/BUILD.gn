@@ -25,16 +25,19 @@ pw_python_package("idl") {
     "matter_grammar.lark",
 
     # Templates used for generation
-    "generators/gni/idl_content.jinja",
     "generators/java/ChipClustersRead.jinja",
 
     # Unit test data
     "tests/available_tests.yaml",
     "tests/inputs/cluster_struct_attribute.matter",
     "tests/inputs/global_struct_attribute.matter",
+    "tests/inputs/several_clusters.matter",
     "tests/inputs/simple_attribute.matter",
     "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
     "tests/outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
+    "tests/outputs/several_clusters/jni/FirstClient-ReadImpl.cpp",
+    "tests/outputs/several_clusters/jni/SecondClient-ReadImpl.cpp",
+    "tests/outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp",
     "tests/outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp",
   ]
 
@@ -42,7 +45,6 @@ pw_python_package("idl") {
     "__init__.py",
     "generators/__init__.py",
     "generators/filters.py",
-    "generators/gni/__init__.py",
     "generators/java/__init__.py",
     "generators/types.py",
     "matter_idl_parser.py",

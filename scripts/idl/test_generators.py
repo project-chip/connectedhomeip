@@ -32,7 +32,6 @@ except:
 
 from idl.matter_idl_types import Idl
 from idl.generators.java import JavaGenerator
-from idl.generators.gni import GniGenerator
 from idl.generators import GeneratorStorage
 
 
@@ -101,8 +100,6 @@ class GeneratorTest:
     def _create_generator(self, storage: GeneratorStorage, idl: Idl):
         if self.generator_name.lower() == 'java':
             return JavaGenerator(storage, idl)
-        elif self.generator_name.lower() == 'gni':
-            return GniGenerator(storage, idl)
         else:
             raise Exception("Unknown generator for testing: %s",
                             self.generator_name.lower())

@@ -1,8 +1,0 @@
-client_clusters = [
-  "First",
-  "Second",
-  "Third",
-]
-
-server_clusters = [
-]

@@ -35,15 +35,16 @@ if (current_os == "android") {
     script = "${chip_root}/scripts/codegen.py"
 
     _idl_file = "controller-clusters.matter"
-    _idl_contents = exec_script("${chip_root}/scripts/codegen.py",
+    _output_files = exec_script("${chip_root}/scripts/codegen.py",
                                 [
                                   "--generator",
-                                  "gni",
-                                  "--output-dir",
-                                  "-",
+                                  "java",
+                                  "--log-level",
+                                  "fatal",
+                                  "--name-only",
                                   rebase_path("controller-clusters.matter"),
                                 ],
-                                "scope",
+                                "list lines",
                                 [ "controller-clusters.matter" ])
 
     args = [
@@ -60,8 +61,8 @@ if (current_os == "android") {
     sources = [ _idl_file ]
     outputs = []
 
-    foreach(name, _idl_contents.client_clusters) {
-      outputs += [ "$target_gen_dir/jni/${name}Client-ReadImpl.cpp" ]
+    foreach(name, _output_files) {
+      outputs += [ "$target_gen_dir/${name}" ]
     }
   }
 

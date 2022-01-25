@@ -28,34 +28,28 @@ except:
 
 from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
 from idl.generators.java import JavaGenerator
-from idl.generators.gni import GniGenerator
 
 
 class CodeGeneratorTypes(enum.Enum):
     JAVA = enum.auto()
-    GNI = enum.auto()
 
     def CreateGenerator(self, *args, **kargs):
         if self == CodeGeneratorTypes.JAVA:
             return JavaGenerator(*args, **kargs)
-        elif self == CodeGeneratorTypes.GNI:
-            return GniGenerator(*args, **kargs)
         else:
             raise Error("Unknown code generator type")
 
 
-class StdOutStorage(GeneratorStorage):
+class ListGeneratedFilesStorage(GeneratorStorage):
     """
-    outputs all generated output into stdout
+    Output a list of files to be generated
     """
 
     def get_existing_data(self, relative_path: str):
         return None  # stdout has no pre-existing data
 
     def write_new_data(self, relative_path: str, content: str):
-        print("################# BEGIN: %s ######################" % relative_path)
-        print(content)
-        print("################# END: %s ######################" % relative_path)
+        print(relative_path)
 
 
 # Supported log levels, mapping string values required for argument
@@ -69,7 +63,6 @@ __LOG_LEVELS__ = {
 
 __GENERATORS__ = {
     'java': CodeGeneratorTypes.JAVA,
-    'gni': CodeGeneratorTypes.GNI,
 }
 
 
@@ -94,10 +87,15 @@ __GENERATORS__ = {
     default=False,
     is_flag=True,
     help='If to actually generate')
+@click.option(
+    '--name-only',
+    default=False,
+    is_flag=True,
+    help='Output just a list of file names that would be generated')
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, idl_path):
+def main(log_level, generator, output_dir, dry_run, name_only, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -107,8 +105,8 @@ def main(log_level, generator, output_dir, dry_run, idl_path):
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
-    if output_dir == '-':
-        storage = StdOutStorage()
+    if name_only:
+        storage = ListGeneratedFilesStorage()
     else:
         storage = FileSystemGeneratorStorage(output_dir)
 
