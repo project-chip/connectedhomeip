@@ -20,7 +20,6 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
-#include <app/chip-zcl-zpro-codec.h>
 #include <lib/core/CHIPEncoding.h>
 
 class ModelCommand : public CHIPCommand
@@ -36,7 +35,7 @@ public:
     void AddArguments()
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+        AddArgument("endpoint-id", 0, UINT16_MAX, &mEndPointId);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
@@ -44,14 +43,14 @@ public:
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
-    virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
+    virtual CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endPointId) = 0;
 
 protected:
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
 
 private:
     chip::NodeId mNodeId;
-    uint8_t mEndPointId;
+    chip::EndpointId mEndPointId;
 
     static void OnDeviceConnectedFn(void * context, ChipDevice * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);

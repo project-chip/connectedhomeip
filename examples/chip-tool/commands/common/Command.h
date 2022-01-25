@@ -33,10 +33,6 @@
 
 class Command;
 
-// Limits on endpoint values.
-#define CHIP_ZCL_ENDPOINT_MIN 0x00
-#define CHIP_ZCL_ENDPOINT_MAX 0xF0
-
 template <typename T, typename... Args>
 std::unique_ptr<Command> make_unique(Args &&... args)
 {

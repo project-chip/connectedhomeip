@@ -96,5 +96,29 @@ AttributeReportIBs::Builder & AttributeReportIBs::Builder::EndOfAttributeReportI
     EndOfContainer();
     return *this;
 }
+
+CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteReadAttributePath & aPath, const StatusIB & aStatus)
+{
+    AttributeReportIB::Builder & attributeReport = CreateAttributeReport();
+    ReturnErrorOnFailure(GetError());
+    AttributeStatusIB::Builder & attributeStatusIBBuilder = attributeReport.CreateAttributeStatus();
+    ReturnErrorOnFailure(attributeReport.GetError());
+    AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+
+    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+    statusIBBuilder.EncodeStatusIB(aStatus);
+    ReturnErrorOnFailure(statusIBBuilder.GetError());
+
+    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
+    return attributeReport.EndOfAttributeReportIB().GetError();
+}
+
 } // namespace app
 } // namespace chip

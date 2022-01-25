@@ -10,8 +10,8 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPStructsObjc.h"
 #import "CHIPCommandPayloadsObjc.h"
-#import "CHIPListUtils_internal.h"
 
+#include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;

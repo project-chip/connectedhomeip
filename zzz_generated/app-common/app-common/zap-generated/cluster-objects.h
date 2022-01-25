@@ -10096,6 +10096,14 @@ enum class WiFiBand : uint8_t
     k60g  = 0x04,
 };
 
+// Bitmap for NetworkCommissioningFeature
+enum class NetworkCommissioningFeature : uint32_t
+{
+    kWiFiNetworkInterface     = 0x1,
+    kThreadNetworkInterface   = 0x2,
+    kEthernetNetworkInterface = 0x4,
+};
+
 namespace Structs {
 namespace NetworkInfo {
 enum class Fields
@@ -35551,6 +35559,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return true; }
 };
 } // namespace TimedWriteBoolean
+namespace GeneralErrorBoolean {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GeneralErrorBoolean::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace GeneralErrorBoolean
+namespace ClusterErrorBoolean {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterErrorBoolean::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClusterErrorBoolean
 namespace Unsupported {
 struct TypeInfo
 {
@@ -36049,8 +36081,10 @@ struct TypeInfo
         Attributes::RangeRestrictedInt16s::TypeInfo::DecodableType rangeRestrictedInt16s = static_cast<int16_t>(0);
         Attributes::ListLongOctetString::TypeInfo::DecodableType listLongOctetString;
         Attributes::ListFabricScoped::TypeInfo::DecodableType listFabricScoped;
-        Attributes::TimedWriteBoolean::TypeInfo::DecodableType timedWriteBoolean = static_cast<bool>(0);
-        Attributes::Unsupported::TypeInfo::DecodableType unsupported             = static_cast<bool>(0);
+        Attributes::TimedWriteBoolean::TypeInfo::DecodableType timedWriteBoolean     = static_cast<bool>(0);
+        Attributes::GeneralErrorBoolean::TypeInfo::DecodableType generalErrorBoolean = static_cast<bool>(0);
+        Attributes::ClusterErrorBoolean::TypeInfo::DecodableType clusterErrorBoolean = static_cast<bool>(0);
+        Attributes::Unsupported::TypeInfo::DecodableType unsupported                 = static_cast<bool>(0);
         Attributes::NullableBoolean::TypeInfo::DecodableType nullableBoolean;
         Attributes::NullableBitmap8::TypeInfo::DecodableType nullableBitmap8;
         Attributes::NullableBitmap16::TypeInfo::DecodableType nullableBitmap16;

@@ -54,8 +54,11 @@ class OctetStringData
 {
 public:
     uint8_t * Data() { return mDataBuf; }
+    const uint8_t * Data() const { return mDataBuf; }
     size_t Length() const { return mDataLen; }
     void SetLength(size_t size) { mDataLen = size; }
+
+    ByteSpan AsSpan() const { return ByteSpan(Data(), Length()); }
 
 private:
     uint8_t mDataBuf[kAttributeEntryLength];
@@ -93,6 +96,7 @@ uint8_t gListUint8Data[kAttributeListLength];
 OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
+OctetStringData gStructAttributeByteSpanData;
 Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
@@ -130,6 +134,12 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
     }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
+    }
     default: {
         break;
     }
@@ -159,6 +169,12 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case NullableStruct::Id: {
         return WriteNullableStruct(aDecoder);
+    }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
     }
     default: {
         break;
@@ -220,8 +236,7 @@ CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & 
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            ByteSpan span(gListOctetStringData[index].Data(), gListOctetStringData[index].Length());
-            ReturnErrorOnFailure(encoder.Encode(span));
+            ReturnErrorOnFailure(encoder.Encode(gListOctetStringData[index].AsSpan()));
         }
         return CHIP_NO_ERROR;
     });
@@ -326,9 +341,8 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDec
         memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
         gListOperationalCert[index].SetLength(entry.operationalCert.size());
 
-        listStructOctetStringData[index].fabricIndex = entry.fabricIndex;
-        listStructOctetStringData[index].operationalCert =
-            ByteSpan(gListOperationalCert[index].Data(), gListOperationalCert[index].Length());
+        listStructOctetStringData[index].fabricIndex     = entry.fabricIndex;
+        listStructOctetStringData[index].operationalCert = gListOperationalCert[index].AsSpan();
         index++;
     }
 
@@ -406,7 +420,19 @@ CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder)
 {
-    return aDecoder.Decode(gStructAttributeValue);
+    // We don't support a nonempty charspan here for now.
+    Structs::SimpleStruct::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    VerifyOrReturnError(temp.e.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    const size_t octet_size = temp.d.size();
+    VerifyOrReturnError(octet_size <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    gStructAttributeValue = temp;
+    memcpy(gStructAttributeByteSpanData.Data(), temp.d.data(), octet_size);
+    gStructAttributeByteSpanData.SetLength(octet_size);
+    gStructAttributeValue.d = gStructAttributeByteSpanData.AsSpan();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
@@ -445,29 +471,11 @@ bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::Con
     }
     gSimpleEnumCount = 0;
 
-    gStructAttributeValue.a = 0;
-    gStructAttributeValue.b = false;
-    gStructAttributeValue.c = SimpleEnum::kValueA;
-    gStructAttributeValue.d = ByteSpan();
-    gStructAttributeValue.e = CharSpan();
-    gStructAttributeValue.f = BitFlags<SimpleBitmap>();
-    gStructAttributeValue.g = 0;
-    gStructAttributeValue.h = 0;
+    gStructAttributeValue = Structs::SimpleStruct::Type();
 
     gNullableStructAttributeValue.SetNull();
 
-    gNullablesAndOptionalsStruct.nullableInt.SetNull();
-    gNullablesAndOptionalsStruct.optionalInt         = NullOptional;
-    gNullablesAndOptionalsStruct.nullableOptionalInt = NullOptional;
-    gNullablesAndOptionalsStruct.nullableString.SetNull();
-    gNullablesAndOptionalsStruct.optionalString         = NullOptional;
-    gNullablesAndOptionalsStruct.nullableOptionalString = NullOptional;
-    gNullablesAndOptionalsStruct.nullableStruct.SetNull();
-    gNullablesAndOptionalsStruct.optionalStruct         = NullOptional;
-    gNullablesAndOptionalsStruct.nullableOptionalStruct = NullOptional;
-    gNullablesAndOptionalsStruct.nullableList.SetNull();
-    gNullablesAndOptionalsStruct.optionalList         = NullOptional;
-    gNullablesAndOptionalsStruct.nullableOptionalList = NullOptional;
+    gNullablesAndOptionalsStruct = Structs::NullablesAndOptionalsStruct::Type();
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;

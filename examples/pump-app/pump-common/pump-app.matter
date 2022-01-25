@@ -68,9 +68,15 @@ server cluster Basic = 40 {
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
   readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
+  attribute boolean localConfigDisabled = 16;
+  readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster Descriptor = 29 {
@@ -707,9 +713,9 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute enum8 effectiveControlMode = 18;
   readonly attribute int16s capacity = 19;
   readonly attribute int16u speed = 20;
-  attribute int24u lifetimeRunningHours = 21;
+  attribute nullable int24u lifetimeRunningHours = 21;
   readonly attribute int24u power = 22;
-  attribute int32u lifetimeEnergyConsumed = 23;
+  attribute nullable int32u lifetimeEnergyConsumed = 23;
   attribute enum8 operationMode = 32;
   attribute enum8 controlMode = 33;
   readonly attribute bitmap16 alarmMask = 34;

@@ -242,7 +242,7 @@ JNI_METHOD(void, pairDevice)
 }
 
 JNI_METHOD(void, pairDeviceWithAddress)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jint pinCode,
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jlong pinCode,
  jbyteArray csrNonce)
 {
     chip::DeviceLayer::StackLock lock;

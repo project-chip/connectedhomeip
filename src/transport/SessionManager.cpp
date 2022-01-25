@@ -617,7 +617,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     if (mCB != nullptr)
     {
-        Optional<SessionHandle> session = CreateGroupSession(packetHeader.GetDestinationGroupId().Value());
+        // TODO : remove hard coded fabric index once GroupDataProvider->Decrypt is implemented
+        Optional<SessionHandle> session = CreateGroupSession(packetHeader.GetDestinationGroupId().Value(), 1);
+
         VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
         Transport::GroupSession * groupSession = session.Value()->AsGroupSession();
 

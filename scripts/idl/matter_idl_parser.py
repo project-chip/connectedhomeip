@@ -82,6 +82,9 @@ class MatterIdlTransformer(Transformer):
     def attr_global(self, _):
         return AttributeTag.GLOBAL
 
+    def attr_nosubscribe(self, _):
+        return AttributeTag.NOSUBSCRIBE
+
     def critical_priority(self, _):
         return EventPriority.CRITICAL
 

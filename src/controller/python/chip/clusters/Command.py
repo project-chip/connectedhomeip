@@ -96,8 +96,7 @@ class AsyncCommandTransaction:
     def _handleError(self, imError: int, chipError: int, exception: Exception):
         if exception:
             self._future.set_exception(exception)
-        elif chipError != 0 and chipError != 0xCA:
-            # 0xCA is CHIP_IM_STATUS_CODE_RECEIVED
+        elif chipError != 0:
             self._future.set_exception(
                 chip.exceptions.ChipStackError(chipError))
         else:

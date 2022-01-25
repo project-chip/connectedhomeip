@@ -20,7 +20,6 @@ assert(chip_device_platform == "ameba")
 
 static_library("Ameba") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "AmebaConfig.cpp",
     "AmebaConfig.h",
@@ -40,12 +39,13 @@ static_library("Ameba") {
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "LwIPCoreLock.cpp",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "ServiceProvisioning.cpp",
-    "ServiceProvisioning.h",
     "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
   ]
 
   deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
@@ -54,4 +54,11 @@ static_library("Ameba") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "AmebaOTAImageProcessor.cpp",
+      "AmebaOTAImageProcessor.h",
+    ]
+  }
 }
