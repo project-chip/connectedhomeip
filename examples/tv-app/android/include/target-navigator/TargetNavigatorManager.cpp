@@ -32,7 +32,6 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
             outputInfo.identifier = static_cast<uint8_t>(i + 1);
             outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
-            i++;
         }
         return CHIP_NO_ERROR;
     });
