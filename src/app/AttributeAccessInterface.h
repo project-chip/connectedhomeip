@@ -352,12 +352,18 @@ public:
      *
      * @param [in] aPath indicates which exact data is being read.
      * @param [in] aEncoder the AttributeValueEncoder to use for encoding the
-     *             data.  If this function returns scucess and no attempt is
-     *             made to encode data using aEncoder, the
-     *             AttributeAccessInterface did not try to provide any data.  In
-     *             this case, normal attribute access will happen for the read.
-     *             This may involve reading from the attribute store or external
-     *             attribute callbacks.
+     *             data.
+     *
+     * The implementation can do one of three things:
+     *
+     * 1) Return a failure.  This is treated as a failed read and the error is
+     *    returned to the client, by converting it to a StatusIB.
+     * 2) Return success and attempt to encode data using aEncoder.  The data is
+     *    returned to the client.
+     * 3) Return success and not attempt to encode any data using aEncoder.  In
+     *    this case, Ember attribute access will happen for the read. This may
+     *    involve reading from the attribute store or external attribute
+     *    callbacks.
      */
     virtual CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
 
@@ -366,12 +372,18 @@ public:
      *
      * @param [in] aPath indicates which exact data is being written.
      * @param [in] aDecoder the AttributeValueDecoder to use for decoding the
-     *             data.  If this function returns scucess and no attempt is
-     *             made to decode data using aDecoder, the
-     *             AttributeAccessInterface did not try to write any data.  In
-     *             this case, normal attribute access will happen for the write.
-     *             This may involve writing to the attribute store or external
-     *             attribute callbacks.
+     *             data.
+     *
+     * The implementation can do one of three things:
+     *
+     * 1) Return a failure.  This is treated as a failed write and the error is
+     *    sent to the client, by converting it to a StatusIB.
+     * 2) Return success and attempt to decode from aDecoder.  This is
+     *    treated as a successful write.
+     * 3) Return success and not attempt to decode from aDecoder.  In
+     *    this case, Ember attribute access will happen for the write. This may
+     *    involve writing to the attribute store or external attribute
+     *    callbacks.
      */
     virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
