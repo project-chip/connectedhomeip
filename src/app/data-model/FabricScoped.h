@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,31 +18,49 @@
 
 #pragma once
 
-#include <lib/support/TypeTraits.h>
+#include <app/data-model/BasicTypes.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
+
 #include <type_traits>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
-/*
- * Check whether a cluster object struct is fabric scoped.
- *   A fabric scoped struct contains a field of "FabricIndex" type, however, we cannot tell the difference between that field and
- * other uint8_t fields. Thus we add a GetFabricIndex member function for getting the fabric id. Here, IsFabricScoped checks the
- * presence of GetFabricIndex function. This template can be used with std::enable_if.
+/**
+ * IsFabricScoped checks whether the given type is fabric scoped, for non-basic types (i.e. cluster objects), it should provide a
+ * static constexpr indicating whether it is a fabric scoped struct and basic types will never be fabric scoped.
+ *
+ * Using IsFabricScoped<X>::value without a basic type or cluster object with kIsFabricScoped will cause compile error, this is a
+ * intended behavior to make users always encode expected values.
  */
-template <typename T>
+template <typename X>
 class IsFabricScoped
 {
 private:
-    template <typename Tp>
-    static auto TestHasFabricIndex(int) -> TemplatedTrueType<decltype(&Tp::GetFabricIndex)>;
+    template <typename X0, decltype(std::decay_t<X0>::kIsFabricScoped) = true>
+    static constexpr bool IsFabricScopedClusterObject()
+    {
+        return std::decay_t<X0>::kIsFabricScoped;
+    }
 
-    template <typename Tp>
-    static auto TestHasFabricIndex(long) -> std::false_type;
+    template <typename X0, std::enable_if_t<IsBasicType<std::decay_t<X0>>::value, bool> = true>
+    static constexpr bool IsFabricScopedClusterObject()
+    {
+        return false;
+    }
 
 public:
-    static constexpr bool value = decltype(TestHasFabricIndex<std::decay_t<T>>(0))::value;
+    static constexpr bool value = IsFabricScopedClusterObject<X>();
+};
+
+template <typename X>
+class IsFabricScoped<Nullable<X>>
+{
+public:
+    static constexpr bool value = IsFabricScoped<X>::value;
 };
 
 } // namespace DataModel

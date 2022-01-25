@@ -271,6 +271,16 @@ struct AccessControlEntryCodec
         return CHIP_NO_ERROR;
     }
 
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const
+    {
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+        // Ignore the error value
+        entry.GetFabricIndex(fabricIndex);
+        return fabricIndex;
+    }
+
     AccessControl::Entry entry;
 };
 
