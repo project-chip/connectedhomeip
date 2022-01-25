@@ -26,7 +26,7 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 70
+        timeout-minutes: 80
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -96,9 +96,6 @@ jobs:
             - name: Build example Lock App
               timeout-minutes: 10
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
-            - name: Build example Bridge App
-              timeout-minutes: 10
-              run: scripts/examples/esp_example.sh bridge-app
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
@@ -109,7 +106,7 @@ jobs:
 
     esp32_1:
         name: ESP32_1
-        timeout-minutes: 60
+        timeout-minutes: 70
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -137,6 +134,10 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
+
+            - name: Build example Bridge App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh bridge-app
 
             - name: Build example Persistent Storage App
               timeout-minutes: 10
