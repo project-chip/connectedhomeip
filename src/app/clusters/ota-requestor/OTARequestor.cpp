@@ -123,13 +123,27 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-        CopySpanToMutableSpan(update.updateToken, updateToken);
-        requestorCore->mTargetVersion = update.softwareVersion;
-        requestorCore->mUpdateToken   = updateToken;
+        if (update.softwareVersion > requestorCore->mCurrentVersion)
+        {
+            ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
+                          requestorCore->mCurrentVersion, update.softwareVersion);
+            MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
+            CopySpanToMutableSpan(update.updateToken, updateToken);
+            requestorCore->mTargetVersion = update.softwareVersion;
+            requestorCore->mUpdateToken   = updateToken;
 
-        requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
-                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+            requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
+                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+        else
+        {
+            ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
+                          update.softwareVersion, requestorCore->mCurrentVersion);
+
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
+                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+
         break;
     }
     case OTAQueryStatus::kBusy:
@@ -536,6 +550,8 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
     update.softwareVersion = response.softwareVersion.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(response.updateToken.Value().size() >= 8 && response.updateToken.Value().size() <= 32,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
 
     update.userConsentNeeded    = response.userConsentNeeded.ValueOr(false);
