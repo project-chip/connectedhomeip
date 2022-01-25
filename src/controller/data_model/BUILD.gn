@@ -36,15 +36,15 @@ if (current_os == "android") {
 
     _idl_file = "controller-clusters.matter"
     _idl_contents = exec_script("${chip_root}/scripts/codegen.py",
-                                 [
-                                   "--generator",
-                                   "gni",
-                                   "--output-dir",
-                                   "-",
-                                   rebase_path("controller-clusters.matter"),
-                                 ],
-                                 "scope",
-                                 [ "controller-clusters.matter" ])
+                                [
+                                  "--generator",
+                                  "gni",
+                                  "--output-dir",
+                                  "-",
+                                  rebase_path("controller-clusters.matter"),
+                                ],
+                                "scope",
+                                [ "controller-clusters.matter" ])
 
     args = [
       "--generator",

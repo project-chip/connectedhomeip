@@ -43,13 +43,14 @@ class CodeGeneratorTypes(enum.Enum):
         else:
             raise Error("Unknown code generator type")
 
+
 class StdOutStorage(GeneratorStorage):
     """
     outputs all generated output into stdout
     """
 
     def get_existing_data(self, relative_path: str):
-        return None # stdout has no pre-existing data
+        return None  # stdout has no pre-existing data
 
     def write_new_data(self, relative_path: str, content: str):
         print("################# BEGIN: %s ######################" % relative_path)
@@ -107,12 +108,13 @@ def main(log_level, generator, output_dir, dry_run, idl_path):
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
     if output_dir == '-':
-        storage=StdOutStorage()
+        storage = StdOutStorage()
     else:
-        storage=FileSystemGeneratorStorage(output_dir)
+        storage = FileSystemGeneratorStorage(output_dir)
 
     logging.info("Running code generator %s" % generator)
-    generator = __GENERATORS__[generator].CreateGenerator(storage, idl=idl_tree)
+    generator = __GENERATORS__[
+        generator].CreateGenerator(storage, idl=idl_tree)
     generator.render(dry_run)
     logging.info("Done")
 
