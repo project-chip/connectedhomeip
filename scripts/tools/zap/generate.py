@@ -111,19 +111,6 @@ def extractGeneratedIdl(output_dir, zap_config_path):
 
     os.rename(idl_path, target_path)
 
-    # GN does not support dynamic variables and we want to generate names
-    # and content that are generally split by cluster. Provide a GNI file
-    # for the build system to use
-    subprocess.check_call([
-        'python3',
-        os.path.join(CHIP_ROOT_DIR, "scripts", "codegen.py"),
-        '--output-dir',
-        os.path.dirname(target_path),
-        '--generator',
-        'gni',
-        target_path,
-    ])
-
 
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     generator_dir = getDirPath('third_party/zap/repo')

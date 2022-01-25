@@ -31,14 +31,20 @@ chip_data_model("data_model") {
 }
 
 if (current_os == "android") {
-
   pw_python_action("java-jni-generate") {
     script = "${chip_root}/scripts/codegen.py"
 
     _idl_file = "controller-clusters.matter"
-    _idl_contents = read_file("idl_content.gni", "scope")
-
-
+    _idl_contents = exec_script("${chip_root}/scripts/codegen.py",
+                                 [
+                                   "--generator",
+                                   "gni",
+                                   "--output-dir",
+                                   "-",
+                                   rebase_path("controller-clusters.matter"),
+                                 ],
+                                 "scope",
+                                 [ "controller-clusters.matter" ])
 
     args = [
       "--generator",
@@ -55,7 +61,7 @@ if (current_os == "android") {
     outputs = []
 
     foreach(name, _idl_contents.client_clusters) {
-      outputs += ["$target_gen_dir/jni/${name}Client-ReadImpl.cpp"]
+      outputs += [ "$target_gen_dir/jni/${name}Client-ReadImpl.cpp" ]
     }
   }
 

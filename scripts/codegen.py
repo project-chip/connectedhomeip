@@ -26,7 +26,7 @@ except:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from idl.matter_idl_parser import CreateParser
 
-from idl.generators import FileSystemGeneratorStorage
+from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
 from idl.generators.java import JavaGenerator
 from idl.generators.gni import GniGenerator
 
@@ -42,6 +42,19 @@ class CodeGeneratorTypes(enum.Enum):
             return GniGenerator(*args, **kargs)
         else:
             raise Error("Unknown code generator type")
+
+class StdOutStorage(GeneratorStorage):
+    """
+    outputs all generated output into stdout
+    """
+
+    def get_existing_data(self, relative_path: str):
+        return None # stdout has no pre-existing data
+
+    def write_new_data(self, relative_path: str, content: str):
+        print("################# BEGIN: %s ######################" % relative_path)
+        print(content)
+        print("################# END: %s ######################" % relative_path)
 
 
 # Supported log levels, mapping string values required for argument
@@ -93,9 +106,13 @@ def main(log_level, generator, output_dir, dry_run, idl_path):
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
+    if output_dir == '-':
+        storage=StdOutStorage()
+    else:
+        storage=FileSystemGeneratorStorage(output_dir)
+
     logging.info("Running code generator %s" % generator)
-    generator = __GENERATORS__[generator].CreateGenerator(
-        storage=FileSystemGeneratorStorage(output_dir), idl=idl_tree)
+    generator = __GENERATORS__[generator].CreateGenerator(storage, idl=idl_tree)
     generator.render(dry_run)
     logging.info("Done")
 
