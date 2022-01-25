@@ -129,10 +129,7 @@ public:
     }
 
 public:
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
-    {
-        return writer.Put(chip::TLV::AnonymousTag(), mNode);
-    }
+    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
     {
@@ -538,14 +535,16 @@ public:
         ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagPrivilege), mPrivilege));
 
         chip::TLV::TLVType internalContainer;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::ContextTag(kTagSubjects), chip::TLV::TLVType::kTLVType_Array, internalContainer));
+        ReturnErrorOnFailure(
+            writer.StartContainer(chip::TLV::ContextTag(kTagSubjects), chip::TLV::TLVType::kTLVType_Array, internalContainer));
         for (size_t i = 0; i < kMaxSubjects; ++i)
         {
             ReturnErrorOnFailure(mSubjects[i].Serialize(writer));
         }
         ReturnErrorOnFailure(writer.EndContainer(internalContainer));
 
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::ContextTag(kTagTargets), chip::TLV::TLVType::kTLVType_Array, internalContainer));
+        ReturnErrorOnFailure(
+            writer.StartContainer(chip::TLV::ContextTag(kTagTargets), chip::TLV::TLVType::kTLVType_Array, internalContainer));
         for (size_t i = 0; i < kMaxTargets; ++i)
         {
             ReturnErrorOnFailure(mTargets[i].Serialize(writer));
