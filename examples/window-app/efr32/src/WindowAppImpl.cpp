@@ -382,7 +382,10 @@ void WindowAppImpl::UpdateLCD()
     }
     else
     {
-        LCDWriteQRCode((uint8_t *) mQRCode.c_str());
+        if (GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+        {
+            LCDWriteQRCode((uint8_t *) mQRCode.c_str());
+        }
     }
 #endif
 }
