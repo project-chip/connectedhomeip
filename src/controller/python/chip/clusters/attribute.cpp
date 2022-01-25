@@ -381,7 +381,7 @@ exit:
 }
 
 chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, ReadClient **pReadClient, ReadClientCallback ** pCallback, DeviceProxy * device,
-                                                          
+
                                                           uint8_t * readParamsBuf,
                                                           size_t n, ...)
 {
