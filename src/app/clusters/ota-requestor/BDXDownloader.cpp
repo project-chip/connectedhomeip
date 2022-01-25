@@ -106,18 +106,6 @@ CHIP_ERROR BDXDownloader::FetchNextData()
     return CHIP_NO_ERROR;
 }
 
-uint8_t BDXDownloader::GetDownloadPercentComplete()
-{
-    if (mBdxTransfer.GetTransferLength() == 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<uint8_t>((mBdxTransfer.GetNumBytesProcessed() * 100) / mBdxTransfer.GetTransferLength());
-    }
-}
-
 void BDXDownloader::OnDownloadTimeout()
 {
     if (mState == State::kInProgress)

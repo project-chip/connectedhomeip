@@ -68,7 +68,7 @@ public:
     virtual void NotifyUpdateApplied(uint32_t version) = 0;
 
     // Get image update progress in percents unit
-    virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, uint8_t & progress) = 0;
+    virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
     // Get requestor state
     virtual CHIP_ERROR GetState(EndpointId endpointId,

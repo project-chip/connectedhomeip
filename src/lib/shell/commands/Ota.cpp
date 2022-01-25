@@ -75,14 +75,10 @@ CHIP_ERROR NotifyImageHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StateHandler(int argc, char ** argv)
+static void HandleState(intptr_t context)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
-
     app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state;
-    err = GetRequestorInstance()->GetState(0, state);
+    CHIP_ERROR err = GetRequestorInstance()->GetState(0, state);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -122,25 +118,52 @@ CHIP_ERROR StateHandler(int argc, char ** argv)
         }
         streamer_printf(streamer_get(), "\r\n");
     }
+    else
+    {
+        streamer_printf(streamer_get(), "Error: %" CHIP_ERROR_FORMAT "\r\n", err.Format());
+    }
+}
 
-    return err;
+static void HandleProgress(intptr_t context)
+{
+    chip::app::DataModel::Nullable<uint8_t> progress;
+    CHIP_ERROR err = GetRequestorInstance()->GetUpdateProgress(0, progress);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        if (progress.IsNull())
+        {
+            streamer_printf(streamer_get(), "Update progress: NULL\r\n");
+        }
+        else
+        {
+            streamer_printf(streamer_get(), "Update progress: %d %%\r\n", progress);
+        }
+    }
+    else
+    {
+        streamer_printf(streamer_get(), "Error: %" CHIP_ERROR_FORMAT "\r\n", err.Format());
+    }
+}
+
+CHIP_ERROR StateHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    PlatformMgr().ScheduleWork(HandleState, reinterpret_cast<intptr_t>(nullptr));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ProgressHandler(int argc, char ** argv)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint8_t progress;
-    err = GetRequestorInstance()->GetUpdateProgress(0, progress);
+    PlatformMgr().ScheduleWork(HandleProgress, reinterpret_cast<intptr_t>(nullptr));
 
-    if (err == CHIP_NO_ERROR)
-    {
-        streamer_printf(streamer_get(), "Update progress: %d %%\r\n", progress);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OtaHandler(int argc, char ** argv)
@@ -168,11 +191,11 @@ void RegisterOtaCommands()
     static const shell_command_t subCommands[] = {
         { &QueryImageHandler, "query", "Query for a new image. Usage: ota query <fabric-index> <provider-node-id> <endpoint-id>" },
         { &ApplyImageHandler, "apply",
-          "Apply the current update. Usage ota apply <fabric-index> <provider-node-id> <endpoint-id>" },
+          "Apply the current update. Usage: ota apply <fabric-index> <provider-node-id> <endpoint-id>" },
         { &NotifyImageHandler, "notify",
           "Notify the new image has been applied. Usage: ota notify <fabric-index> <provider-node-id> <endpoint-id>" },
-        { &StateHandler, "state", "Gets state of a current image update process. Usage ota state" },
-        { &ProgressHandler, "progress", "Gets progress of a current image update process. Usage ota progress" }
+        { &StateHandler, "state", "Gets state of a current image update process. Usage: ota state" },
+        { &ProgressHandler, "progress", "Gets progress of a current image update process. Usage: ota progress" }
     };
 
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));

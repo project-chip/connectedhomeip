@@ -72,8 +72,6 @@ public:
 
     State GetState() const { return mState; }
 
-    virtual uint8_t GetDownloadPercentComplete() = 0;
-
     virtual ~OTADownloader() = default;
 
 protected:

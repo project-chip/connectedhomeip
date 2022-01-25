@@ -104,7 +104,7 @@ public:
     void ConnectToProvider(OnConnectedAction onConnectedAction);
 
     // Get image update progress in percents unit
-    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, uint8_t & progress) override;
+    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
 
     // Get requestor state
     CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
