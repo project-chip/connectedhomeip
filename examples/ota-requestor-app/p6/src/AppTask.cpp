@@ -39,12 +39,32 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/GenericOTARequestorDriver.h"
+#include "platform/P6/OTAImageProcessorImpl.h"
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+
+using chip::BDXDownloader;
+using chip::CharSpan;
+using chip::FabricIndex;
+using chip::GetRequestorInstance;
+using chip::NodeId;
+using chip::OTADownloader;
+using chip::OTAImageProcessorImpl;
+using chip::OTAImageProcessorParams;
+using chip::OTARequestor;
+using chip::System::Layer;
+
+using namespace ::chip;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::app::Clusters;
 
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -64,12 +84,12 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-} // namespace
 
-using namespace chip::TLV;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
+OTARequestor gRequestorCore;
+GenericOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -134,6 +154,12 @@ CHIP_ERROR AppTask::Init()
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
+
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // Print setup info
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
