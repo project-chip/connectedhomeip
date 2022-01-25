@@ -25,6 +25,7 @@
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -35,7 +36,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <unistd.h>
 
 using chip::BitFlags;
@@ -61,63 +61,53 @@ static uint32_t gDelayedActionTimeSec                                 = 0;
 static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 
-// Basic CSV parser that expects a precise format - Device Software Version Model Schema.
-// vendorId,productId,softwareVersion,softwareVersionString,CDVersionNumber,softwareVersionValid,minApplicableSoftwareVersion,maxApplicableSoftwareVersion,otaURL
-// Example of file contents:
-// 1,1,10,Version_1,18,true,0,100,/tmp/ota1.txt
-// 1,1,20,Version_2,45,false,4,123,/tmp/ota2.txt
-// TODO: Replace with a JSON file for simpler parsing. The idea is that the contents of the
-// response from the DCL server will be populated into this file appropriately.
-static bool parse_csv_file_and_populate_candidates(const char * filepath,
-                                                   std::vector<OTAProviderExample::DeviceSoftwareVersionModel> & candidates)
+// Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
+static bool parse_json_file_and_populate_candidates(const char * filepath,
+                                                    std::vector<OTAProviderExample::DeviceSoftwareVersionModel> & candidates)
 {
-    std::ifstream fpStream(filepath);
-    std::string line;
-    while (std::getline(fpStream, line))
+    bool ret = false;
+    Json::Value root;
+    Json::CharReaderBuilder builder;
+    JSONCPP_STRING errs;
+    std::ifstream ifs;
+
+    builder["collectComments"] = true; // allow C/C++ type comments in JSON file
+    ifs.open(filepath);
+
+    if (!parseFromStream(builder, ifs, &root, &errs))
     {
-        OTAProviderExample::DeviceSoftwareVersionModel candidate;
-        if (line.find("#") == 0)
-            continue; // Ignore lines starting with #
-        std::istringstream s(line);
-        std::string field;
-        uint8_t pos = 0;
-        while (getline(s, field, ','))
-        {
-            switch (pos)
-            {
-            case 0:
-                candidate.vendorId = static_cast<uint16_t>(std::stoul(field));
-                break;
-            case 1:
-                candidate.productId = static_cast<uint16_t>(std::stoul(field));
-                break;
-            case 2:
-                candidate.softwareVersion = static_cast<uint32_t>(std::stoul(field));
-                break;
-            case 3:
-                strncpy(candidate.softwareVersionString, field.c_str(), OTAProviderExample::SW_VER_STR_MAX_LEN);
-                break;
-            case 4:
-                candidate.CDVersionNumber = static_cast<uint16_t>(std::stoul(field));
-                break;
-            case 5:
-                candidate.softwareVersionValid = (strcmp(field.c_str(), "true") == 0) ? true : false;
-                break;
-            case 6:
-                candidate.minApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
-                break;
-            case 7:
-                candidate.maxApplicableSoftwareVersion = static_cast<uint32_t>(std::stoul(field));
-                break;
-            case 8:
-                strncpy(candidate.otaURL, field.c_str(), OTAProviderExample::OTA_URL_MAX_LEN);
-                break;
-            }
-            pos++;
-        }
-        candidates.push_back(candidate);
+        ChipLogDetail(SoftwareUpdate, "Error parsing JSON from file: \"%s\"", filepath);
     }
-    return true;
+    else
+    {
+        const Json::Value devSofVerModValue = root["deviceSoftwareVersionModel"];
+        if (!devSofVerModValue || !devSofVerModValue.isArray())
+        {
+            ChipLogDetail(SoftwareUpdate, "Error: Key deviceSoftwareVersionModel not found or its value is not of type Array");
+        }
+        else
+        {
+            for (auto iter : devSofVerModValue)
+            {
+                OTAProviderExample::DeviceSoftwareVersionModel candidate;
+                candidate.vendorId        = static_cast<uint16_t>(iter.get("vendorId", 1).asUInt());
+                candidate.productId       = static_cast<uint16_t>(iter.get("productId", 1).asUInt());
+                candidate.softwareVersion = static_cast<uint32_t>(iter.get("softwareVersion", 10).asUInt64());
+                strncpy(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString(),
+                        OTAProviderExample::SW_VER_STR_MAX_LEN);
+                candidate.CDVersionNumber      = static_cast<uint16_t>(iter.get("CDVersionNumber", 0).asUInt());
+                candidate.softwareVersionValid = iter.get("softwareVersionValid", true).asBool() ? true : false;
+                candidate.minApplicableSoftwareVersion =
+                    static_cast<uint32_t>(iter.get("minApplicableSoftwareVersion", 0).asUInt64());
+                candidate.maxApplicableSoftwareVersion =
+                    static_cast<uint32_t>(iter.get("maxApplicableSoftwareVersion", 1000).asUInt64());
+                strncpy(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString(), OTAProviderExample::OTA_URL_MAX_LEN);
+                candidates.push_back(candidate);
+                ret = true;
+            }
+        }
+    }
+    return ret;
 }
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -273,9 +263,9 @@ int main(int argc, char * argv[])
 
     if (gOtaImageListFilepath != nullptr)
     {
-        // Parse CSV file and load the ota candidates
+        // Parse JSON file and load the ota candidates
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
-        parse_csv_file_and_populate_candidates(gOtaImageListFilepath, candidates);
+        parse_json_file_and_populate_candidates(gOtaImageListFilepath, candidates);
         otaProvider.SetOTACandidates(candidates);
     }
 

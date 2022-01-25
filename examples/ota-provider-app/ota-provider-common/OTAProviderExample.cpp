@@ -119,7 +119,7 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
     {
         // VendorID and ProductID will be the primary key when querying
         // the DCL servers. If not we can add the vendor/product ID checks here.
-        if (requestorSoftwareVersion < candidate.softwareVersion &&
+        if (candidate.softwareVersionValid && requestorSoftwareVersion < candidate.softwareVersion &&
             requestorSoftwareVersion >= candidate.minApplicableSoftwareVersion &&
             requestorSoftwareVersion <= candidate.maxApplicableSoftwareVersion)
         {

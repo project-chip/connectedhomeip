@@ -24,9 +24,10 @@ executable("chip-ota-provider-app") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
     "${chip_root}/src/protocols/bdx",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
-  cflags = [ "-Wconversion" ]
+  cflags = [ "-Wconversion", "-ljsoncpp" ]
 
   output_dir = root_out_dir
 }

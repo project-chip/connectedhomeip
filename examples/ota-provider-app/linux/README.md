@@ -15,28 +15,73 @@ Suggest doing the following:
 If `--filepath` is supplied, `ota-provider-app` will automatically serve that
 file to the OTA Requestor (SoftwareVersion will be Requester version + 1).
 
-If `--otaImageList` is supplied, `ota-provider-app` will parse the CSV file and
-extract all required data. Then the most recent software version will be
-selected and sent to the OTA Requestor.
+If `--otaImageList` is supplied, `ota-provider-app` will parse the JSON file and
+extract all required data. Then the most recent, valid software version will be
+selected and the corresponding ota-file will be sent to the OTA Requestor.
 
-The `ota-provider-app`'s Basic CSV parser expects a precise format - Device
-Software Version Model Schema (lines beginning with # are ignored).
-
-vendorId,productId,softwareVersion,softwareVersionString,CDVersionNumber,
-softwareVersionValid,minApplicableSoftwareVersion,maxApplicableSoftwareVersion,otaURL
 
 Here's an example of the otaImageList file contents:
 
-#vendorId,productId,softwareVersion,softwareVersionString,CDVersionNumber,softwareVersionValid,minApplicableSoftwareVersion,maxApplicableSoftwareVersion,otaURL
-1,1,10,Version_1,18,true,0,100,/tmp/ota.txt
-1,1,20,Version_2,14,true,0,100,/tmp/ota.txt
-1,1,30,Version_3,49,true,0,100,/tmp/ota.txt
-1,1,40,Version_4,10,true,0,100,/tmp/ota.txt
-1,1,50,Version_5,23,true,0,100,/tmp/ota.txt
-
-TODO: Replace with a JSON file for simpler parsing. The idea is that the
-contents of the response from the DCL server will be populated into this file
-appropriately.
+{
+    "foo": 1, // ignored by parser
+    "deviceSoftwareVersionModel": [
+        {
+            "vendorId": 1,
+            "productId": 1,
+            "softwareVersion": 10,
+            "softwareVersionString": "1.0.0",
+            "CDVersionNumber": 18,
+            "softwareVersionValid": true,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 100,
+            "otaURL": "/tmp/ota.txt"
+        },
+        {
+            "vendorId": 1,
+            "productId": 1,
+            "softwareVersion": 20,
+            "softwareVersionString": "1.0.1",
+            "CDVersionNumber": 18,
+            "softwareVersionValid": false,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 100,
+            "otaURL": "/tmp/ota.txt"
+        },
+        {
+            "vendorId": 1,
+            "productId": 1,
+            "softwareVersion": 30,
+            "softwareVersionString": "1.0.2",
+            "CDVersionNumber": 18,
+            "softwareVersionValid": true,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 100,
+            "otaURL": "/tmp/ota.txt"
+        },
+        {
+            "vendorId": 1,
+            "productId": 1,
+            "softwareVersion": 40,
+            "softwareVersionString": "1.1.0",
+            "CDVersionNumber": 18,
+            "softwareVersionValid": true,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 100,
+            "otaURL": "/tmp/ota.txt"
+        },
+        {
+            "vendorId": 1,
+            "productId": 1,
+            "softwareVersion": 50,
+            "softwareVersionString": "1.1.1",
+            "CDVersionNumber": 18,
+            "softwareVersionValid": false,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 100,
+            "otaURL": "/tmp/ota.txt"
+        }
+    ]
+}
 
 If neither `--filepath` nor `--otaImageList` are supplied, `ota-provider-app`
 will respond to `QueryImage` with `NotAvailable` status.
