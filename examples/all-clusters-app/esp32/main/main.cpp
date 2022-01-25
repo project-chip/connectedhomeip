@@ -17,8 +17,8 @@
 
 #include "BluetoothWidget.h"
 #include "Button.h"
-#include "CaseCommands.h"
 #include "CHIPDeviceManager.h"
+#include "CaseCommands.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
 #include "Globals.h"
