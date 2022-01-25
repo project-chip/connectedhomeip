@@ -1733,11 +1733,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendNOC:
-            ChipLogError(Controller, "AddNOC contents not specified %s %s %s %s",
-params.GetNoc().HasValue() ? "true" : "false",
-params.GetIcac().HasValue() ? "true" : "false",
-params.GetIpk().HasValue() ? "true" : "false",
-params.GetAdminSubject().HasValue() ? "true" : "false");
+        ChipLogError(Controller, "AddNOC contents not specified %s %s %s %s", params.GetNoc().HasValue() ? "true" : "false",
+                     params.GetIcac().HasValue() ? "true" : "false", params.GetIpk().HasValue() ? "true" : "false",
+                     params.GetAdminSubject().HasValue() ? "true" : "false");
         if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() ||
             !params.GetAdminSubject().HasValue())
         {
