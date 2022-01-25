@@ -106,7 +106,7 @@ public:
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
-                                    aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex),
+                                    aArg.GetFabricIndex() == mAttributeValueEncoder.mAccessingFabricIndex,
                                 CHIP_NO_ERROR);
             return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
         }

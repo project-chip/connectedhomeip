@@ -28,21 +28,21 @@ namespace DataModel {
 /*
  * Check whether a cluster object struct is fabric scoped.
  *   A fabric scoped struct contains a field of "FabricIndex" type, however, we cannot tell the difference between that field and
- * other uint8_t fields. Thus we add a MatchesFabricIndex member function for checking the fabric id. Here, IsFabricScoped check the
- * presence of MatchesFabricIndex function. This template can be used with std::enable_if.
+ * other uint8_t fields. Thus we add a GetFabricIndex member function for checking the fabric id. Here, IsFabricScoped check the
+ * presence of GetFabricIndex function. This template can be used with std::enable_if.
  */
 template <typename T>
 class IsFabricScoped
 {
 private:
     template <typename Tp>
-    static auto TestHasMatchesFabricIndex(int) -> TemplatedTrueType<decltype(&Tp::MatchesFabricIndex)>;
+    static auto TestHasFabricIndex(int) -> TemplatedTrueType<decltype(&Tp::GetFabricIndex)>;
 
     template <typename Tp>
-    static auto TestHasMatchesFabricIndex(long) -> std::false_type;
+    static auto TestHasFabricIndex(long) -> std::false_type;
 
 public:
-    static constexpr bool value = decltype(TestHasMatchesFabricIndex<std::decay_t<T>>(0))::value;
+    static constexpr bool value = decltype(TestHasFabricIndex<std::decay_t<T>>(0))::value;
 };
 
 } // namespace DataModel
