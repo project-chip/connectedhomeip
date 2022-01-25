@@ -168,12 +168,12 @@ In order to send commands to a device, it must be paired with the client and
 connected to the network.
 
 To run the commissioning process via BLE, run the built executable and pass it
-the network ssid and password, fabric id, discriminator and pairing code of the
-remote device.
+the network ssid and password, discriminator and pairing code of the remote
+device.
 
 Example:
 
-    $ chip-tool pairing ble-wifi network_ssid network_password 0 20202021 3840
+    $ chip-tool pairing ble-wifi network_ssid network_password 20202021 3840
 
 ## Sending ZCL commands
 

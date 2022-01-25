@@ -95,6 +95,8 @@ typedef struct
     bool increasing;
     bool useOnLevel;
     uint8_t onLevel;
+    uint8_t minLevel;
+    uint8_t maxLevel;
     uint16_t storedLevel;
     uint32_t eventDurationMs;
     uint32_t transitionTimeMs;
@@ -102,9 +104,6 @@ typedef struct
 } EmberAfLevelControlState;
 
 static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-
-static uint8_t minLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
-static uint8_t maxLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
@@ -195,13 +194,13 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     }
     else if (state->increasing)
     {
-        assert(currentLevel < maxLevel);
+        assert(currentLevel < state->maxLevel);
         assert(currentLevel < state->moveToLevel);
         currentLevel++;
     }
     else
     {
-        assert(minLevel < currentLevel);
+        assert(state->minLevel < currentLevel);
         assert(state->moveToLevel < currentLevel);
         currentLevel--;
     }
@@ -233,8 +232,8 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         if (state->commandId == Commands::MoveToLevelWithOnOff::Id || state->commandId == Commands::MoveWithOnOff::Id ||
             state->commandId == Commands::StepWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (currentLevel != minLevel));
-            if (currentLevel == minLevel && state->useOnLevel)
+            setOnOffValue(endpoint, (currentLevel != state->minLevel));
+            if (currentLevel == state->minLevel && state->useOnLevel)
             {
                 status = Attributes::CurrentLevel::Set(endpoint, state->onLevel);
                 if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -530,13 +529,13 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
 
     // Move To Level commands cause the device to move from its current level to
     // the specified level at the specified rate.
-    if (maxLevel <= level)
+    if (state->maxLevel <= level)
     {
-        state->moveToLevel = maxLevel;
+        state->moveToLevel = state->maxLevel;
     }
-    else if (level <= minLevel)
+    else if (level <= state->minLevel)
     {
-        state->moveToLevel = minLevel;
+        state->moveToLevel = state->minLevel;
     }
     else
     {
@@ -551,7 +550,7 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
     {
         if (commandId == Commands::MoveToLevelWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (state->moveToLevel != minLevel));
+            setOnOffValue(endpoint, (state->moveToLevel != state->minLevel));
         }
         if (currentLevel == state->moveToLevel)
         {
@@ -675,13 +674,13 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     {
     case EMBER_ZCL_MOVE_MODE_UP:
         state->increasing  = true;
-        state->moveToLevel = maxLevel;
-        difference         = static_cast<uint8_t>(maxLevel - currentLevel);
+        state->moveToLevel = state->maxLevel;
+        difference         = static_cast<uint8_t>(state->maxLevel - currentLevel);
         break;
     case EMBER_ZCL_MOVE_MODE_DOWN:
         state->increasing  = false;
-        state->moveToLevel = minLevel;
-        difference         = static_cast<uint8_t>(currentLevel - minLevel);
+        state->moveToLevel = state->minLevel;
+        difference         = static_cast<uint8_t>(currentLevel - state->minLevel);
         break;
     default:
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
@@ -696,7 +695,7 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     {
         if (commandId == Commands::MoveWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (state->moveToLevel != minLevel));
+            setOnOffValue(endpoint, (state->moveToLevel != state->minLevel));
         }
         if (currentLevel == state->moveToLevel)
         {
@@ -788,10 +787,10 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     {
     case EMBER_ZCL_STEP_MODE_UP:
         state->increasing = true;
-        if (maxLevel - currentLevel < stepSize)
+        if (state->maxLevel - currentLevel < stepSize)
         {
-            state->moveToLevel = maxLevel;
-            actualStepSize     = static_cast<uint8_t>(maxLevel - currentLevel);
+            state->moveToLevel = state->maxLevel;
+            actualStepSize     = static_cast<uint8_t>(state->maxLevel - currentLevel);
         }
         else
         {
@@ -800,10 +799,10 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
         break;
     case EMBER_ZCL_STEP_MODE_DOWN:
         state->increasing = false;
-        if (currentLevel - minLevel < stepSize)
+        if (currentLevel - state->minLevel < stepSize)
         {
-            state->moveToLevel = minLevel;
-            actualStepSize     = static_cast<uint8_t>(currentLevel - minLevel);
+            state->moveToLevel = state->minLevel;
+            actualStepSize     = static_cast<uint8_t>(currentLevel - state->minLevel);
         }
         else
         {
@@ -823,7 +822,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     {
         if (commandId == Commands::StepWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (state->moveToLevel != minLevel));
+            setOnOffValue(endpoint, (state->moveToLevel != state->minLevel));
         }
         if (currentLevel == state->moveToLevel)
         {
@@ -905,8 +904,16 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     app::DataModel::Nullable<uint8_t> resolvedLevel;
     uint8_t temporaryCurrentLevelCache;
     uint16_t currentOnOffTransitionTime;
-    uint8_t minimumLevelAllowedForTheDevice = minLevel;
     EmberAfStatus status;
+
+    EmberAfLevelControlState * state = getState(endpoint);
+    if (state == NULL)
+    {
+        emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
+        return;
+    }
+
+    uint8_t minimumLevelAllowedForTheDevice = state->minLevel;
 
     // "Temporarily store CurrentLevel."
     status = Attributes::CurrentLevel::Get(endpoint, &temporaryCurrentLevelCache);
@@ -992,23 +999,34 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
 void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
+    EmberAfLevelControlState * state = getState(endpoint);
+
+    if (state == NULL)
+    {
+        emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
+        return;
+    }
+
+    state->minLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
+    state->maxLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
+
     // If these read only attributes are enabled we use those values as our set minLevel and maxLevel
     // if get isn't possible, value stays at default
-    Attributes::MinLevel::Get(endpoint, &minLevel);
-    Attributes::MaxLevel::Get(endpoint, &maxLevel);
+    Attributes::MinLevel::Get(endpoint, &state->minLevel);
+    Attributes::MaxLevel::Get(endpoint, &state->maxLevel);
 
     uint32_t featureMap;
     if (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
         READBITS(featureMap, EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING))
     {
-        if (minLevel < LEVEL_CONTROL_LIGHTING_MIN_LEVEL)
+        if (state->minLevel < LEVEL_CONTROL_LIGHTING_MIN_LEVEL)
         {
-            minLevel = LEVEL_CONTROL_LIGHTING_MIN_LEVEL;
+            state->minLevel = LEVEL_CONTROL_LIGHTING_MIN_LEVEL;
         }
 
-        if (maxLevel > LEVEL_CONTROL_LIGHTING_MAX_LEVEL)
+        if (state->maxLevel > LEVEL_CONTROL_LIGHTING_MAX_LEVEL)
         {
-            maxLevel = LEVEL_CONTROL_LIGHTING_MAX_LEVEL;
+            state->maxLevel = LEVEL_CONTROL_LIGHTING_MAX_LEVEL;
         }
     }
 
@@ -1041,20 +1059,20 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                 {
                     if (startUpCurrentLevel.Value() == STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM)
                     {
-                        currentLevel = minLevel;
+                        currentLevel = state->minLevel;
                     }
                     else
                     {
                         // Otherwise set to specified value 0x01-0xFE.
                         // But, need to enforce currentLevel's min/max, right?
                         // Spec doesn't mention this.
-                        if (startUpCurrentLevel.Value() < minLevel)
+                        if (startUpCurrentLevel.Value() < state->minLevel)
                         {
-                            currentLevel = minLevel;
+                            currentLevel = state->minLevel;
                         }
-                        else if (startUpCurrentLevel.Value() > maxLevel)
+                        else if (startUpCurrentLevel.Value() > state->maxLevel)
                         {
-                            currentLevel = maxLevel;
+                            currentLevel = state->maxLevel;
                         }
                         else
                         {
@@ -1069,13 +1087,13 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
        // In any case, we make sure that the respects min/max
-        if (currentLevel < minLevel)
+        if (currentLevel < state->minLevel)
         {
-            Attributes::CurrentLevel::Set(endpoint, minLevel);
+            Attributes::CurrentLevel::Set(endpoint, state->minLevel);
         }
-        else if (currentLevel > maxLevel)
+        else if (currentLevel > state->maxLevel)
         {
-            Attributes::CurrentLevel::Set(endpoint, maxLevel);
+            Attributes::CurrentLevel::Set(endpoint, state->maxLevel);
         }
     }
 

@@ -278,9 +278,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
         {{#chip_cluster_command_non_expanded_arguments}}
         {{#if isArray}}
@@ -315,9 +315,9 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadEvent ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -348,9 +348,9 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportEvent ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -400,9 +400,9 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -443,9 +443,9 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -475,9 +475,9 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
