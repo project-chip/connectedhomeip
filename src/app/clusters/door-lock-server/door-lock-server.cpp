@@ -693,27 +693,16 @@ void DoorLockServer::ClearCredentialCommandHandler(
     }
 
     const auto & credential = commandData.credential;
-    // Android ZAP generators generate bad code when command has nullable struct as an argument.
-    // So far we don't support removing all credentials as it could be workaround by executing
-    // clearCredential command for all the credential types.
-#if DOR_LOCK_ANDROID_GENERATORS_FIXED
     if (credential.IsNull())
     {
         emberAfDoorLockClusterPrintln("[ClearCredential] Clearing all credentials [endpointId=%d]", commandPath.mEndpointId);
         emberAfSendImmediateDefaultResponse(clearCredentials(commandPath.mEndpointId, modifier, sourceNodeId));
         return;
     }
-#endif // DOR_LOCK_ANDROID_GENERATORS_FIXED
 
     // Remove all the credentials of the particular type.
-#if DOR_LOCK_ANDROID_GENERATORS_FIXED
     auto credentialType  = credential.Value().credentialType;
     auto credentialIndex = credential.Value().credentialIndex;
-#else
-    auto credentialType  = credential.credentialType;
-    auto credentialIndex = credential.credentialIndex;
-#endif // DOR_LOCK_ANDROID_GENERATORS_FIXED
-
     if (0xFFFE == credentialIndex)
     {
         emberAfSendImmediateDefaultResponse(clearCredentials(commandPath.mEndpointId, modifier, sourceNodeId, credentialType));
