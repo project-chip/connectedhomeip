@@ -69,6 +69,8 @@ public:
 
     virtual bool IsActive() const { return true; }
 
+    virtual CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
 protected:
