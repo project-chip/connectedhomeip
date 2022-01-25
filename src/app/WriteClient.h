@@ -79,8 +79,9 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - A CHIP_ERROR encapsulating a StatusIB: If we got a
-         *   non-path-specific status response from the server.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
@@ -224,8 +225,9 @@ private:
     // Timed Request.  The caller is assumed to have already checked that our
     // exchange context member is the one the message came in on.
     //
-    // If the server returned an error status, that will be returned as an error
-    // value of CHIP_ERROR.
+    // If the server returned an error status response its status will be
+    // encapsulated in the CHIP_ERROR this returns.  In that case,
+    // StatusIB::InitFromChipError can be used to extract the status.
     CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     // Send our queued-up Write Request message.  Assumes the exchange is ready

@@ -37,7 +37,11 @@ namespace Controller {
  *     cluster object.
  *
  *  3. Automatically representing all errors as a CHIP_ERROR (which might
- *     encapsulate a StatusIB).
+ *     encapsulate a StatusIB).  This could be a path-specific error or it
+ *     could be a general error for the entire request; the distinction is not
+ *     that important, because we only have one path involved.  If the
+ *     CHIP_ERROR encapsulates a StatusIB, StatusIB::InitFromChipError can be
+ *     used to extract the status.
  */
 template <typename DecodableAttributeType>
 class TypedReadAttributeCallback final : public app::ReadClient::Callback

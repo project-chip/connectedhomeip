@@ -37,8 +37,9 @@ public:
     // Handle a response message (which may not actually be a StatusResponse,
     // but came in after we sent a timed request).
     //
-    // If the response is a failure StatusResponse, its status will be returned
-    // in the CHIP_ERROR this returns.
+    // If the response is a failure StatusResponse, its status will be
+    // encapsulated in the CHIP_ERROR this returns.  In that case,
+    // StatusIB::InitFromChipError can be used to extract the status.
     static CHIP_ERROR HandleResponse(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 };
 
