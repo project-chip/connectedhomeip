@@ -73,18 +73,6 @@ public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
-    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
-    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
-    bool HasWiFiCredentials() const { return mWiFiCreds.HasValue(); }
-    bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
-    bool HasNOCChainGenerationaParameters() const { return mNOCChainGenerationParameters.HasValue(); }
-    bool HasRootCert() const { return mRootCert.HasValue(); }
-    bool HasNoc() const { return mNoc.HasValue(); }
-    bool HasIcac() const { return mIcac.HasValue(); }
-    bool HasAttestationElements() const { return mAttestationElements.HasValue(); }
-    bool HasAttestationSignature() const { return mAttestationSignature.HasValue(); }
-    bool HasPAI() const { return mPAI.HasValue(); }
-    bool HasDAC() const { return mDAC.HasValue(); }
     uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
