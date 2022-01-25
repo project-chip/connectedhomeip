@@ -227,6 +227,17 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
+    //
+    // In situations where all the controller instances get shutdown, the entire stack is then also
+    // implicitly shutdown. In the REPL, users can create such a situation by manually shutting down
+    // controllers (for example, when they call ChipReplStartup::LoadFabricAdmins multiple times). In
+    // that situation, momentarily, the stack gets de-initialized. This results in further interactions with
+    // the stack being dangerous (and in fact, causes crashes).
+    //
+    // This retain call ensures the stack doesn't get de-initialized in the REPL.
+    //
+    DeviceControllerFactory::GetInstance().RetainSystemState();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

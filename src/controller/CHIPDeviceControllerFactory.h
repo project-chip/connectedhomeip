@@ -109,6 +109,15 @@ public:
     DeviceControllerFactory(DeviceControllerFactory const &) = delete;
     void operator=(DeviceControllerFactory const &) = delete;
 
+    //
+    // Some clients do not prefer a complete shutdown of the stack being initiated if
+    // all device controllers have ceased to exist. To avoid that, this method has been
+    // created to permit retention of the underlying system state to avoid that.
+    //
+    void RetainSystemState()  {
+        (void)mSystemState->Retain();
+    }
+
 private:
     DeviceControllerFactory(){};
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
