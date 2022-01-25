@@ -112,14 +112,6 @@ void InteractionModelEngine::Shutdown()
     //
     mpActiveReadClientList = nullptr;
 
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
-        {
-            writeClient.Shutdown();
-        }
-    }
-
     for (auto & writeHandler : mWriteHandlers)
     {
         VerifyOrDie(writeHandler.IsFree());
@@ -139,21 +131,6 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
     for (auto & readHandler : mReadHandlers)
     {
         if (!readHandler.IsFree())
-        {
-            numActive++;
-        }
-    }
-
-    return numActive;
-}
-
-uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
-{
-    uint32_t numActive = 0;
-
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
         {
             numActive++;
         }
@@ -205,25 +182,6 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricInde
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback,
-                                                  const Optional<uint16_t> & aTimedWriteTimeoutMs)
-{
-    apWriteClient.SetWriteClient(nullptr);
-
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
-        {
-            continue;
-        }
-        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback, aTimedWriteTimeoutMs));
-        apWriteClient.SetWriteClient(&writeClient);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
-}
-
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
     mCommandHandlerObjs.ReleaseObject(&apCommandObj);
@@ -247,6 +205,42 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR InteractionModelEngine::ShutdownExistingSubscriptionsIfNeeded(Messaging::ExchangeContext * apExchangeContext,
+                                                                         System::PacketBufferHandle && aPayload)
+{
+    bool keepSubscriptions = true;
+    System::PacketBufferTLVReader reader;
+    reader.Init(std::move(aPayload));
+    ReturnErrorOnFailure(reader.Next());
+    SubscribeRequestMessage::Parser subscribeRequestParser;
+    ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
+    CHIP_ERROR err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
+    if (CHIP_END_OF_TLV == err)
+    {
+        return CHIP_NO_ERROR;
+    }
+    else if (CHIP_NO_ERROR != err)
+    {
+        return err;
+    }
+
+    if (keepSubscriptions)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
+            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
+            readHandler.GetAccessingFabricIndex() == apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex())
+        {
+            readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
                                                         const PayloadHeader & aPayloadHeader,
                                                         System::PacketBufferHandle && aPayload,
@@ -255,26 +249,6 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 {
     ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
-
-    for (auto & readHandler : mReadHandlers)
-    {
-        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
-            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
-            readHandler.GetAccessingFabricIndex() == apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex())
-        {
-            bool keepSubscriptions = true;
-            System::PacketBufferTLVReader reader;
-            reader.Init(aPayload.Retain());
-            ReturnErrorOnFailure(reader.Next());
-            SubscribeRequestMessage::Parser subscribeRequestParser;
-            ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
-            CHIP_ERROR err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
-            if (err == CHIP_NO_ERROR && !keepSubscriptions)
-            {
-                readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
-            }
-        }
-    }
 
     // Reserve the last ReadHandler for ReadInteraction
     if (aInteractionType == ReadHandler::InteractionType::Subscribe &&
@@ -397,7 +371,9 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
-        SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
+        System::PacketBufferHandle payload = aPayload.Retain();
+        SuccessOrExit(ShutdownExistingSubscriptionsIfNeeded(apExchangeContext, std::move(aPayload)));
+        SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(payload),
                                            ReadHandler::InteractionType::Subscribe, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
@@ -426,11 +402,6 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(ec));
-}
-
-uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const
-{
-    return static_cast<uint16_t>(apWriteClient - mWriteClients);
 }
 
 uint16_t InteractionModelEngine::GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const

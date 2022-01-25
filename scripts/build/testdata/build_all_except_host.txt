@@ -166,6 +166,9 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating cyw30739-cyw930739m2evb_01-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
+
 # Generating efr32-brd4161a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
 
@@ -867,6 +870,9 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+
+# Building cyw30739-cyw930739m2evb_01-light
+ninja -C {out}/cyw30739-cyw930739m2evb_01-light
 
 # Building efr32-brd4161a-light
 ninja -C {out}/efr32-brd4161a-light

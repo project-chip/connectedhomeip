@@ -27,6 +27,7 @@ adb
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddThreadNetwork
 adk
 adoc
 AdvAutonomous
@@ -252,12 +253,14 @@ customizations
 cvfJ
 cxx
 CY
+CYW
 DAC
 DAP
 DataFrame
 dataset
 datasets
 dbf
+DBG
 dBm
 DBUILD
 dbus
@@ -316,6 +319,7 @@ DMM
 DNS
 Dnsmasq
 dnsmasqd
+DNSSD
 DNSStubListener
 Dockerfile
 Dockerfiles
@@ -355,6 +359,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EnableNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName
@@ -414,6 +419,7 @@ fsl
 fstab
 fsync
 fullclean
+gbl
 gcloud
 GDB
 GeneralCommissioning
@@ -650,6 +656,7 @@ MoveToSaturation
 MoveWithOnOff
 MPSL
 MRP
+MTD
 MTU
 Multiband
 Multicast
@@ -722,6 +729,7 @@ OTA
 OTADownloader
 OTAImageProcessorDriver
 OTAImageProcessorInterface
+OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
@@ -837,6 +845,7 @@ RendezVousTest
 repo
 req
 Requestor
+Requestors
 responder
 retargeting
 reusability
@@ -940,6 +949,7 @@ submodules
 subprocess
 SubscribeResponse
 SubscriptionId
+subtype
 sudo
 svg
 SVR
@@ -978,6 +988,7 @@ testws
 texinfo
 textboxes
 TFT
+threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
 Thunderboard
@@ -988,6 +999,7 @@ TLV
 tmp
 tngvndl
 TODO
+tokenized
 toolchain
 toolchains
 topologies

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <lib/support/CodeUtils.h>
 #include <stdlib.h>
 #include <system/SystemClock.h>
 
@@ -77,10 +78,7 @@ public:
 
     void SetMonotonicTimestamp(System::Clock::Timestamp value)
     {
-        if (value < mCurrentTime)
-        {
-            abort();
-        }
+        VerifyOrDie(value >= mCurrentTime);
         mCurrentTime = value;
     }
 

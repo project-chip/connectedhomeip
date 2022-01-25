@@ -10,6 +10,7 @@ FROM connectedhomeip/chip-build-tizen:${VERSION} AS tizen
 FROM connectedhomeip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM connectedhomeip/chip-build-ameba:${VERSION} AS ameba
 FROM connectedhomeip/chip-build-k32w:${VERSION} AS k32w
+FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -40,6 +41,9 @@ COPY --from=ameba /opt/ameba /opt/ameba
 
 COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
 
+COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
+
+
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
 # 'vscode' to accept licenses)
@@ -67,3 +71,4 @@ ENV TIZEN_HOME /opt/tizen_sdk
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott/

@@ -90,6 +90,13 @@ CHIPDevice * GetConnectedDevice(void)
     _expectation = nil;
 }
 
+- (void)onCommissioningComplete:(NSError *)error
+{
+    XCTAssertEqual(error.code, 0);
+    [_expectation fulfill];
+    _expectation = nil;
+}
+
 - (void)onAddressUpdated:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
@@ -211,6 +218,7 @@ CHIPDevice * GetConnectedDevice(void)
 {{#unless (isStrEqual "Basic" name)}}
 {{#unless (isStrEqual "Thermostat" name)}}
 {{#unless (isStrEqual "OTA Software Update Provider" name)}}
+{{#unless (isStrEqual "Network Commissioning" name)}} {{! "Networks" is broken }}
 {{#chip_server_cluster_attributes}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 - (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler
@@ -263,6 +271,7 @@ CHIPDevice * GetConnectedDevice(void)
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/unless}}

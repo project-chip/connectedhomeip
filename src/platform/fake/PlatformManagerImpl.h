@@ -121,6 +121,12 @@ private:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    CHIP_ERROR _GetSupportedCalendarTypes(
+        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
     void _LockChipStack() {}
     bool _TryLockChipStack() { return true; }
     void _UnlockChipStack() {}

@@ -331,8 +331,8 @@ CHIP_ERROR AttributeListReader::Read(const ConcreteReadAttributePath & aPath, At
 // Helper function for trying to read an attribute value via an
 // AttributeAccessInterface.  On failure, the read has failed.  On success, the
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
-CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                  AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFabricFiltered,
+                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                   AttributeValueEncoder::AttributeEncodeState * aEncoderState,
                                   AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
 {
@@ -340,7 +340,8 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
     // into status responses, unless our caller already does that.
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, state);
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, aIsFabricFiltered,
+                                       state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)
@@ -360,8 +361,8 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
 
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
@@ -416,9 +417,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
         }
     }
 
-    // Read attribute using attribute override, if appropriate. This includes registered overrides, but also
-    // specially handled mandatory global attributes (which use unregistered overrides).
-
     {
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
         // reader (which can be lightweight constructed even from nullptr).
@@ -428,8 +426,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
         if (attributeOverride)
         {
             bool triedEncode;
-            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
-                                                        attributeOverride, &triedEncode));
+            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aIsFabricFiltered, aPath, aAttributeReports,
+                                                        apEncoderState, attributeOverride, &triedEncode));
             ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
         }
     }
@@ -658,21 +656,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             {
                 ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
             }
-            break;
-        }
-        case ZCL_ARRAY_ATTRIBUTE_TYPE: {
-            // We only get here for attributes of list type that have no override
-            // registered.  There should not be any nonempty lists like that.
-            uint16_t length = emberAfGetInt16u(attributeData, 0, 2);
-            if (length != 0)
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-
-            // Just encode an empty array.
-            TLV::TLVType containerType;
-            ReturnErrorOnFailure(writer->StartContainer(tag, TLV::kTLVType_Array, containerType));
-            ReturnErrorOnFailure(writer->EndContainer(containerType));
             break;
         }
         default:

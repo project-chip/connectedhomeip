@@ -48,8 +48,8 @@
 #include "lcd.h"
 #endif
 
-#if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
+#if CHIP_ENABLE_OPENTHREAD
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -62,6 +62,10 @@
 #include <openthread/thread.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#if defined(RS911X_WIFI) || defined(WF200_WIFI)
+#include "wfx_host_events.h"
+#endif /* RS911X_WIFI */
+
 #if PW_RPC_ENABLED
 #include "Rpc.h"
 #endif
@@ -70,6 +74,7 @@
 #include "matter_shell.h"
 #endif
 
+#define BLE_DEV_NAME "SiLabs-Light"
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -135,7 +140,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LIGHT");
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();
@@ -160,6 +165,13 @@ int main(void)
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
+#ifdef WF200_WIFI
+    // Start wfx bus communication task.
+    wfx_bus_start();
+#ifdef SL_WFX_USE_SECURE_LINK
+    wfx_securelink_task_start(); // start securelink key renegotiation task
+#endif                           // SL_WFX_USE_SECURE_LINK
+#endif                           /* WF200_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Starting OpenThread task");
@@ -172,6 +184,13 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+#ifdef RS911X_WIFI
+    /*
+     * Start up any RSI interface stuff
+     * (Not required) - Note that wfx_wifi_start will deal with
+     * starting up a rsi task - which will initialize the SPI interface.
+     */
+#endif
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();

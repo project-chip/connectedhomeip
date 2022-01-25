@@ -86,6 +86,7 @@ target_sources(${APP_TARGET} PRIVATE
 
                ${APP_CLUSTERS}/application-basic-server/application-basic-server.cpp
                ${APP_CLUSTERS}/basic/basic.cpp
+               ${APP_CLUSTERS}/bindings/BindingManager.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/access-control-server/access-control-server.cpp
@@ -108,6 +109,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/level-control/level-control.cpp
                ${APP_CLUSTERS}/low-power-server/low-power-server.cpp
                ${APP_CLUSTERS}/localization-configuration-server/localization-configuration-server.cpp
+               ${APP_CLUSTERS}/time-format-localization-server/time-format-localization-server.cpp
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
@@ -136,6 +138,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
                ${APP_CLUSTERS}/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
+               ${APP_CLUSTERS}/power-source-server/power-source-server.cpp
                ${APP_CLUSTERS}/ota-requestor/ota-requestor-server.cpp
                ${APP_CLUSTERS}/ota-requestor/BDXDownloader.cpp
                ${APP_CLUSTERS}/ota-requestor/OTARequestor.cpp
