@@ -538,6 +538,17 @@ AppCallbacks sCallbacks;
 
 } // namespace
 
+static void InitOTARequestor(void)
+{
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+#endif
+}
+
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
@@ -548,17 +559,7 @@ static void InitServer(intptr_t context)
     NetWorkCommissioningInstInit();
     SetupPretendDevices();
     InitBindingHandlers();
-}
-
-static void InitOTARequestor(void)
-{
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
+    InitOTARequestor();
 }
 
 extern "C" void app_main()
@@ -620,8 +621,6 @@ extern "C" void app_main()
 
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-
-    InitOTARequestor();
 
 #if CONFIG_HAVE_DISPLAY
     std::string qrCodeText;
