@@ -277,7 +277,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called, but UpdateDevice did not succeed (%s)", ErrorStr(err));
+        ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called, but UpdateDevice did not succeed (%" CHIP_ERROR_FORMAT ")", err.Format());
     }
 }
 
