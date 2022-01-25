@@ -167,10 +167,9 @@ To build the POSIX CLI CHIPTool application check the guide
 In order to send commands to a device, it must be paired with the client and
 connected to the network.
 
-To run the commissioning process via BLE, run the built executable and
-pass it the node id to assign to the newly-commmissioned node, network
-ssid and password, discriminator and pairing code of the remote
-device.
+To run the commissioning process via BLE, run the built executable and pass it
+the node id to assign to the newly-commmissioned node, network ssid and
+password, discriminator and pairing code of the remote device.
 
 Example:
 
