@@ -82,7 +82,10 @@ public:
     const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
     const Optional<ByteSpan> GetNoc() const { return mNoc; }
     const Optional<ByteSpan> GetIcac() const { return mIcac; }
-    const Optional<AesCcm128KeySpan> GetIpk() const { return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>(); }
+    const Optional<AesCcm128KeySpan> GetIpk() const
+    {
+        return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>();
+    }
     const Optional<NodeId> GetAdminSubject() const { return mAdminSubject; }
     const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
@@ -214,7 +217,9 @@ struct AttestationResponse
 
 struct NocChain
 {
-    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) : noc(newNoc), icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject) {}
+    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) :
+        noc(newNoc), icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject)
+    {}
     ByteSpan noc;
     ByteSpan icac;
     ByteSpan rcac;
