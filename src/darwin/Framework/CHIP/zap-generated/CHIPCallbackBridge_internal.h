@@ -26,7 +26,6 @@
 typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
 using CHIPCommandSuccessCallbackType = CommandSuccessCallback;
 typedef void (*CHIPDefaultSuccessCallbackType)(void *);
-typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
 
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
