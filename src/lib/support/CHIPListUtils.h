@@ -18,9 +18,11 @@
 #ifndef CHIP_LISTUTILS_INTERNAL_H
 #define CHIP_LISTUTILS_INTERNAL_H
 
+#include <app/data-model/List.h>
 #include <set>
 #include <type_traits>
 
+// TODO move to chip namespace
 template <typename T>
 struct ListMemberTypeGetter
 {
