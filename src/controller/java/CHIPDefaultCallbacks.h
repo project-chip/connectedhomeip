@@ -1,8 +1,8 @@
 #include <jni.h>
 
+#include "zap-generated/CHIPClientCallbacks.h"
 #include <lib/core/CHIPError.h>
 #include <zap-generated/CHIPCallbackTypes.h>
-#include "zap-generated/CHIPClientCallbacks.h"
 
 namespace chip {
 
