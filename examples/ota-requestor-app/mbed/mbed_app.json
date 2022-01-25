@@ -13,7 +13,8 @@
             "mbed-trace.enable": true,
             "target.printf_lib": "std",
             "mcuboot.bootloader-build": false,
-            "mcuboot.log-level": "MCUBOOT_LOG_LEVEL_DEBUG"
+            "mcuboot.log-enable": true,
+            "mcuboot.log-level": "MCUBOOT_LOG_LEVEL_ERROR"
         },
         "CY8CPROTO_062_4343W": {
             "target.network-default-interface-type": "WIFI",
