@@ -289,42 +289,144 @@ struct EmberAfPluginDoorLockUserInfo
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
 
+/**
+ * @brief Status of the schedule slot in the schedule database.
+ */
 enum class DlScheduleStatus : uint8_t
 {
-    kAvailable = 0x00, /**< Indicates if credential slot is available. */
-    kOccupied  = 0x01, /**< Indicates if credential slot is already occupied. */
+    kAvailable = 0x00, /**< Indicates if schedule slot is available. */
+    kOccupied  = 0x01, /**< Indicates if schedule slot is already occupied. */
 };
 
+/**
+ * @brief Structure that holds week day schedule information.
+ */
 struct EmberAfPluginDoorLockWeekDaySchedule
 {
-    DlDaysMaskMap daysMask;
-    uint8_t startHour;
-    uint8_t startMinute;
-    uint8_t endHour;
-    uint8_t endMinute;
+    DlDaysMaskMap daysMask; /** Indicates the days of the week the Week Day schedule applies for. */
+    uint8_t startHour;      /** Starting hour for the Week Day schedule. */
+    uint8_t startMinute;    /** Starting minute for the Week Day schedule. */
+    uint8_t endHour;        /** Ending hour for the Week Day schedule. */
+    uint8_t endMinute;      /** Ending minute for the Week Day schedule. */
 };
 
+/**
+ * @brief Structure that holds year day schedule information.
+ */
 struct EmberAfPluginDoorLockYearDaySchedule
 {
-    uint32_t localStartTime;
-    uint32_t localEndTime;
+    uint32_t localStartTime; /** The starting time for the Year Day schedule in Epoch Time in Seconds with local time offset based
+                                on the local timezone and DST offset on the day represented by the value. */
+    uint32_t localEndTime;   /** The ending time for the Year Day schedule in Epoch Time in Seconds with local time offset based on
+                              * the local timezone and DST offset on the day represented by the value. */
 };
 
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the Week Day schedule in the schedules database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param weekdayIndex Index of the week day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     week day schedule (from 1 up to NumberOfWeekDaySchedulesSupportedPerUser).
+ * @param userIndex Index of the user to get week day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param[out] schedule Resulting week day schedule.
+ *
+ * @retval DlStatus::kSuccess if schedule was retrieved successfully
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule);
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the Year Day schedule in the schedules database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param yearDayIndex Index of the year day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     year day schedule (from 1 up to NumberOfYearDaySchedulesSupportedPerUser)
+ * @param userIndex Index of the user to get year day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param[out] schedule Resulting year day schedule.
+ *
+ * @retval DlStatus::kSuccess if schedule was retrieved successfully
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockYearDaySchedule & schedule);
 
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the week day schedule in schedules
+ * database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param weekdayIndex Index of the week day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     week day schedule (from 1 up to NumberOfWeekDaySchedulesSupportedPerUser).
+ * @param userIndex Index of the user to get year day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param status New status of the schedule slot (occupied/available). DlScheduleStatus::kAvailable means that the
+ *               schedules must be deleted.
+ * @param daysMask Indicates the days of the week the Week Day schedule applies for.
+ * @param startHour Starting hour for the Week Day schedule.
+ * @param startMinute Starting minute for the Week Day schedule
+ * @param endHour Ending hour for the Week Day schedule. Guaranteed to be greater or equal to \p startHour.
+ * @param endMinute Ending minute for the Week Day schedule. If \p endHour is equal to \p startHour then EndMinute
+ *                  is guaranteed to be greater than \p startMinute.
+ *
+ * @retval DlStatus::kSuccess if schedule was successfully modified
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute);
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the year day schedule in schedules
+ * database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param yearDayIndex Index of the year day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     year day schedule (from 1 up to NumberOfYearDaySchedulesSupportedPerUser).
+ * @param userIndex Index of the user to get year day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param status New status of the schedule slot (occupied/available). DlScheduleStatus::kAvailable means that the
+ *               schedules must be deleted.
+ * @param localStartTime The starting time for the Year Day schedule in Epoch Time in Seconds with local time offset based on the
+ *                       local timezone and DST offset on the day represented by the value.
+ * @param localEndTime The ending time for the Year Day schedule in Epoch Time in Seconds with local time offset based on the local
+ *                     timezone and DST offset on the day represented by the value. \p localEndTime is guaranteed to be greater than
+ *                     \p localStartTime.
+ *
+ * @retval DlStatus::kSuccess if schedule was successfully modified
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
 
 typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 
+/**
+ * @brief This callback is called when Door Lock cluster needs to issue command to lock the door.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param pinCode PIN code that is used to lock the door. Could be absent if attribute RequirePINforRemoteOperation is not set or
+ *                set to false.
+ *
+ * @return true if the door was locked, false in case of any failure.
+ */
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to issue command to unlock the door.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param pinCode PIN code that is used to unllock the door. Could be absent if attribute RequirePINforRemoteOperation is not set or
+ *                set to false.
+ *
+ * @return true if the door was unlocked, false in case of any failure.
+ */
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+
 bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode,
                                                          uint16_t timeout);
 
