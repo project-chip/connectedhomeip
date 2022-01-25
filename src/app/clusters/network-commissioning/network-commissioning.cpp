@@ -64,11 +64,11 @@ NetworkCommissioning::WiFiBand ToClusterObjectEnum(DeviceLayer::NetworkCommissio
     using ClusterObject     = NetworkCommissioning::WiFiBand;
     using PlatfromInterface = DeviceLayer::NetworkCommissioning::WiFiBand;
 
-    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g valus mismatch.");
+    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 value mismatch.");
+    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 value mismatch.");
+    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g value mismatch.");
+    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g value mismatch.");
+    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g value mismatch.");
 
     return static_cast<ClusterObject>(to_underlying(band));
 }
@@ -82,6 +82,9 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(
         DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init());
+    mLastNetworkingStatusValue.SetNull();
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
     return CHIP_NO_ERROR;
 }
 
@@ -194,15 +197,21 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::InterfaceEnabled::Id:
         return aEncoder.Encode(mpBaseDriver->GetEnabled());
 
-    // TODO: Add support to the following attributes
     case Attributes::LastNetworkingStatus::Id:
-        return aEncoder.Encode(NetworkCommissioningStatus::kSuccess);
+        return aEncoder.Encode(mLastNetworkingStatusValue);
 
     case Attributes::LastNetworkID::Id:
-        return aEncoder.Encode(ByteSpan());
+        if (mLastNetworkIDLen == 0)
+        {
+            return aEncoder.EncodeNull();
+        }
+        else
+        {
+            return aEncoder.Encode(ByteSpan(mLastNetworkID, mLastNetworkIDLen));
+        }
 
     case Attributes::LastConnectErrorValue::Id:
-        return aEncoder.Encode(Attributes::LastConnectErrorValue::TypeInfo::Type(0));
+        return aEncoder.Encode(mLastConnectErrorValue);
 
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
@@ -267,6 +276,14 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
+    if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
+    }
+
+    mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
+    memcpy(mConnectingNetworkID, req.networkID.data(), sizeof(mConnectingNetworkID));
+
     mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
@@ -294,6 +311,12 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.debugText        = errorText;
     response.errorValue       = interfaceStatus;
     commandHandle->AddResponseData(mPath, response);
+
+    mLastNetworkIDLen = mConnectingNetworkIDLen;
+    memcpy(mLastNetworkID, mConnectingNetworkID, sizeof(mConnectingNetworkID));
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
+    mLastConnectErrorValue.SetNonNull(interfaceStatus);
+
     if (commissioningError == Status::kSuccess)
     {
         // TODO: Pass the actual network id to device control server.
@@ -312,6 +335,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         // We may receive the callback after it and should make it noop.
         return;
     }
+
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
@@ -366,6 +393,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
         // We may receive the callback after it and should make it noop.
         return;
     }
+
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
