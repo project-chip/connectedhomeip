@@ -114,9 +114,7 @@ public:
     // all device controllers have ceased to exist. To avoid that, this method has been
     // created to permit retention of the underlying system state to avoid that.
     //
-    void RetainSystemState()  {
-        (void)mSystemState->Retain();
-    }
+    void RetainSystemState() { (void) mSystemState->Retain(); }
 
 private:
     DeviceControllerFactory(){};
