@@ -48906,6 +48906,14 @@ public:
                             " ***** Test Step 471 : Verify nullable range-restricted signed 16-bit integer value is null\n");
             err = TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsNull_471();
             break;
+        case 472:
+            ChipLogProgress(chipTool, " ***** Test Step 472 : Write attribute that returns general status on write\n");
+            err = TestWriteAttributeThatReturnsGeneralStatusOnWrite_472();
+            break;
+        case 473:
+            ChipLogProgress(chipTool, " ***** Test Step 473 : Write attribute that returns cluster-specific status on write\n");
+            err = TestWriteAttributeThatReturnsClusterSpecificStatusOnWrite_473();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -48917,7 +48925,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 472;
+    const uint16_t mTestCount = 474;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -52786,6 +52794,20 @@ private:
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_471(nullableRangeRestrictedInt16s);
     }
+
+    static void OnFailureCallback_472(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_472(error);
+    }
+
+    static void OnSuccessCallback_472(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_472(); }
+
+    static void OnFailureCallback_473(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_473(error);
+    }
+
+    static void OnSuccessCallback_473(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_473(); }
 
     //
     // Tests methods
@@ -64783,6 +64805,52 @@ private:
 
         NextTest();
     }
+
+    CHIP_ERROR TestWriteAttributeThatReturnsGeneralStatusOnWrite_472()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool generalErrorBooleanArgument;
+        generalErrorBooleanArgument = false;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo>(
+            generalErrorBooleanArgument, this, OnSuccessCallback_472, OnFailureCallback_472));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_472(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_DATA_TYPE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_472() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestWriteAttributeThatReturnsClusterSpecificStatusOnWrite_473()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool clusterErrorBooleanArgument;
+        clusterErrorBooleanArgument = false;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo>(
+            clusterErrorBooleanArgument, this, OnSuccessCallback_473, OnFailureCallback_473));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_473(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_473() { ThrowSuccessResponse(); }
 };
 
 class TestClusterComplexTypes : public TestCommand

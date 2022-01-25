@@ -13340,6 +13340,42 @@ public class ChipClusters {
       subscribeTimedWriteBooleanAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readGeneralErrorBooleanAttribute(BooleanAttributeCallback callback) {
+      readGeneralErrorBooleanAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeGeneralErrorBooleanAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeGeneralErrorBooleanAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeGeneralErrorBooleanAttribute(
+        DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeGeneralErrorBooleanAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeGeneralErrorBooleanAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneralErrorBooleanAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterErrorBooleanAttribute(BooleanAttributeCallback callback) {
+      readClusterErrorBooleanAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeClusterErrorBooleanAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeClusterErrorBooleanAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeClusterErrorBooleanAttribute(
+        DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeClusterErrorBooleanAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeClusterErrorBooleanAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterErrorBooleanAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -14450,6 +14486,30 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeTimedWriteBooleanAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneralErrorBooleanAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeGeneralErrorBooleanAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Boolean value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeGeneralErrorBooleanAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterErrorBooleanAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeClusterErrorBooleanAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Boolean value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeClusterErrorBooleanAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readUnsupportedAttribute(

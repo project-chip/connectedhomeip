@@ -3709,3 +3709,21 @@ tests:
       attribute: "nullable_range_restricted_int16s"
       response:
           value: null
+
+    - label: "Write attribute that returns general status on write"
+      command: "writeAttribute"
+      attribute: "general_error_boolean"
+      arguments:
+          value: false
+      response:
+          error: INVALID_DATA_TYPE
+
+    - label: "Write attribute that returns cluster-specific status on write"
+      command: "writeAttribute"
+      attribute: "cluster_error_boolean"
+      arguments:
+          value: false
+      response:
+          # TODO: We don't have a way to represent cluster-specific status
+          # here yet.
+          error: FAILURE

@@ -1568,6 +1568,42 @@ public class ClusterWriteMapping {
     writeTestClusterInteractionInfo.put(
         "writeTimedWriteBooleanAttribute",
         writeTestClusterTimedWriteBooleanAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterGeneralErrorBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClustergeneralErrorBooleanCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeTestClusterGeneralErrorBooleanCommandParams.put(
+        "value", testClustergeneralErrorBooleanCommandParameterInfo);
+    InteractionInfo writeTestClusterGeneralErrorBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeGeneralErrorBooleanAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterGeneralErrorBooleanCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeGeneralErrorBooleanAttribute",
+        writeTestClusterGeneralErrorBooleanAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterClusterErrorBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClusterclusterErrorBooleanCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeTestClusterClusterErrorBooleanCommandParams.put(
+        "value", testClusterclusterErrorBooleanCommandParameterInfo);
+    InteractionInfo writeTestClusterClusterErrorBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeClusterErrorBooleanAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterClusterErrorBooleanCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeClusterErrorBooleanAttribute",
+        writeTestClusterClusterErrorBooleanAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeTestClusterUnsupportedCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterunsupportedCommandParameterInfo =

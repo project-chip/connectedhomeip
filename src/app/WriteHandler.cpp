@@ -173,7 +173,14 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             const ConcreteAttributePath concretePath =
                 ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
             MatterPreAttributeWriteCallback(concretePath);
+            TLV::TLVWriter backup;
+            mWriteResponseBuilder.Checkpoint(backup);
             err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
+            if (err != CHIP_NO_ERROR)
+            {
+                mWriteResponseBuilder.Rollback(backup);
+                err = AddStatus(concretePath, StatusIB(err));
+            }
             MatterPostAttributeWriteCallback(concretePath);
         }
         SuccessOrExit(err);
@@ -253,8 +260,12 @@ exit:
     return status;
 }
 
-CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
-                                   const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
+{
+    return AddStatus(aPath, StatusIB(aStatus));
+}
+
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteAttributePath & aPath, const StatusIB & aStatus)
 {
     AttributeStatusIBs::Builder & writeResponses   = mWriteResponseBuilder.GetWriteResponses();
     AttributeStatusIB::Builder & attributeStatusIB = writeResponses.CreateAttributeStatus();
@@ -262,13 +273,11 @@ CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathPar
 
     AttributePathIB::Builder & path = attributeStatusIB.CreatePath();
     ReturnErrorOnFailure(attributeStatusIB.GetError());
-    ReturnErrorOnFailure(path.Encode(aAttributePathParams));
+    ReturnErrorOnFailure(path.Encode(AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId)));
 
-    StatusIB statusIB;
-    statusIB.mStatus                    = aStatus;
     StatusIB::Builder & statusIBBuilder = attributeStatusIB.CreateErrorStatus();
     ReturnErrorOnFailure(attributeStatusIB.GetError());
-    statusIBBuilder.EncodeStatusIB(statusIB);
+    statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
     attributeStatusIB.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatusIB.GetError());
