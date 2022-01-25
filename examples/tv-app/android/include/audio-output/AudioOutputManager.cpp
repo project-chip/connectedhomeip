@@ -30,7 +30,7 @@ uint8_t AudioOutputManager::HandleGetCurrentOutput()
 CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-    return aEncoder.EncodeList((const auto & encoder)->CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         int maximumVectorSize = 3;
         for (int i = 0; i < maximumVectorSize; ++i)
         {
