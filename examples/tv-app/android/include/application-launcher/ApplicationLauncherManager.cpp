@@ -54,7 +54,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
     helper.Success(response);
 }
 
-void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
                                                const ApplicationLauncherApplicationType & application)
 {
     // TODO: Insert code here
