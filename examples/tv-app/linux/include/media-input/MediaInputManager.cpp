@@ -29,8 +29,8 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
         for (int i = 0; i < maximumVectorSize; ++i)
         {
             chip::app::Clusters::MediaInput::Structs::InputInfo::Type inputInfo;
-            inputInfo.description = chip::CharSpan("exampleDescription", strlen("exampleDescription"));
-            inputInfo.name        = chip::CharSpan("exampleName", strlen("exampleName"));
+            inputInfo.description = chip::CharSpan::fromCharString("exampleDescription");
+            inputInfo.name        = chip::CharSpan::fromCharString("exampleName");
             inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
             inputInfo.index       = static_cast<uint8_t>(1 + i);
 
