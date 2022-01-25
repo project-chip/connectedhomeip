@@ -67,7 +67,7 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 0 20202021 3840
+    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 20202021 3840
 
 where:
 
@@ -76,16 +76,14 @@ where:
 -   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
     where the bytes of the SSID are encoded as two-digit hex numbers.
 -   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
--   The 0 is the fabric id, until more complete support for multiple fabrics is
-    implemented in our commissioning process.
 
 For example:
 
-    $ chip-tool pairing ble-wifi 0x11 xyz secret 0 20202021 3840
+    $ chip-tool pairing ble-wifi 0x11 xyz secret 20202021 3840
 
 or equivalently:
 
-    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 0 20202021 3840
+    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 20202021 3840
 
 #### Pair a device over IP
 

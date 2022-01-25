@@ -21,7 +21,7 @@
 
 typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataModel::NullObjectType &);
 typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
-typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 typedef void (*CHIPAccessControlClusterAclAttributeCallbackType)(
     void *, const chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo::DecodableType &);

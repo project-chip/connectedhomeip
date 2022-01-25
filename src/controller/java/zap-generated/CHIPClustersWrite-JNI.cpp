@@ -28,11 +28,13 @@
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPDefaultCallbacks.h>
 #include <jni.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
+#include <vector>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -40,14 +42,299 @@
 using namespace chip;
 using namespace chip::Controller;
 
+JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                jobject element_0_fabricIndexItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
+                                                                  element_0_fabricIndexItem_1);
+                listHolder_0->mList[i_0].fabricIndex =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIndex)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricIndexItem_1));
+                jobject element_0_privilegeItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "privilege", "Ljava/lang/Integer;",
+                                                                  element_0_privilegeItem_1);
+                listHolder_0->mList[i_0].privilege =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].privilege)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_privilegeItem_1));
+                jobject element_0_authModeItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "authMode", "Ljava/lang/Integer;",
+                                                                  element_0_authModeItem_1);
+                listHolder_0->mList[i_0].authMode =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].authMode)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_authModeItem_1));
+                jobject element_0_subjectsItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "subjects", "Ljava/util/ArrayList;",
+                                                                  element_0_subjectsItem_1);
+                if (element_0_subjectsItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].subjects.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].subjects.SetNonNull();
+                    {
+                        using ListType_3       = std::remove_reference_t<decltype(nonNullValue_2)>;
+                        using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                        jint element_0_subjectsItem_1Size;
+                        chip::JniReferences::GetInstance().GetArrayListSize(element_0_subjectsItem_1, element_0_subjectsItem_1Size);
+                        if (element_0_subjectsItem_1Size != 0)
+                        {
+                            auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_subjectsItem_1Size);
+                            listFreer.add(listHolder_3);
+
+                            for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_subjectsItem_1Size); ++i_3)
+                            {
+                                jobject element_3;
+                                chip::JniReferences::GetInstance().GetArrayListItem(element_0_subjectsItem_1, i_3, element_3);
+                                listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(
+                                    chip::JniReferences::GetInstance().LongToPrimitive(element_3));
+                            }
+                            nonNullValue_2 = ListType_3(listHolder_3->mList, element_0_subjectsItem_1Size);
+                        }
+                        else
+                        {
+                            nonNullValue_2 = ListType_3();
+                        }
+                    }
+                }
+                jobject element_0_targetsItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "targets", "Ljava/util/ArrayList;",
+                                                                  element_0_targetsItem_1);
+                if (element_0_targetsItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].targets.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].targets.SetNonNull();
+                    {
+                        using ListType_3       = std::remove_reference_t<decltype(nonNullValue_2)>;
+                        using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                        jint element_0_targetsItem_1Size;
+                        chip::JniReferences::GetInstance().GetArrayListSize(element_0_targetsItem_1, element_0_targetsItem_1Size);
+                        if (element_0_targetsItem_1Size != 0)
+                        {
+                            auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_targetsItem_1Size);
+                            listFreer.add(listHolder_3);
+
+                            for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_targetsItem_1Size); ++i_3)
+                            {
+                                jobject element_3;
+                                chip::JniReferences::GetInstance().GetArrayListItem(element_0_targetsItem_1, i_3, element_3);
+                                jobject element_3_clusterItem_4;
+                                chip::JniReferences::GetInstance().GetObjectField(element_3, "cluster", "Ljava/lang/Long;",
+                                                                                  element_3_clusterItem_4);
+                                if (element_3_clusterItem_4 == nullptr)
+                                {
+                                    listHolder_3->mList[i_3].cluster.SetNull();
+                                }
+                                else
+                                {
+                                    auto & nonNullValue_5 = listHolder_3->mList[i_3].cluster.SetNonNull();
+                                    nonNullValue_5        = static_cast<std::remove_reference_t<decltype(nonNullValue_5)>>(
+                                        chip::JniReferences::GetInstance().LongToPrimitive(element_3_clusterItem_4));
+                                }
+                                jobject element_3_endpointItem_4;
+                                chip::JniReferences::GetInstance().GetObjectField(element_3, "endpoint", "Ljava/lang/Integer;",
+                                                                                  element_3_endpointItem_4);
+                                if (element_3_endpointItem_4 == nullptr)
+                                {
+                                    listHolder_3->mList[i_3].endpoint.SetNull();
+                                }
+                                else
+                                {
+                                    auto & nonNullValue_5 = listHolder_3->mList[i_3].endpoint.SetNonNull();
+                                    nonNullValue_5        = static_cast<std::remove_reference_t<decltype(nonNullValue_5)>>(
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_3_endpointItem_4));
+                                }
+                                jobject element_3_deviceTypeItem_4;
+                                chip::JniReferences::GetInstance().GetObjectField(element_3, "deviceType", "Ljava/lang/Long;",
+                                                                                  element_3_deviceTypeItem_4);
+                                if (element_3_deviceTypeItem_4 == nullptr)
+                                {
+                                    listHolder_3->mList[i_3].deviceType.SetNull();
+                                }
+                                else
+                                {
+                                    auto & nonNullValue_5 = listHolder_3->mList[i_3].deviceType.SetNonNull();
+                                    nonNullValue_5        = static_cast<std::remove_reference_t<decltype(nonNullValue_5)>>(
+                                        chip::JniReferences::GetInstance().LongToPrimitive(element_3_deviceTypeItem_4));
+                                }
+                            }
+                            nonNullValue_2 = ListType_3(listHolder_3->mList, element_0_targetsItem_1Size);
+                        }
+                        else
+                        {
+                            nonNullValue_2 = ListType_3();
+                        }
+                    }
+                }
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    AccessControlCluster * cppCluster = reinterpret_cast<AccessControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                jobject element_0_fabricIndexItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
+                                                                  element_0_fabricIndexItem_1);
+                listHolder_0->mList[i_0].fabricIndex =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIndex)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricIndexItem_1));
+                jobject element_0_dataItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "data", "[B", element_0_dataItem_1);
+                cleanupByteArrays.push_back(
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_dataItem_1)));
+                listHolder_0->mList[i_0].data = cleanupByteArrays.back()->byteSpan();
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    AccessControlCluster * cppCluster = reinterpret_cast<AccessControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
 JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -91,10 +378,15 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::Location::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -138,10 +430,15 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -185,10 +482,15 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -232,10 +534,15 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -279,10 +586,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -326,10 +638,15 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -373,10 +690,15 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -420,10 +742,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -467,10 +794,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -514,10 +846,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -561,10 +898,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -608,10 +950,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -655,10 +1002,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -702,10 +1054,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -749,10 +1106,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -796,10 +1158,15 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -843,10 +1210,15 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -890,10 +1262,14 @@ JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribu
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -937,10 +1313,15 @@ JNI_METHOD(void, DoorLockCluster, writeLanguageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -984,10 +1365,14 @@ JNI_METHOD(void, DoorLockCluster, writeAutoRelockTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1031,10 +1416,15 @@ JNI_METHOD(void, DoorLockCluster, writeSoundVolumeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1078,10 +1468,15 @@ JNI_METHOD(void, DoorLockCluster, writeOperatingModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1125,10 +1520,15 @@ JNI_METHOD(void, DoorLockCluster, writeEnableOneTouchLockingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1172,10 +1572,15 @@ JNI_METHOD(void, DoorLockCluster, writeEnablePrivacyModeButtonAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1219,10 +1624,15 @@ JNI_METHOD(void, DoorLockCluster, writeWrongCodeEntryLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1266,10 +1676,14 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1313,10 +1727,15 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1360,10 +1779,15 @@ JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1407,10 +1831,15 @@ JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1454,15 +1883,23 @@ JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1506,15 +1943,23 @@ JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1558,15 +2003,23 @@ JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1610,15 +2063,23 @@ JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1662,15 +2123,23 @@ JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1714,10 +2183,15 @@ JNI_METHOD(void, LocalizationConfigurationCluster, writeActiveLocaleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1761,10 +2235,15 @@ JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1808,10 +2287,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1851,14 +2335,109 @@ JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
     onFailure.release();
 }
 
+JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProvidersAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                jobject element_0_fabricIndexItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
+                                                                  element_0_fabricIndexItem_1);
+                listHolder_0->mList[i_0].fabricIndex =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIndex)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricIndexItem_1));
+                jobject element_0_providerNodeIDItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "providerNodeID", "Ljava/lang/Long;",
+                                                                  element_0_providerNodeIDItem_1);
+                listHolder_0->mList[i_0].providerNodeID =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].providerNodeID)>>(
+                        chip::JniReferences::GetInstance().LongToPrimitive(element_0_providerNodeIDItem_1));
+                jobject element_0_endpointItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "endpoint", "Ljava/lang/Integer;",
+                                                                  element_0_endpointItem_1);
+                listHolder_0->mList[i_0].endpoint =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].endpoint)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_endpointItem_1));
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
 JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1902,10 +2481,15 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1949,10 +2533,15 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1996,10 +2585,15 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2043,15 +2637,23 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeRunningHoursAt
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2095,15 +2697,23 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeEnergyConsumed
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2147,10 +2757,15 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2194,10 +2809,15 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2241,10 +2861,15 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2288,10 +2913,15 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2335,10 +2965,15 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2382,10 +3017,14 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2429,10 +3068,14 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2476,10 +3119,15 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2523,10 +3171,15 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2570,10 +3223,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt24uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2617,10 +3274,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2664,10 +3325,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt40uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2711,10 +3376,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt48uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2758,10 +3427,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt56uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2805,10 +3478,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2852,10 +3529,15 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2899,10 +3581,15 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2946,10 +3633,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt24sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2993,10 +3684,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3040,10 +3735,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt40sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3087,10 +3786,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt48sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3134,10 +3837,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt56sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3181,10 +3888,14 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3228,10 +3939,15 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3275,10 +3991,15 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3322,10 +4043,14 @@ JNI_METHOD(void, TestClusterCluster, writeFloatSingleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().FloatToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().FloatToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3369,10 +4094,15 @@ JNI_METHOD(void, TestClusterCluster, writeFloatDoubleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().DoubleToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().DoubleToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3416,10 +4146,248 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(value)));
+    cppValue = cleanupByteArrays.back()->byteSpan();
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TestClusterCluster, writeListInt8uAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                cleanupByteArrays.push_back(
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0)));
+                listHolder_0->mList[i_0] = cleanupByteArrays.back()->byteSpan();
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                jobject element_0_fabricIndexItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Long;",
+                                                                  element_0_fabricIndexItem_1);
+                listHolder_0->mList[i_0].fabricIndex =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIndex)>>(
+                        chip::JniReferences::GetInstance().LongToPrimitive(element_0_fabricIndexItem_1));
+                jobject element_0_operationalCertItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "operationalCert", "[B",
+                                                                  element_0_operationalCertItem_1);
+                cleanupByteArrays.push_back(
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_operationalCertItem_1)));
+                listHolder_0->mList[i_0].operationalCert = cleanupByteArrays.back()->byteSpan();
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3463,10 +4431,15 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(value)));
+    cppValue = cleanupByteArrays.back()->byteSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3510,10 +4483,15 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3557,10 +4535,15 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+    cppValue = cleanupStrings.back()->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3604,10 +4587,14 @@ JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3651,10 +4638,14 @@ JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3698,10 +4689,449 @@ JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                jobject element_0_nullableIntItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableInt", "Ljava/lang/Integer;",
+                                                                  element_0_nullableIntItem_1);
+                if (element_0_nullableIntItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].nullableInt.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableInt.SetNonNull();
+                    nonNullValue_2        = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_nullableIntItem_1));
+                }
+                jobject element_0_optionalIntItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "optionalInt", "Ljava/util/Optional;",
+                                                                  element_0_optionalIntItem_1);
+                if (element_0_optionalIntItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_optionalIntItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].optionalInt.Emplace();
+                    definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                }
+                jobject element_0_nullableOptionalIntItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableOptionalInt", "Ljava/util/Optional;",
+                                                                  element_0_nullableOptionalIntItem_1);
+                if (element_0_nullableOptionalIntItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nullableOptionalIntItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalInt.Emplace();
+                    if (optionalValue_2 == nullptr)
+                    {
+                        definedValue_2.SetNull();
+                    }
+                    else
+                    {
+                        auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                        nonNullValue_3        = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                    }
+                }
+                jobject element_0_nullableStringItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableString", "Ljava/lang/String;",
+                                                                  element_0_nullableStringItem_1);
+                if (element_0_nullableStringItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].nullableString.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableString.SetNonNull();
+                    cleanupStrings.push_back(
+                        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_0_nullableStringItem_1)));
+                    nonNullValue_2 = cleanupStrings.back()->charSpan();
+                }
+                jobject element_0_optionalStringItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "optionalString", "Ljava/util/Optional;",
+                                                                  element_0_optionalStringItem_1);
+                if (element_0_optionalStringItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_optionalStringItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].optionalString.Emplace();
+                    cleanupStrings.push_back(
+                        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2)));
+                    definedValue_2 = cleanupStrings.back()->charSpan();
+                }
+                jobject element_0_nullableOptionalStringItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableOptionalString", "Ljava/util/Optional;",
+                                                                  element_0_nullableOptionalStringItem_1);
+                if (element_0_nullableOptionalStringItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nullableOptionalStringItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalString.Emplace();
+                    if (optionalValue_2 == nullptr)
+                    {
+                        definedValue_2.SetNull();
+                    }
+                    else
+                    {
+                        auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                        cleanupStrings.push_back(
+                            chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2)));
+                        nonNullValue_3 = cleanupStrings.back()->charSpan();
+                    }
+                }
+                jobject element_0_nullableStructItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(
+                    element_0, "nullableStruct", "Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;",
+                    element_0_nullableStructItem_1);
+                if (element_0_nullableStructItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].nullableStruct.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableStruct.SetNonNull();
+                    jobject element_0_nullableStructItem_1_aItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "a", "Ljava/lang/Integer;",
+                                                                      element_0_nullableStructItem_1_aItem_3);
+                    nonNullValue_2.a = static_cast<std::remove_reference_t<decltype(nonNullValue_2.a)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_nullableStructItem_1_aItem_3));
+                    jobject element_0_nullableStructItem_1_bItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "b", "Ljava/lang/Boolean;",
+                                                                      element_0_nullableStructItem_1_bItem_3);
+                    nonNullValue_2.b = static_cast<std::remove_reference_t<decltype(nonNullValue_2.b)>>(
+                        chip::JniReferences::GetInstance().BooleanToPrimitive(element_0_nullableStructItem_1_bItem_3));
+                    jobject element_0_nullableStructItem_1_cItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "c", "Ljava/lang/Integer;",
+                                                                      element_0_nullableStructItem_1_cItem_3);
+                    nonNullValue_2.c = static_cast<std::remove_reference_t<decltype(nonNullValue_2.c)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_nullableStructItem_1_cItem_3));
+                    jobject element_0_nullableStructItem_1_dItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "d", "[B",
+                                                                      element_0_nullableStructItem_1_dItem_3);
+                    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(
+                        env, static_cast<jbyteArray>(element_0_nullableStructItem_1_dItem_3)));
+                    nonNullValue_2.d = cleanupByteArrays.back()->byteSpan();
+                    jobject element_0_nullableStructItem_1_eItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "e", "Ljava/lang/String;",
+                                                                      element_0_nullableStructItem_1_eItem_3);
+                    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
+                        env, static_cast<jstring>(element_0_nullableStructItem_1_eItem_3)));
+                    nonNullValue_2.e = cleanupStrings.back()->charSpan();
+                    jobject element_0_nullableStructItem_1_fItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "f", "Ljava/lang/Integer;",
+                                                                      element_0_nullableStructItem_1_fItem_3);
+                    nonNullValue_2.f = static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_nullableStructItem_1_fItem_3));
+                    jobject element_0_nullableStructItem_1_gItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "g", "Ljava/lang/Float;",
+                                                                      element_0_nullableStructItem_1_gItem_3);
+                    nonNullValue_2.g = static_cast<std::remove_reference_t<decltype(nonNullValue_2.g)>>(
+                        chip::JniReferences::GetInstance().FloatToPrimitive(element_0_nullableStructItem_1_gItem_3));
+                    jobject element_0_nullableStructItem_1_hItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "h", "Ljava/lang/Double;",
+                                                                      element_0_nullableStructItem_1_hItem_3);
+                    nonNullValue_2.h = static_cast<std::remove_reference_t<decltype(nonNullValue_2.h)>>(
+                        chip::JniReferences::GetInstance().DoubleToPrimitive(element_0_nullableStructItem_1_hItem_3));
+                }
+                jobject element_0_optionalStructItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "optionalStruct", "Ljava/util/Optional;",
+                                                                  element_0_optionalStructItem_1);
+                if (element_0_optionalStructItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_optionalStructItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].optionalStruct.Emplace();
+                    jobject optionalValue_2_aItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "a", "Ljava/lang/Integer;",
+                                                                      optionalValue_2_aItem_3);
+                    definedValue_2.a = static_cast<std::remove_reference_t<decltype(definedValue_2.a)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_aItem_3));
+                    jobject optionalValue_2_bItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "b", "Ljava/lang/Boolean;",
+                                                                      optionalValue_2_bItem_3);
+                    definedValue_2.b = static_cast<std::remove_reference_t<decltype(definedValue_2.b)>>(
+                        chip::JniReferences::GetInstance().BooleanToPrimitive(optionalValue_2_bItem_3));
+                    jobject optionalValue_2_cItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "c", "Ljava/lang/Integer;",
+                                                                      optionalValue_2_cItem_3);
+                    definedValue_2.c = static_cast<std::remove_reference_t<decltype(definedValue_2.c)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_cItem_3));
+                    jobject optionalValue_2_dItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "d", "[B", optionalValue_2_dItem_3);
+                    cleanupByteArrays.push_back(
+                        chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2_dItem_3)));
+                    definedValue_2.d = cleanupByteArrays.back()->byteSpan();
+                    jobject optionalValue_2_eItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "e", "Ljava/lang/String;",
+                                                                      optionalValue_2_eItem_3);
+                    cleanupStrings.push_back(
+                        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2_eItem_3)));
+                    definedValue_2.e = cleanupStrings.back()->charSpan();
+                    jobject optionalValue_2_fItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "f", "Ljava/lang/Integer;",
+                                                                      optionalValue_2_fItem_3);
+                    definedValue_2.f = static_cast<std::remove_reference_t<decltype(definedValue_2.f)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_fItem_3));
+                    jobject optionalValue_2_gItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "g", "Ljava/lang/Float;",
+                                                                      optionalValue_2_gItem_3);
+                    definedValue_2.g = static_cast<std::remove_reference_t<decltype(definedValue_2.g)>>(
+                        chip::JniReferences::GetInstance().FloatToPrimitive(optionalValue_2_gItem_3));
+                    jobject optionalValue_2_hItem_3;
+                    chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "h", "Ljava/lang/Double;",
+                                                                      optionalValue_2_hItem_3);
+                    definedValue_2.h = static_cast<std::remove_reference_t<decltype(definedValue_2.h)>>(
+                        chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_2_hItem_3));
+                }
+                jobject element_0_nullableOptionalStructItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableOptionalStruct", "Ljava/util/Optional;",
+                                                                  element_0_nullableOptionalStructItem_1);
+                if (element_0_nullableOptionalStructItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nullableOptionalStructItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalStruct.Emplace();
+                    if (optionalValue_2 == nullptr)
+                    {
+                        definedValue_2.SetNull();
+                    }
+                    else
+                    {
+                        auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                        jobject optionalValue_2_aItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "a", "Ljava/lang/Integer;",
+                                                                          optionalValue_2_aItem_4);
+                        nonNullValue_3.a = static_cast<std::remove_reference_t<decltype(nonNullValue_3.a)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_aItem_4));
+                        jobject optionalValue_2_bItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "b", "Ljava/lang/Boolean;",
+                                                                          optionalValue_2_bItem_4);
+                        nonNullValue_3.b = static_cast<std::remove_reference_t<decltype(nonNullValue_3.b)>>(
+                            chip::JniReferences::GetInstance().BooleanToPrimitive(optionalValue_2_bItem_4));
+                        jobject optionalValue_2_cItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "c", "Ljava/lang/Integer;",
+                                                                          optionalValue_2_cItem_4);
+                        nonNullValue_3.c = static_cast<std::remove_reference_t<decltype(nonNullValue_3.c)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_cItem_4));
+                        jobject optionalValue_2_dItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "d", "[B", optionalValue_2_dItem_4);
+                        cleanupByteArrays.push_back(
+                            chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2_dItem_4)));
+                        nonNullValue_3.d = cleanupByteArrays.back()->byteSpan();
+                        jobject optionalValue_2_eItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "e", "Ljava/lang/String;",
+                                                                          optionalValue_2_eItem_4);
+                        cleanupStrings.push_back(
+                            chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2_eItem_4)));
+                        nonNullValue_3.e = cleanupStrings.back()->charSpan();
+                        jobject optionalValue_2_fItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "f", "Ljava/lang/Integer;",
+                                                                          optionalValue_2_fItem_4);
+                        nonNullValue_3.f = static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_fItem_4));
+                        jobject optionalValue_2_gItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "g", "Ljava/lang/Float;",
+                                                                          optionalValue_2_gItem_4);
+                        nonNullValue_3.g = static_cast<std::remove_reference_t<decltype(nonNullValue_3.g)>>(
+                            chip::JniReferences::GetInstance().FloatToPrimitive(optionalValue_2_gItem_4));
+                        jobject optionalValue_2_hItem_4;
+                        chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "h", "Ljava/lang/Double;",
+                                                                          optionalValue_2_hItem_4);
+                        nonNullValue_3.h = static_cast<std::remove_reference_t<decltype(nonNullValue_3.h)>>(
+                            chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_2_hItem_4));
+                    }
+                }
+                jobject element_0_nullableListItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableList", "Ljava/util/ArrayList;",
+                                                                  element_0_nullableListItem_1);
+                if (element_0_nullableListItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].nullableList.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableList.SetNonNull();
+                    {
+                        using ListType_3       = std::remove_reference_t<decltype(nonNullValue_2)>;
+                        using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                        jint element_0_nullableListItem_1Size;
+                        chip::JniReferences::GetInstance().GetArrayListSize(element_0_nullableListItem_1,
+                                                                            element_0_nullableListItem_1Size);
+                        if (element_0_nullableListItem_1Size != 0)
+                        {
+                            auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_nullableListItem_1Size);
+                            listFreer.add(listHolder_3);
+
+                            for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_nullableListItem_1Size); ++i_3)
+                            {
+                                jobject element_3;
+                                chip::JniReferences::GetInstance().GetArrayListItem(element_0_nullableListItem_1, i_3, element_3);
+                                listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_3));
+                            }
+                            nonNullValue_2 = ListType_3(listHolder_3->mList, element_0_nullableListItem_1Size);
+                        }
+                        else
+                        {
+                            nonNullValue_2 = ListType_3();
+                        }
+                    }
+                }
+                jobject element_0_optionalListItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "optionalList", "Ljava/util/Optional;",
+                                                                  element_0_optionalListItem_1);
+                if (element_0_optionalListItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_optionalListItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].optionalList.Emplace();
+                    {
+                        using ListType_3       = std::remove_reference_t<decltype(definedValue_2)>;
+                        using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                        jint optionalValue_2Size;
+                        chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_2, optionalValue_2Size);
+                        if (optionalValue_2Size != 0)
+                        {
+                            auto * listHolder_3 = new ListHolder<ListMemberType_3>(optionalValue_2Size);
+                            listFreer.add(listHolder_3);
+
+                            for (size_t i_3 = 0; i_3 < static_cast<size_t>(optionalValue_2Size); ++i_3)
+                            {
+                                jobject element_3;
+                                chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_2, i_3, element_3);
+                                listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_3));
+                            }
+                            definedValue_2 = ListType_3(listHolder_3->mList, optionalValue_2Size);
+                        }
+                        else
+                        {
+                            definedValue_2 = ListType_3();
+                        }
+                    }
+                }
+                jobject element_0_nullableOptionalListItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableOptionalList", "Ljava/util/Optional;",
+                                                                  element_0_nullableOptionalListItem_1);
+                if (element_0_nullableOptionalListItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nullableOptionalListItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalList.Emplace();
+                    if (optionalValue_2 == nullptr)
+                    {
+                        definedValue_2.SetNull();
+                    }
+                    else
+                    {
+                        auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                        {
+                            using ListType_4       = std::remove_reference_t<decltype(nonNullValue_3)>;
+                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                            jint optionalValue_2Size;
+                            chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_2, optionalValue_2Size);
+                            if (optionalValue_2Size != 0)
+                            {
+                                auto * listHolder_4 = new ListHolder<ListMemberType_4>(optionalValue_2Size);
+                                listFreer.add(listHolder_4);
+
+                                for (size_t i_4 = 0; i_4 < static_cast<size_t>(optionalValue_2Size); ++i_4)
+                                {
+                                    jobject element_4;
+                                    chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_2, i_4, element_4);
+                                    listHolder_4->mList[i_4] =
+                                        static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(
+                                            chip::JniReferences::GetInstance().IntegerToPrimitive(element_4));
+                                }
+                                nonNullValue_3 = ListType_4(listHolder_4->mList, optionalValue_2Size);
+                            }
+                            else
+                            {
+                                nonNullValue_3 = ListType_4();
+                            }
+                        }
+                    }
+                }
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3745,10 +5175,15 @@ JNI_METHOD(void, TestClusterCluster, writeEnumAttrAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3792,10 +5227,15 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3839,10 +5279,15 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3886,10 +5331,15 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3933,10 +5383,15 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3980,10 +5435,15 @@ JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4020,10 +5480,15 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4067,15 +5532,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
-    bool valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().BooleanToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<bool>() : chip::app::DataModel::Nullable<bool>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4119,15 +5592,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4171,15 +5652,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4223,15 +5712,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4275,15 +5772,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4327,15 +5832,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4379,15 +5892,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4431,15 +5952,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4483,15 +6012,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4535,15 +6072,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4587,15 +6132,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4639,15 +6192,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4691,15 +6252,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4743,15 +6312,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int8_t>() : chip::app::DataModel::Nullable<int8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4795,15 +6372,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int16_t>() : chip::app::DataModel::Nullable<int16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4847,15 +6432,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int32_t>() : chip::app::DataModel::Nullable<int32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4899,15 +6492,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int32_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int32_t>() : chip::app::DataModel::Nullable<int32_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4951,15 +6552,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int64_t>() : chip::app::DataModel::Nullable<int64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5003,15 +6612,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int64_t>() : chip::app::DataModel::Nullable<int64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5055,15 +6672,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int64_t>() : chip::app::DataModel::Nullable<int64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5107,15 +6732,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int64_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int64_t>() : chip::app::DataModel::Nullable<int64_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5159,15 +6792,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5211,15 +6852,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5263,15 +6912,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatSingleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo;
     TypeInfo::Type cppValue;
 
-    float valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().FloatToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<float>() : chip::app::DataModel::Nullable<float>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().FloatToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5315,15 +6972,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatDoubleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo;
     TypeInfo::Type cppValue;
 
-    double valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().DoubleToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<double>() : chip::app::DataModel::Nullable<double>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5367,16 +7032,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    chip::ByteSpan valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<chip::ByteSpan>()
-                                : chip::app::DataModel::Nullable<chip::ByteSpan>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(value)));
+        nonNullValue_0 = cleanupByteArrays.back()->byteSpan();
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5420,16 +7092,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo;
     TypeInfo::Type cppValue;
 
-    chip::CharSpan valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<chip::CharSpan>()
-                                : chip::app::DataModel::Nullable<chip::CharSpan>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(value)));
+        nonNullValue_0 = cleanupStrings.back()->charSpan();
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5473,16 +7152,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnumAttrAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo;
     TypeInfo::Type cppValue;
 
-    decltype(cppValue)::UnderlyingType valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = static_cast<decltype(valueValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum>()
-                                : chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5526,15 +7212,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5578,15 +7272,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int8_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int8_t>() : chip::app::DataModel::Nullable<int8_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5630,15 +7332,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16uAttribute
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
-    uint16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5682,15 +7392,23 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16sAttribute
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
-    int16_t valueValue;
-    if (value != nullptr)
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
     {
-        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+        cppValue.SetNull();
     }
-    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int16_t>() : chip::app::DataModel::Nullable<int16_t>(valueValue);
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5734,10 +7452,15 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5781,10 +7504,15 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5828,10 +7556,15 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5875,10 +7608,15 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5922,10 +7660,15 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5969,10 +7712,15 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6016,10 +7764,15 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6063,10 +7816,15 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6110,10 +7868,15 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6157,10 +7920,15 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6205,10 +7973,15 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6253,10 +8026,15 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6301,10 +8079,15 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeHourFormatAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6348,10 +8131,15 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeActiveCalendarTypeAttribute
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6391,14 +8179,101 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, writeActiveCalendarTypeAttribute
     onFailure.release();
 }
 
+JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                jobject element_0_labelItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "label", "Ljava/lang/String;", element_0_labelItem_1);
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_0_labelItem_1)));
+                listHolder_0->mList[i_0].label = cleanupStrings.back()->charSpan();
+                jobject element_0_valueItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "value", "Ljava/lang/String;", element_0_valueItem_1);
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_0_valueItem_1)));
+                listHolder_0->mList[i_0].value = cleanupStrings.back()->charSpan();
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    UserLabelCluster * cppCluster = reinterpret_cast<UserLabelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
 JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo;
     TypeInfo::Type cppValue;
 
-    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    cppValue =
+        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

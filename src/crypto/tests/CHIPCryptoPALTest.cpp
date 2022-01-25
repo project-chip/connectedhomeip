@@ -1776,10 +1776,12 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
     };
     static_assert(sizeof(kExpectedCompressedFabricIdentifier) == kCompressedFabricIdentifierSize,
                   "Expected compressed fabric identifier must the correct size");
+    const uint64_t kExpectedCompressedFabricIdentifierInt = 0x87e1b004e235a130;
 
     uint8_t compressed_fabric_id[kCompressedFabricIdentifierSize];
     MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
     ClearSecretData(compressed_fabric_id, sizeof(compressed_fabric_id));
+    uint64_t compressed_fabric_id_int;
 
     CHIP_ERROR error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_span);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
@@ -1806,6 +1808,11 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
     MutableByteSpan compressed_fabric_id_small_span(compressed_fabric_id, kCompressedFabricIdentifierSize - 1);
     error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_small_span);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Test overload that writes to an integer output type.
+    error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_int);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, compressed_fabric_id_int == kExpectedCompressedFabricIdentifierInt);
 
     // Test invalid public key
     const uint8_t kInvalidRootPublicKey[65] = {

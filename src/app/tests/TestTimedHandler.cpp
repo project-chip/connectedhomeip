@@ -67,8 +67,7 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
         mLastMessageWasStatus = aPayloadHeader.HasMessageType(MsgType::StatusResponse);
         if (mLastMessageWasStatus)
         {
-            mStatus.mStatus = Status::Failure;
-            StatusResponse::ProcessStatusResponse(std::move(aPayload), mStatus);
+            mError = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         }
         if (mKeepExchangeOpen)
         {
@@ -83,7 +82,7 @@ public:
     bool mKeepExchangeOpen     = false;
     bool mNewMessageReceived   = false;
     bool mLastMessageWasStatus = false;
-    StatusIB mStatus;
+    CHIP_ERROR mError          = CHIP_NO_ERROR;
 };
 
 } // anonymous namespace
@@ -128,7 +127,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
+    NL_TEST_ASSERT(aSuite, delegate.mError == CHIP_NO_ERROR);
 
     // Send an empty payload, which will error out but not with the
     // UNSUPPORTED_ACCESS status we expect if we miss our timeout.
@@ -144,7 +143,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus != Status::UnsupportedAccess);
+    NL_TEST_ASSERT(aSuite, StatusIB(delegate.mError).mStatus != Status::UnsupportedAccess);
 }
 
 void TestTimedHandler::TestInvokeFastEnough(nlTestSuite * aSuite, void * aContext)
@@ -178,7 +177,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * 
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
+    NL_TEST_ASSERT(aSuite, delegate.mError == CHIP_NO_ERROR);
 
     // Sleep for > 50ms so we miss our time window.
     chip::test_utils::SleepMillis(75);
@@ -197,7 +196,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * 
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::UnsupportedAccess);
+    NL_TEST_ASSERT(aSuite, StatusIB(delegate.mError).mStatus == Status::UnsupportedAccess);
 }
 
 void TestTimedHandler::TestInvokeTooSlow(nlTestSuite * aSuite, void * aContext)
@@ -229,7 +228,7 @@ void TestTimedHandler::TestInvokeNeverComes(nlTestSuite * aSuite, void * aContex
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
+    NL_TEST_ASSERT(aSuite, delegate.mError == CHIP_NO_ERROR);
 
     // Do nothing else; exchange on the server remains open.  We are testing to
     // see whether shutdown cleans it up properly.

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <algorithm>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DLLUtil.h>
@@ -27,8 +28,8 @@
 #include <vector>
 
 namespace chip {
-
-class TestPersistentStorageDelegate : public PersistentStorageDelegate
+// TODO : Remove FabricStorage dependency
+class TestPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
 {
 public:
     TestPersistentStorageDelegate() {}
@@ -59,6 +60,18 @@ public:
         mStorage.erase(key);
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
+    {
+        return SyncSetKeyValue(key, buffer, size);
+    };
+
+    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
+    {
+        return SyncGetKeyValue(key, buffer, size);
+    };
+
+    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;

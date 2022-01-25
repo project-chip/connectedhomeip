@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,11 +15,15 @@
  *    limitations under the License.
  */
 
-#ifndef _SERVICE_PROVISIONING_H
-#define _SERVICE_PROVISIONING_H
+#import "AppDelegate.h"
+#import <UIKit/UIKit.h>
 
-#include <core/CHIPError.h>
-
-CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
-
-#endif // _SERVICE_PROVISIONING_H
+int main(int argc, char * argv[])
+{
+    NSString * appDelegateClassName;
+    @autoreleasepool {
+        // Setup code that might create autoreleased objects goes here.
+        appDelegateClassName = NSStringFromClass([AppDelegate class]);
+    }
+    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
+}

@@ -150,8 +150,8 @@ public:
     void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress, FabricIndex fabric)
     {
         Init(params, fabric);
-        mDeviceId = deviceId;
-        mState    = ConnectionState::Connecting;
+        mPeerId = PeerId().SetNodeId(deviceId);
+        mState  = ConnectionState::Connecting;
 
         mDeviceAddress = peerAddress;
     }
@@ -210,7 +210,9 @@ public:
 
     void Reset();
 
-    NodeId GetDeviceId() const override { return mDeviceId; }
+    NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
+    PeerId GetPeerId() const { return mPeerId; }
+    CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
@@ -231,53 +233,6 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
-    CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
-    {
-        VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
-        return CHIP_NO_ERROR;
-    }
-
-    ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
-
-    CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
-    {
-        VerifyOrReturnError(attestationNonce.size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mAttestationNonce, attestationNonce.data(), attestationNonce.size());
-        return CHIP_NO_ERROR;
-    }
-
-    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
-
-    bool AreCredentialsAvailable() const { return (mDAC != nullptr && mDACLen != 0); }
-
-    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
-    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
-
-    CHIP_ERROR SetDAC(const ByteSpan & dac);
-    CHIP_ERROR SetPAI(const ByteSpan & pai);
-
-    Optional<AesCcm128KeySpan> GetIpk() const
-    {
-        return mIpk.HasValue() ? Optional<AesCcm128KeySpan>((mIpk.Value().Span())) : Optional<AesCcm128KeySpan>();
-    }
-    void SetIpk(Optional<AesCcm128KeySpan> ipk);
-
-    Optional<NodeId> GetAdminSubject() const { return mAdminSubject; }
-    void SetAdminSubject(Optional<NodeId> adminSubject) { mAdminSubject = adminSubject; }
-
-    MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
-
-    CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
-
-    ByteSpan GetNOCCert() const { return ByteSpan(mNOCCertBuffer, mNOCCertBufferSize); }
-
-    MutableByteSpan GetMutableICACert() { return MutableByteSpan(mICACertBuffer, sizeof(mICACertBuffer)); }
-
-    CHIP_ERROR SetICACertBufferSize(size_t new_size);
-
-    ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
-
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
 
 private:
@@ -293,8 +248,9 @@ private:
         kYes,
         kNo,
     };
-    /* Node ID assigned to the CHIP device */
-    NodeId mDeviceId;
+
+    /* Compressed fabric ID and node ID assigned to the device. */
+    PeerId mPeerId;
 
     /** Address used to communicate with the device.
      */
@@ -339,31 +295,7 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    void ReleaseDAC();
-    void ReleasePAI();
-    void ClearIpk();
-    void ClearAdminSubject() { mAdminSubject = Optional<NodeId>(); }
-
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
-
-    // TODO: Offload Nonces and DAC/PAI into a new struct
-    uint8_t mCSRNonce[Controller::kOpCSRNonceLength];
-    uint8_t mAttestationNonce[kAttestationNonceLength];
-
-    uint8_t * mDAC   = nullptr;
-    uint16_t mDACLen = 0;
-    uint8_t * mPAI   = nullptr;
-    uint16_t mPAILen = 0;
-
-    uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
-    size_t mNOCCertBufferSize = 0;
-
-    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
-    size_t mICACertBufferSize = 0;
-
-    Optional<Crypto::AesCcm128Key> mIpk;
-
-    Optional<NodeId> mAdminSubject;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 };

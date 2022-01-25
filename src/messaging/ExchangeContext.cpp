@@ -87,15 +87,23 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
 void ExchangeContext::UpdateSEDPollingMode()
 {
-    if (GetSessionHandle()->AsSecureSession()->GetPeerAddress().GetTransportType() != Transport::Type::kBle)
+    SessionHandle sessionHandle              = GetSessionHandle();
+    Transport::Session::SessionType sessType = sessionHandle->GetSessionType();
+
+    // During PASE session, which happen on BLE, the session is kUnauthenticated
+    // So AsSecureSession() ends up faulting the system
+    if (sessType != Transport::Session::SessionType::kUnauthenticated)
     {
-        if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
+        if (sessionHandle->AsSecureSession()->GetPeerAddress().GetTransportType() != Transport::Type::kBle)
         {
-            chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
-        }
-        else
-        {
-            chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+            if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
+            {
+                chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+            }
+            else
+            {
+                chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+            }
         }
     }
 }

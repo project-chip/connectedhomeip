@@ -40,11 +40,6 @@
 #include "sl_system_kernel.h"
 #include <app/server/Server.h>
 
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/EFR32/OTAImageProcessorImpl.h"
-#include "platform/GenericOTARequestorDriver.h"
-
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
@@ -81,12 +76,6 @@ using namespace ::chip::DeviceLayer;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
-// Global OTA objects
-OTARequestor gRequestorCore;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
-
 volatile int apperror_cnt;
 
 #include "platform/bootloader/api/application_properties.h"
@@ -117,7 +106,7 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 
       /// Bitfield representing type of application
       /// e.g. @ref APPLICATION_TYPE_BLUETOOTH_APP
-      .type = APPLICATION_TYPE_ZIGBEE,
+      .type = APPLICATION_TYPE_THREAD,
 
       /// Version number for this application
       .version = APP_PROPERTIES_VERSION,
@@ -210,22 +199,6 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
-
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan("test.txt");
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();

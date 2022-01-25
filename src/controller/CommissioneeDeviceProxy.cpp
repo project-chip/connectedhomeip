@@ -159,11 +159,6 @@ void CommissioneeDeviceProxy::Reset()
     mBleLayer = nullptr;
 #endif
     mExchangeMgr = nullptr;
-
-    ReleaseDAC();
-    ReleasePAI();
-    ClearIpk();
-    ClearAdminSubject();
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
@@ -181,8 +176,8 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId,
-                                              &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex));
+    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress),
+                                              GetDeviceId(), &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex));
     mState = ConnectionState::SecureConnected;
 
 exit:
@@ -204,112 +199,14 @@ bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port
     return true;
 }
 
-void CommissioneeDeviceProxy::ReleaseDAC()
+CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
+
+CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(ByteSpan rcac, ByteSpan noc)
 {
-    if (mDAC != nullptr)
-    {
-        Platform::MemoryFree(mDAC);
-    }
-    mDACLen = 0;
-    mDAC    = nullptr;
-}
-
-CHIP_ERROR CommissioneeDeviceProxy::SetDAC(const ByteSpan & dac)
-{
-    if (dac.size() == 0)
-    {
-        ReleaseDAC();
-        return CHIP_NO_ERROR;
-    }
-
-    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDACLen != 0)
-    {
-        ReleaseDAC();
-    }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDAC == nullptr)
-    {
-        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
-    }
-    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
-    mDACLen = static_cast<uint16_t>(dac.size());
-    memcpy(mDAC, dac.data(), mDACLen);
-
-    return CHIP_NO_ERROR;
-}
-
-void CommissioneeDeviceProxy::ReleasePAI()
-{
-    if (mPAI != nullptr)
-    {
-        chip::Platform::MemoryFree(mPAI);
-    }
-    mPAILen = 0;
-    mPAI    = nullptr;
-}
-
-CHIP_ERROR CommissioneeDeviceProxy::SetPAI(const chip::ByteSpan & pai)
-{
-    if (pai.size() == 0)
-    {
-        ReleasePAI();
-        return CHIP_NO_ERROR;
-    }
-
-    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAILen != 0)
-    {
-        ReleasePAI();
-    }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAI == nullptr)
-    {
-        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
-    }
-    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
-    mPAILen = static_cast<uint16_t>(pai.size());
-    memcpy(mPAI, pai.data(), mPAILen);
-
-    return CHIP_NO_ERROR;
-}
-
-void CommissioneeDeviceProxy::ClearIpk()
-{
-    mIpk.ClearValue(); // AesCcm128Key destructor will clear secret data.
-}
-
-void CommissioneeDeviceProxy::SetIpk(Optional<AesCcm128KeySpan> ipk)
-{
-    if (!ipk.HasValue())
-    {
-        ClearIpk();
-    }
-    else
-    {
-        mIpk.Emplace(ipk.Value());
-    }
-}
-
-CommissioneeDeviceProxy::~CommissioneeDeviceProxy()
-{
-    ReleaseDAC();
-    ReleasePAI();
-}
-
-CHIP_ERROR CommissioneeDeviceProxy::SetNOCCertBufferSize(size_t new_size)
-{
-    ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mNOCCertBufferSize = new_size;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CommissioneeDeviceProxy::SetICACertBufferSize(size_t new_size)
-{
-    ReturnErrorCodeIf(new_size > sizeof(mICACertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mICACertBufferSize = new_size;
+    CompressedFabricId compressedFabricId;
+    NodeId nodeId;
+    ReturnErrorOnFailure(Credentials::ExtractNodeIdCompressedFabricIdFromOpCerts(rcac, noc, compressedFabricId, nodeId));
+    mPeerId = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
     return CHIP_NO_ERROR;
 }
 
