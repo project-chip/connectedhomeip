@@ -24,3 +24,7 @@ java:
         jni/FirstClient-ReadImpl.cpp: outputs/several_clusters/jni/FirstClient-ReadImpl.cpp
         jni/SecondClient-ReadImpl.cpp: outputs/several_clusters/jni/SecondClient-ReadImpl.cpp
         jni/ThirdClient-ReadImpl.cpp: outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp
+
+gni:
+    inputs/several_clusters.matter:
+        idl_content.gni: outputs/several_clusters/idl_content.gni
