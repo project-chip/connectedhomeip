@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommand.h"
 #include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/ValueChecker.h>
@@ -28,7 +29,12 @@
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
-class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public PICSChecker, public LogCommands
+class TestCommand : public CHIPCommand,
+                    public ValueChecker,
+                    public ConstraintsChecker,
+                    public PICSChecker,
+                    public LogCommands,
+                    public SystemCommands
 {
 public:
     TestCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
