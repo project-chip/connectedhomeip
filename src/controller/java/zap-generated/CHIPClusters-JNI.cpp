@@ -14881,6 +14881,44 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeSupportedLocalesAttr
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, LocalizationConfigurationCluster, subscribeClusterRevisionAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    LocalizationConfigurationCluster * cppCluster = reinterpret_cast<LocalizationConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPLocalizationConfigurationClusterClusterRevisionAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -19359,6 +19397,44 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OperationalCredentialsCluster, subscribeNOCsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOperationalCredentialsNOCsAttributeCallback, void (*)(CHIPOperationalCredentialsNOCsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOperationalCredentialsNOCsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOperationalCredentialsNOCsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPOperationalCredentialsNOCsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -31684,6 +31760,160 @@ JNI_METHOD(jlong, TimeFormatLocalizationCluster, initWithDevice)(JNIEnv * env, j
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeHourFormatAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TimeFormatLocalizationCluster * cppCluster = reinterpret_cast<TimeFormatLocalizationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeActiveCalendarTypeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TimeFormatLocalizationCluster * cppCluster = reinterpret_cast<TimeFormatLocalizationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTimeFormatLocalizationClusterActiveCalendarTypeAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeSupportedCalendarTypesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback,
+                    void (*)(CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TimeFormatLocalizationCluster * cppCluster = reinterpret_cast<TimeFormatLocalizationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeClusterRevisionAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TimeFormatLocalizationCluster * cppCluster = reinterpret_cast<TimeFormatLocalizationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(jlong, UserLabelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
