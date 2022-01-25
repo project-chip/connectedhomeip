@@ -4662,9 +4662,9 @@ public:
 
     ~ReadAccessControlAccessControlEntryChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4693,9 +4693,9 @@ public:
 
     ~ReportAccessControlAccessControlEntryChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4735,9 +4735,9 @@ public:
 
     ~ReadAccessControlAccessControlExtensionChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4766,9 +4766,9 @@ public:
 
     ~ReportAccessControlAccessControlExtensionChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4809,9 +4809,9 @@ public:
 
     ~ReadAccessControlAcl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4842,9 +4842,9 @@ public:
 
     ~ReportAccessControlAcl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4887,9 +4887,9 @@ public:
 
     ~ReadAccessControlExtension() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4920,9 +4920,9 @@ public:
 
     ~ReportAccessControlExtension() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4965,9 +4965,9 @@ public:
 
     ~ReadAccessControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4995,9 +4995,9 @@ public:
 
     ~ReportAccessControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5037,9 +5037,9 @@ public:
 
     ~ReadAccessControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5067,9 +5067,9 @@ public:
 
     ~ReportAccessControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5119,9 +5119,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnAccountLoginGetSetupPINResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -5144,9 +5144,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -5164,9 +5164,9 @@ class AccountLoginLogoutRequest : public ModelCommand
 public:
     AccountLoginLogoutRequest() : ModelCommand("logout-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -5190,9 +5190,9 @@ public:
 
     ~ReadAccountLoginAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5220,9 +5220,9 @@ public:
 
     ~ReportAccountLoginAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5262,9 +5262,9 @@ public:
 
     ~ReadAccountLoginClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5292,9 +5292,9 @@ public:
 
     ~ReportAccountLoginClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5347,9 +5347,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -5376,9 +5376,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -5396,9 +5396,9 @@ class AdministratorCommissioningRevokeCommissioning : public ModelCommand
 public:
     AdministratorCommissioningRevokeCommissioning() : ModelCommand("revoke-commissioning") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -5422,9 +5422,9 @@ public:
 
     ~ReadAdministratorCommissioningWindowStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5452,9 +5452,9 @@ public:
 
     ~ReportAdministratorCommissioningWindowStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5494,9 +5494,9 @@ public:
 
     ~ReadAdministratorCommissioningAdminFabricIndex() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5524,9 +5524,9 @@ public:
 
     ~ReportAdministratorCommissioningAdminFabricIndex() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5566,9 +5566,9 @@ public:
 
     ~ReadAdministratorCommissioningAdminVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5596,9 +5596,9 @@ public:
 
     ~ReportAdministratorCommissioningAdminVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5638,9 +5638,9 @@ public:
 
     ~ReadAdministratorCommissioningAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5668,9 +5668,9 @@ public:
 
     ~ReportAdministratorCommissioningAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5710,9 +5710,9 @@ public:
 
     ~ReadAdministratorCommissioningClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5740,9 +5740,9 @@ public:
 
     ~ReportAdministratorCommissioningClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5802,9 +5802,9 @@ public:
 
     ~ReadApplicationBasicVendorName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5832,9 +5832,9 @@ public:
 
     ~ReportApplicationBasicVendorName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5871,9 +5871,9 @@ public:
 
     ~ReadApplicationBasicVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5901,9 +5901,9 @@ public:
 
     ~ReportApplicationBasicVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5940,9 +5940,9 @@ public:
 
     ~ReadApplicationBasicApplicationName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -5970,9 +5970,9 @@ public:
 
     ~ReportApplicationBasicApplicationName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6012,9 +6012,9 @@ public:
 
     ~ReadApplicationBasicProductId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6042,9 +6042,9 @@ public:
 
     ~ReportApplicationBasicProductId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6081,9 +6081,9 @@ public:
 
     ~ReadApplicationBasicApplicationStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6111,9 +6111,9 @@ public:
 
     ~ReportApplicationBasicApplicationStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6153,9 +6153,9 @@ public:
 
     ~ReadApplicationBasicApplicationVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6183,9 +6183,9 @@ public:
 
     ~ReportApplicationBasicApplicationVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6225,9 +6225,9 @@ public:
 
     ~ReadApplicationBasicAllowedVendorList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6255,9 +6255,9 @@ public:
 
     ~ReportApplicationBasicAllowedVendorList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6297,9 +6297,9 @@ public:
 
     ~ReadApplicationBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6327,9 +6327,9 @@ public:
 
     ~ReportApplicationBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6369,9 +6369,9 @@ public:
 
     ~ReadApplicationBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6399,9 +6399,9 @@ public:
 
     ~ReportApplicationBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6452,9 +6452,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherLauncherResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -6477,9 +6477,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherLauncherResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -6501,9 +6501,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherLauncherResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -6527,9 +6527,9 @@ public:
 
     ~ReadApplicationLauncherApplicationLauncherList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6557,9 +6557,9 @@ public:
 
     ~ReportApplicationLauncherApplicationLauncherList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6599,9 +6599,9 @@ public:
 
     ~ReadApplicationLauncherAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6629,9 +6629,9 @@ public:
 
     ~ReportApplicationLauncherAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6671,9 +6671,9 @@ public:
 
     ~ReadApplicationLauncherClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6701,9 +6701,9 @@ public:
 
     ~ReportApplicationLauncherClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6755,9 +6755,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -6779,9 +6779,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -6805,9 +6805,9 @@ public:
 
     ~ReadAudioOutputAudioOutputList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6837,9 +6837,9 @@ public:
 
     ~ReportAudioOutputAudioOutputList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6881,9 +6881,9 @@ public:
 
     ~ReadAudioOutputCurrentAudioOutput() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6911,9 +6911,9 @@ public:
 
     ~ReportAudioOutputCurrentAudioOutput() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6950,9 +6950,9 @@ public:
 
     ~ReadAudioOutputAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6980,9 +6980,9 @@ public:
 
     ~ReportAudioOutputAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7022,9 +7022,9 @@ public:
 
     ~ReadAudioOutputClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7052,9 +7052,9 @@ public:
 
     ~ReportAudioOutputClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7107,9 +7107,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -7127,9 +7127,9 @@ class BarrierControlBarrierControlStop : public ModelCommand
 public:
     BarrierControlBarrierControlStop() : ModelCommand("barrier-control-stop") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -7153,9 +7153,9 @@ public:
 
     ~ReadBarrierControlBarrierMovingState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7183,9 +7183,9 @@ public:
 
     ~ReportBarrierControlBarrierMovingState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7222,9 +7222,9 @@ public:
 
     ~ReadBarrierControlBarrierSafetyStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7252,9 +7252,9 @@ public:
 
     ~ReportBarrierControlBarrierSafetyStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7291,9 +7291,9 @@ public:
 
     ~ReadBarrierControlBarrierCapabilities() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7321,9 +7321,9 @@ public:
 
     ~ReportBarrierControlBarrierCapabilities() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7360,9 +7360,9 @@ public:
 
     ~ReadBarrierControlBarrierPosition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7390,9 +7390,9 @@ public:
 
     ~ReportBarrierControlBarrierPosition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7429,9 +7429,9 @@ public:
 
     ~ReadBarrierControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7459,9 +7459,9 @@ public:
 
     ~ReportBarrierControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7501,9 +7501,9 @@ public:
 
     ~ReadBarrierControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7531,9 +7531,9 @@ public:
 
     ~ReportBarrierControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7600,9 +7600,9 @@ class BasicMfgSpecificPing : public ModelCommand
 public:
     BasicMfgSpecificPing() : ModelCommand("mfg-specific-ping") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -7626,9 +7626,9 @@ public:
 
     ~ReadBasicStartUp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7656,9 +7656,9 @@ public:
 
     ~ReportBasicStartUp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7697,9 +7697,9 @@ public:
 
     ~ReadBasicShutDown() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7727,9 +7727,9 @@ public:
 
     ~ReportBasicShutDown() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7768,9 +7768,9 @@ public:
 
     ~ReadBasicLeave() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7797,9 +7797,9 @@ public:
 
     ~ReportBasicLeave() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7838,9 +7838,9 @@ public:
 
     ~ReadBasicReachableChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7868,9 +7868,9 @@ public:
 
     ~ReportBasicReachableChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7910,9 +7910,9 @@ public:
 
     ~ReadBasicInteractionModelVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7940,9 +7940,9 @@ public:
 
     ~ReportBasicInteractionModelVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -7979,9 +7979,9 @@ public:
 
     ~ReadBasicVendorName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8009,9 +8009,9 @@ public:
 
     ~ReportBasicVendorName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8048,9 +8048,9 @@ public:
 
     ~ReadBasicVendorID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8078,9 +8078,9 @@ public:
 
     ~ReportBasicVendorID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8117,9 +8117,9 @@ public:
 
     ~ReadBasicProductName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8147,9 +8147,9 @@ public:
 
     ~ReportBasicProductName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8186,9 +8186,9 @@ public:
 
     ~ReadBasicProductID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8216,9 +8216,9 @@ public:
 
     ~ReportBasicProductID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8255,9 +8255,9 @@ public:
 
     ~ReadBasicNodeLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8283,9 +8283,9 @@ public:
 
     ~WriteBasicNodeLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8311,9 +8311,9 @@ public:
 
     ~ReportBasicNodeLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8350,9 +8350,9 @@ public:
 
     ~ReadBasicLocation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8378,9 +8378,9 @@ public:
 
     ~WriteBasicLocation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) WriteAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8406,9 +8406,9 @@ public:
 
     ~ReportBasicLocation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8445,9 +8445,9 @@ public:
 
     ~ReadBasicHardwareVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8475,9 +8475,9 @@ public:
 
     ~ReportBasicHardwareVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8514,9 +8514,9 @@ public:
 
     ~ReadBasicHardwareVersionString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8544,9 +8544,9 @@ public:
 
     ~ReportBasicHardwareVersionString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8583,9 +8583,9 @@ public:
 
     ~ReadBasicSoftwareVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8613,9 +8613,9 @@ public:
 
     ~ReportBasicSoftwareVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8652,9 +8652,9 @@ public:
 
     ~ReadBasicSoftwareVersionString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8682,9 +8682,9 @@ public:
 
     ~ReportBasicSoftwareVersionString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8721,9 +8721,9 @@ public:
 
     ~ReadBasicManufacturingDate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8751,9 +8751,9 @@ public:
 
     ~ReportBasicManufacturingDate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8790,9 +8790,9 @@ public:
 
     ~ReadBasicPartNumber() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8820,9 +8820,9 @@ public:
 
     ~ReportBasicPartNumber() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8859,9 +8859,9 @@ public:
 
     ~ReadBasicProductURL() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8889,9 +8889,9 @@ public:
 
     ~ReportBasicProductURL() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8928,9 +8928,9 @@ public:
 
     ~ReadBasicProductLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8958,9 +8958,9 @@ public:
 
     ~ReportBasicProductLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8997,9 +8997,9 @@ public:
 
     ~ReadBasicSerialNumber() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9027,9 +9027,9 @@ public:
 
     ~ReportBasicSerialNumber() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9066,9 +9066,9 @@ public:
 
     ~ReadBasicLocalConfigDisabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9094,9 +9094,9 @@ public:
 
     ~WriteBasicLocalConfigDisabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) WriteAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9122,9 +9122,9 @@ public:
 
     ~ReportBasicLocalConfigDisabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9161,9 +9161,9 @@ public:
 
     ~ReadBasicReachable() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9191,9 +9191,9 @@ public:
 
     ~ReportBasicReachable() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9230,9 +9230,9 @@ public:
 
     ~ReadBasicUniqueID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9260,9 +9260,9 @@ public:
 
     ~ReportBasicUniqueID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9299,9 +9299,9 @@ public:
 
     ~ReadBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9329,9 +9329,9 @@ public:
 
     ~ReportBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9371,9 +9371,9 @@ public:
 
     ~ReadBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9401,9 +9401,9 @@ public:
 
     ~ReportBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9455,9 +9455,9 @@ public:
 
     ~ReadBinaryInputBasicOutOfService() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReadAttribute (0x00000051) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9483,9 +9483,9 @@ public:
 
     ~WriteBinaryInputBasicOutOfService() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) WriteAttribute (0x00000051) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9511,9 +9511,9 @@ public:
 
     ~ReportBinaryInputBasicOutOfService() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReportAttribute (0x00000051) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9550,9 +9550,9 @@ public:
 
     ~ReadBinaryInputBasicPresentValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReadAttribute (0x00000055) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9578,9 +9578,9 @@ public:
 
     ~WriteBinaryInputBasicPresentValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) WriteAttribute (0x00000055) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9606,9 +9606,9 @@ public:
 
     ~ReportBinaryInputBasicPresentValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReportAttribute (0x00000055) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9645,9 +9645,9 @@ public:
 
     ~ReadBinaryInputBasicStatusFlags() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReadAttribute (0x0000006F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9675,9 +9675,9 @@ public:
 
     ~ReportBinaryInputBasicStatusFlags() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReportAttribute (0x0000006F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9714,9 +9714,9 @@ public:
 
     ~ReadBinaryInputBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9744,9 +9744,9 @@ public:
 
     ~ReportBinaryInputBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9786,9 +9786,9 @@ public:
 
     ~ReadBinaryInputBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9816,9 +9816,9 @@ public:
 
     ~ReportBinaryInputBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000000F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9870,9 +9870,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -9897,9 +9897,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -9923,9 +9923,9 @@ public:
 
     ~ReadBindingAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9953,9 +9953,9 @@ public:
 
     ~ReportBindingAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9995,9 +9995,9 @@ public:
 
     ~ReadBindingClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10025,9 +10025,9 @@ public:
 
     ~ReportBindingClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10078,9 +10078,9 @@ public:
 
     ~ReadBooleanStateStateChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10108,9 +10108,9 @@ public:
 
     ~ReportBooleanStateStateChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10150,9 +10150,9 @@ public:
 
     ~ReadBooleanStateStateValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10180,9 +10180,9 @@ public:
 
     ~ReportBooleanStateStateValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10219,9 +10219,9 @@ public:
 
     ~ReadBooleanStateAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10249,9 +10249,9 @@ public:
 
     ~ReportBooleanStateAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10291,9 +10291,9 @@ public:
 
     ~ReadBooleanStateClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10321,9 +10321,9 @@ public:
 
     ~ReportBooleanStateClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10388,9 +10388,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10414,9 +10414,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10439,9 +10439,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10465,9 +10465,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10490,9 +10490,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10516,9 +10516,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10541,9 +10541,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10567,9 +10567,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10592,9 +10592,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10617,9 +10617,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10643,9 +10643,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10668,9 +10668,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -10694,9 +10694,9 @@ public:
 
     ~ReadBridgedActionsStateChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10724,9 +10724,9 @@ public:
 
     ~ReportBridgedActionsStateChanged() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10765,9 +10765,9 @@ public:
 
     ~ReadBridgedActionsActionFailed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10795,9 +10795,9 @@ public:
 
     ~ReportBridgedActionsActionFailed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10837,9 +10837,9 @@ public:
 
     ~ReadBridgedActionsActionList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10870,9 +10870,9 @@ public:
 
     ~ReportBridgedActionsActionList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10915,9 +10915,9 @@ public:
 
     ~ReadBridgedActionsEndpointList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10948,9 +10948,9 @@ public:
 
     ~ReportBridgedActionsEndpointList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -10993,9 +10993,9 @@ public:
 
     ~ReadBridgedActionsSetupUrl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11023,9 +11023,9 @@ public:
 
     ~ReportBridgedActionsSetupUrl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11062,9 +11062,9 @@ public:
 
     ~ReadBridgedActionsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11092,9 +11092,9 @@ public:
 
     ~ReportBridgedActionsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11134,9 +11134,9 @@ public:
 
     ~ReadBridgedActionsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11164,9 +11164,9 @@ public:
 
     ~ReportBridgedActionsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11215,9 +11215,9 @@ public:
 
     ~ReadBridgedDeviceBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedDeviceBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11245,9 +11245,9 @@ public:
 
     ~ReportBridgedDeviceBasicAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedDeviceBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11287,9 +11287,9 @@ public:
 
     ~ReadBridgedDeviceBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedDeviceBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11317,9 +11317,9 @@ public:
 
     ~ReportBridgedDeviceBasicClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BridgedDeviceBasicCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11371,9 +11371,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11395,9 +11395,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnChannelChangeChannelResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -11419,9 +11419,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11445,9 +11445,9 @@ public:
 
     ~ReadChannelChannelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ChannelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11477,9 +11477,9 @@ public:
 
     ~ReportChannelChannelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ChannelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11521,9 +11521,9 @@ public:
 
     ~ReadChannelAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ChannelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11551,9 +11551,9 @@ public:
 
     ~ReportChannelAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ChannelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11593,9 +11593,9 @@ public:
 
     ~ReadChannelClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ChannelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11623,9 +11623,9 @@ public:
 
     ~ReportChannelClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ChannelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11753,9 +11753,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11781,9 +11781,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11810,9 +11810,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11838,9 +11838,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11867,9 +11867,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11894,9 +11894,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11924,9 +11924,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11952,9 +11952,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -11980,9 +11980,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12008,9 +12008,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12035,9 +12035,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12064,9 +12064,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12092,9 +12092,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12119,9 +12119,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12147,9 +12147,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12178,9 +12178,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12207,9 +12207,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12236,9 +12236,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12261,9 +12261,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -12287,9 +12287,9 @@ public:
 
     ~ReadColorControlCurrentHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12317,9 +12317,9 @@ public:
 
     ~ReportColorControlCurrentHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12356,9 +12356,9 @@ public:
 
     ~ReadColorControlCurrentSaturation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12386,9 +12386,9 @@ public:
 
     ~ReportColorControlCurrentSaturation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12425,9 +12425,9 @@ public:
 
     ~ReadColorControlRemainingTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12455,9 +12455,9 @@ public:
 
     ~ReportColorControlRemainingTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12494,9 +12494,9 @@ public:
 
     ~ReadColorControlCurrentX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12524,9 +12524,9 @@ public:
 
     ~ReportColorControlCurrentX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12563,9 +12563,9 @@ public:
 
     ~ReadColorControlCurrentY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12593,9 +12593,9 @@ public:
 
     ~ReportColorControlCurrentY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12632,9 +12632,9 @@ public:
 
     ~ReadColorControlDriftCompensation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12662,9 +12662,9 @@ public:
 
     ~ReportColorControlDriftCompensation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12701,9 +12701,9 @@ public:
 
     ~ReadColorControlCompensationText() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12731,9 +12731,9 @@ public:
 
     ~ReportColorControlCompensationText() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12770,9 +12770,9 @@ public:
 
     ~ReadColorControlColorTemperature() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12800,9 +12800,9 @@ public:
 
     ~ReportColorControlColorTemperature() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12839,9 +12839,9 @@ public:
 
     ~ReadColorControlColorMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12869,9 +12869,9 @@ public:
 
     ~ReportColorControlColorMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12908,9 +12908,9 @@ public:
 
     ~ReadColorControlColorControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12936,9 +12936,9 @@ public:
 
     ~WriteColorControlColorControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -12964,9 +12964,9 @@ public:
 
     ~ReportColorControlColorControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13003,9 +13003,9 @@ public:
 
     ~ReadColorControlNumberOfPrimaries() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13033,9 +13033,9 @@ public:
 
     ~ReportColorControlNumberOfPrimaries() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13072,9 +13072,9 @@ public:
 
     ~ReadColorControlPrimary1X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13102,9 +13102,9 @@ public:
 
     ~ReportColorControlPrimary1X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13141,9 +13141,9 @@ public:
 
     ~ReadColorControlPrimary1Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13171,9 +13171,9 @@ public:
 
     ~ReportColorControlPrimary1Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13210,9 +13210,9 @@ public:
 
     ~ReadColorControlPrimary1Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13240,9 +13240,9 @@ public:
 
     ~ReportColorControlPrimary1Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13279,9 +13279,9 @@ public:
 
     ~ReadColorControlPrimary2X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13309,9 +13309,9 @@ public:
 
     ~ReportColorControlPrimary2X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13348,9 +13348,9 @@ public:
 
     ~ReadColorControlPrimary2Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13378,9 +13378,9 @@ public:
 
     ~ReportColorControlPrimary2Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13417,9 +13417,9 @@ public:
 
     ~ReadColorControlPrimary2Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13447,9 +13447,9 @@ public:
 
     ~ReportColorControlPrimary2Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13486,9 +13486,9 @@ public:
 
     ~ReadColorControlPrimary3X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13516,9 +13516,9 @@ public:
 
     ~ReportColorControlPrimary3X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13555,9 +13555,9 @@ public:
 
     ~ReadColorControlPrimary3Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13585,9 +13585,9 @@ public:
 
     ~ReportColorControlPrimary3Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13624,9 +13624,9 @@ public:
 
     ~ReadColorControlPrimary3Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13654,9 +13654,9 @@ public:
 
     ~ReportColorControlPrimary3Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13693,9 +13693,9 @@ public:
 
     ~ReadColorControlPrimary4X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13723,9 +13723,9 @@ public:
 
     ~ReportColorControlPrimary4X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13762,9 +13762,9 @@ public:
 
     ~ReadColorControlPrimary4Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13792,9 +13792,9 @@ public:
 
     ~ReportColorControlPrimary4Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13831,9 +13831,9 @@ public:
 
     ~ReadColorControlPrimary4Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13861,9 +13861,9 @@ public:
 
     ~ReportColorControlPrimary4Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13900,9 +13900,9 @@ public:
 
     ~ReadColorControlPrimary5X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13930,9 +13930,9 @@ public:
 
     ~ReportColorControlPrimary5X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13969,9 +13969,9 @@ public:
 
     ~ReadColorControlPrimary5Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13999,9 +13999,9 @@ public:
 
     ~ReportColorControlPrimary5Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14038,9 +14038,9 @@ public:
 
     ~ReadColorControlPrimary5Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14068,9 +14068,9 @@ public:
 
     ~ReportColorControlPrimary5Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14107,9 +14107,9 @@ public:
 
     ~ReadColorControlPrimary6X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14137,9 +14137,9 @@ public:
 
     ~ReportColorControlPrimary6X() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14176,9 +14176,9 @@ public:
 
     ~ReadColorControlPrimary6Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14206,9 +14206,9 @@ public:
 
     ~ReportColorControlPrimary6Y() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14245,9 +14245,9 @@ public:
 
     ~ReadColorControlPrimary6Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14275,9 +14275,9 @@ public:
 
     ~ReportColorControlPrimary6Intensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14314,9 +14314,9 @@ public:
 
     ~ReadColorControlWhitePointX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14342,9 +14342,9 @@ public:
 
     ~WriteColorControlWhitePointX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14370,9 +14370,9 @@ public:
 
     ~ReportColorControlWhitePointX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14409,9 +14409,9 @@ public:
 
     ~ReadColorControlWhitePointY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14437,9 +14437,9 @@ public:
 
     ~WriteColorControlWhitePointY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14465,9 +14465,9 @@ public:
 
     ~ReportColorControlWhitePointY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14504,9 +14504,9 @@ public:
 
     ~ReadColorControlColorPointRX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14532,9 +14532,9 @@ public:
 
     ~WriteColorControlColorPointRX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14560,9 +14560,9 @@ public:
 
     ~ReportColorControlColorPointRX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14599,9 +14599,9 @@ public:
 
     ~ReadColorControlColorPointRY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14627,9 +14627,9 @@ public:
 
     ~WriteColorControlColorPointRY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14655,9 +14655,9 @@ public:
 
     ~ReportColorControlColorPointRY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14694,9 +14694,9 @@ public:
 
     ~ReadColorControlColorPointRIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000034) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14722,9 +14722,9 @@ public:
 
     ~WriteColorControlColorPointRIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000034) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14750,9 +14750,9 @@ public:
 
     ~ReportColorControlColorPointRIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000034) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14789,9 +14789,9 @@ public:
 
     ~ReadColorControlColorPointGX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000036) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14817,9 +14817,9 @@ public:
 
     ~WriteColorControlColorPointGX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000036) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14845,9 +14845,9 @@ public:
 
     ~ReportColorControlColorPointGX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000036) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14884,9 +14884,9 @@ public:
 
     ~ReadColorControlColorPointGY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000037) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14912,9 +14912,9 @@ public:
 
     ~WriteColorControlColorPointGY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000037) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14940,9 +14940,9 @@ public:
 
     ~ReportColorControlColorPointGY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000037) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14979,9 +14979,9 @@ public:
 
     ~ReadColorControlColorPointGIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00000038) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15007,9 +15007,9 @@ public:
 
     ~WriteColorControlColorPointGIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00000038) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15035,9 +15035,9 @@ public:
 
     ~ReportColorControlColorPointGIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000038) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15074,9 +15074,9 @@ public:
 
     ~ReadColorControlColorPointBX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000003A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15102,9 +15102,9 @@ public:
 
     ~WriteColorControlColorPointBX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x0000003A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15130,9 +15130,9 @@ public:
 
     ~ReportColorControlColorPointBX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000003A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15169,9 +15169,9 @@ public:
 
     ~ReadColorControlColorPointBY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000003B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15197,9 +15197,9 @@ public:
 
     ~WriteColorControlColorPointBY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x0000003B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15225,9 +15225,9 @@ public:
 
     ~ReportColorControlColorPointBY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000003B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15264,9 +15264,9 @@ public:
 
     ~ReadColorControlColorPointBIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000003C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15292,9 +15292,9 @@ public:
 
     ~WriteColorControlColorPointBIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x0000003C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15320,9 +15320,9 @@ public:
 
     ~ReportColorControlColorPointBIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000003C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15359,9 +15359,9 @@ public:
 
     ~ReadColorControlEnhancedCurrentHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15389,9 +15389,9 @@ public:
 
     ~ReportColorControlEnhancedCurrentHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15428,9 +15428,9 @@ public:
 
     ~ReadColorControlEnhancedColorMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15458,9 +15458,9 @@ public:
 
     ~ReportColorControlEnhancedColorMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15497,9 +15497,9 @@ public:
 
     ~ReadColorControlColorLoopActive() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15527,9 +15527,9 @@ public:
 
     ~ReportColorControlColorLoopActive() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15566,9 +15566,9 @@ public:
 
     ~ReadColorControlColorLoopDirection() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15596,9 +15596,9 @@ public:
 
     ~ReportColorControlColorLoopDirection() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15635,9 +15635,9 @@ public:
 
     ~ReadColorControlColorLoopTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15665,9 +15665,9 @@ public:
 
     ~ReportColorControlColorLoopTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15704,9 +15704,9 @@ public:
 
     ~ReadColorControlColorLoopStartEnhancedHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15734,9 +15734,9 @@ public:
 
     ~ReportColorControlColorLoopStartEnhancedHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15776,9 +15776,9 @@ public:
 
     ~ReadColorControlColorLoopStoredEnhancedHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15806,9 +15806,9 @@ public:
 
     ~ReportColorControlColorLoopStoredEnhancedHue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15848,9 +15848,9 @@ public:
 
     ~ReadColorControlColorCapabilities() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000400A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15878,9 +15878,9 @@ public:
 
     ~ReportColorControlColorCapabilities() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15917,9 +15917,9 @@ public:
 
     ~ReadColorControlColorTempPhysicalMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000400B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15947,9 +15947,9 @@ public:
 
     ~ReportColorControlColorTempPhysicalMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15986,9 +15986,9 @@ public:
 
     ~ReadColorControlColorTempPhysicalMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000400C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16016,9 +16016,9 @@ public:
 
     ~ReportColorControlColorTempPhysicalMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16055,9 +16055,9 @@ public:
 
     ~ReadColorControlCoupleColorTempToLevelMinMireds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000400D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16085,9 +16085,9 @@ public:
 
     ~ReportColorControlCoupleColorTempToLevelMinMireds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16127,9 +16127,9 @@ public:
 
     ~ReadColorControlStartUpColorTemperatureMireds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x00004010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16155,9 +16155,9 @@ public:
 
     ~WriteColorControlStartUpColorTemperatureMireds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) WriteAttribute (0x00004010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16183,9 +16183,9 @@ public:
 
     ~ReportColorControlStartUpColorTemperatureMireds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16225,9 +16225,9 @@ public:
 
     ~ReadColorControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16255,9 +16255,9 @@ public:
 
     ~ReportColorControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16297,9 +16297,9 @@ public:
 
     ~ReadColorControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16327,9 +16327,9 @@ public:
 
     ~ReportColorControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16382,9 +16382,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnContentLauncherLaunchResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -16408,9 +16408,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnContentLauncherLaunchResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -16434,9 +16434,9 @@ public:
 
     ~ReadContentLauncherAcceptHeaderList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16464,9 +16464,9 @@ public:
 
     ~ReportContentLauncherAcceptHeaderList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16506,9 +16506,9 @@ public:
 
     ~ReadContentLauncherSupportedStreamingProtocols() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16534,9 +16534,9 @@ public:
 
     ~WriteContentLauncherSupportedStreamingProtocols() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16562,9 +16562,9 @@ public:
 
     ~ReportContentLauncherSupportedStreamingProtocols() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16604,9 +16604,9 @@ public:
 
     ~ReadContentLauncherAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16634,9 +16634,9 @@ public:
 
     ~ReportContentLauncherAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16676,9 +16676,9 @@ public:
 
     ~ReadContentLauncherClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16706,9 +16706,9 @@ public:
 
     ~ReportContentLauncherClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16761,9 +16761,9 @@ public:
 
     ~ReadDescriptorDeviceList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16793,9 +16793,9 @@ public:
 
     ~ReportDescriptorDeviceList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16837,9 +16837,9 @@ public:
 
     ~ReadDescriptorServerList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16867,9 +16867,9 @@ public:
 
     ~ReportDescriptorServerList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16909,9 +16909,9 @@ public:
 
     ~ReadDescriptorClientList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16939,9 +16939,9 @@ public:
 
     ~ReportDescriptorClientList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -16981,9 +16981,9 @@ public:
 
     ~ReadDescriptorPartsList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17011,9 +17011,9 @@ public:
 
     ~ReportDescriptorPartsList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17053,9 +17053,9 @@ public:
 
     ~ReadDescriptorAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17083,9 +17083,9 @@ public:
 
     ~ReportDescriptorAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17125,9 +17125,9 @@ public:
 
     ~ReadDescriptorClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17155,9 +17155,9 @@ public:
 
     ~ReportDescriptorClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17208,9 +17208,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDiagnosticLogsRetrieveLogsResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -17234,9 +17234,9 @@ public:
 
     ~ReadDiagnosticLogsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0032) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000032) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DiagnosticLogsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17264,9 +17264,9 @@ public:
 
     ~ReportDiagnosticLogsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0032) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000032) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DiagnosticLogsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17345,9 +17345,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -17369,9 +17369,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -17393,9 +17393,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetCredentialStatusResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -17417,9 +17417,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -17441,9 +17441,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -17471,9 +17471,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockSetCredentialResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -17505,9 +17505,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -17529,9 +17529,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -17555,9 +17555,9 @@ public:
 
     ~ReadDoorLockDoorLockAlarm() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17585,9 +17585,9 @@ public:
 
     ~ReportDoorLockDoorLockAlarm() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17626,9 +17626,9 @@ public:
 
     ~ReadDoorLockDoorStateChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17656,9 +17656,9 @@ public:
 
     ~ReportDoorLockDoorStateChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17697,9 +17697,9 @@ public:
 
     ~ReadDoorLockLockOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17727,9 +17727,9 @@ public:
 
     ~ReportDoorLockLockOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17768,9 +17768,9 @@ public:
 
     ~ReadDoorLockLockOperationError() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17798,9 +17798,9 @@ public:
 
     ~ReportDoorLockLockOperationError() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17839,9 +17839,9 @@ public:
 
     ~ReadDoorLockLockUserChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadEvent (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17869,9 +17869,9 @@ public:
 
     ~ReportDoorLockLockUserChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportEvent (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17911,9 +17911,9 @@ public:
 
     ~ReadDoorLockLockState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17942,9 +17942,9 @@ public:
 
     ~ReportDoorLockLockState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -17985,9 +17985,9 @@ public:
 
     ~ReadDoorLockLockType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18015,9 +18015,9 @@ public:
 
     ~ReportDoorLockLockType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18057,9 +18057,9 @@ public:
 
     ~ReadDoorLockActuatorEnabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18087,9 +18087,9 @@ public:
 
     ~ReportDoorLockActuatorEnabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18126,9 +18126,9 @@ public:
 
     ~ReadDoorLockDoorState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18157,9 +18157,9 @@ public:
 
     ~ReportDoorLockDoorState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18200,9 +18200,9 @@ public:
 
     ~ReadDoorLockNumberOfTotalUsersSupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18230,9 +18230,9 @@ public:
 
     ~ReportDoorLockNumberOfTotalUsersSupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18269,9 +18269,9 @@ public:
 
     ~ReadDoorLockNumberOfPINUsersSupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18299,9 +18299,9 @@ public:
 
     ~ReportDoorLockNumberOfPINUsersSupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18338,9 +18338,9 @@ public:
 
     ~ReadDoorLockMaxPINCodeLength() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18368,9 +18368,9 @@ public:
 
     ~ReportDoorLockMaxPINCodeLength() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18407,9 +18407,9 @@ public:
 
     ~ReadDoorLockMinPINCodeLength() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18437,9 +18437,9 @@ public:
 
     ~ReportDoorLockMinPINCodeLength() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18476,9 +18476,9 @@ public:
 
     ~ReadDoorLockLanguage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18504,9 +18504,9 @@ public:
 
     ~WriteDoorLockLanguage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18532,9 +18532,9 @@ public:
 
     ~ReportDoorLockLanguage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18571,9 +18571,9 @@ public:
 
     ~ReadDoorLockAutoRelockTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18599,9 +18599,9 @@ public:
 
     ~WriteDoorLockAutoRelockTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18627,9 +18627,9 @@ public:
 
     ~ReportDoorLockAutoRelockTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18666,9 +18666,9 @@ public:
 
     ~ReadDoorLockSoundVolume() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18694,9 +18694,9 @@ public:
 
     ~WriteDoorLockSoundVolume() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18722,9 +18722,9 @@ public:
 
     ~ReportDoorLockSoundVolume() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18761,9 +18761,9 @@ public:
 
     ~ReadDoorLockOperatingMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18789,9 +18789,9 @@ public:
 
     ~WriteDoorLockOperatingMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18817,9 +18817,9 @@ public:
 
     ~ReportDoorLockOperatingMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18859,9 +18859,9 @@ public:
 
     ~ReadDoorLockSupportedOperatingModes() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18889,9 +18889,9 @@ public:
 
     ~ReportDoorLockSupportedOperatingModes() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18928,9 +18928,9 @@ public:
 
     ~ReadDoorLockEnableOneTouchLocking() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18956,9 +18956,9 @@ public:
 
     ~WriteDoorLockEnableOneTouchLocking() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -18984,9 +18984,9 @@ public:
 
     ~ReportDoorLockEnableOneTouchLocking() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19023,9 +19023,9 @@ public:
 
     ~ReadDoorLockEnablePrivacyModeButton() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19051,9 +19051,9 @@ public:
 
     ~WriteDoorLockEnablePrivacyModeButton() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19079,9 +19079,9 @@ public:
 
     ~ReportDoorLockEnablePrivacyModeButton() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19118,9 +19118,9 @@ public:
 
     ~ReadDoorLockWrongCodeEntryLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19146,9 +19146,9 @@ public:
 
     ~WriteDoorLockWrongCodeEntryLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19174,9 +19174,9 @@ public:
 
     ~ReportDoorLockWrongCodeEntryLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19213,9 +19213,9 @@ public:
 
     ~ReadDoorLockAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19243,9 +19243,9 @@ public:
 
     ~ReportDoorLockAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19285,9 +19285,9 @@ public:
 
     ~ReadDoorLockClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19315,9 +19315,9 @@ public:
 
     ~ReportDoorLockClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19377,9 +19377,9 @@ public:
 
     ~ReadElectricalMeasurementMeasurementType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19407,9 +19407,9 @@ public:
 
     ~ReportElectricalMeasurementMeasurementType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19449,9 +19449,9 @@ public:
 
     ~ReadElectricalMeasurementTotalActivePower() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000304) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19479,9 +19479,9 @@ public:
 
     ~ReportElectricalMeasurementTotalActivePower() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000304) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19521,9 +19521,9 @@ public:
 
     ~ReadElectricalMeasurementRmsVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000505) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19551,9 +19551,9 @@ public:
 
     ~ReportElectricalMeasurementRmsVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000505) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19590,9 +19590,9 @@ public:
 
     ~ReadElectricalMeasurementRmsVoltageMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000506) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19620,9 +19620,9 @@ public:
 
     ~ReportElectricalMeasurementRmsVoltageMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000506) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19659,9 +19659,9 @@ public:
 
     ~ReadElectricalMeasurementRmsVoltageMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000507) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19689,9 +19689,9 @@ public:
 
     ~ReportElectricalMeasurementRmsVoltageMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000507) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19728,9 +19728,9 @@ public:
 
     ~ReadElectricalMeasurementRmsCurrent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000508) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19758,9 +19758,9 @@ public:
 
     ~ReportElectricalMeasurementRmsCurrent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000508) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19797,9 +19797,9 @@ public:
 
     ~ReadElectricalMeasurementRmsCurrentMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x00000509) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19827,9 +19827,9 @@ public:
 
     ~ReportElectricalMeasurementRmsCurrentMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x00000509) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19866,9 +19866,9 @@ public:
 
     ~ReadElectricalMeasurementRmsCurrentMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x0000050A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19896,9 +19896,9 @@ public:
 
     ~ReportElectricalMeasurementRmsCurrentMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x0000050A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19935,9 +19935,9 @@ public:
 
     ~ReadElectricalMeasurementActivePower() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x0000050B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -19965,9 +19965,9 @@ public:
 
     ~ReportElectricalMeasurementActivePower() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x0000050B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20004,9 +20004,9 @@ public:
 
     ~ReadElectricalMeasurementActivePowerMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x0000050C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20034,9 +20034,9 @@ public:
 
     ~ReportElectricalMeasurementActivePowerMin() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x0000050C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20073,9 +20073,9 @@ public:
 
     ~ReadElectricalMeasurementActivePowerMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x0000050D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20103,9 +20103,9 @@ public:
 
     ~ReportElectricalMeasurementActivePowerMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x0000050D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20142,9 +20142,9 @@ public:
 
     ~ReadElectricalMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20172,9 +20172,9 @@ public:
 
     ~ReportElectricalMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20214,9 +20214,9 @@ public:
 
     ~ReadElectricalMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20244,9 +20244,9 @@ public:
 
     ~ReportElectricalMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20303,9 +20303,9 @@ class EthernetNetworkDiagnosticsResetCounts : public ModelCommand
 public:
     EthernetNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -20329,9 +20329,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsPHYRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20359,9 +20359,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsPHYRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20398,9 +20398,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsFullDuplex() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20428,9 +20428,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsFullDuplex() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20467,9 +20467,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsPacketRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20497,9 +20497,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsPacketRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20539,9 +20539,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsPacketTxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20569,9 +20569,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsPacketTxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20611,9 +20611,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsTxErrCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20641,9 +20641,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsTxErrCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20683,9 +20683,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsCollisionCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20713,9 +20713,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsCollisionCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20755,9 +20755,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsOverrunCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20785,9 +20785,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsOverrunCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20827,9 +20827,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsCarrierDetect() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20857,9 +20857,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsCarrierDetect() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20896,9 +20896,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsTimeSinceReset() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20926,9 +20926,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsTimeSinceReset() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20968,9 +20968,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20998,9 +20998,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21040,9 +21040,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21070,9 +21070,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21112,9 +21112,9 @@ public:
 
     ~ReadEthernetNetworkDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21142,9 +21142,9 @@ public:
 
     ~ReportEthernetNetworkDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21197,9 +21197,9 @@ public:
 
     ~ReadFixedLabelLabelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21229,9 +21229,9 @@ public:
 
     ~ReportFixedLabelLabelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21273,9 +21273,9 @@ public:
 
     ~ReadFixedLabelAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21303,9 +21303,9 @@ public:
 
     ~ReportFixedLabelAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21345,9 +21345,9 @@ public:
 
     ~ReadFixedLabelClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21375,9 +21375,9 @@ public:
 
     ~ReportFixedLabelClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21430,9 +21430,9 @@ public:
 
     ~ReadFlowMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21460,9 +21460,9 @@ public:
 
     ~ReportFlowMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21499,9 +21499,9 @@ public:
 
     ~ReadFlowMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21529,9 +21529,9 @@ public:
 
     ~ReportFlowMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21568,9 +21568,9 @@ public:
 
     ~ReadFlowMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21598,9 +21598,9 @@ public:
 
     ~ReportFlowMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21637,9 +21637,9 @@ public:
 
     ~ReadFlowMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21667,9 +21667,9 @@ public:
 
     ~ReportFlowMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21706,9 +21706,9 @@ public:
 
     ~ReadFlowMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21736,9 +21736,9 @@ public:
 
     ~ReportFlowMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21778,9 +21778,9 @@ public:
 
     ~ReadFlowMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21808,9 +21808,9 @@ public:
 
     ~ReportFlowMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21866,9 +21866,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningArmFailSafeResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -21886,9 +21886,9 @@ class GeneralCommissioningCommissioningComplete : public ModelCommand
 public:
     GeneralCommissioningCommissioningComplete() : ModelCommand("commissioning-complete") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningCommissioningCompleteResponseSuccess,
                                                OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -21914,9 +21914,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningSetRegulatoryConfigResponseSuccess,
                                                OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -21940,9 +21940,9 @@ public:
 
     ~ReadGeneralCommissioningBreadcrumb() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21968,9 +21968,9 @@ public:
 
     ~WriteGeneralCommissioningBreadcrumb() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21996,9 +21996,9 @@ public:
 
     ~ReportGeneralCommissioningBreadcrumb() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22035,9 +22035,9 @@ public:
 
     ~ReadGeneralCommissioningBasicCommissioningInfoList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22068,9 +22068,9 @@ public:
 
     ~ReportGeneralCommissioningBasicCommissioningInfoList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22114,9 +22114,9 @@ public:
 
     ~ReadGeneralCommissioningRegulatoryConfig() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22144,9 +22144,9 @@ public:
 
     ~ReportGeneralCommissioningRegulatoryConfig() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22183,9 +22183,9 @@ public:
 
     ~ReadGeneralCommissioningLocationCapability() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22213,9 +22213,9 @@ public:
 
     ~ReportGeneralCommissioningLocationCapability() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22255,9 +22255,9 @@ public:
 
     ~ReadGeneralCommissioningAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22285,9 +22285,9 @@ public:
 
     ~ReportGeneralCommissioningAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22327,9 +22327,9 @@ public:
 
     ~ReadGeneralCommissioningClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22357,9 +22357,9 @@ public:
 
     ~ReportGeneralCommissioningClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22420,9 +22420,9 @@ public:
 
     ~ReadGeneralDiagnosticsHardwareFaultChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22451,9 +22451,9 @@ public:
 
     ~ReportGeneralDiagnosticsHardwareFaultChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22493,9 +22493,9 @@ public:
 
     ~ReadGeneralDiagnosticsRadioFaultChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22524,9 +22524,9 @@ public:
 
     ~ReportGeneralDiagnosticsRadioFaultChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22566,9 +22566,9 @@ public:
 
     ~ReadGeneralDiagnosticsNetworkFaultChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22597,9 +22597,9 @@ public:
 
     ~ReportGeneralDiagnosticsNetworkFaultChange() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22639,9 +22639,9 @@ public:
 
     ~ReadGeneralDiagnosticsBootReason() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22669,9 +22669,9 @@ public:
 
     ~ReportGeneralDiagnosticsBootReason() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22711,9 +22711,9 @@ public:
 
     ~ReadGeneralDiagnosticsNetworkInterfaces() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22744,9 +22744,9 @@ public:
 
     ~ReportGeneralDiagnosticsNetworkInterfaces() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22788,9 +22788,9 @@ public:
 
     ~ReadGeneralDiagnosticsRebootCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22818,9 +22818,9 @@ public:
 
     ~ReportGeneralDiagnosticsRebootCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22857,9 +22857,9 @@ public:
 
     ~ReadGeneralDiagnosticsUpTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22887,9 +22887,9 @@ public:
 
     ~ReportGeneralDiagnosticsUpTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22926,9 +22926,9 @@ public:
 
     ~ReadGeneralDiagnosticsTotalOperationalHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22956,9 +22956,9 @@ public:
 
     ~ReportGeneralDiagnosticsTotalOperationalHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -22998,9 +22998,9 @@ public:
 
     ~ReadGeneralDiagnosticsBootReasons() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23028,9 +23028,9 @@ public:
 
     ~ReportGeneralDiagnosticsBootReasons() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23067,9 +23067,9 @@ public:
 
     ~ReadGeneralDiagnosticsActiveHardwareFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23097,9 +23097,9 @@ public:
 
     ~ReportGeneralDiagnosticsActiveHardwareFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23139,9 +23139,9 @@ public:
 
     ~ReadGeneralDiagnosticsActiveRadioFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23169,9 +23169,9 @@ public:
 
     ~ReportGeneralDiagnosticsActiveRadioFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23211,9 +23211,9 @@ public:
 
     ~ReadGeneralDiagnosticsActiveNetworkFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23241,9 +23241,9 @@ public:
 
     ~ReportGeneralDiagnosticsActiveNetworkFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23283,9 +23283,9 @@ public:
 
     ~ReadGeneralDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23313,9 +23313,9 @@ public:
 
     ~ReportGeneralDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23355,9 +23355,9 @@ public:
 
     ~ReadGeneralDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23385,9 +23385,9 @@ public:
 
     ~ReportGeneralDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23442,9 +23442,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupKeyManagementKeySetReadResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -23466,9 +23466,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupKeyManagementKeySetReadAllIndicesResponseSuccess,
                                                OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -23490,9 +23490,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -23514,9 +23514,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -23540,9 +23540,9 @@ public:
 
     ~ReadGroupKeyManagementGroupKeyMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23573,9 +23573,9 @@ public:
 
     ~ReportGroupKeyManagementGroupKeyMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23618,9 +23618,9 @@ public:
 
     ~ReadGroupKeyManagementGroupTable() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23651,9 +23651,9 @@ public:
 
     ~ReportGroupKeyManagementGroupTable() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23696,9 +23696,9 @@ public:
 
     ~ReadGroupKeyManagementMaxGroupsPerFabric() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23726,9 +23726,9 @@ public:
 
     ~ReportGroupKeyManagementMaxGroupsPerFabric() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23768,9 +23768,9 @@ public:
 
     ~ReadGroupKeyManagementMaxGroupKeysPerFabric() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23798,9 +23798,9 @@ public:
 
     ~ReportGroupKeyManagementMaxGroupKeysPerFabric() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23840,9 +23840,9 @@ public:
 
     ~ReadGroupKeyManagementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23870,9 +23870,9 @@ public:
 
     ~ReportGroupKeyManagementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23912,9 +23912,9 @@ public:
 
     ~ReadGroupKeyManagementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23942,9 +23942,9 @@ public:
 
     ~ReportGroupKeyManagementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -23999,9 +23999,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsAddGroupResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -24024,9 +24024,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -24048,9 +24048,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsGetGroupMembershipResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -24068,9 +24068,9 @@ class GroupsRemoveAllGroups : public ModelCommand
 public:
     GroupsRemoveAllGroups() : ModelCommand("remove-all-groups") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -24092,9 +24092,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsRemoveGroupResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -24116,9 +24116,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsViewGroupResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -24142,9 +24142,9 @@ public:
 
     ~ReadGroupsNameSupport() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24172,9 +24172,9 @@ public:
 
     ~ReportGroupsNameSupport() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24211,9 +24211,9 @@ public:
 
     ~ReadGroupsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24241,9 +24241,9 @@ public:
 
     ~ReportGroupsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24283,9 +24283,9 @@ public:
 
     ~ReadGroupsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24313,9 +24313,9 @@ public:
 
     ~ReportGroupsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24367,9 +24367,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -24387,9 +24387,9 @@ class IdentifyIdentifyQuery : public ModelCommand
 public:
     IdentifyIdentifyQuery() : ModelCommand("identify-query") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnIdentifyIdentifyQueryResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -24414,9 +24414,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -24440,9 +24440,9 @@ public:
 
     ~ReadIdentifyIdentifyTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24468,9 +24468,9 @@ public:
 
     ~WriteIdentifyIdentifyTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24496,9 +24496,9 @@ public:
 
     ~ReportIdentifyIdentifyTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24535,9 +24535,9 @@ public:
 
     ~ReadIdentifyIdentifyType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24565,9 +24565,9 @@ public:
 
     ~ReportIdentifyIdentifyType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24604,9 +24604,9 @@ public:
 
     ~ReadIdentifyAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24634,9 +24634,9 @@ public:
 
     ~ReportIdentifyAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24676,9 +24676,9 @@ public:
 
     ~ReadIdentifyClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24706,9 +24706,9 @@ public:
 
     ~ReportIdentifyClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24762,9 +24762,9 @@ public:
 
     ~ReadIlluminanceMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24792,9 +24792,9 @@ public:
 
     ~ReportIlluminanceMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24834,9 +24834,9 @@ public:
 
     ~ReadIlluminanceMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24864,9 +24864,9 @@ public:
 
     ~ReportIlluminanceMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24906,9 +24906,9 @@ public:
 
     ~ReadIlluminanceMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24936,9 +24936,9 @@ public:
 
     ~ReportIlluminanceMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -24978,9 +24978,9 @@ public:
 
     ~ReadIlluminanceMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25008,9 +25008,9 @@ public:
 
     ~ReportIlluminanceMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25047,9 +25047,9 @@ public:
 
     ~ReadIlluminanceMeasurementLightSensorType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25077,9 +25077,9 @@ public:
 
     ~ReportIlluminanceMeasurementLightSensorType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25119,9 +25119,9 @@ public:
 
     ~ReadIlluminanceMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25149,9 +25149,9 @@ public:
 
     ~ReportIlluminanceMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25191,9 +25191,9 @@ public:
 
     ~ReadIlluminanceMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25221,9 +25221,9 @@ public:
 
     ~ReportIlluminanceMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000400) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25275,9 +25275,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnKeypadInputSendKeyResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -25301,9 +25301,9 @@ public:
 
     ~ReadKeypadInputAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0509) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::KeypadInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25331,9 +25331,9 @@ public:
 
     ~ReportKeypadInputAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0509) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::KeypadInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25373,9 +25373,9 @@ public:
 
     ~ReadKeypadInputClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0509) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::KeypadInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25403,9 +25403,9 @@ public:
 
     ~ReportKeypadInputClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0509) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::KeypadInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25479,9 +25479,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25506,9 +25506,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25531,9 +25531,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25557,9 +25557,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25586,9 +25586,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25613,9 +25613,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25638,9 +25638,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25658,9 +25658,9 @@ class LevelControlStopWithOnOff : public ModelCommand
 public:
     LevelControlStopWithOnOff() : ModelCommand("stop-with-on-off") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -25684,9 +25684,9 @@ public:
 
     ~ReadLevelControlCurrentLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25714,9 +25714,9 @@ public:
 
     ~ReportLevelControlCurrentLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25753,9 +25753,9 @@ public:
 
     ~ReadLevelControlRemainingTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25783,9 +25783,9 @@ public:
 
     ~ReportLevelControlRemainingTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25822,9 +25822,9 @@ public:
 
     ~ReadLevelControlMinLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25852,9 +25852,9 @@ public:
 
     ~ReportLevelControlMinLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25891,9 +25891,9 @@ public:
 
     ~ReadLevelControlMaxLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25921,9 +25921,9 @@ public:
 
     ~ReportLevelControlMaxLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25960,9 +25960,9 @@ public:
 
     ~ReadLevelControlCurrentFrequency() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25990,9 +25990,9 @@ public:
 
     ~ReportLevelControlCurrentFrequency() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26029,9 +26029,9 @@ public:
 
     ~ReadLevelControlMinFrequency() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26059,9 +26059,9 @@ public:
 
     ~ReportLevelControlMinFrequency() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26098,9 +26098,9 @@ public:
 
     ~ReadLevelControlMaxFrequency() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26128,9 +26128,9 @@ public:
 
     ~ReportLevelControlMaxFrequency() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26167,9 +26167,9 @@ public:
 
     ~ReadLevelControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26195,9 +26195,9 @@ public:
 
     ~WriteLevelControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26223,9 +26223,9 @@ public:
 
     ~ReportLevelControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26262,9 +26262,9 @@ public:
 
     ~ReadLevelControlOnOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26290,9 +26290,9 @@ public:
 
     ~WriteLevelControlOnOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26318,9 +26318,9 @@ public:
 
     ~ReportLevelControlOnOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26357,9 +26357,9 @@ public:
 
     ~ReadLevelControlOnLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26385,9 +26385,9 @@ public:
 
     ~WriteLevelControlOnLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26413,9 +26413,9 @@ public:
 
     ~ReportLevelControlOnLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26455,9 +26455,9 @@ public:
 
     ~ReadLevelControlOnTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26483,9 +26483,9 @@ public:
 
     ~WriteLevelControlOnTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26511,9 +26511,9 @@ public:
 
     ~ReportLevelControlOnTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26553,9 +26553,9 @@ public:
 
     ~ReadLevelControlOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26581,9 +26581,9 @@ public:
 
     ~WriteLevelControlOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26609,9 +26609,9 @@ public:
 
     ~ReportLevelControlOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26651,9 +26651,9 @@ public:
 
     ~ReadLevelControlDefaultMoveRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26679,9 +26679,9 @@ public:
 
     ~WriteLevelControlDefaultMoveRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26707,9 +26707,9 @@ public:
 
     ~ReportLevelControlDefaultMoveRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26749,9 +26749,9 @@ public:
 
     ~ReadLevelControlStartUpCurrentLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26777,9 +26777,9 @@ public:
 
     ~WriteLevelControlStartUpCurrentLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) WriteAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26805,9 +26805,9 @@ public:
 
     ~ReportLevelControlStartUpCurrentLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26847,9 +26847,9 @@ public:
 
     ~ReadLevelControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26877,9 +26877,9 @@ public:
 
     ~ReportLevelControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26919,9 +26919,9 @@ public:
 
     ~ReadLevelControlFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26949,9 +26949,9 @@ public:
 
     ~ReportLevelControlFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -26988,9 +26988,9 @@ public:
 
     ~ReadLevelControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27018,9 +27018,9 @@ public:
 
     ~ReportLevelControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27070,9 +27070,9 @@ public:
 
     ~ReadLocalizationConfigurationActiveLocale() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002B) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LocalizationConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27098,9 +27098,9 @@ public:
 
     ~WriteLocalizationConfigurationActiveLocale() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002B) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002B) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LocalizationConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27126,9 +27126,9 @@ public:
 
     ~ReportLocalizationConfigurationActiveLocale() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002B) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LocalizationConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27168,9 +27168,9 @@ public:
 
     ~ReadLocalizationConfigurationSupportedLocales() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002B) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LocalizationConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27198,9 +27198,9 @@ public:
 
     ~ReportLocalizationConfigurationSupportedLocales() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002B) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LocalizationConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27319,9 +27319,9 @@ class LowPowerSleep : public ModelCommand
 public:
     LowPowerSleep() : ModelCommand("sleep") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -27345,9 +27345,9 @@ public:
 
     ~ReadLowPowerAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0508) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LowPowerCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27375,9 +27375,9 @@ public:
 
     ~ReportLowPowerAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0508) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LowPowerCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27417,9 +27417,9 @@ public:
 
     ~ReadLowPowerClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0508) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LowPowerCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27447,9 +27447,9 @@ public:
 
     ~ReportLowPowerClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0508) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::LowPowerCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27498,9 +27498,9 @@ class MediaInputHideInputStatusRequest : public ModelCommand
 public:
     MediaInputHideInputStatusRequest() : ModelCommand("hide-input-status-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -27523,9 +27523,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -27547,9 +27547,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -27567,9 +27567,9 @@ class MediaInputShowInputStatusRequest : public ModelCommand
 public:
     MediaInputShowInputStatusRequest() : ModelCommand("show-input-status-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -27593,9 +27593,9 @@ public:
 
     ~ReadMediaInputMediaInputList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27625,9 +27625,9 @@ public:
 
     ~ReportMediaInputMediaInputList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27669,9 +27669,9 @@ public:
 
     ~ReadMediaInputCurrentMediaInput() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27699,9 +27699,9 @@ public:
 
     ~ReportMediaInputCurrentMediaInput() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27738,9 +27738,9 @@ public:
 
     ~ReadMediaInputAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27768,9 +27768,9 @@ public:
 
     ~ReportMediaInputAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27810,9 +27810,9 @@ public:
 
     ~ReadMediaInputClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27840,9 +27840,9 @@ public:
 
     ~ReportMediaInputClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
@@ -27902,9 +27902,9 @@ class MediaPlaybackFastForwardRequest : public ModelCommand
 public:
     MediaPlaybackFastForwardRequest() : ModelCommand("fast-forward-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -27922,9 +27922,9 @@ class MediaPlaybackNextRequest : public ModelCommand
 public:
     MediaPlaybackNextRequest() : ModelCommand("next-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -27942,9 +27942,9 @@ class MediaPlaybackPauseRequest : public ModelCommand
 public:
     MediaPlaybackPauseRequest() : ModelCommand("pause-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -27962,9 +27962,9 @@ class MediaPlaybackPlayRequest : public ModelCommand
 public:
     MediaPlaybackPlayRequest() : ModelCommand("play-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -27982,9 +27982,9 @@ class MediaPlaybackPreviousRequest : public ModelCommand
 public:
     MediaPlaybackPreviousRequest() : ModelCommand("previous-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28002,9 +28002,9 @@ class MediaPlaybackRewindRequest : public ModelCommand
 public:
     MediaPlaybackRewindRequest() : ModelCommand("rewind-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28026,9 +28026,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28050,9 +28050,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28074,9 +28074,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28094,9 +28094,9 @@ class MediaPlaybackStartOverRequest : public ModelCommand
 public:
     MediaPlaybackStartOverRequest() : ModelCommand("start-over-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28114,9 +28114,9 @@ class MediaPlaybackStopRequest : public ModelCommand
 public:
     MediaPlaybackStopRequest() : ModelCommand("stop-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackPlaybackResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -28140,9 +28140,9 @@ public:
 
     ~ReadMediaPlaybackPlaybackState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28170,9 +28170,9 @@ public:
 
     ~ReportMediaPlaybackPlaybackState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28212,9 +28212,9 @@ public:
 
     ~ReadMediaPlaybackStartTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28242,9 +28242,9 @@ public:
 
     ~ReportMediaPlaybackStartTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28281,9 +28281,9 @@ public:
 
     ~ReadMediaPlaybackDuration() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28311,9 +28311,9 @@ public:
 
     ~ReportMediaPlaybackDuration() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28350,9 +28350,9 @@ public:
 
     ~ReadMediaPlaybackPlaybackSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28380,9 +28380,9 @@ public:
 
     ~ReportMediaPlaybackPlaybackSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28419,9 +28419,9 @@ public:
 
     ~ReadMediaPlaybackSeekRangeEnd() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28449,9 +28449,9 @@ public:
 
     ~ReportMediaPlaybackSeekRangeEnd() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28488,9 +28488,9 @@ public:
 
     ~ReadMediaPlaybackSeekRangeStart() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28518,9 +28518,9 @@ public:
 
     ~ReportMediaPlaybackSeekRangeStart() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28557,9 +28557,9 @@ public:
 
     ~ReadMediaPlaybackAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28587,9 +28587,9 @@ public:
 
     ~ReportMediaPlaybackAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28629,9 +28629,9 @@ public:
 
     ~ReadMediaPlaybackClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28659,9 +28659,9 @@ public:
 
     ~ReportMediaPlaybackClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28714,9 +28714,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -28740,9 +28740,9 @@ public:
 
     ~ReadModeSelectCurrentMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28770,9 +28770,9 @@ public:
 
     ~ReportModeSelectCurrentMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28809,9 +28809,9 @@ public:
 
     ~ReadModeSelectSupportedModes() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28842,9 +28842,9 @@ public:
 
     ~ReportModeSelectSupportedModes() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28887,9 +28887,9 @@ public:
 
     ~ReadModeSelectOnMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28915,9 +28915,9 @@ public:
 
     ~WriteModeSelectOnMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28943,9 +28943,9 @@ public:
 
     ~ReportModeSelectOnMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -28982,9 +28982,9 @@ public:
 
     ~ReadModeSelectStartUpMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29012,9 +29012,9 @@ public:
 
     ~ReportModeSelectStartUpMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29051,9 +29051,9 @@ public:
 
     ~ReadModeSelectDescription() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29081,9 +29081,9 @@ public:
 
     ~ReportModeSelectDescription() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29120,9 +29120,9 @@ public:
 
     ~ReadModeSelectAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29150,9 +29150,9 @@ public:
 
     ~ReportModeSelectAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29192,9 +29192,9 @@ public:
 
     ~ReadModeSelectClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29222,9 +29222,9 @@ public:
 
     ~ReportModeSelectClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29286,9 +29286,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -29312,9 +29312,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -29337,9 +29337,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningConnectNetworkResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -29362,9 +29362,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -29388,9 +29388,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -29413,9 +29413,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningScanNetworksResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -29439,9 +29439,9 @@ public:
 
     ~ReadNetworkCommissioningMaxNetworks() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29469,9 +29469,9 @@ public:
 
     ~ReportNetworkCommissioningMaxNetworks() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29508,9 +29508,9 @@ public:
 
     ~ReadNetworkCommissioningNetworks() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29541,9 +29541,9 @@ public:
 
     ~ReportNetworkCommissioningNetworks() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29586,9 +29586,9 @@ public:
 
     ~ReadNetworkCommissioningScanMaxTimeSeconds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29616,9 +29616,9 @@ public:
 
     ~ReportNetworkCommissioningScanMaxTimeSeconds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29658,9 +29658,9 @@ public:
 
     ~ReadNetworkCommissioningConnectMaxTimeSeconds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29688,9 +29688,9 @@ public:
 
     ~ReportNetworkCommissioningConnectMaxTimeSeconds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29730,9 +29730,9 @@ public:
 
     ~ReadNetworkCommissioningInterfaceEnabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29758,9 +29758,9 @@ public:
 
     ~WriteNetworkCommissioningInterfaceEnabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) WriteAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29786,9 +29786,9 @@ public:
 
     ~ReportNetworkCommissioningInterfaceEnabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29825,9 +29825,9 @@ public:
 
     ~ReadNetworkCommissioningLastNetworkingStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29855,9 +29855,9 @@ public:
 
     ~ReportNetworkCommissioningLastNetworkingStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29897,9 +29897,9 @@ public:
 
     ~ReadNetworkCommissioningLastNetworkID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29927,9 +29927,9 @@ public:
 
     ~ReportNetworkCommissioningLastNetworkID() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29969,9 +29969,9 @@ public:
 
     ~ReadNetworkCommissioningLastConnectErrorValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -29999,9 +29999,9 @@ public:
 
     ~ReportNetworkCommissioningLastConnectErrorValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30041,9 +30041,9 @@ public:
 
     ~ReadNetworkCommissioningFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30071,9 +30071,9 @@ public:
 
     ~ReportNetworkCommissioningFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30110,9 +30110,9 @@ public:
 
     ~ReadNetworkCommissioningClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30140,9 +30140,9 @@ public:
 
     ~ReportNetworkCommissioningClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30193,9 +30193,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess,
                                                OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -30218,9 +30218,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -30249,9 +30249,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderQueryImageResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -30275,9 +30275,9 @@ public:
 
     ~ReadOtaSoftwareUpdateProviderAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0029) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30305,9 +30305,9 @@ public:
 
     ~ReportOtaSoftwareUpdateProviderAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0029) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30347,9 +30347,9 @@ public:
 
     ~ReadOtaSoftwareUpdateProviderClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0029) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30377,9 +30377,9 @@ public:
 
     ~ReportOtaSoftwareUpdateProviderClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0029) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30443,9 +30443,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -30469,9 +30469,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorStateTransition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30500,9 +30500,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorStateTransition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30542,9 +30542,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorVersionApplied() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30573,9 +30573,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorVersionApplied() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30615,9 +30615,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorDownloadError() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30646,9 +30646,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorDownloadError() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30689,9 +30689,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30722,9 +30722,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30768,9 +30768,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorUpdatePossible() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30798,9 +30798,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorUpdatePossible() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30840,9 +30840,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorUpdateState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30870,9 +30870,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorUpdateState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30912,9 +30912,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorUpdateStateProgress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30942,9 +30942,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorUpdateStateProgress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -30985,9 +30985,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31015,9 +31015,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31057,9 +31057,9 @@ public:
 
     ~ReadOtaSoftwareUpdateRequestorClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31087,9 +31087,9 @@ public:
 
     ~ReportOtaSoftwareUpdateRequestorClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31144,9 +31144,9 @@ public:
 
     ~ReadOccupancySensingOccupancy() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31174,9 +31174,9 @@ public:
 
     ~ReportOccupancySensingOccupancy() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31213,9 +31213,9 @@ public:
 
     ~ReadOccupancySensingOccupancySensorType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31243,9 +31243,9 @@ public:
 
     ~ReportOccupancySensingOccupancySensorType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31282,9 +31282,9 @@ public:
 
     ~ReadOccupancySensingOccupancySensorTypeBitmap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31312,9 +31312,9 @@ public:
 
     ~ReportOccupancySensingOccupancySensorTypeBitmap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31354,9 +31354,9 @@ public:
 
     ~ReadOccupancySensingAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31384,9 +31384,9 @@ public:
 
     ~ReportOccupancySensingAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31426,9 +31426,9 @@ public:
 
     ~ReadOccupancySensingClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31456,9 +31456,9 @@ public:
 
     ~ReportOccupancySensingClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000406) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31513,9 +31513,9 @@ class OnOffOff : public ModelCommand
 public:
     OnOffOff() : ModelCommand("off") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -31540,9 +31540,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -31560,9 +31560,9 @@ class OnOffOn : public ModelCommand
 public:
     OnOffOn() : ModelCommand("on") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -31580,9 +31580,9 @@ class OnOffOnWithRecallGlobalScene : public ModelCommand
 public:
     OnOffOnWithRecallGlobalScene() : ModelCommand("on-with-recall-global-scene") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -31607,9 +31607,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -31627,9 +31627,9 @@ class OnOffToggle : public ModelCommand
 public:
     OnOffToggle() : ModelCommand("toggle") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -31653,9 +31653,9 @@ public:
 
     ~ReadOnOffOnOff() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31683,9 +31683,9 @@ public:
 
     ~ReportOnOffOnOff() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31722,9 +31722,9 @@ public:
 
     ~ReadOnOffGlobalSceneControl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31752,9 +31752,9 @@ public:
 
     ~ReportOnOffGlobalSceneControl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31791,9 +31791,9 @@ public:
 
     ~ReadOnOffOnTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31819,9 +31819,9 @@ public:
 
     ~WriteOnOffOnTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) WriteAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31847,9 +31847,9 @@ public:
 
     ~ReportOnOffOnTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31886,9 +31886,9 @@ public:
 
     ~ReadOnOffOffWaitTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31914,9 +31914,9 @@ public:
 
     ~WriteOnOffOffWaitTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) WriteAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31942,9 +31942,9 @@ public:
 
     ~ReportOnOffOffWaitTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -31981,9 +31981,9 @@ public:
 
     ~ReadOnOffStartUpOnOff() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x00004003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32009,9 +32009,9 @@ public:
 
     ~WriteOnOffStartUpOnOff() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) WriteAttribute (0x00004003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32037,9 +32037,9 @@ public:
 
     ~ReportOnOffStartUpOnOff() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32076,9 +32076,9 @@ public:
 
     ~ReadOnOffAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32106,9 +32106,9 @@ public:
 
     ~ReportOnOffAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32148,9 +32148,9 @@ public:
 
     ~ReadOnOffFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32178,9 +32178,9 @@ public:
 
     ~ReportOnOffFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32217,9 +32217,9 @@ public:
 
     ~ReadOnOffClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32247,9 +32247,9 @@ public:
 
     ~ReportOnOffClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32300,9 +32300,9 @@ public:
 
     ~ReadOnOffSwitchConfigurationSwitchType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32330,9 +32330,9 @@ public:
 
     ~ReportOnOffSwitchConfigurationSwitchType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32369,9 +32369,9 @@ public:
 
     ~ReadOnOffSwitchConfigurationSwitchActions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32397,9 +32397,9 @@ public:
 
     ~WriteOnOffSwitchConfigurationSwitchActions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) WriteAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32425,9 +32425,9 @@ public:
 
     ~ReportOnOffSwitchConfigurationSwitchActions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32467,9 +32467,9 @@ public:
 
     ~ReadOnOffSwitchConfigurationAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32497,9 +32497,9 @@ public:
 
     ~ReportOnOffSwitchConfigurationAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32539,9 +32539,9 @@ public:
 
     ~ReadOnOffSwitchConfigurationClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32569,9 +32569,9 @@ public:
 
     ~ReportOnOffSwitchConfigurationClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000007) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32640,9 +32640,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32664,9 +32664,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -32688,9 +32688,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsAttestationResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32712,9 +32712,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsCertificateChainResponseSuccess,
                                                OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32736,9 +32736,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsOpCSRResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32760,9 +32760,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32784,9 +32784,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -32808,9 +32808,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32833,9 +32833,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -32937,9 +32937,9 @@ public:
 
     ~ReadOperationalCredentialsFabricsList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -32970,9 +32970,9 @@ public:
 
     ~ReportOperationalCredentialsFabricsList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33014,9 +33014,9 @@ public:
 
     ~ReadOperationalCredentialsSupportedFabrics() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33044,9 +33044,9 @@ public:
 
     ~ReportOperationalCredentialsSupportedFabrics() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33086,9 +33086,9 @@ public:
 
     ~ReadOperationalCredentialsCommissionedFabrics() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33116,9 +33116,9 @@ public:
 
     ~ReportOperationalCredentialsCommissionedFabrics() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33158,9 +33158,9 @@ public:
 
     ~ReadOperationalCredentialsTrustedRootCertificates() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33188,9 +33188,9 @@ public:
 
     ~ReportOperationalCredentialsTrustedRootCertificates() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33231,9 +33231,9 @@ public:
 
     ~ReadOperationalCredentialsCurrentFabricIndex() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33261,9 +33261,9 @@ public:
 
     ~ReportOperationalCredentialsCurrentFabricIndex() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33303,9 +33303,9 @@ public:
 
     ~ReadOperationalCredentialsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33333,9 +33333,9 @@ public:
 
     ~ReportOperationalCredentialsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33375,9 +33375,9 @@ public:
 
     ~ReadOperationalCredentialsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33405,9 +33405,9 @@ public:
 
     ~ReportOperationalCredentialsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33469,9 +33469,9 @@ public:
 
     ~ReadPowerSourceStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33499,9 +33499,9 @@ public:
 
     ~ReportPowerSourceStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33538,9 +33538,9 @@ public:
 
     ~ReadPowerSourceOrder() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33568,9 +33568,9 @@ public:
 
     ~ReportPowerSourceOrder() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33607,9 +33607,9 @@ public:
 
     ~ReadPowerSourceDescription() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33637,9 +33637,9 @@ public:
 
     ~ReportPowerSourceDescription() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33676,9 +33676,9 @@ public:
 
     ~ReadPowerSourceBatteryVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33706,9 +33706,9 @@ public:
 
     ~ReportPowerSourceBatteryVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33745,9 +33745,9 @@ public:
 
     ~ReadPowerSourceBatteryPercentRemaining() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33775,9 +33775,9 @@ public:
 
     ~ReportPowerSourceBatteryPercentRemaining() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33814,9 +33814,9 @@ public:
 
     ~ReadPowerSourceBatteryTimeRemaining() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33844,9 +33844,9 @@ public:
 
     ~ReportPowerSourceBatteryTimeRemaining() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33883,9 +33883,9 @@ public:
 
     ~ReadPowerSourceBatteryChargeLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33913,9 +33913,9 @@ public:
 
     ~ReportPowerSourceBatteryChargeLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33952,9 +33952,9 @@ public:
 
     ~ReadPowerSourceActiveBatteryFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -33982,9 +33982,9 @@ public:
 
     ~ReportPowerSourceActiveBatteryFaults() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34024,9 +34024,9 @@ public:
 
     ~ReadPowerSourceBatteryChargeState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34054,9 +34054,9 @@ public:
 
     ~ReportPowerSourceBatteryChargeState() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34093,9 +34093,9 @@ public:
 
     ~ReadPowerSourceAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34123,9 +34123,9 @@ public:
 
     ~ReportPowerSourceAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34165,9 +34165,9 @@ public:
 
     ~ReadPowerSourceFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34195,9 +34195,9 @@ public:
 
     ~ReportPowerSourceFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34234,9 +34234,9 @@ public:
 
     ~ReadPowerSourceClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34264,9 +34264,9 @@ public:
 
     ~ReportPowerSourceClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34316,9 +34316,9 @@ public:
 
     ~ReadPowerSourceConfigurationSources() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002E) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34346,9 +34346,9 @@ public:
 
     ~ReportPowerSourceConfigurationSources() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002E) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34388,9 +34388,9 @@ public:
 
     ~ReadPowerSourceConfigurationAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002E) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34418,9 +34418,9 @@ public:
 
     ~ReportPowerSourceConfigurationAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002E) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34460,9 +34460,9 @@ public:
 
     ~ReadPowerSourceConfigurationClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002E) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34490,9 +34490,9 @@ public:
 
     ~ReportPowerSourceConfigurationClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002E) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34547,9 +34547,9 @@ public:
 
     ~ReadPressureMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34577,9 +34577,9 @@ public:
 
     ~ReportPressureMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34616,9 +34616,9 @@ public:
 
     ~ReadPressureMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34646,9 +34646,9 @@ public:
 
     ~ReportPressureMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34685,9 +34685,9 @@ public:
 
     ~ReadPressureMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34715,9 +34715,9 @@ public:
 
     ~ReportPressureMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34754,9 +34754,9 @@ public:
 
     ~ReadPressureMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34784,9 +34784,9 @@ public:
 
     ~ReportPressureMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34826,9 +34826,9 @@ public:
 
     ~ReadPressureMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34856,9 +34856,9 @@ public:
 
     ~ReportPressureMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34949,9 +34949,9 @@ public:
 
     ~ReadPumpConfigurationAndControlSupplyVoltageLow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -34980,9 +34980,9 @@ public:
 
     ~ReportPumpConfigurationAndControlSupplyVoltageLow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35022,9 +35022,9 @@ public:
 
     ~ReadPumpConfigurationAndControlSupplyVoltageHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35053,9 +35053,9 @@ public:
 
     ~ReportPumpConfigurationAndControlSupplyVoltageHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35095,9 +35095,9 @@ public:
 
     ~ReadPumpConfigurationAndControlPowerMissingPhase() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35126,9 +35126,9 @@ public:
 
     ~ReportPumpConfigurationAndControlPowerMissingPhase() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35168,9 +35168,9 @@ public:
 
     ~ReadPumpConfigurationAndControlSystemPressureLow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35199,9 +35199,9 @@ public:
 
     ~ReportPumpConfigurationAndControlSystemPressureLow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35241,9 +35241,9 @@ public:
 
     ~ReadPumpConfigurationAndControlSystemPressureHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35272,9 +35272,9 @@ public:
 
     ~ReportPumpConfigurationAndControlSystemPressureHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35314,9 +35314,9 @@ public:
 
     ~ReadPumpConfigurationAndControlDryRunning() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35345,9 +35345,9 @@ public:
 
     ~ReportPumpConfigurationAndControlDryRunning() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35387,9 +35387,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMotorTemperatureHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35418,9 +35418,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMotorTemperatureHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35461,9 +35461,9 @@ public:
 
     ~ReadPumpConfigurationAndControlPumpMotorFatalFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35493,9 +35493,9 @@ public:
 
     ~ReportPumpConfigurationAndControlPumpMotorFatalFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35536,9 +35536,9 @@ public:
 
     ~ReadPumpConfigurationAndControlElectronicTemperatureHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35569,9 +35569,9 @@ public:
 
     ~ReportPumpConfigurationAndControlElectronicTemperatureHigh() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35613,9 +35613,9 @@ public:
 
     ~ReadPumpConfigurationAndControlPumpBlocked() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35644,9 +35644,9 @@ public:
 
     ~ReportPumpConfigurationAndControlPumpBlocked() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35686,9 +35686,9 @@ public:
 
     ~ReadPumpConfigurationAndControlSensorFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35717,9 +35717,9 @@ public:
 
     ~ReportPumpConfigurationAndControlSensorFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35759,9 +35759,9 @@ public:
 
     ~ReadPumpConfigurationAndControlElectronicNonFatalFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35792,9 +35792,9 @@ public:
 
     ~ReportPumpConfigurationAndControlElectronicNonFatalFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35836,9 +35836,9 @@ public:
 
     ~ReadPumpConfigurationAndControlElectronicFatalFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35868,9 +35868,9 @@ public:
 
     ~ReportPumpConfigurationAndControlElectronicFatalFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35911,9 +35911,9 @@ public:
 
     ~ReadPumpConfigurationAndControlGeneralFault() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35942,9 +35942,9 @@ public:
 
     ~ReportPumpConfigurationAndControlGeneralFault() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -35984,9 +35984,9 @@ public:
 
     ~ReadPumpConfigurationAndControlLeakage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36015,9 +36015,9 @@ public:
 
     ~ReportPumpConfigurationAndControlLeakage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36057,9 +36057,9 @@ public:
 
     ~ReadPumpConfigurationAndControlAirDetection() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36088,9 +36088,9 @@ public:
 
     ~ReportPumpConfigurationAndControlAirDetection() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36130,9 +36130,9 @@ public:
 
     ~ReadPumpConfigurationAndControlTurbineOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadEvent (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36161,9 +36161,9 @@ public:
 
     ~ReportPumpConfigurationAndControlTurbineOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportEvent (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36204,9 +36204,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36234,9 +36234,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36276,9 +36276,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36306,9 +36306,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36345,9 +36345,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxFlow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36375,9 +36375,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxFlow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36414,9 +36414,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMinConstPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36444,9 +36444,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMinConstPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36486,9 +36486,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxConstPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36516,9 +36516,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxConstPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36558,9 +36558,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMinCompPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36588,9 +36588,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMinCompPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36630,9 +36630,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxCompPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36660,9 +36660,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxCompPressure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36702,9 +36702,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMinConstSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36732,9 +36732,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMinConstSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36774,9 +36774,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxConstSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36804,9 +36804,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxConstSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36846,9 +36846,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMinConstFlow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36876,9 +36876,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMinConstFlow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36918,9 +36918,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxConstFlow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36948,9 +36948,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxConstFlow() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -36990,9 +36990,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMinConstTemp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37020,9 +37020,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMinConstTemp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37062,9 +37062,9 @@ public:
 
     ~ReadPumpConfigurationAndControlMaxConstTemp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37092,9 +37092,9 @@ public:
 
     ~ReportPumpConfigurationAndControlMaxConstTemp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37134,9 +37134,9 @@ public:
 
     ~ReadPumpConfigurationAndControlPumpStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37164,9 +37164,9 @@ public:
 
     ~ReportPumpConfigurationAndControlPumpStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37206,9 +37206,9 @@ public:
 
     ~ReadPumpConfigurationAndControlEffectiveOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37237,9 +37237,9 @@ public:
 
     ~ReportPumpConfigurationAndControlEffectiveOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37280,9 +37280,9 @@ public:
 
     ~ReadPumpConfigurationAndControlEffectiveControlMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37310,9 +37310,9 @@ public:
 
     ~ReportPumpConfigurationAndControlEffectiveControlMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37353,9 +37353,9 @@ public:
 
     ~ReadPumpConfigurationAndControlCapacity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37383,9 +37383,9 @@ public:
 
     ~ReportPumpConfigurationAndControlCapacity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37422,9 +37422,9 @@ public:
 
     ~ReadPumpConfigurationAndControlSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37452,9 +37452,9 @@ public:
 
     ~ReportPumpConfigurationAndControlSpeed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37491,9 +37491,9 @@ public:
 
     ~ReadPumpConfigurationAndControlLifetimeRunningHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37519,9 +37519,9 @@ public:
 
     ~WritePumpConfigurationAndControlLifetimeRunningHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) WriteAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37547,9 +37547,9 @@ public:
 
     ~ReportPumpConfigurationAndControlLifetimeRunningHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37590,9 +37590,9 @@ public:
 
     ~ReadPumpConfigurationAndControlPower() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37620,9 +37620,9 @@ public:
 
     ~ReportPumpConfigurationAndControlPower() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37659,9 +37659,9 @@ public:
 
     ~ReadPumpConfigurationAndControlLifetimeEnergyConsumed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37688,9 +37688,9 @@ public:
 
     ~WritePumpConfigurationAndControlLifetimeEnergyConsumed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) WriteAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37717,9 +37717,9 @@ public:
 
     ~ReportPumpConfigurationAndControlLifetimeEnergyConsumed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37760,9 +37760,9 @@ public:
 
     ~ReadPumpConfigurationAndControlOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37788,9 +37788,9 @@ public:
 
     ~WritePumpConfigurationAndControlOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) WriteAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37816,9 +37816,9 @@ public:
 
     ~ReportPumpConfigurationAndControlOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37858,9 +37858,9 @@ public:
 
     ~ReadPumpConfigurationAndControlControlMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37886,9 +37886,9 @@ public:
 
     ~WritePumpConfigurationAndControlControlMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) WriteAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37914,9 +37914,9 @@ public:
 
     ~ReportPumpConfigurationAndControlControlMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37956,9 +37956,9 @@ public:
 
     ~ReadPumpConfigurationAndControlAlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -37986,9 +37986,9 @@ public:
 
     ~ReportPumpConfigurationAndControlAlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38028,9 +38028,9 @@ public:
 
     ~ReadPumpConfigurationAndControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38058,9 +38058,9 @@ public:
 
     ~ReportPumpConfigurationAndControlAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38100,9 +38100,9 @@ public:
 
     ~ReadPumpConfigurationAndControlFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38130,9 +38130,9 @@ public:
 
     ~ReportPumpConfigurationAndControlFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38172,9 +38172,9 @@ public:
 
     ~ReadPumpConfigurationAndControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38202,9 +38202,9 @@ public:
 
     ~ReportPumpConfigurationAndControlClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38260,9 +38260,9 @@ public:
 
     ~ReadRelativeHumidityMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38290,9 +38290,9 @@ public:
 
     ~ReportRelativeHumidityMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38332,9 +38332,9 @@ public:
 
     ~ReadRelativeHumidityMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38362,9 +38362,9 @@ public:
 
     ~ReportRelativeHumidityMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38404,9 +38404,9 @@ public:
 
     ~ReadRelativeHumidityMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38434,9 +38434,9 @@ public:
 
     ~ReportRelativeHumidityMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38476,9 +38476,9 @@ public:
 
     ~ReadRelativeHumidityMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38506,9 +38506,9 @@ public:
 
     ~ReportRelativeHumidityMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38548,9 +38548,9 @@ public:
 
     ~ReadRelativeHumidityMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38578,9 +38578,9 @@ public:
 
     ~ReportRelativeHumidityMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38620,9 +38620,9 @@ public:
 
     ~ReadRelativeHumidityMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38650,9 +38650,9 @@ public:
 
     ~ReportRelativeHumidityMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000405) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38718,9 +38718,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesAddSceneResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -38742,9 +38742,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesGetSceneMembershipResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -38768,9 +38768,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -38792,9 +38792,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesRemoveAllScenesResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -38817,9 +38817,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesRemoveSceneResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -38842,9 +38842,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesStoreSceneResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -38867,9 +38867,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesViewSceneResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -38893,9 +38893,9 @@ public:
 
     ~ReadScenesSceneCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38923,9 +38923,9 @@ public:
 
     ~ReportScenesSceneCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38962,9 +38962,9 @@ public:
 
     ~ReadScenesCurrentScene() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -38992,9 +38992,9 @@ public:
 
     ~ReportScenesCurrentScene() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39031,9 +39031,9 @@ public:
 
     ~ReadScenesCurrentGroup() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39061,9 +39061,9 @@ public:
 
     ~ReportScenesCurrentGroup() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39100,9 +39100,9 @@ public:
 
     ~ReadScenesSceneValid() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39130,9 +39130,9 @@ public:
 
     ~ReportScenesSceneValid() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39169,9 +39169,9 @@ public:
 
     ~ReadScenesNameSupport() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39199,9 +39199,9 @@ public:
 
     ~ReportScenesNameSupport() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39238,9 +39238,9 @@ public:
 
     ~ReadScenesAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39268,9 +39268,9 @@ public:
 
     ~ReportScenesAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39310,9 +39310,9 @@ public:
 
     ~ReadScenesClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39340,9 +39340,9 @@ public:
 
     ~ReportScenesClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39392,9 +39392,9 @@ class SoftwareDiagnosticsResetWatermarks : public ModelCommand
 public:
     SoftwareDiagnosticsResetWatermarks() : ModelCommand("reset-watermarks") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -39418,9 +39418,9 @@ public:
 
     ~ReadSoftwareDiagnosticsSoftwareFault() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39449,9 +39449,9 @@ public:
 
     ~ReportSoftwareDiagnosticsSoftwareFault() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39491,9 +39491,9 @@ public:
 
     ~ReadSoftwareDiagnosticsThreadMetrics() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39524,9 +39524,9 @@ public:
 
     ~ReportSoftwareDiagnosticsThreadMetrics() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39569,9 +39569,9 @@ public:
 
     ~ReadSoftwareDiagnosticsCurrentHeapFree() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39599,9 +39599,9 @@ public:
 
     ~ReportSoftwareDiagnosticsCurrentHeapFree() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39638,9 +39638,9 @@ public:
 
     ~ReadSoftwareDiagnosticsCurrentHeapUsed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39668,9 +39668,9 @@ public:
 
     ~ReportSoftwareDiagnosticsCurrentHeapUsed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39707,9 +39707,9 @@ public:
 
     ~ReadSoftwareDiagnosticsCurrentHeapHighWatermark() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39737,9 +39737,9 @@ public:
 
     ~ReportSoftwareDiagnosticsCurrentHeapHighWatermark() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39779,9 +39779,9 @@ public:
 
     ~ReadSoftwareDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39809,9 +39809,9 @@ public:
 
     ~ReportSoftwareDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39851,9 +39851,9 @@ public:
 
     ~ReadSoftwareDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39881,9 +39881,9 @@ public:
 
     ~ReportSoftwareDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39920,9 +39920,9 @@ public:
 
     ~ReadSoftwareDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -39950,9 +39950,9 @@ public:
 
     ~ReportSoftwareDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40012,9 +40012,9 @@ public:
 
     ~ReadSwitchSwitchLatched() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40042,9 +40042,9 @@ public:
 
     ~ReportSwitchSwitchLatched() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40083,9 +40083,9 @@ public:
 
     ~ReadSwitchInitialPress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40113,9 +40113,9 @@ public:
 
     ~ReportSwitchInitialPress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40154,9 +40154,9 @@ public:
 
     ~ReadSwitchLongPress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40184,9 +40184,9 @@ public:
 
     ~ReportSwitchLongPress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40225,9 +40225,9 @@ public:
 
     ~ReadSwitchShortRelease() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40255,9 +40255,9 @@ public:
 
     ~ReportSwitchShortRelease() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40296,9 +40296,9 @@ public:
 
     ~ReadSwitchLongRelease() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40326,9 +40326,9 @@ public:
 
     ~ReportSwitchLongRelease() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40367,9 +40367,9 @@ public:
 
     ~ReadSwitchMultiPressOngoing() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40397,9 +40397,9 @@ public:
 
     ~ReportSwitchMultiPressOngoing() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40438,9 +40438,9 @@ public:
 
     ~ReadSwitchMultiPressComplete() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadEvent (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40468,9 +40468,9 @@ public:
 
     ~ReportSwitchMultiPressComplete() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportEvent (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40510,9 +40510,9 @@ public:
 
     ~ReadSwitchNumberOfPositions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40540,9 +40540,9 @@ public:
 
     ~ReportSwitchNumberOfPositions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40579,9 +40579,9 @@ public:
 
     ~ReadSwitchCurrentPosition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40609,9 +40609,9 @@ public:
 
     ~ReportSwitchCurrentPosition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40648,9 +40648,9 @@ public:
 
     ~ReadSwitchMultiPressMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40678,9 +40678,9 @@ public:
 
     ~ReportSwitchMultiPressMax() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40717,9 +40717,9 @@ public:
 
     ~ReadSwitchAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40747,9 +40747,9 @@ public:
 
     ~ReportSwitchAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40789,9 +40789,9 @@ public:
 
     ~ReadSwitchFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40819,9 +40819,9 @@ public:
 
     ~ReportSwitchFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40858,9 +40858,9 @@ public:
 
     ~ReadSwitchClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40888,9 +40888,9 @@ public:
 
     ~ReportSwitchClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40941,9 +40941,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTargetNavigatorNavigateTargetResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -40967,9 +40967,9 @@ public:
 
     ~ReadTargetNavigatorTargetNavigatorList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -40999,9 +40999,9 @@ public:
 
     ~ReportTargetNavigatorTargetNavigatorList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41043,9 +41043,9 @@ public:
 
     ~ReadTargetNavigatorCurrentNavigatorTarget() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41073,9 +41073,9 @@ public:
 
     ~ReportTargetNavigatorCurrentNavigatorTarget() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41115,9 +41115,9 @@ public:
 
     ~ReadTargetNavigatorAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41145,9 +41145,9 @@ public:
 
     ~ReportTargetNavigatorAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41187,9 +41187,9 @@ public:
 
     ~ReadTargetNavigatorClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41217,9 +41217,9 @@ public:
 
     ~ReportTargetNavigatorClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41272,9 +41272,9 @@ public:
 
     ~ReadTemperatureMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41302,9 +41302,9 @@ public:
 
     ~ReportTemperatureMeasurementMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41341,9 +41341,9 @@ public:
 
     ~ReadTemperatureMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41371,9 +41371,9 @@ public:
 
     ~ReportTemperatureMeasurementMinMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41413,9 +41413,9 @@ public:
 
     ~ReadTemperatureMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41443,9 +41443,9 @@ public:
 
     ~ReportTemperatureMeasurementMaxMeasuredValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41485,9 +41485,9 @@ public:
 
     ~ReadTemperatureMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41515,9 +41515,9 @@ public:
 
     ~ReportTemperatureMeasurementTolerance() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41554,9 +41554,9 @@ public:
 
     ~ReadTemperatureMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41584,9 +41584,9 @@ public:
 
     ~ReportTemperatureMeasurementAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41626,9 +41626,9 @@ public:
 
     ~ReadTemperatureMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41656,9 +41656,9 @@ public:
 
     ~ReportTemperatureMeasurementClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000402) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -41805,9 +41805,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterSimpleStructResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -41825,9 +41825,9 @@ class TestClusterTest : public ModelCommand
 public:
     TestClusterTest() : ModelCommand("test") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -41850,9 +41850,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestAddArgumentsResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -41876,9 +41876,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestEmitTestEventResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -41901,9 +41901,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestEnumsResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -41925,9 +41925,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -41949,9 +41949,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestListInt8UReverseResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -41973,9 +41973,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -41997,9 +41997,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -42021,9 +42021,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -42045,9 +42045,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -42065,9 +42065,9 @@ class TestClusterTestNotHandled : public ModelCommand
 public:
     TestClusterTestNotHandled() : ModelCommand("test-not-handled") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -42089,9 +42089,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestNullableOptionalResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -42113,9 +42113,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -42133,9 +42133,9 @@ class TestClusterTestSpecific : public ModelCommand
 public:
     TestClusterTestSpecific() : ModelCommand("test-specific") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestSpecificResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -42157,9 +42157,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
                                                mRequest, mTimedInteractionTimeoutMs);
@@ -42177,9 +42177,9 @@ class TestClusterTestUnknownCommand : public ModelCommand
 public:
     TestClusterTestUnknownCommand() : ModelCommand("test-unknown-command") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -42197,9 +42197,9 @@ class TestClusterTimedInvokeRequest : public ModelCommand
 public:
     TestClusterTimedInvokeRequest() : ModelCommand("timed-invoke-request") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -42223,9 +42223,9 @@ public:
 
     ~ReadTestClusterTestEvent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42253,9 +42253,9 @@ public:
 
     ~ReportTestClusterTestEvent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42295,9 +42295,9 @@ public:
 
     ~ReadTestClusterBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42323,9 +42323,9 @@ public:
 
     ~WriteTestClusterBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42351,9 +42351,9 @@ public:
 
     ~ReportTestClusterBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42390,9 +42390,9 @@ public:
 
     ~ReadTestClusterBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42418,9 +42418,9 @@ public:
 
     ~WriteTestClusterBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42446,9 +42446,9 @@ public:
 
     ~ReportTestClusterBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42485,9 +42485,9 @@ public:
 
     ~ReadTestClusterBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42513,9 +42513,9 @@ public:
 
     ~WriteTestClusterBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42541,9 +42541,9 @@ public:
 
     ~ReportTestClusterBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42580,9 +42580,9 @@ public:
 
     ~ReadTestClusterBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42608,9 +42608,9 @@ public:
 
     ~WriteTestClusterBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42636,9 +42636,9 @@ public:
 
     ~ReportTestClusterBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42675,9 +42675,9 @@ public:
 
     ~ReadTestClusterBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42703,9 +42703,9 @@ public:
 
     ~WriteTestClusterBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42731,9 +42731,9 @@ public:
 
     ~ReportTestClusterBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42770,9 +42770,9 @@ public:
 
     ~ReadTestClusterInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42798,9 +42798,9 @@ public:
 
     ~WriteTestClusterInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42826,9 +42826,9 @@ public:
 
     ~ReportTestClusterInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42865,9 +42865,9 @@ public:
 
     ~ReadTestClusterInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42893,9 +42893,9 @@ public:
 
     ~WriteTestClusterInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42921,9 +42921,9 @@ public:
 
     ~ReportTestClusterInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42960,9 +42960,9 @@ public:
 
     ~ReadTestClusterInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -42988,9 +42988,9 @@ public:
 
     ~WriteTestClusterInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43016,9 +43016,9 @@ public:
 
     ~ReportTestClusterInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43055,9 +43055,9 @@ public:
 
     ~ReadTestClusterInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43083,9 +43083,9 @@ public:
 
     ~WriteTestClusterInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43111,9 +43111,9 @@ public:
 
     ~ReportTestClusterInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43150,9 +43150,9 @@ public:
 
     ~ReadTestClusterInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43178,9 +43178,9 @@ public:
 
     ~WriteTestClusterInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43206,9 +43206,9 @@ public:
 
     ~ReportTestClusterInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43245,9 +43245,9 @@ public:
 
     ~ReadTestClusterInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43273,9 +43273,9 @@ public:
 
     ~WriteTestClusterInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43301,9 +43301,9 @@ public:
 
     ~ReportTestClusterInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43340,9 +43340,9 @@ public:
 
     ~ReadTestClusterInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43368,9 +43368,9 @@ public:
 
     ~WriteTestClusterInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43396,9 +43396,9 @@ public:
 
     ~ReportTestClusterInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43435,9 +43435,9 @@ public:
 
     ~ReadTestClusterInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43463,9 +43463,9 @@ public:
 
     ~WriteTestClusterInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43491,9 +43491,9 @@ public:
 
     ~ReportTestClusterInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43530,9 +43530,9 @@ public:
 
     ~ReadTestClusterInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43558,9 +43558,9 @@ public:
 
     ~WriteTestClusterInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43586,9 +43586,9 @@ public:
 
     ~ReportTestClusterInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43625,9 +43625,9 @@ public:
 
     ~ReadTestClusterInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43653,9 +43653,9 @@ public:
 
     ~WriteTestClusterInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43681,9 +43681,9 @@ public:
 
     ~ReportTestClusterInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43720,9 +43720,9 @@ public:
 
     ~ReadTestClusterInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43748,9 +43748,9 @@ public:
 
     ~WriteTestClusterInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43776,9 +43776,9 @@ public:
 
     ~ReportTestClusterInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43815,9 +43815,9 @@ public:
 
     ~ReadTestClusterInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43843,9 +43843,9 @@ public:
 
     ~WriteTestClusterInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43871,9 +43871,9 @@ public:
 
     ~ReportTestClusterInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43910,9 +43910,9 @@ public:
 
     ~ReadTestClusterInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43938,9 +43938,9 @@ public:
 
     ~WriteTestClusterInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -43966,9 +43966,9 @@ public:
 
     ~ReportTestClusterInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44005,9 +44005,9 @@ public:
 
     ~ReadTestClusterInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44033,9 +44033,9 @@ public:
 
     ~WriteTestClusterInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44061,9 +44061,9 @@ public:
 
     ~ReportTestClusterInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44100,9 +44100,9 @@ public:
 
     ~ReadTestClusterInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44128,9 +44128,9 @@ public:
 
     ~WriteTestClusterInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44156,9 +44156,9 @@ public:
 
     ~ReportTestClusterInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44195,9 +44195,9 @@ public:
 
     ~ReadTestClusterInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44223,9 +44223,9 @@ public:
 
     ~WriteTestClusterInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44251,9 +44251,9 @@ public:
 
     ~ReportTestClusterInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44290,9 +44290,9 @@ public:
 
     ~ReadTestClusterEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44318,9 +44318,9 @@ public:
 
     ~WriteTestClusterEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44346,9 +44346,9 @@ public:
 
     ~ReportTestClusterEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44385,9 +44385,9 @@ public:
 
     ~ReadTestClusterEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44413,9 +44413,9 @@ public:
 
     ~WriteTestClusterEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44441,9 +44441,9 @@ public:
 
     ~ReportTestClusterEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44480,9 +44480,9 @@ public:
 
     ~ReadTestClusterFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44508,9 +44508,9 @@ public:
 
     ~WriteTestClusterFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44536,9 +44536,9 @@ public:
 
     ~ReportTestClusterFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44575,9 +44575,9 @@ public:
 
     ~ReadTestClusterFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44603,9 +44603,9 @@ public:
 
     ~WriteTestClusterFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44631,9 +44631,9 @@ public:
 
     ~ReportTestClusterFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44670,9 +44670,9 @@ public:
 
     ~ReadTestClusterOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44698,9 +44698,9 @@ public:
 
     ~WriteTestClusterOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44726,9 +44726,9 @@ public:
 
     ~ReportTestClusterOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44765,9 +44765,9 @@ public:
 
     ~ReadTestClusterListInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44795,9 +44795,9 @@ public:
 
     ~ReportTestClusterListInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44837,9 +44837,9 @@ public:
 
     ~ReadTestClusterListOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44867,9 +44867,9 @@ public:
 
     ~ReportTestClusterListOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44909,9 +44909,9 @@ public:
 
     ~ReadTestClusterListStructOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44942,9 +44942,9 @@ public:
 
     ~ReportTestClusterListStructOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -44987,9 +44987,9 @@ public:
 
     ~ReadTestClusterLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000001D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45015,9 +45015,9 @@ public:
 
     ~WriteTestClusterLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000001D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45043,9 +45043,9 @@ public:
 
     ~ReportTestClusterLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45082,9 +45082,9 @@ public:
 
     ~ReadTestClusterCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000001E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45110,9 +45110,9 @@ public:
 
     ~WriteTestClusterCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000001E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45138,9 +45138,9 @@ public:
 
     ~ReportTestClusterCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45177,9 +45177,9 @@ public:
 
     ~ReadTestClusterLongCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000001F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45205,9 +45205,9 @@ public:
 
     ~WriteTestClusterLongCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000001F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45233,9 +45233,9 @@ public:
 
     ~ReportTestClusterLongCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45272,9 +45272,9 @@ public:
 
     ~ReadTestClusterEpochUs() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45300,9 +45300,9 @@ public:
 
     ~WriteTestClusterEpochUs() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45328,9 +45328,9 @@ public:
 
     ~ReportTestClusterEpochUs() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45367,9 +45367,9 @@ public:
 
     ~ReadTestClusterEpochS() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45395,9 +45395,9 @@ public:
 
     ~WriteTestClusterEpochS() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45423,9 +45423,9 @@ public:
 
     ~ReportTestClusterEpochS() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45462,9 +45462,9 @@ public:
 
     ~ReadTestClusterVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45490,9 +45490,9 @@ public:
 
     ~WriteTestClusterVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45518,9 +45518,9 @@ public:
 
     ~ReportTestClusterVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45557,9 +45557,9 @@ public:
 
     ~ReadTestClusterListNullablesAndOptionalsStruct() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45590,9 +45590,9 @@ public:
 
     ~ReportTestClusterListNullablesAndOptionalsStruct() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45634,9 +45634,9 @@ public:
 
     ~ReadTestClusterEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45662,9 +45662,9 @@ public:
 
     ~WriteTestClusterEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45690,9 +45690,9 @@ public:
 
     ~ReportTestClusterEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45732,9 +45732,9 @@ public:
 
     ~ReadTestClusterRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45760,9 +45760,9 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45788,9 +45788,9 @@ public:
 
     ~ReportTestClusterRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45827,9 +45827,9 @@ public:
 
     ~ReadTestClusterRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45855,9 +45855,9 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45883,9 +45883,9 @@ public:
 
     ~ReportTestClusterRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45922,9 +45922,9 @@ public:
 
     ~ReadTestClusterRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45950,9 +45950,9 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -45978,9 +45978,9 @@ public:
 
     ~ReportTestClusterRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46017,9 +46017,9 @@ public:
 
     ~ReadTestClusterRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46045,9 +46045,9 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46073,9 +46073,9 @@ public:
 
     ~ReportTestClusterRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46112,9 +46112,9 @@ public:
 
     ~ReadTestClusterListLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46142,9 +46142,9 @@ public:
 
     ~ReportTestClusterListLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46184,9 +46184,9 @@ public:
 
     ~ReadTestClusterTimedWriteBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46212,9 +46212,9 @@ public:
 
     ~WriteTestClusterTimedWriteBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46240,9 +46240,9 @@ public:
 
     ~ReportTestClusterTimedWriteBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46279,9 +46279,9 @@ public:
 
     ~ReadTestClusterUnsupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x000000FF) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46307,9 +46307,9 @@ public:
 
     ~WriteTestClusterUnsupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x000000FF) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46335,9 +46335,9 @@ public:
 
     ~ReportTestClusterUnsupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x000000FF) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46374,9 +46374,9 @@ public:
 
     ~ReadTestClusterNullableBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46402,9 +46402,9 @@ public:
 
     ~WriteTestClusterNullableBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46430,9 +46430,9 @@ public:
 
     ~ReportTestClusterNullableBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46472,9 +46472,9 @@ public:
 
     ~ReadTestClusterNullableBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46500,9 +46500,9 @@ public:
 
     ~WriteTestClusterNullableBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46528,9 +46528,9 @@ public:
 
     ~ReportTestClusterNullableBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46570,9 +46570,9 @@ public:
 
     ~ReadTestClusterNullableBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46598,9 +46598,9 @@ public:
 
     ~WriteTestClusterNullableBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46626,9 +46626,9 @@ public:
 
     ~ReportTestClusterNullableBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46668,9 +46668,9 @@ public:
 
     ~ReadTestClusterNullableBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46696,9 +46696,9 @@ public:
 
     ~WriteTestClusterNullableBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46724,9 +46724,9 @@ public:
 
     ~ReportTestClusterNullableBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46766,9 +46766,9 @@ public:
 
     ~ReadTestClusterNullableBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46794,9 +46794,9 @@ public:
 
     ~WriteTestClusterNullableBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46822,9 +46822,9 @@ public:
 
     ~ReportTestClusterNullableBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46864,9 +46864,9 @@ public:
 
     ~ReadTestClusterNullableInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46892,9 +46892,9 @@ public:
 
     ~WriteTestClusterNullableInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46920,9 +46920,9 @@ public:
 
     ~ReportTestClusterNullableInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46962,9 +46962,9 @@ public:
 
     ~ReadTestClusterNullableInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -46990,9 +46990,9 @@ public:
 
     ~WriteTestClusterNullableInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47018,9 +47018,9 @@ public:
 
     ~ReportTestClusterNullableInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47060,9 +47060,9 @@ public:
 
     ~ReadTestClusterNullableInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47088,9 +47088,9 @@ public:
 
     ~WriteTestClusterNullableInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47116,9 +47116,9 @@ public:
 
     ~ReportTestClusterNullableInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47158,9 +47158,9 @@ public:
 
     ~ReadTestClusterNullableInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47186,9 +47186,9 @@ public:
 
     ~WriteTestClusterNullableInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47214,9 +47214,9 @@ public:
 
     ~ReportTestClusterNullableInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47256,9 +47256,9 @@ public:
 
     ~ReadTestClusterNullableInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47284,9 +47284,9 @@ public:
 
     ~WriteTestClusterNullableInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47312,9 +47312,9 @@ public:
 
     ~ReportTestClusterNullableInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47354,9 +47354,9 @@ public:
 
     ~ReadTestClusterNullableInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000800A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47382,9 +47382,9 @@ public:
 
     ~WriteTestClusterNullableInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000800A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47410,9 +47410,9 @@ public:
 
     ~ReportTestClusterNullableInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47452,9 +47452,9 @@ public:
 
     ~ReadTestClusterNullableInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000800B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47480,9 +47480,9 @@ public:
 
     ~WriteTestClusterNullableInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000800B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47508,9 +47508,9 @@ public:
 
     ~ReportTestClusterNullableInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47550,9 +47550,9 @@ public:
 
     ~ReadTestClusterNullableInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000800C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47578,9 +47578,9 @@ public:
 
     ~WriteTestClusterNullableInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000800C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47606,9 +47606,9 @@ public:
 
     ~ReportTestClusterNullableInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47648,9 +47648,9 @@ public:
 
     ~ReadTestClusterNullableInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000800D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47676,9 +47676,9 @@ public:
 
     ~WriteTestClusterNullableInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000800D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47704,9 +47704,9 @@ public:
 
     ~ReportTestClusterNullableInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47746,9 +47746,9 @@ public:
 
     ~ReadTestClusterNullableInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000800E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47774,9 +47774,9 @@ public:
 
     ~WriteTestClusterNullableInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000800E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47802,9 +47802,9 @@ public:
 
     ~ReportTestClusterNullableInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47844,9 +47844,9 @@ public:
 
     ~ReadTestClusterNullableInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000800F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47872,9 +47872,9 @@ public:
 
     ~WriteTestClusterNullableInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000800F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47900,9 +47900,9 @@ public:
 
     ~ReportTestClusterNullableInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47942,9 +47942,9 @@ public:
 
     ~ReadTestClusterNullableInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47970,9 +47970,9 @@ public:
 
     ~WriteTestClusterNullableInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -47998,9 +47998,9 @@ public:
 
     ~ReportTestClusterNullableInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48040,9 +48040,9 @@ public:
 
     ~ReadTestClusterNullableInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48068,9 +48068,9 @@ public:
 
     ~WriteTestClusterNullableInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48096,9 +48096,9 @@ public:
 
     ~ReportTestClusterNullableInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48138,9 +48138,9 @@ public:
 
     ~ReadTestClusterNullableInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48166,9 +48166,9 @@ public:
 
     ~WriteTestClusterNullableInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48194,9 +48194,9 @@ public:
 
     ~ReportTestClusterNullableInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48236,9 +48236,9 @@ public:
 
     ~ReadTestClusterNullableInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48264,9 +48264,9 @@ public:
 
     ~WriteTestClusterNullableInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48292,9 +48292,9 @@ public:
 
     ~ReportTestClusterNullableInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48334,9 +48334,9 @@ public:
 
     ~ReadTestClusterNullableInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48362,9 +48362,9 @@ public:
 
     ~WriteTestClusterNullableInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48390,9 +48390,9 @@ public:
 
     ~ReportTestClusterNullableInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48432,9 +48432,9 @@ public:
 
     ~ReadTestClusterNullableEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48460,9 +48460,9 @@ public:
 
     ~WriteTestClusterNullableEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48488,9 +48488,9 @@ public:
 
     ~ReportTestClusterNullableEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48530,9 +48530,9 @@ public:
 
     ~ReadTestClusterNullableEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48558,9 +48558,9 @@ public:
 
     ~WriteTestClusterNullableEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48586,9 +48586,9 @@ public:
 
     ~ReportTestClusterNullableEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48628,9 +48628,9 @@ public:
 
     ~ReadTestClusterNullableFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48656,9 +48656,9 @@ public:
 
     ~WriteTestClusterNullableFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48684,9 +48684,9 @@ public:
 
     ~ReportTestClusterNullableFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48726,9 +48726,9 @@ public:
 
     ~ReadTestClusterNullableFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48754,9 +48754,9 @@ public:
 
     ~WriteTestClusterNullableFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48782,9 +48782,9 @@ public:
 
     ~ReportTestClusterNullableFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48824,9 +48824,9 @@ public:
 
     ~ReadTestClusterNullableOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48852,9 +48852,9 @@ public:
 
     ~WriteTestClusterNullableOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48880,9 +48880,9 @@ public:
 
     ~ReportTestClusterNullableOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48922,9 +48922,9 @@ public:
 
     ~ReadTestClusterNullableCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000801E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48950,9 +48950,9 @@ public:
 
     ~WriteTestClusterNullableCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000801E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -48978,9 +48978,9 @@ public:
 
     ~ReportTestClusterNullableCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000801E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49020,9 +49020,9 @@ public:
 
     ~ReadTestClusterNullableEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49049,9 +49049,9 @@ public:
 
     ~WriteTestClusterNullableEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49077,9 +49077,9 @@ public:
 
     ~ReportTestClusterNullableEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49120,9 +49120,9 @@ public:
 
     ~ReadTestClusterNullableRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49148,9 +49148,9 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49176,9 +49176,9 @@ public:
 
     ~ReportTestClusterNullableRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49218,9 +49218,9 @@ public:
 
     ~ReadTestClusterNullableRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49246,9 +49246,9 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49274,9 +49274,9 @@ public:
 
     ~ReportTestClusterNullableRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49316,9 +49316,9 @@ public:
 
     ~ReadTestClusterNullableRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49344,9 +49344,9 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49372,9 +49372,9 @@ public:
 
     ~ReportTestClusterNullableRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49414,9 +49414,9 @@ public:
 
     ~ReadTestClusterNullableRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x00008029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49442,9 +49442,9 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00008029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49470,9 +49470,9 @@ public:
 
     ~ReportTestClusterNullableRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49512,9 +49512,9 @@ public:
 
     ~ReadTestClusterAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49542,9 +49542,9 @@ public:
 
     ~ReportTestClusterAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49584,9 +49584,9 @@ public:
 
     ~ReadTestClusterClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49614,9 +49614,9 @@ public:
 
     ~ReportTestClusterClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49682,9 +49682,9 @@ class ThermostatClearWeeklySchedule : public ModelCommand
 public:
     ThermostatClearWeeklySchedule() : ModelCommand("clear-weekly-schedule") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -49702,9 +49702,9 @@ class ThermostatGetRelayStatusLog : public ModelCommand
 public:
     ThermostatGetRelayStatusLog() : ModelCommand("get-relay-status-log") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnThermostatGetRelayStatusLogResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -49730,9 +49730,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnThermostatGetWeeklyScheduleResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -49761,9 +49761,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -49786,9 +49786,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -49812,9 +49812,9 @@ public:
 
     ~ReadThermostatLocalTemperature() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49842,9 +49842,9 @@ public:
 
     ~ReportThermostatLocalTemperature() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49881,9 +49881,9 @@ public:
 
     ~ReadThermostatAbsMinHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49911,9 +49911,9 @@ public:
 
     ~ReportThermostatAbsMinHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49950,9 +49950,9 @@ public:
 
     ~ReadThermostatAbsMaxHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -49980,9 +49980,9 @@ public:
 
     ~ReportThermostatAbsMaxHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50019,9 +50019,9 @@ public:
 
     ~ReadThermostatAbsMinCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50049,9 +50049,9 @@ public:
 
     ~ReportThermostatAbsMinCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50088,9 +50088,9 @@ public:
 
     ~ReadThermostatAbsMaxCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50118,9 +50118,9 @@ public:
 
     ~ReportThermostatAbsMaxCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50157,9 +50157,9 @@ public:
 
     ~ReadThermostatOccupiedCoolingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50185,9 +50185,9 @@ public:
 
     ~WriteThermostatOccupiedCoolingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50213,9 +50213,9 @@ public:
 
     ~ReportThermostatOccupiedCoolingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50252,9 +50252,9 @@ public:
 
     ~ReadThermostatOccupiedHeatingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50280,9 +50280,9 @@ public:
 
     ~WriteThermostatOccupiedHeatingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50308,9 +50308,9 @@ public:
 
     ~ReportThermostatOccupiedHeatingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50347,9 +50347,9 @@ public:
 
     ~ReadThermostatMinHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50375,9 +50375,9 @@ public:
 
     ~WriteThermostatMinHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50403,9 +50403,9 @@ public:
 
     ~ReportThermostatMinHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50442,9 +50442,9 @@ public:
 
     ~ReadThermostatMaxHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50470,9 +50470,9 @@ public:
 
     ~WriteThermostatMaxHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50498,9 +50498,9 @@ public:
 
     ~ReportThermostatMaxHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50537,9 +50537,9 @@ public:
 
     ~ReadThermostatMinCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50565,9 +50565,9 @@ public:
 
     ~WriteThermostatMinCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50593,9 +50593,9 @@ public:
 
     ~ReportThermostatMinCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50632,9 +50632,9 @@ public:
 
     ~ReadThermostatMaxCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50660,9 +50660,9 @@ public:
 
     ~WriteThermostatMaxCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50688,9 +50688,9 @@ public:
 
     ~ReportThermostatMaxCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50727,9 +50727,9 @@ public:
 
     ~ReadThermostatMinSetpointDeadBand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50755,9 +50755,9 @@ public:
 
     ~WriteThermostatMinSetpointDeadBand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50783,9 +50783,9 @@ public:
 
     ~ReportThermostatMinSetpointDeadBand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50822,9 +50822,9 @@ public:
 
     ~ReadThermostatControlSequenceOfOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50850,9 +50850,9 @@ public:
 
     ~WriteThermostatControlSequenceOfOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50878,9 +50878,9 @@ public:
 
     ~ReportThermostatControlSequenceOfOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50917,9 +50917,9 @@ public:
 
     ~ReadThermostatSystemMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50945,9 +50945,9 @@ public:
 
     ~WriteThermostatSystemMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) WriteAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -50973,9 +50973,9 @@ public:
 
     ~ReportThermostatSystemMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51012,9 +51012,9 @@ public:
 
     ~ReadThermostatStartOfWeek() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51042,9 +51042,9 @@ public:
 
     ~ReportThermostatStartOfWeek() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51081,9 +51081,9 @@ public:
 
     ~ReadThermostatNumberOfWeeklyTransitions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51111,9 +51111,9 @@ public:
 
     ~ReportThermostatNumberOfWeeklyTransitions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51150,9 +51150,9 @@ public:
 
     ~ReadThermostatNumberOfDailyTransitions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51180,9 +51180,9 @@ public:
 
     ~ReportThermostatNumberOfDailyTransitions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51219,9 +51219,9 @@ public:
 
     ~ReadThermostatAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51249,9 +51249,9 @@ public:
 
     ~ReportThermostatAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51291,9 +51291,9 @@ public:
 
     ~ReadThermostatFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51321,9 +51321,9 @@ public:
 
     ~ReportThermostatFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51360,9 +51360,9 @@ public:
 
     ~ReadThermostatClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51390,9 +51390,9 @@ public:
 
     ~ReportThermostatClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51444,9 +51444,9 @@ public:
 
     ~ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51473,9 +51473,9 @@ public:
 
     ~WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51502,9 +51502,9 @@ public:
 
     ~ReportThermostatUserInterfaceConfigurationTemperatureDisplayMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51545,9 +51545,9 @@ public:
 
     ~ReadThermostatUserInterfaceConfigurationKeypadLockout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51574,9 +51574,9 @@ public:
 
     ~WriteThermostatUserInterfaceConfigurationKeypadLockout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51603,9 +51603,9 @@ public:
 
     ~ReportThermostatUserInterfaceConfigurationKeypadLockout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51646,9 +51646,9 @@ public:
 
     ~ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51676,9 +51676,9 @@ public:
 
     ~WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51705,9 +51705,9 @@ public:
 
     ~ReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51748,9 +51748,9 @@ public:
 
     ~ReadThermostatUserInterfaceConfigurationAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51779,9 +51779,9 @@ public:
 
     ~ReportThermostatUserInterfaceConfigurationAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51822,9 +51822,9 @@ public:
 
     ~ReadThermostatUserInterfaceConfigurationClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51853,9 +51853,9 @@ public:
 
     ~ReportThermostatUserInterfaceConfigurationClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000204) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
@@ -51968,9 +51968,9 @@ class ThreadNetworkDiagnosticsResetCounts : public ModelCommand
 public:
     ThreadNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -51994,9 +51994,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsConnectionStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52025,9 +52025,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsConnectionStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52068,9 +52068,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsChannel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52098,9 +52098,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsChannel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52137,9 +52137,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRoutingRole() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52167,9 +52167,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRoutingRole() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52206,9 +52206,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsNetworkName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52236,9 +52236,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsNetworkName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52278,9 +52278,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsPanId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52308,9 +52308,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsPanId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52347,9 +52347,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsExtendedPanId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52377,9 +52377,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsExtendedPanId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52419,9 +52419,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsMeshLocalPrefix() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52449,9 +52449,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsMeshLocalPrefix() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52491,9 +52491,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsOverrunCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52521,9 +52521,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsOverrunCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52563,9 +52563,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsNeighborTableList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52596,9 +52596,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsNeighborTableList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52640,9 +52640,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRouteTableList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52672,9 +52672,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRouteTableList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52716,9 +52716,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsPartitionId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52746,9 +52746,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsPartitionId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52785,9 +52785,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsWeighting() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52815,9 +52815,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsWeighting() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52854,9 +52854,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsDataVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52884,9 +52884,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsDataVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52923,9 +52923,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsStableDataVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52953,9 +52953,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsStableDataVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -52995,9 +52995,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsLeaderRouterId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53025,9 +53025,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsLeaderRouterId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53067,9 +53067,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsDetachedRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53097,9 +53097,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsDetachedRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53139,9 +53139,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsChildRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53169,9 +53169,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsChildRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53211,9 +53211,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRouterRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53241,9 +53241,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRouterRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53283,9 +53283,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsLeaderRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53313,9 +53313,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsLeaderRoleCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53355,9 +53355,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsAttachAttemptCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53385,9 +53385,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsAttachAttemptCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53427,9 +53427,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsPartitionIdChangeCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53457,9 +53457,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsPartitionIdChangeCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53500,9 +53500,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53531,9 +53531,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53574,9 +53574,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsParentChangeCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53604,9 +53604,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsParentChangeCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53646,9 +53646,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxTotalCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53676,9 +53676,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxTotalCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53718,9 +53718,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxUnicastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53748,9 +53748,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxUnicastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53790,9 +53790,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxBroadcastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53820,9 +53820,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxBroadcastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53862,9 +53862,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxAckRequestedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53892,9 +53892,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxAckRequestedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53934,9 +53934,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxAckedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -53964,9 +53964,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxAckedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54006,9 +54006,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxNoAckRequestedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54036,9 +54036,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxNoAckRequestedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54079,9 +54079,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxDataCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54109,9 +54109,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxDataCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54148,9 +54148,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxDataPollCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000001D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54178,9 +54178,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxDataPollCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000001D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54220,9 +54220,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxBeaconCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000001E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54250,9 +54250,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxBeaconCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000001E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54292,9 +54292,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxBeaconRequestCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000001F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54322,9 +54322,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxBeaconRequestCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000001F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54365,9 +54365,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxOtherCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54395,9 +54395,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxOtherCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54437,9 +54437,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxRetryCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54467,9 +54467,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxRetryCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54509,9 +54509,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54540,9 +54540,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54583,9 +54583,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54614,9 +54614,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54657,9 +54657,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxErrCcaCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54687,9 +54687,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxErrCcaCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54729,9 +54729,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxErrAbortCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54759,9 +54759,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxErrAbortCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54801,9 +54801,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsTxErrBusyChannelCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54831,9 +54831,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsTxErrBusyChannelCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54874,9 +54874,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxTotalCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54904,9 +54904,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxTotalCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000027) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54946,9 +54946,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxUnicastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -54976,9 +54976,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxUnicastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55018,9 +55018,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxBroadcastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55048,9 +55048,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxBroadcastCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55090,9 +55090,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxDataCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55120,9 +55120,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxDataCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55159,9 +55159,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxDataPollCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55189,9 +55189,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxDataPollCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55231,9 +55231,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxBeaconCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000002C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55261,9 +55261,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxBeaconCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000002C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55303,9 +55303,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxBeaconRequestCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000002D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55333,9 +55333,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxBeaconRequestCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000002D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55376,9 +55376,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxOtherCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000002E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55406,9 +55406,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxOtherCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000002E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55448,9 +55448,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxAddressFilteredCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000002F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55478,9 +55478,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxAddressFilteredCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000002F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55521,9 +55521,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55551,9 +55551,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxDestAddrFilteredCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55594,9 +55594,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxDuplicatedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55624,9 +55624,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxDuplicatedCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55666,9 +55666,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxErrNoFrameCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55696,9 +55696,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxErrNoFrameCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55738,9 +55738,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55769,9 +55769,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxErrUnknownNeighborCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55812,9 +55812,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000034) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55842,9 +55842,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000034) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55885,9 +55885,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxErrSecCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000035) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55915,9 +55915,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxErrSecCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000035) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55957,9 +55957,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxErrFcsCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000036) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -55987,9 +55987,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxErrFcsCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000036) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56029,9 +56029,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsRxErrOtherCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000037) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56059,9 +56059,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsRxErrOtherCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000037) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56101,9 +56101,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsActiveTimestamp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000038) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56131,9 +56131,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsActiveTimestamp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000038) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56173,9 +56173,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsPendingTimestamp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x00000039) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56203,9 +56203,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsPendingTimestamp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x00000039) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56245,9 +56245,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000003A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56275,9 +56275,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000003A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56314,9 +56314,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsSecurityPolicy() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000003B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56347,9 +56347,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsSecurityPolicy() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000003B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56391,9 +56391,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsChannelMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000003C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56421,9 +56421,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsChannelMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000003C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56463,9 +56463,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsOperationalDatasetComponents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000003D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56497,9 +56497,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsOperationalDatasetComponents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000003D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56543,9 +56543,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsActiveNetworkFaultsList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000003E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56575,9 +56575,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsActiveNetworkFaultsList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000003E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56620,9 +56620,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56650,9 +56650,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56692,9 +56692,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56722,9 +56722,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56761,9 +56761,9 @@ public:
 
     ~ReadThreadNetworkDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -56791,9 +56791,9 @@ public:
 
     ~ReportThreadNetworkDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57204,9 +57204,9 @@ public:
 
     ~ReadUserLabelLabelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0041) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000041) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::UserLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57236,9 +57236,9 @@ public:
 
     ~ReportUserLabelLabelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0041) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000041) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::UserLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57280,9 +57280,9 @@ public:
 
     ~ReadUserLabelClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0041) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000041) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::UserLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57310,9 +57310,9 @@ public:
 
     ~ReportUserLabelClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0041) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000041) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::UserLabelCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57362,9 +57362,9 @@ public:
 
     ~ReadWakeOnLanWakeOnLanMacAddress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57392,9 +57392,9 @@ public:
 
     ~ReportWakeOnLanWakeOnLanMacAddress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57431,9 +57431,9 @@ public:
 
     ~ReadWakeOnLanAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57461,9 +57461,9 @@ public:
 
     ~ReportWakeOnLanAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57503,9 +57503,9 @@ public:
 
     ~ReadWakeOnLanClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57533,9 +57533,9 @@ public:
 
     ~ReportWakeOnLanClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57596,9 +57596,9 @@ class WiFiNetworkDiagnosticsResetCounts : public ModelCommand
 public:
     WiFiNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -57622,9 +57622,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsDisconnection() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57653,9 +57653,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsDisconnection() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportEvent (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57695,9 +57695,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsAssociationFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57726,9 +57726,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsAssociationFailure() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportEvent (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57768,9 +57768,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsConnectionStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57799,9 +57799,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsConnectionStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportEvent on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57842,9 +57842,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsBssid() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57872,9 +57872,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsBssid() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57911,9 +57911,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsSecurityType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57941,9 +57941,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsSecurityType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -57980,9 +57980,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsWiFiVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58010,9 +58010,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsWiFiVersion() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58049,9 +58049,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsChannelNumber() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58079,9 +58079,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsChannelNumber() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58118,9 +58118,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsRssi() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58148,9 +58148,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsRssi() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58187,9 +58187,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsBeaconLostCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58217,9 +58217,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsBeaconLostCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58259,9 +58259,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsBeaconRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58289,9 +58289,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsBeaconRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58328,9 +58328,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsPacketMulticastRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58358,9 +58358,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsPacketMulticastRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58401,9 +58401,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsPacketMulticastTxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58431,9 +58431,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsPacketMulticastTxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58474,9 +58474,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsPacketUnicastRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58504,9 +58504,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsPacketUnicastRxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58546,9 +58546,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsPacketUnicastTxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58576,9 +58576,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsPacketUnicastTxCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58618,9 +58618,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsCurrentMaxRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58648,9 +58648,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsCurrentMaxRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58690,9 +58690,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsOverrunCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58720,9 +58720,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsOverrunCount() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58759,9 +58759,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58789,9 +58789,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58831,9 +58831,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58861,9 +58861,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58900,9 +58900,9 @@ public:
 
     ~ReadWiFiNetworkDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -58930,9 +58930,9 @@ public:
 
     ~ReportWiFiNetworkDiagnosticsClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59004,9 +59004,9 @@ class WindowCoveringDownOrClose : public ModelCommand
 public:
     WindowCoveringDownOrClose() : ModelCommand("down-or-close") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59029,9 +59029,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59053,9 +59053,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59078,9 +59078,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59102,9 +59102,9 @@ public:
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59122,9 +59122,9 @@ class WindowCoveringStopMotion : public ModelCommand
 public:
     WindowCoveringStopMotion() : ModelCommand("stop-motion") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59142,9 +59142,9 @@ class WindowCoveringUpOrOpen : public ModelCommand
 public:
     WindowCoveringUpOrOpen() : ModelCommand("up-or-open") { ModelCommand::AddArguments(); }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -59168,9 +59168,9 @@ public:
 
     ~ReadWindowCoveringType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59198,9 +59198,9 @@ public:
 
     ~ReportWindowCoveringType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59237,9 +59237,9 @@ public:
 
     ~ReadWindowCoveringCurrentPositionLift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59267,9 +59267,9 @@ public:
 
     ~ReportWindowCoveringCurrentPositionLift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59309,9 +59309,9 @@ public:
 
     ~ReadWindowCoveringCurrentPositionTilt() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59339,9 +59339,9 @@ public:
 
     ~ReportWindowCoveringCurrentPositionTilt() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59381,9 +59381,9 @@ public:
 
     ~ReadWindowCoveringConfigStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59411,9 +59411,9 @@ public:
 
     ~ReportWindowCoveringConfigStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59450,9 +59450,9 @@ public:
 
     ~ReadWindowCoveringCurrentPositionLiftPercentage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59480,9 +59480,9 @@ public:
 
     ~ReportWindowCoveringCurrentPositionLiftPercentage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59522,9 +59522,9 @@ public:
 
     ~ReadWindowCoveringCurrentPositionTiltPercentage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59552,9 +59552,9 @@ public:
 
     ~ReportWindowCoveringCurrentPositionTiltPercentage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59594,9 +59594,9 @@ public:
 
     ~ReadWindowCoveringOperationalStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59624,9 +59624,9 @@ public:
 
     ~ReportWindowCoveringOperationalStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59663,9 +59663,9 @@ public:
 
     ~ReadWindowCoveringTargetPositionLiftPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59693,9 +59693,9 @@ public:
 
     ~ReportWindowCoveringTargetPositionLiftPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59736,9 +59736,9 @@ public:
 
     ~ReadWindowCoveringTargetPositionTiltPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59766,9 +59766,9 @@ public:
 
     ~ReportWindowCoveringTargetPositionTiltPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59809,9 +59809,9 @@ public:
 
     ~ReadWindowCoveringEndProductType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59839,9 +59839,9 @@ public:
 
     ~ReportWindowCoveringEndProductType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59878,9 +59878,9 @@ public:
 
     ~ReadWindowCoveringCurrentPositionLiftPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59908,9 +59908,9 @@ public:
 
     ~ReportWindowCoveringCurrentPositionLiftPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59951,9 +59951,9 @@ public:
 
     ~ReadWindowCoveringCurrentPositionTiltPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -59981,9 +59981,9 @@ public:
 
     ~ReportWindowCoveringCurrentPositionTiltPercent100ths() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60024,9 +60024,9 @@ public:
 
     ~ReadWindowCoveringInstalledOpenLimitLift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60054,9 +60054,9 @@ public:
 
     ~ReportWindowCoveringInstalledOpenLimitLift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60096,9 +60096,9 @@ public:
 
     ~ReadWindowCoveringInstalledClosedLimitLift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60126,9 +60126,9 @@ public:
 
     ~ReportWindowCoveringInstalledClosedLimitLift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60168,9 +60168,9 @@ public:
 
     ~ReadWindowCoveringInstalledOpenLimitTilt() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60198,9 +60198,9 @@ public:
 
     ~ReportWindowCoveringInstalledOpenLimitTilt() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60240,9 +60240,9 @@ public:
 
     ~ReadWindowCoveringInstalledClosedLimitTilt() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60270,9 +60270,9 @@ public:
 
     ~ReportWindowCoveringInstalledClosedLimitTilt() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60312,9 +60312,9 @@ public:
 
     ~ReadWindowCoveringMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60340,9 +60340,9 @@ public:
 
     ~WriteWindowCoveringMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) WriteAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) WriteAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60368,9 +60368,9 @@ public:
 
     ~ReportWindowCoveringMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60407,9 +60407,9 @@ public:
 
     ~ReadWindowCoveringSafetyStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60437,9 +60437,9 @@ public:
 
     ~ReportWindowCoveringSafetyStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60476,9 +60476,9 @@ public:
 
     ~ReadWindowCoveringAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60506,9 +60506,9 @@ public:
 
     ~ReportWindowCoveringAttributeList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60548,9 +60548,9 @@ public:
 
     ~ReadWindowCoveringFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60578,9 +60578,9 @@ public:
 
     ~ReportWindowCoveringFeatureMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60617,9 +60617,9 @@ public:
 
     ~ReadWindowCoveringClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReadAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -60647,9 +60647,9 @@ public:
 
     ~ReportWindowCoveringClusterRevision() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);

@@ -1153,15 +1153,10 @@ static void TestChipCert_ExtractOperationalDiscoveryId(nlTestSuite * inSuite, vo
         NL_TEST_ASSERT(inSuite, nodeId == testCase.ExpectedNodeId);
         NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
 
-        // Extract the Public key from the root certificate.
-        Credentials::P256PublicKeySpan rootPubKey;
-        err = Credentials::ExtractPublicKeyFromChipCert(rcac, rootPubKey);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        // Extract Node ID and Fabric ID from the NOC, and generate the
-        // compressed fabric ID from the root CA public Key and fabric ID.
+        // Extract Node ID, Fabric ID and Compressed Fabric ID from the
+        // NOC and root certificate.
         CompressedFabricId compressedFabricId;
-        err = ExtractNodeIdFabricIdCompressedFabricIdFromRootPubKeyOpCert(rootPubKey, noc, compressedFabricId, fabricId, nodeId);
+        err = ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(rcac, noc, compressedFabricId, fabricId, nodeId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, compressedFabricId == testCase.ExpectedCompressedFabricId);
         NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
