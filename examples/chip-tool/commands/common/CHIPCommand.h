@@ -39,7 +39,7 @@ constexpr const char kIdentityGamma[] = "gamma";
 // commissioner portion of such an architecture.  The null-fabric-commissioner
 // can carry a commissioning flow up until the point of operational channel
 // (CASE) communcation.
-constexpr const char kIdentityNull[]  = "null-fabric-commissioner";
+constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {
