@@ -39,6 +39,8 @@ using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
 
 namespace {
 
+constexpr size_t kMaxActiveLocaleLength = 35;
+
 class LocalizationConfigurationAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -150,7 +152,9 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
 {
     DeviceLayer::AttributeList<CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
     CharSpan validLocale;
-    MutableCharSpan activeLocale;
+
+    char outBuffer[kMaxActiveLocaleLength] = "";
+    MutableCharSpan activeLocale(outBuffer, kMaxActiveLocaleLength);
     EmberAfStatus status = ActiveLocale::Get(endpoint, activeLocale);
 
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", status));
