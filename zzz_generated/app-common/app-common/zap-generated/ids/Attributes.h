@@ -5280,6 +5280,14 @@ namespace TimedWriteBoolean {
 static constexpr AttributeId Id = 0x00000030;
 } // namespace TimedWriteBoolean
 
+namespace GeneralErrorBoolean {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace GeneralErrorBoolean
+
+namespace ClusterErrorBoolean {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace ClusterErrorBoolean
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
