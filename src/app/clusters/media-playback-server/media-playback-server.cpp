@@ -181,8 +181,7 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadDurationAttribute(app::AttributeValueEnc
 
 CHIP_ERROR MediaPlaybackAttrAccess::ReadSampledPositionAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    Structs::PlaybackPosition::Type sampledPosition = delegate->HandleGetSampledPosition();
-    return aEncoder.Encode(sampledPosition);
+    return delegate->HandleGetSampledPosition(aEncoder);
 }
 
 CHIP_ERROR MediaPlaybackAttrAccess::ReadPlaybackSpeedAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

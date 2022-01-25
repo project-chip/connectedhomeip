@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
 #include <app/util/af.h>
 #include <list>
@@ -52,10 +53,9 @@ public:
     }
 
     // this attribute should only be enabled for app platform instance (endpoint 1)
-    ApplicationEPType HandleGetCurrentApp();
+    CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
 
-    // TODO: refactor this method signature to address memory issue (see PR 13398)
-    virtual std::list<uint16_t> HandleGetCatalogList() = 0;
+    virtual CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) = 0;
 
     virtual void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
                                  const ApplicationLauncherApplicationType & application) = 0;

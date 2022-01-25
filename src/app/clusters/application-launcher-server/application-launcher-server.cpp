@@ -96,7 +96,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 }
 
 // this attribute should only be enabled for app platform instance (endpoint 1)
-ApplicationEPType Delegate::HandleGetCurrentApp()
+CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     if (HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
@@ -113,7 +113,7 @@ ApplicationEPType Delegate::HandleGetCurrentApp()
                 currentApp.application.catalogVendorId = vendorApp->catalogVendorId;
                 currentApp.application.applicationId   = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
                 currentApp.endpoint                    = CharSpan(endpointStr.c_str(), endpointStr.length());
-                return currentApp;
+                return aEncoder.Encode(currentApp);
             }
         }
     }
@@ -124,7 +124,7 @@ ApplicationEPType Delegate::HandleGetCurrentApp()
     currentApp.application.catalogVendorId = 123;
     currentApp.application.applicationId   = CharSpan("applicationId", strlen("applicationId"));
     currentApp.endpoint                    = CharSpan("endpointId", strlen("endpointId"));
-    return currentApp;
+    return aEncoder.Encode(currentApp);
 }
 
 } // namespace ApplicationLauncher
@@ -179,20 +179,12 @@ CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributeP
 
 CHIP_ERROR ApplicationLauncherAttrAccess::ReadCatalogListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<uint16_t> catalogList = delegate->HandleGetCatalogList();
-    return aEncoder.EncodeList([catalogList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & catalog : catalogList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(catalog));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetCatalogList(aEncoder);
 }
 
 CHIP_ERROR ApplicationLauncherAttrAccess::ReadCurrentAppAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    ApplicationEPType currentApp = delegate->HandleGetCurrentApp();
-    return aEncoder.Encode(currentApp);
+    return delegate->HandleGetCurrentApp(aEncoder);
 }
 
 } // anonymous namespace

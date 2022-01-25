@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
 #include <list>
 
@@ -70,14 +71,14 @@ public:
     Delegate() : Delegate(123, "applicationId"){};
     Delegate(uint16_t szCatalogVendorId, const char * szApplicationId) : mCatalogVendorApp(szCatalogVendorId, szApplicationId){};
 
-    virtual CharSpan HandleGetVendorName()      = 0;
-    virtual uint16_t HandleGetVendorId()        = 0;
-    virtual CharSpan HandleGetApplicationName() = 0;
-    virtual uint16_t HandleGetProductId()       = 0;
-    ApplicationBasicApplicationType HandleGetApplication();
+    virtual CHIP_ERROR HandleGetVendorName(app::AttributeValueEncoder & aEncoder)      = 0;
+    virtual uint16_t HandleGetVendorId()                                               = 0;
+    virtual CHIP_ERROR HandleGetApplicationName(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual uint16_t HandleGetProductId()                                              = 0;
+    CHIP_ERROR HandleGetApplication(app::AttributeValueEncoder & aEncoder);
     inline ApplicationStatusEnum HandleGetStatus() { return mApplicationStatus; }
-    virtual CharSpan HandleGetApplicationVersion()           = 0;
-    virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;
+    virtual CHIP_ERROR HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder)  = 0;
 
     inline void SetApplicationStatus(ApplicationStatusEnum status) { mApplicationStatus = status; }
     bool Matches(ApplicationBasicApplication match);

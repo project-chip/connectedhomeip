@@ -27,6 +27,7 @@
 #include "MediaPlaybackManager.h"
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::MediaPlayback;
 
 /** @brief Media PlayBack Cluster Init
@@ -253,7 +254,7 @@ exit:
     return response;
 }
 
-Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
+CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
     Structs::PlaybackPosition::Type response;
     response.updatedAt = 0;
@@ -292,5 +293,5 @@ exit:
         ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s", err.AsString());
     }
 
-    return response;
+    return aEncoder.Encode(response);
 }

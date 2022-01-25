@@ -95,12 +95,12 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
     return GetDelegate(endpoint);
 }
 
-ApplicationBasicApplicationType Delegate::HandleGetApplication()
+CHIP_ERROR Delegate::HandleGetApplication(app::AttributeValueEncoder & aEncoder)
 {
     ApplicationBasicApplicationType application;
     application.catalogVendorId = mCatalogVendorApp.catalogVendorId;
     application.applicationId   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
-    return application;
+    return aEncoder.Encode(application);
 }
 
 bool Delegate::Matches(ApplicationBasicApplication match)
@@ -186,8 +186,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadVendorNameAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    CharSpan vendorName = delegate->HandleGetVendorName();
-    return aEncoder.Encode(vendorName);
+    return delegate->HandleGetVendorName(aEncoder);
 }
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadVendorIdAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
@@ -198,8 +197,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadVendorIdAttribute(app::AttributeValue
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationNameAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    CharSpan applicationName = delegate->HandleGetApplicationName();
-    return aEncoder.Encode(applicationName);
+    return delegate->HandleGetApplicationName(aEncoder);
 }
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadProductIdAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
@@ -210,8 +208,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadProductIdAttribute(app::AttributeValu
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    Structs::ApplicationBasicApplication::Type application = delegate->HandleGetApplication();
-    return aEncoder.Encode(application);
+    return delegate->HandleGetApplication(aEncoder);
 }
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadStatusAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
@@ -222,20 +219,12 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadStatusAttribute(app::AttributeValueEn
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationVersionAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    CharSpan applicationVersion = delegate->HandleGetApplicationVersion();
-    return aEncoder.Encode(applicationVersion);
+    return delegate->HandleGetApplicationVersion(aEncoder);
 }
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadAllowedVendorListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<uint16_t> allowedVendorList = delegate->HandleGetAllowedVendorList();
-    return aEncoder.EncodeList([allowedVendorList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & allowedVendor : allowedVendorList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(allowedVendor));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetAllowedVendorList(aEncoder);
 }
 
 } // anonymous namespace

@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
 #include <app/util/af.h>
 #include <list>
@@ -35,8 +36,7 @@ namespace TargetNavigator {
 class Delegate
 {
 public:
-    // TODO: refactor this method signature to address memory issue (see PR 13398)
-    virtual std::list<Structs::TargetInfo::Type> HandleGetTargetList()                = 0;
+    virtual CHIP_ERROR HandleGetTargetList(app::AttributeValueEncoder & aEncoder)     = 0;
     virtual uint8_t HandleGetCurrentTarget()                                          = 0;
     virtual void HandleNavigateTarget(CommandResponseHelper<Commands::NavigateTargetResponse::Type> & helper,
                                       const uint64_t & target, const CharSpan & data) = 0;

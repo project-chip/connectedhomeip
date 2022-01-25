@@ -143,14 +143,7 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
 
 CHIP_ERROR TargetNavigatorAttrAccess::ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<Structs::TargetInfo::Type> targetList = delegate->HandleGetTargetList();
-    return aEncoder.EncodeList([targetList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & target : targetList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(target));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetTargetList(aEncoder);
 }
 
 CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

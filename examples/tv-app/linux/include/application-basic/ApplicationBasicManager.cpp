@@ -19,11 +19,12 @@
 #include "ApplicationBasicManager.h"
 
 using namespace std;
+using namespace chip::app;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-CharSpan ApplicationBasicManager::HandleGetVendorName()
+CHIP_ERROR ApplicationBasicManager::HandleGetVendorName(AttributeValueEncoder & aEncoder)
 {
-    return CharSpan(mVendorName, strlen(mVendorName));
+    return aEncoder.Encode(CharSpan(mVendorName, strlen(mVendorName)));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
@@ -31,9 +32,9 @@ uint16_t ApplicationBasicManager::HandleGetVendorId()
     return mVendorId;
 }
 
-CharSpan ApplicationBasicManager::HandleGetApplicationName()
+CHIP_ERROR ApplicationBasicManager::HandleGetApplicationName(AttributeValueEncoder & aEncoder)
 {
-    return CharSpan(mApplicationName, strlen(mApplicationName));
+    return aEncoder.Encode(CharSpan(mApplicationName, strlen(mApplicationName)));
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
@@ -41,12 +42,19 @@ uint16_t ApplicationBasicManager::HandleGetProductId()
     return mProductId;
 }
 
-CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
+CHIP_ERROR ApplicationBasicManager::HandleGetApplicationVersion(AttributeValueEncoder & aEncoder)
 {
-    return CharSpan(mApplicationVersion, strlen(mApplicationVersion));
+    return aEncoder.Encode(CharSpan(mApplicationVersion, strlen(mApplicationVersion)));
 }
 
-std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList()
+CHIP_ERROR ApplicationBasicManager::HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder)
 {
-    return { mVendorId, 456 };
+    std::list<uint16_t> allowedVendorList = { mVendorId, 456 };
+    return aEncoder.EncodeList([allowedVendorList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & allowedVendor : allowedVendorList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(allowedVendor));
+        }
+        return CHIP_NO_ERROR;
+    });
 }

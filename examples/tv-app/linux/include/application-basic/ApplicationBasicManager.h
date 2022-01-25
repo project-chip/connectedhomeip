@@ -21,6 +21,7 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
 using chip::Platform::CopyString;
 using ApplicationBasicDelegate = chip::app::Clusters::ApplicationBasic::Delegate;
 
@@ -44,12 +45,12 @@ public:
     };
     virtual ~ApplicationBasicManager(){};
 
-    CharSpan HandleGetVendorName() override;
+    CHIP_ERROR HandleGetVendorName(AttributeValueEncoder & aEncoder) override;
     uint16_t HandleGetVendorId() override;
-    CharSpan HandleGetApplicationName() override;
+    CHIP_ERROR HandleGetApplicationName(AttributeValueEncoder & aEncoder) override;
     uint16_t HandleGetProductId() override;
-    CharSpan HandleGetApplicationVersion() override;
-    std::list<uint16_t> HandleGetAllowedVendorList() override;
+    CHIP_ERROR HandleGetApplicationVersion(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder) override;
 
 protected:
     static const int kVendorNameSize         = 32;

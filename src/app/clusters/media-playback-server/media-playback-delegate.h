@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
 #include <app/util/af.h>
 #include <list>
@@ -35,13 +36,13 @@ namespace MediaPlayback {
 class Delegate
 {
 public:
-    virtual PlaybackStateEnum HandleGetCurrentState()                  = 0;
-    virtual uint64_t HandleGetStartTime()                              = 0;
-    virtual uint64_t HandleGetDuration()                               = 0;
-    virtual Structs::PlaybackPosition::Type HandleGetSampledPosition() = 0;
-    virtual float HandleGetPlaybackSpeed()                             = 0;
-    virtual uint64_t HandleGetSeekRangeStart()                         = 0;
-    virtual uint64_t HandleGetSeekRangeEnd()                           = 0;
+    virtual PlaybackStateEnum HandleGetCurrentState()                                  = 0;
+    virtual uint64_t HandleGetStartTime()                                              = 0;
+    virtual uint64_t HandleGetDuration()                                               = 0;
+    virtual CHIP_ERROR HandleGetSampledPosition(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual float HandleGetPlaybackSpeed()                                             = 0;
+    virtual uint64_t HandleGetSeekRangeStart()                                         = 0;
+    virtual uint64_t HandleGetSeekRangeEnd()                                           = 0;
 
     virtual void HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)             = 0;
     virtual void HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)            = 0;

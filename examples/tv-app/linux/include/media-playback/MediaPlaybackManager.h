@@ -20,6 +20,7 @@
 
 #include <app/clusters/media-playback-server/media-playback-server.h>
 
+using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using MediaPlaybackDelegate = chip::app::Clusters::MediaPlayback::Delegate;
 using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
@@ -30,7 +31,7 @@ public:
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
     uint64_t HandleGetDuration() override;
-    chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type HandleGetSampledPosition() override;
+    CHIP_ERROR HandleGetSampledPosition(AttributeValueEncoder & aEncoder) override;
     float HandleGetPlaybackSpeed() override;
     uint64_t HandleGetSeekRangeStart() override;
     uint64_t HandleGetSeekRangeEnd() override;

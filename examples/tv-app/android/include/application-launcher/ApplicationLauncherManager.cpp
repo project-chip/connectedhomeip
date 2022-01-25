@@ -19,11 +19,19 @@
 #include "ApplicationLauncherManager.h"
 
 using namespace std;
+using namespace chip::app;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
+CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncoder & aEncoder)
 {
-    return { 123, 456 };
+    std::list<uint16_t> catalogList = { 123, 456 };
+    return aEncoder.EncodeList([catalogList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & catalog : catalogList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(catalog));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,

@@ -87,10 +87,9 @@ namespace AppPlatform {
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
 {
-    CharSpan appNameCharSpan = app->GetApplicationBasicDelegate()->HandleGetApplicationName();
-    std::string appName(appNameCharSpan.data(), appNameCharSpan.size());
+    CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
-    ChipLogProgress(DeviceLayer, "Adding device %s ", appName.c_str());
+    ChipLogProgress(DeviceLayer, "Adding ContentApp with appid %s ", vendorApp.applicationId);
     uint8_t index = 0;
     // check if already loaded
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -115,14 +114,14 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
-                    ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", appName.c_str(),
+                    ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
                                     mCurrentEndpointId, index);
                     app->SetEndpointId(mCurrentEndpointId);
                     return app->GetEndpointId();
                 }
                 else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
                 {
-                    ChipLogProgress(DeviceLayer, "Adding device error=%d", ret);
+                    ChipLogProgress(DeviceLayer, "Adding ContentApp error=%d", ret);
                     return kNoCurrentEndpointId;
                 }
                 // Handle wrap condition

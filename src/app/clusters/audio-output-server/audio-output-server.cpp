@@ -130,14 +130,7 @@ CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
 
 CHIP_ERROR AudioOutputAttrAccess::ReadOutputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<Structs::OutputInfo::Type> outputList = delegate->HandleGetOutputList();
-    return aEncoder.EncodeList([outputList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & output : outputList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(output));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetOutputList(aEncoder);
 }
 
 CHIP_ERROR AudioOutputAttrAccess::ReadCurrentOutputAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

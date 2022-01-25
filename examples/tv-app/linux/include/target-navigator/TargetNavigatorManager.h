@@ -20,6 +20,7 @@
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
 using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using TargetNavigatorDelegate    = chip::app::Clusters::TargetNavigator::Delegate;
 using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type;
@@ -31,7 +32,7 @@ public:
     TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, kNoCurrentTarget){};
     TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget);
 
-    std::list<TargetInfoType> HandleGetTargetList() override;
+    CHIP_ERROR HandleGetTargetList(AttributeValueEncoder & aEncoder) override;
     uint8_t HandleGetCurrentTarget() override;
     void HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & responser, const uint64_t & target,
                               const CharSpan & data) override;

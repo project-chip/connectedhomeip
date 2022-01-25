@@ -22,6 +22,7 @@
 #include <list>
 
 using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ApplicationLauncherDelegate        = chip::app::Clusters::ApplicationLauncher::Delegate;
 using ApplicationLauncherApplicationType = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type;
@@ -30,7 +31,7 @@ using LauncherResponseType               = chip::app::Clusters::ApplicationLaunc
 class ApplicationLauncherManager : public ApplicationLauncherDelegate
 {
 public:
-    std::list<uint16_t> HandleGetCatalogList() override;
+    CHIP_ERROR HandleGetCatalogList(AttributeValueEncoder & aEncoder) override;
 
     void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
                          const ApplicationLauncherApplicationType & application) override;

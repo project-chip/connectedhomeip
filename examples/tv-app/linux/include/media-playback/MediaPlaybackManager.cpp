@@ -35,12 +35,13 @@ uint64_t MediaPlaybackManager::HandleGetDuration()
     return 0;
 }
 
-Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
+CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
     Structs::PlaybackPosition::Type sampledPosition;
     sampledPosition.updatedAt = 0;
     sampledPosition.position  = 0;
-    return sampledPosition;
+
+    return aEncoder.Encode(sampledPosition);
 }
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
