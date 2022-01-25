@@ -40,7 +40,9 @@
 
 namespace chip {
 namespace app {
-constexpr size_t kMaxEventSizeReserve = 512;
+constexpr const uint32_t kEventManagementProfile = 0x1;
+constexpr const uint32_t kFabricIndexTag         = 0x1;
+constexpr size_t kMaxEventSizeReserve            = 512;
 constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
@@ -322,6 +324,7 @@ public:
      *                         completion, the event number of the next one we plan to fetch.
      *
      * @param[out] aEventCount The number of fetched event
+     * @param[in] aFabricIndex fabric index for current read handler
      * @retval #CHIP_END_OF_TLV             The function has reached the end of the
      *                                       available log entries at the specified
      *                                       priority level
@@ -336,7 +339,7 @@ public:
      *
      */
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                size_t & aEventCount);
+                                size_t & aEventCount, const FabricIndex & aFabricIndex);
 
     /**
      * @brief

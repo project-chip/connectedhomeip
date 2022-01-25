@@ -513,6 +513,7 @@ limitations under the License.
       <field id="4" name="arg4" type="SimpleStruct"/>
       <field id="5" name="arg5" type="SimpleStruct" array="true"/>
       <field id="6" name="arg6" type="SimpleEnum" array="true"/>
+      <field id="7" name="arg7" type="fabric_idx"/>
     </event>
   </cluster>
 </configurator>

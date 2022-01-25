@@ -2801,6 +2801,7 @@ client cluster TestCluster = 1295 {
     SimpleStruct arg4 = 4;
     SimpleStruct arg5[] = 5;
     SimpleEnum arg6[] = 6;
+    fabric_idx arg7 = 7;
   }
 
   attribute boolean boolean = 0;

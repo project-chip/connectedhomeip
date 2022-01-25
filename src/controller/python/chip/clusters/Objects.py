@@ -32012,6 +32012,7 @@ class TestCluster(Cluster):
                             ClusterObjectFieldDescriptor(Label="arg4", Tag=4, Type=TestCluster.Structs.SimpleStruct),
                             ClusterObjectFieldDescriptor(Label="arg5", Tag=5, Type=typing.List[TestCluster.Structs.SimpleStruct]),
                             ClusterObjectFieldDescriptor(Label="arg6", Tag=6, Type=typing.List[TestCluster.Enums.SimpleEnum]),
+                            ClusterObjectFieldDescriptor(Label="arg7", Tag=7, Type=uint),
                     ])
 
             arg1: 'uint' = 0
@@ -32020,6 +32021,7 @@ class TestCluster(Cluster):
             arg4: 'TestCluster.Structs.SimpleStruct' = field(default_factory=lambda: TestCluster.Structs.SimpleStruct())
             arg5: 'typing.List[TestCluster.Structs.SimpleStruct]' = field(default_factory=lambda: [])
             arg6: 'typing.List[TestCluster.Enums.SimpleEnum]' = field(default_factory=lambda: [])
+            arg7: 'uint' = 0
 
 
 @dataclass
