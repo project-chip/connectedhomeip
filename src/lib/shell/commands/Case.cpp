@@ -15,14 +15,14 @@
  *    limitations under the License.
  */
 
-#include <app/server/Server.h>
 #include <app/CASESessionManager.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/shell/Engine.h>
-#include <lib/shell/Commands.h>
-#include <lib/shell/commands/Help.h>
+#include <app/server/Server.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/shell/Commands.h>
+#include <lib/shell/Engine.h>
+#include <lib/shell/commands/Help.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::DeviceLayer;
 
@@ -45,22 +45,22 @@ Callback::Callback<OnDeviceConnectionFailure> sOnConnectionFailureCallback(OnCon
 
 void ConnectToNode(intptr_t arg)
 {
-    FabricInfo * fabricInfo = reinterpret_cast<FabricInfo *>(arg);
-    Server * server = &(chip::Server::GetInstance());
+    FabricInfo * fabricInfo                 = reinterpret_cast<FabricInfo *>(arg);
+    Server * server                         = &(chip::Server::GetInstance());
     CASESessionManager * caseSessionManager = server->GetCASESessionManager();
     if (caseSessionManager == nullptr)
     {
         ChipLogError(SecureChannel, "Can't get the CASESessionManager");
         return;
     }
-    caseSessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(sNodeId),&sOnConnectedCallback,
+    caseSessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(sNodeId), &sOnConnectedCallback,
                                                &sOnConnectionFailureCallback);
 }
 
 CHIP_ERROR ConnectToNodeHandler(int argc, char ** argv)
 {
-    const FabricIndex fabricIndex   = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    const FabricIndex fabricIndex = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
+    FabricInfo * fabricInfo       = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
 
     if (fabricInfo == nullptr)
     {
@@ -92,11 +92,11 @@ CHIP_ERROR caseHandler(int argc, char ** argv)
 void RegisterCaseCommands()
 {
     static const shell_command_t subCommands[] = {
-        { &ConnectToNodeHandler, "connect", "Establish CASESession to a node, Usage: case connect <fabric-index> <node-id>"},
+        { &ConnectToNodeHandler, "connect", "Establish CASESession to a node, Usage: case connect <fabric-index> <node-id>" },
     };
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
 
-    static const shell_command_t caseCommand = { &caseHandler, "case", "Case Commands"};
+    static const shell_command_t caseCommand = { &caseHandler, "case", "Case Commands" };
     Engine::Root().RegisterCommands(&caseCommand, 1);
 }
 
