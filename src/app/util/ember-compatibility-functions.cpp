@@ -254,30 +254,14 @@ CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, Attr
     return aAttributeReport.EndOfAttributeReportIB().GetError();
 }
 
-CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIB::Builder & aAttributeReport,
+CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                              Protocols::InteractionModel::Status aStatus, TLV::TLVWriter * aReportCheckpoint)
 {
     if (aReportCheckpoint != nullptr)
     {
-        aAttributeReport.Rollback(*aReportCheckpoint);
+        aAttributeReports.Rollback(*aReportCheckpoint);
     }
-    AttributeStatusIB::Builder & attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
-    ReturnErrorOnFailure(aAttributeReport.GetError());
-    AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
-    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
-
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-        .Cluster(aPath.mClusterId)
-        .Attribute(aPath.mAttributeId)
-        .EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
-    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
-    statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
-    ReturnErrorOnFailure(statusIBBuilder.GetError());
-
-    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
-    return aAttributeReport.EndOfAttributeReportIB().GetError();
+    return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(aStatus));
 }
 
 // This reader should never actually be registered; we do manual dispatch to it
@@ -336,8 +320,6 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
                                   AttributeValueEncoder::AttributeEncodeState * aEncoderState,
                                   AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
 {
-    // TODO: We should probably clone the writer and convert failures here
-    // into status responses, unless our caller already does that.
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, aIsFabricFiltered,
@@ -388,9 +370,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
+        return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
@@ -410,9 +390,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             }
             else
             {
-                AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-                ReturnErrorOnFailure(aAttributeReports.GetError());
-                return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+                return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
             }
         }
     }
@@ -434,11 +412,11 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     // Read attribute using Ember, if it doesn't have an override.
 
+    TLV::TLVWriter backup;
+    aAttributeReports.Checkpoint(backup);
+
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
-
-    TLV::TLVWriter backup;
-    attributeReport.Checkpoint(backup);
 
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
@@ -670,7 +648,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, attributeReport, imStatus, &backup);
+    return SendFailureStatus(aPath, aAttributeReports, imStatus, &backup);
 }
 
 namespace {
