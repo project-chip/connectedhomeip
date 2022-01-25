@@ -107,7 +107,6 @@ void ReadHandler::Close()
 
     MoveToState(HandlerState::AwaitingDestruction);
     mCallback.OnDone(*this);
-    mLastWrittenEventsBytes = 0;
 }
 
 CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
