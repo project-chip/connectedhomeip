@@ -20495,10 +20495,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 256
     }
-<<<<<<< HEAD
-  ]
-=======
   ],
   "log": []
->>>>>>> upstream/master
 }
