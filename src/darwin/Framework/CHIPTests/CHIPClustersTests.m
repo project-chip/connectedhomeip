@@ -40378,7 +40378,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     id locationArgument;
-    locationArgument = @"us";
+    locationArgument = @"US";
     [cluster writeAttributeLocationWithValue:locationArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write location Error: %@", err);
@@ -40400,7 +40400,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     id locationArgument;
-    locationArgument = @"";
+    locationArgument = @"XX";
     [cluster writeAttributeLocationWithValue:locationArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Restore initial location value Error: %@", err);

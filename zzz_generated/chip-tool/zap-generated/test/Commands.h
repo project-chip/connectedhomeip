@@ -65657,7 +65657,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
+        locationArgument = chip::Span<const char>("USgarbage: not in length on purpose", 2);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
@@ -65675,7 +65675,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -67376,7 +67376,7 @@ private:
         cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
+        locationArgument = chip::Span<const char>("USgarbage: not in length on purpose", 2);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1, OnDoneCallback_1));
@@ -67404,7 +67404,7 @@ private:
 
     void OnSuccessResponse_2(chip::CharSpan location)
     {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("US", 2)));
 
         NextTest();
     }
@@ -67416,7 +67416,7 @@ private:
         cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+        locationArgument = chip::Span<const char>("FRgarbage: not in length on purpose", 2);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3));
@@ -67444,7 +67444,7 @@ private:
 
     void OnSuccessResponse_4(chip::CharSpan location)
     {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("FR", 2)));
 
         NextTest();
     }
