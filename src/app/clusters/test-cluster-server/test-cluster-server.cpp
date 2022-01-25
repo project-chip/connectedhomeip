@@ -565,6 +565,7 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
+
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestEmitTestEventRequest::DecodableType & commandData)
@@ -576,6 +577,40 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 
     // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
     Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
+
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+    commandObj->AddResponseData(commandPath, responseData);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
+{
+    Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
+    Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
+
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+    commandObj->AddResponseData(commandPath, responseData);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestEmitTestNullableFabricScopedEventRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestNullableFabricScopedEventRequest::DecodableType & commandData)
+{
+    Commands::TestEmitTestNullableFabricScopedEventResponse::Type responseData;
+    DataModel::Nullable<chip::FabricIndex> fabric;
+    fabric.SetNonNull(commandData.arg1);
+    Events::TestNullableFabricScopedEvent::Type event{ fabric };
 
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {

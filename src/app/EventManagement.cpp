@@ -97,6 +97,7 @@ struct EventEnvelopeContext
     EndpointId mEndpointId   = 0;
     EventId mEventId         = 0;
     EventNumber mEventNumber = 0;
+    DataModel::Nullable<chip::FabricIndex> mFabricIndex;
 };
 
 void EventManagement::InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
@@ -359,6 +360,10 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
     // Callback to write the EventData
     ReturnErrorOnFailure(apDelegate->WriteEvent(apContext->mWriter));
+    if (!(apOptions->mFabricIndex.IsNull()))
+    {
+        apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex.Value());
+    }
     eventDataIBBuilder.EndOfEventDataIB();
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
     eventReportBuilder.EndOfEventReportIB();
@@ -406,25 +411,27 @@ CircularEventBuffer * EventManagement::GetPriorityBuffer(PriorityLevel aPriority
 
 CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, size_t aDepth, void * apContext)
 {
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
     CopyAndAdjustDeltaTimeContext * ctx = static_cast<CopyAndAdjustDeltaTimeContext *>(apContext);
     TLVReader reader(aReader);
 
     if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kSystemTimestamp))) && !(ctx->mpContext->mFirst))
     {
-        err = ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)),
+        return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)),
                                  ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
     else if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEpochTimestamp))) && !(ctx->mpContext->mFirst))
     {
-        err = ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)),
+        return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)),
                                  ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
+    }
+    else if (TLV::IsProfileTag(aReader.GetTag()) && aReader.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
+    {
+        return CHIP_NO_ERROR;
     }
     else
     {
-        err = ctx->mpWriter->CopyElement(reader);
+        return ctx->mpWriter->CopyElement(reader);
     }
-    return err;
 }
 
 void EventManagement::VendEventNumber()
@@ -487,8 +494,9 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     // Create all event specific data
     // Timestamp; encoded as a delta time
 
-    opts.mUrgent = aEventOptions.mUrgent;
-    opts.mPath   = aEventOptions.mPath;
+    opts.mUrgent      = aEventOptions.mUrgent;
+    opts.mPath        = aEventOptions.mPath;
+    opts.mFabricIndex = aEventOptions.mFabricIndex;
 
     ctxt.mCurrentEventNumber = mLastEventNumber;
     ctxt.mCurrentTime.mValue = mLastEventTimestamp.mValue;
@@ -584,6 +592,13 @@ static bool IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, co
     {
         return false;
     }
+
+    if (!event.mFabricIndex.IsNull() && eventLoadOutContext->mFabricIndex != event.mFabricIndex.Value())
+    {
+        ChipLogError(EventLogging, "not match fabric index");
+        return false;
+    }
+
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
@@ -661,7 +676,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
 }
 
 CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                             size_t & aEventCount)
+                                             size_t & aEventCount, const FabricIndex & aFabricIndex)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -674,6 +689,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
+    context.mFabricIndex           = aFabricIndex;
     context.mpInterestedEventPaths = apClusterInfolist;
     err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
     SuccessOrExit(err);
@@ -746,6 +762,13 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         ReturnErrorOnFailure(reader.Get(epochTime));
         envelope->mCurrentTime.mType  = Timestamp::Type::kEpoch;
         envelope->mCurrentTime.mValue = epochTime;
+    }
+
+    if (TLV::IsProfileTag(reader.GetTag()) && reader.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
+    {
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+        ReturnErrorOnFailure(reader.Get(fabricIndex));
+        envelope->mFabricIndex.SetNonNull(fabricIndex);
     }
     return CHIP_NO_ERROR;
 }
