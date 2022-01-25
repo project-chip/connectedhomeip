@@ -104,7 +104,8 @@ class GeneratorTest:
         elif self.generator_name.lower() == 'gni':
             return GniGenerator(storage, idl)
         else:
-            raise Exception("Unknown generator for testing: %s", self.generator_name.lower())
+            raise Exception("Unknown generator for testing: %s",
+                            self.generator_name.lower())
 
     def run_test_cases(self, checker: unittest.TestCase):
         for test in self.test_cases:
