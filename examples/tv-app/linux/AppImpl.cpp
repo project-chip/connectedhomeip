@@ -158,7 +158,7 @@ CHIP_ERROR ContentAppFactoryImpl::LookupCatalogVendorApp(uint16_t vendorId, uint
 {
     std::string appId               = BuildAppId(vendorId);
     destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
-    strncpy(destinationApp->applicationId, appId.c_str(), sizeof(destinationApp->applicationId));
+    Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), appId.c_str());
     return CHIP_NO_ERROR;
 }
 
@@ -169,12 +169,12 @@ CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendo
     if (appId == "applicationId")
     {
         // test case passes "applicationId", map this to our test suite app
-        strncpy(destinationApp->applicationId, "1111", sizeof(destinationApp->applicationId));
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "1111");
     }
     else
     {
         // for now, just return the applicationId passed in
-        strncpy(destinationApp->applicationId, sourceApp.applicationId, sizeof(destinationApp->applicationId));
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), sourceApp.applicationId);
     }
     return CHIP_NO_ERROR;
 }

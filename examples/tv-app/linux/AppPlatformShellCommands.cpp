@@ -76,7 +76,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
                                             sizeof(rotatingIdString));
 
-        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, state->GetRotatingIdLength());
+        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
 
         static const size_t kSetupPinSize = 12;
         char setupPin[kSetupPinSize];
