@@ -19,12 +19,13 @@
 #include "ApplicationBasicManager.h"
 
 using namespace std;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ApplicationBasic;
 
 CHIP_ERROR ApplicationBasicManager::HandleGetVendorName(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(chip::CharSpan("exampleVendorName1", strlen("exampleVendorName1")));
+    return aEncoder.Encode(CharSpan("exampleVendorName1", strlen("exampleVendorName1")));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
