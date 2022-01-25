@@ -719,9 +719,9 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     chip::KeysetId prev            = 0xffff;
     bool first                     = true;
 
-    uint16_t keyset_id = 0;
+    uint16_t keyset_id            = 0;
     KeySet::SecurityPolicy policy = KeySet::SecurityPolicy::kStandard;
-    uint8_t keys_count = 0;
+    uint8_t keys_count            = 0;
     OperationalKey operational_keys[KeySet::kEpochKeysMax];
 
     KeySetData() = default;
@@ -740,7 +740,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy        = KeySet::SecurityPolicy::kStandard;
+        policy     = KeySet::SecurityPolicy::kStandard;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
         next = 0xffff;
@@ -764,7 +764,8 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
                 ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item));
                 ReturnErrorOnFailure(writer.Put(TagStartTime(), static_cast<uint64_t>(key.start_time)));
                 ReturnErrorOnFailure(writer.Put(TagKeyHash(), key.hash));
-                ReturnErrorOnFailure(writer.Put(TagKeyValue(), ByteSpan(key.value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)));
+                ReturnErrorOnFailure(
+                    writer.Put(TagKeyValue(), ByteSpan(key.value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)));
                 ReturnErrorOnFailure(writer.EndContainer(item));
             }
             ReturnErrorOnFailure(writer.EndContainer(array));
@@ -1576,13 +1577,13 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     // Search existing keyset
     bool found = keyset.Find(mStorage, fabric, in_keyset.keyset_id);
 
-    keyset.keyset_id     = in_keyset.keyset_id;
-    keyset.policy        = in_keyset.policy;
+    keyset.keyset_id  = in_keyset.keyset_id;
+    keyset.policy     = in_keyset.policy;
     keyset.keys_count = in_keyset.num_keys_used;
     memset(keyset.operational_keys, 0x00, sizeof(keyset.operational_keys));
 
     // Store the operational keys and hash instead of the epoch keys
-    for(size_t i = 0; i < in_keyset.num_keys_used; ++i)
+    for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         MutableByteSpan key(keyset.operational_keys[i].value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
@@ -1839,13 +1840,13 @@ size_t GroupDataProviderImpl::GroupSessionIteratorImpl::Count()
 
             // Group found, get the keyset
             KeySetData keyset;
-            if (! keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id))
+            if (!keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id))
             {
                 break;
             }
             for (uint16_t k = 0; k < keyset.keys_count; ++k)
             {
-                if(keyset.operational_keys[k].hash == mSessionId)
+                if (keyset.operational_keys[k].hash == mSessionId)
                 {
                     count++;
                 }
@@ -1885,7 +1886,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         KeySetData keyset;
         VerifyOrReturnError(keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id), false);
 
-        if(mKeyIndex >= keyset.keys_count)
+        if (mKeyIndex >= keyset.keys_count)
         {
             // No more keys in current keyset, try next
             mMapping = mapping.next;
@@ -1894,8 +1895,8 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
             continue;
         }
 
-        OperationalKey &key = keyset.operational_keys[mKeyIndex++];
-        if(key.hash == mSessionId)
+        OperationalKey & key = keyset.operational_keys[mKeyIndex++];
+        if (key.hash == mSessionId)
         {
             mKey.SetKey(ByteSpan(key.value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
             output.fabric_index = fabric.fabric_index;

@@ -99,7 +99,7 @@ static KeySet kKeySet1(kKeysetId1, KeySet::SecurityPolicy::kLowLatency, 1);
 static KeySet kKeySet2(kKeysetId2, KeySet::SecurityPolicy::kLowLatency, 2);
 static KeySet kKeySet3(kKeysetId3, KeySet::SecurityPolicy::kStandard, 3);
 
-uint8_t kZeroKeys[KeySet::kEpochKeysMax][EpochKey::kLengthBytes] = { {0}, {0}, {0} };
+uint8_t kZeroKeys[KeySet::kEpochKeysMax][EpochKey::kLengthBytes] = { { 0 }, { 0 }, { 0 } };
 
 class TestListener : public GroupDataProvider::GroupListener
 {
@@ -1010,12 +1010,10 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keys.num_keys_used);
     NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
 
-
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keys));
     NL_TEST_ASSERT(apSuite, kKeySet1.policy == keys.policy);
     NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keys.num_keys_used);
     NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
-
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keys));
     NL_TEST_ASSERT(apSuite, kKeySet0.policy == keys.policy);
