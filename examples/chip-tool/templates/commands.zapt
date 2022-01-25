@@ -335,7 +335,7 @@ public:
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("report-event")
+    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("subscribe-event")
     {
         AddArgument("event-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -462,7 +462,7 @@ private:
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("report")
+    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("subscribe")
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
