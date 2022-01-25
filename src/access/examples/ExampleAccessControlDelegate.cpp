@@ -1142,6 +1142,12 @@ public:
                         EntryStorage::ConvertIndex(*index, *fabricIndex, EntryStorage::ConvertDirection::kAbsoluteToRelative);
                     }
                 }
+
+                CHIP_ERROR saveError = SaveToFlash();
+                if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
+                {
+                    ChipLogDetail(DataManagement, "CreateEntry failed to save to flash");
+                }
             }
             return err;
         }
@@ -1166,7 +1172,16 @@ public:
     {
         if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
-            return Copy(entry, *storage);
+            CHIP_ERROR err = Copy(entry, *storage);
+            if (err == CHIP_NO_ERROR)
+            {
+                CHIP_ERROR saveError = SaveToFlash();
+                if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
+                {
+                    ChipLogDetail(DataManagement, "UpdateEntry failed to save to flash");
+                }
+            }
+            return err;
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -1201,6 +1216,12 @@ public:
             for (auto & delegate : EntryIteratorDelegate::pool)
             {
                 delegate.FixAfterDelete(*storage);
+            }
+
+            CHIP_ERROR saveError = SaveToFlash();
+            if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
+            {
+                ChipLogDetail(DataManagement, "DeleteEntry failed to save to flash");
             }
             return CHIP_NO_ERROR;
         }
