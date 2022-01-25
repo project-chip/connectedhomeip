@@ -304,6 +304,14 @@ namespace TestEvent {
 static constexpr EventId Id = 0x00000001;
 } // namespace TestEvent
 
+namespace TestFabricScopedEvent {
+static constexpr EventId Id = 0x00000002;
+} // namespace TestFabricScopedEvent
+
+namespace TestNullableFabricScopedEvent {
+static constexpr EventId Id = 0x00000003;
+} // namespace TestNullableFabricScopedEvent
+
 } // namespace Events
 } // namespace TestCluster
 

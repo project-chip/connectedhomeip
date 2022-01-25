@@ -15054,11 +15054,22 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
+                                                                            chip::app::CommandSender * commandObj, uint64_t value);
+/**
  * @brief Test Cluster Cluster TestListNestedStructListArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestNullableFabricScopedEventResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEmitTestNullableFabricScopedEventResponseCallback(chip::EndpointId endpoint,
+                                                                                    chip::app::CommandSender * commandObj,
+                                                                                    uint64_t value);
 /**
  * @brief Test Cluster Cluster TestListInt8UReverseRequest Command callback (from client)
  */
@@ -15107,6 +15118,18 @@ bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestNullableFabricScopedEventRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEmitTestNullableFabricScopedEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestNullableFabricScopedEventRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
