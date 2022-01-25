@@ -52,10 +52,7 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
     readParams.mpAttributePathParamsList    = &attributePath;
     readParams.mAttributePathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadAttributeCallback<DecodableAttributeType> * callback) {
-        chip::Platform::Delete(apReadClient);
-        chip::Platform::Delete(callback);
-    };
+    auto onDone = [](TypedReadAttributeCallback<DecodableAttributeType> * callback) { chip::Platform::Delete(callback); };
 
     auto callback = chip::Platform::MakeUnique<TypedReadAttributeCallback<DecodableAttributeType>>(
         clusterId, attributeId, readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
@@ -71,8 +68,8 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
     // of the read operation to permit us to free up the callback object. So, release ownership of the callback
     // object now to prevent it from being reclaimed at the end of this scoped block.
     //
+    callback->AdoptReadClient(std::move(readClient));
     callback.release();
-    readClient.release();
 
     return err;
 }
@@ -186,10 +183,7 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventType> * callback) {
-        chip::Platform::Delete(apReadClient);
-        chip::Platform::Delete(callback);
-    };
+    auto onDone = [](TypedReadEventCallback<DecodableEventType> * callback) { chip::Platform::Delete(callback); };
 
     auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(
         readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
@@ -204,7 +198,7 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     // of the read operation to permit us to free up the callback object. So, release ownership of the callback
     // object now to prevent it from being reclaimed at the end of this scoped block.
     //
-    callback.release();
+    callback->AdoptReadClient(std::move(readClient));
     readClient.release();
 
     return err;
