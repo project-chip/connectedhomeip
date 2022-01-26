@@ -22,7 +22,6 @@
 #include "AppPlatformShellCommands.h"
 #include "ControllerShellCommands.h"
 #include <AppMain.h>
-#include <app/app-platform/ContentAppPlatform.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -33,8 +32,14 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 using namespace ::chip::Controller;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::app::Clusters;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

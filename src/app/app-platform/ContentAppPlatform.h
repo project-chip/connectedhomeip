@@ -30,8 +30,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 
 namespace chip {
@@ -130,4 +128,3 @@ protected:
 
 } // namespace AppPlatform
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

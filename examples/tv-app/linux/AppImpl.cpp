@@ -43,9 +43,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
-using namespace chip::AppPlatform;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
 
 namespace chip {
 namespace AppPlatform {
