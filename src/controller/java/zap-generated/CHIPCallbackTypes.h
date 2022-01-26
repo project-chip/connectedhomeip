@@ -513,6 +513,10 @@ typedef void (*CHIPGroupsClusterViewGroupResponseCallbackType)(
 
 typedef void (*CHIPGroupsClusterNameSupportAttributeCallbackType)(
     void *, chip::app::Clusters::Groups::Attributes::NameSupport::TypeInfo::DecodableArgType);
+typedef void (*CHIPGroupsClusterServerGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Groups::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPGroupsClusterClientGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Groups::Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGroupsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Groups::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPGroupsClusterClusterRevisionAttributeCallbackType)(
@@ -524,6 +528,10 @@ typedef void (*CHIPIdentifyClusterIdentifyTimeAttributeCallbackType)(
     void *, chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo::DecodableArgType);
 typedef void (*CHIPIdentifyClusterIdentifyTypeAttributeCallbackType)(
     void *, chip::app::Clusters::Identify::Attributes::IdentifyType::TypeInfo::DecodableArgType);
+typedef void (*CHIPIdentifyClusterServerGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Identify::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPIdentifyClusterClientGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Identify::Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPIdentifyClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Identify::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPIdentifyClusterClusterRevisionAttributeCallbackType)(
@@ -885,6 +893,10 @@ typedef void (*CHIPScenesClusterSceneValidAttributeCallbackType)(
     void *, chip::app::Clusters::Scenes::Attributes::SceneValid::TypeInfo::DecodableArgType);
 typedef void (*CHIPScenesClusterNameSupportAttributeCallbackType)(
     void *, chip::app::Clusters::Scenes::Attributes::NameSupport::TypeInfo::DecodableArgType);
+typedef void (*CHIPScenesClusterServerGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPScenesClusterClientGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPScenesClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Scenes::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPScenesClusterClusterRevisionAttributeCallbackType)(

@@ -23980,6 +23980,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NameSupport                                                       | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -24198,6 +24200,150 @@ private:
 };
 
 /*
+ * Attribute ServerGeneratedCommandList
+ */
+class ReadGroupsServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadGroupsServerGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGroupsServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::GroupsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Groups::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "Groups.ServerGeneratedCommandList response", value);
+    }
+};
+
+class ReportGroupsServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportGroupsServerGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGroupsServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::GroupsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Groups::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("Groups.ServerGeneratedCommandList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClientGeneratedCommandList
+ */
+class ReadGroupsClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadGroupsClientGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGroupsClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReadAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::GroupsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Groups::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "Groups.ClientGeneratedCommandList response", value);
+    }
+};
+
+class ReportGroupsClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportGroupsClientGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGroupsClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::GroupsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Groups::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("Groups.ClientGeneratedCommandList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute AttributeList
  */
 class ReadGroupsAttributeList : public ModelCommand
@@ -24349,6 +24495,8 @@ private:
 | Attributes:                                                         |        |
 | * IdentifyTime                                                      | 0x0000 |
 | * IdentifyType                                                      | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -24583,6 +24731,150 @@ public:
     }
 
     static void OnValueReport(void * context, uint8_t value) { LogValue("Identify.IdentifyType report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ServerGeneratedCommandList
+ */
+class ReadIdentifyServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadIdentifyServerGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadIdentifyServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Identify::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "Identify.ServerGeneratedCommandList response", value);
+    }
+};
+
+class ReportIdentifyServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportIdentifyServerGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportIdentifyServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Identify::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("Identify.ServerGeneratedCommandList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClientGeneratedCommandList
+ */
+class ReadIdentifyClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadIdentifyClientGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadIdentifyClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReadAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Identify::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "Identify.ClientGeneratedCommandList response", value);
+    }
+};
+
+class ReportIdentifyClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportIdentifyClientGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportIdentifyClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Identify::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("Identify.ClientGeneratedCommandList report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -38696,6 +38988,8 @@ private:
 | * CurrentGroup                                                      | 0x0002 |
 | * SceneValid                                                        | 0x0003 |
 | * NameSupport                                                       | 0x0004 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -39217,6 +39511,150 @@ public:
     }
 
     static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.NameSupport report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ServerGeneratedCommandList
+ */
+class ReadScenesServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadScenesServerGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadScenesServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ScenesCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "Scenes.ServerGeneratedCommandList response", value);
+    }
+};
+
+class ReportScenesServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportScenesServerGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportScenesServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ScenesCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Scenes::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("Scenes.ServerGeneratedCommandList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClientGeneratedCommandList
+ */
+class ReadScenesClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadScenesClientGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadScenesClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReadAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ScenesCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "Scenes.ClientGeneratedCommandList response", value);
+    }
+};
+
+class ReportScenesClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportScenesClientGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportScenesClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ScenesCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Scenes::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("Scenes.ClientGeneratedCommandList report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -61664,18 +62102,22 @@ void registerClusterGroups(Commands & commands)
     const char * clusterName = "Groups";
 
     commands_list clusterCommands = {
-        make_unique<GroupsAddGroup>(),              //
-        make_unique<GroupsAddGroupIfIdentifying>(), //
-        make_unique<GroupsGetGroupMembership>(),    //
-        make_unique<GroupsRemoveAllGroups>(),       //
-        make_unique<GroupsRemoveGroup>(),           //
-        make_unique<GroupsViewGroup>(),             //
-        make_unique<ReadGroupsNameSupport>(),       //
-        make_unique<ReportGroupsNameSupport>(),     //
-        make_unique<ReadGroupsAttributeList>(),     //
-        make_unique<ReportGroupsAttributeList>(),   //
-        make_unique<ReadGroupsClusterRevision>(),   //
-        make_unique<ReportGroupsClusterRevision>(), //
+        make_unique<GroupsAddGroup>(),                         //
+        make_unique<GroupsAddGroupIfIdentifying>(),            //
+        make_unique<GroupsGetGroupMembership>(),               //
+        make_unique<GroupsRemoveAllGroups>(),                  //
+        make_unique<GroupsRemoveGroup>(),                      //
+        make_unique<GroupsViewGroup>(),                        //
+        make_unique<ReadGroupsNameSupport>(),                  //
+        make_unique<ReportGroupsNameSupport>(),                //
+        make_unique<ReadGroupsServerGeneratedCommandList>(),   //
+        make_unique<ReportGroupsServerGeneratedCommandList>(), //
+        make_unique<ReadGroupsClientGeneratedCommandList>(),   //
+        make_unique<ReportGroupsClientGeneratedCommandList>(), //
+        make_unique<ReadGroupsAttributeList>(),                //
+        make_unique<ReportGroupsAttributeList>(),              //
+        make_unique<ReadGroupsClusterRevision>(),              //
+        make_unique<ReportGroupsClusterRevision>(),            //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -61685,18 +62127,22 @@ void registerClusterIdentify(Commands & commands)
     const char * clusterName = "Identify";
 
     commands_list clusterCommands = {
-        make_unique<IdentifyIdentify>(),              //
-        make_unique<IdentifyIdentifyQuery>(),         //
-        make_unique<IdentifyTriggerEffect>(),         //
-        make_unique<ReadIdentifyIdentifyTime>(),      //
-        make_unique<WriteIdentifyIdentifyTime>(),     //
-        make_unique<ReportIdentifyIdentifyTime>(),    //
-        make_unique<ReadIdentifyIdentifyType>(),      //
-        make_unique<ReportIdentifyIdentifyType>(),    //
-        make_unique<ReadIdentifyAttributeList>(),     //
-        make_unique<ReportIdentifyAttributeList>(),   //
-        make_unique<ReadIdentifyClusterRevision>(),   //
-        make_unique<ReportIdentifyClusterRevision>(), //
+        make_unique<IdentifyIdentify>(),                         //
+        make_unique<IdentifyIdentifyQuery>(),                    //
+        make_unique<IdentifyTriggerEffect>(),                    //
+        make_unique<ReadIdentifyIdentifyTime>(),                 //
+        make_unique<WriteIdentifyIdentifyTime>(),                //
+        make_unique<ReportIdentifyIdentifyTime>(),               //
+        make_unique<ReadIdentifyIdentifyType>(),                 //
+        make_unique<ReportIdentifyIdentifyType>(),               //
+        make_unique<ReadIdentifyServerGeneratedCommandList>(),   //
+        make_unique<ReportIdentifyServerGeneratedCommandList>(), //
+        make_unique<ReadIdentifyClientGeneratedCommandList>(),   //
+        make_unique<ReportIdentifyClientGeneratedCommandList>(), //
+        make_unique<ReadIdentifyAttributeList>(),                //
+        make_unique<ReportIdentifyAttributeList>(),              //
+        make_unique<ReadIdentifyClusterRevision>(),              //
+        make_unique<ReportIdentifyClusterRevision>(),            //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -62287,27 +62733,31 @@ void registerClusterScenes(Commands & commands)
     const char * clusterName = "Scenes";
 
     commands_list clusterCommands = {
-        make_unique<ScenesAddScene>(),              //
-        make_unique<ScenesGetSceneMembership>(),    //
-        make_unique<ScenesRecallScene>(),           //
-        make_unique<ScenesRemoveAllScenes>(),       //
-        make_unique<ScenesRemoveScene>(),           //
-        make_unique<ScenesStoreScene>(),            //
-        make_unique<ScenesViewScene>(),             //
-        make_unique<ReadScenesSceneCount>(),        //
-        make_unique<ReportScenesSceneCount>(),      //
-        make_unique<ReadScenesCurrentScene>(),      //
-        make_unique<ReportScenesCurrentScene>(),    //
-        make_unique<ReadScenesCurrentGroup>(),      //
-        make_unique<ReportScenesCurrentGroup>(),    //
-        make_unique<ReadScenesSceneValid>(),        //
-        make_unique<ReportScenesSceneValid>(),      //
-        make_unique<ReadScenesNameSupport>(),       //
-        make_unique<ReportScenesNameSupport>(),     //
-        make_unique<ReadScenesAttributeList>(),     //
-        make_unique<ReportScenesAttributeList>(),   //
-        make_unique<ReadScenesClusterRevision>(),   //
-        make_unique<ReportScenesClusterRevision>(), //
+        make_unique<ScenesAddScene>(),                         //
+        make_unique<ScenesGetSceneMembership>(),               //
+        make_unique<ScenesRecallScene>(),                      //
+        make_unique<ScenesRemoveAllScenes>(),                  //
+        make_unique<ScenesRemoveScene>(),                      //
+        make_unique<ScenesStoreScene>(),                       //
+        make_unique<ScenesViewScene>(),                        //
+        make_unique<ReadScenesSceneCount>(),                   //
+        make_unique<ReportScenesSceneCount>(),                 //
+        make_unique<ReadScenesCurrentScene>(),                 //
+        make_unique<ReportScenesCurrentScene>(),               //
+        make_unique<ReadScenesCurrentGroup>(),                 //
+        make_unique<ReportScenesCurrentGroup>(),               //
+        make_unique<ReadScenesSceneValid>(),                   //
+        make_unique<ReportScenesSceneValid>(),                 //
+        make_unique<ReadScenesNameSupport>(),                  //
+        make_unique<ReportScenesNameSupport>(),                //
+        make_unique<ReadScenesServerGeneratedCommandList>(),   //
+        make_unique<ReportScenesServerGeneratedCommandList>(), //
+        make_unique<ReadScenesClientGeneratedCommandList>(),   //
+        make_unique<ReportScenesClientGeneratedCommandList>(), //
+        make_unique<ReadScenesAttributeList>(),                //
+        make_unique<ReportScenesAttributeList>(),              //
+        make_unique<ReadScenesClusterRevision>(),              //
+        make_unique<ReportScenesClusterRevision>(),            //
     };
 
     commands.Register(clusterName, clusterCommands);
