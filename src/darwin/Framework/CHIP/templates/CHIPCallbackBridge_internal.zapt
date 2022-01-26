@@ -60,7 +60,7 @@ typedef void (*Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#if isList}}
+{{#if isArray}}
 {{#>CHIPCallbackBridge header="1" ns=parent.name                                }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/CHIPCallbackBridge}}
 {{/if}}
 {{/chip_server_cluster_attributes}}

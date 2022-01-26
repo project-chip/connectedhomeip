@@ -236,7 +236,7 @@ public class ClusterInfoMapping {
 
   {{/chip_cluster_responses}}
       {{#chip_server_cluster_attributes}}
-      {{#if isList}}
+      {{#if isArray}}
       {{#if isStruct}}
 
       {{/if}}
