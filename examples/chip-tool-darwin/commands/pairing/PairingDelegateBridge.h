@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,15 @@
  *   limitations under the License.
  *
  */
+#pragma once
+#include "PairingCommandBridge.h"
 
-#import <CHIP/CHIP.h>
-#import <Foundation/Foundation.h>
 
-int main(int argc, const char * argv[]) { return EXIT_SUCCESS; }
+@interface CHIPToolPairingDelegate : NSObject <CHIPDevicePairingDelegate>
+@property PairingCommandBridge * commandBridge;
+@property chip::NodeId deviceID;
+- (void)onPairingComplete:(NSError *)error;
+- (void)onPairingDeleted:(NSError *)error;
+- (void)onCommissioningComplete:(NSError *)error;
+
+@end
