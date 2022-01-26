@@ -27,7 +27,7 @@ namespace app {
 namespace DataModel {
 
 /**
- * IsFabricScoped checks whether the given type is fabric scoped, non-basic types (i.e. cluster objects), should provide a
+ * IsFabricScoped checks whether the given type is fabric scoped.  Non-basic types (i.e. cluster objects), should provide a
  * static constexpr indicating whether the type is a fabric scoped struct, and basic types will never be fabric scoped.
  *
  * Using IsFabricScoped<X>::value without a basic type or cluster object with kIsFabricScoped will cause a compile error.  This is
