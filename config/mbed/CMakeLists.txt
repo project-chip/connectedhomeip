@@ -279,6 +279,10 @@ if (CONFIG_CHIP_PW_RPC)
     chip_gn_arg_bool  ("chip_build_pw_rpc_lighting_proto"     CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
     chip_gn_arg_bool  ("chip_build_pw_rpc_locking_proto"      CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 endif(CONFIG_CHIP_PW_RPC)
+if (CONFIG_CHIP_OTA_REQUESTOR)
+    chip_gn_arg_bool  ("chip_enable_ota_requestor"            CONFIG_CHIP_OTA_REQUESTOR)
+endif(CONFIG_CHIP_OTA_REQUESTOR)
+
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 
@@ -324,6 +328,12 @@ list(APPEND CHIP_INCLUDES)
 
 # CHIP defines
 list(APPEND CHIP_DEFINES)
+
+# Target specific configuration
+if("capsense" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ${CMAKE_BINARY_DIR}/capsense_build)
+    target_link_libraries(${APP_TARGET} capsense)
+endif()
 
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
@@ -441,6 +451,67 @@ if (CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 endif(CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 
 endif(CONFIG_CHIP_PW_RPC)
+
+if (CONFIG_CHIP_OTA_REQUESTOR)
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor
+        ${CHIP_ROOT}/src/platform
+        ${CHIP_ROOT}/src/platform/mbed
+        ${CHIP_ROOT}/src/include/platform
+    )
+
+    target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
+
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+
+        ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
+    )
+
+    list(APPEND CHIP_DEFINES 
+        CHIP_OTA_REQUESTOR=1
+    )
+endif(CONFIG_CHIP_OTA_REQUESTOR)
+
+if(BOOT_ENABLED)
+    add_subdirectory(${MCUBOOT_PATH}/boot/bootutil/ ${CMAKE_BINARY_DIR}/mbed_mcu_boot_util_build)
+    add_subdirectory(${MCUBOOT_PATH}/boot/mbed/ ${CMAKE_BINARY_DIR}/mbed_mcu_boot_build)
+
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${MCUBOOT_PATH}/boot/mbed/include
+    )
+
+    target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/examples/platform/mbed/bootloader/default_bd.cpp
+    )
+
+    target_include_directories(bootutil PUBLIC
+                           ${CHIP_ROOT}/config/mbed/mbedtls
+    )
+
+    target_link_libraries(${APP_TARGET} mbed-mcuboot bootutil)
+
+    file(READ ${APP_PATH}/mbed_app.json mbedAppJson)
+    string(JSON PRIMARY_SLOT_ADDRESS GET "${mbedAppJson}" target_overrides ${MBED_TARGET} mcuboot.primary-slot-address)
+    string(JSON HEADER_SIZE GET "${mbedAppJson}" target_overrides ${MBED_TARGET} mcuboot.header-size)
+    string(JSON SLOT_SIZE GET "${mbedAppJson}" target_overrides ${MBED_TARGET} mcuboot.slot-size)
+    math(EXPR APP_START "${PRIMARY_SLOT_ADDRESS} + ${HEADER_SIZE}" OUTPUT_FORMAT HEXADECIMAL)
+    math(EXPR APP_SIZE "${SLOT_SIZE} - 2 * ${HEADER_SIZE}" OUTPUT_FORMAT HEXADECIMAL)
+    target_compile_definitions(mbed-core
+        INTERFACE
+            "-DMBED_APP_START=${APP_START}"
+            "-DMBED_APP_SIZE=${APP_SIZE}"
+    )
+
+    list(APPEND CHIP_DEFINES 
+        BOOT_ENABLED=1
+    )
+endif()
 
 
 target_include_directories(${APP_TARGET} PRIVATE 

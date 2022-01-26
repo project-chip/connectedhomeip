@@ -23,6 +23,8 @@ bitstring==3.1.7
     # via -r requirements.esp32.txt
 brotli==1.0.9
     # via flask-compress
+cbor==1.0.0
+    # via -r requirements.txt
 certifi==2021.5.30
     # via requests
 cffi==1.14.5
@@ -287,7 +289,7 @@ wcwidth==0.2.5
     #   prompt-toolkit
 werkzeug==0.16.1
     # via flask
-west==0.11.0
+west==0.12.0
     # via -r requirements.txt
 wheel==0.36.2
     # via -r requirements.txt

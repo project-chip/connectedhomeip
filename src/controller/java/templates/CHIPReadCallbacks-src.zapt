@@ -116,7 +116,7 @@ CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::
 }
 {{/if_in_global_responses}}
 
-{{#if isList}}
+{{#if isArray}}
 void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
     chip::DeviceLayer::StackUnlock unlock;

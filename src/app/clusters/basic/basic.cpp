@@ -362,7 +362,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
     if (ConfigurationMgr().GetNodeLabel(nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
     {
-        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan(nodeLabel, strlen(nodeLabel)));
+        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan::fromCharString(nodeLabel));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
     }
 
@@ -373,17 +373,17 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         if (codeLen == 0)
         {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+            status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString("XX"));
         }
         else
         {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
+            status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString(location));
         }
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
     }
     else
     {
-        status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+        status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString("XX"));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
     }
 

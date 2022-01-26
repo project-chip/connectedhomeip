@@ -325,6 +325,13 @@ bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketH
 
 void ExchangeContext::OnSessionReleased()
 {
+    if (mFlags.Has(Flags::kFlagClosed))
+    {
+        // Exchange is already being closed. It may occur when closing an exchange after sending
+        // RemoveFabric response which triggers removal of all sessions for the given fabric.
+        return;
+    }
+
     ExchangeHandle ref(*this);
 
     if (IsResponseExpected())

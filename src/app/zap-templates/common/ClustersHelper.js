@@ -218,7 +218,7 @@ function asChipCallback(item)
     return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
-  if (item.isList) {
+  if (item.isArray) {
     return { name : 'List', type : null };
   }
 
@@ -301,7 +301,6 @@ function handleList(item, [ atomics, enums, bitmaps, structs ])
     throw new Error(item.label, 'List[T] is missing type "T" information');
   }
 
-  item.isList  = true;
   item.isArray = true;
   item.type    = entryType;
   enhancedItem(item, [ atomics, enums, bitmaps, structs ]);
@@ -458,7 +457,6 @@ function enhancedEvents(events, types)
     const argument = {
       name : event.name,
       type : event.name,
-      isList : false,
       isArray : false,
       isEvent : true,
       isNullable : false,
@@ -484,8 +482,7 @@ function enhancedAttributes(attributes, globalAttributes, types)
       name : attribute.name,
       type : attribute.type,
       size : attribute.size,
-      isList : attribute.isList,
-      isArray : attribute.isList,
+      isArray : attribute.isArray,
       isEvent : false,
       isNullable : attribute.isNullable,
       chipType : attribute.chipType,
