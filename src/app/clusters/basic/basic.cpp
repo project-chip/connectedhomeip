@@ -101,7 +101,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case ProductName::Id: {
         constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
         char productName[kMaxLen + 1] = { 0 };
-        status                        = ConfigurationMgr().GetVendorName(productName, sizeof(productName));
+        status                        = ConfigurationMgr().GetProductName(productName, sizeof(productName));
         status                        = EncodeStringOnSuccess(status, aEncoder, productName, kMaxLen);
         break;
     }
