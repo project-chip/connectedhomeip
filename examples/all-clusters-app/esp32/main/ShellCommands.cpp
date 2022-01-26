@@ -36,7 +36,7 @@ void OnOffCommands::Register()
 
 Callback::Callback<OnDeviceConnected> CASECommands::sOnConnectedCallback(CASECommands::OnConnected, nullptr);
 Callback::Callback<OnDeviceConnectionFailure> CASECommands::sOnConnectionFailureCallback(CASECommands::OnConnectionFailure,
-                                                            nullptr);
+                                                                                         nullptr);
 Shell::Engine CASECommands::sSubShell;
 void CASECommands::Register()
 {

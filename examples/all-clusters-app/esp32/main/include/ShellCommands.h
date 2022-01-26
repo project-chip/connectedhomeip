@@ -23,8 +23,8 @@
 #include <app/server/Server.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/shell/Engine.h>
 #include <lib/shell/Commands.h>
+#include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -128,7 +128,8 @@ public:
     void SetFabricInfo(FabricInfo * fabricInfo) { mFabricInfo = fabricInfo; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
     FabricInfo * GetFabricInfo(void) { return mFabricInfo; }
-    NodeId GetNodeId(void) {return mNodeId; }
+    NodeId GetNodeId(void) { return mNodeId; }
+
 private:
     CASECommands() {}
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
@@ -143,7 +144,7 @@ private:
 
     static void ConnectToNode(intptr_t arg)
     {
-        CASECommands * caseCommand             = reinterpret_cast<CASECommands *>(arg);
+        CASECommands * caseCommand              = reinterpret_cast<CASECommands *>(arg);
         Server * server                         = &(chip::Server::GetInstance());
         CASESessionManager * caseSessionManager = server->GetCASESessionManager();
         if (caseSessionManager == nullptr)
@@ -158,7 +159,7 @@ private:
     static CHIP_ERROR ConnectToNodeHandler(int argc, char ** argv)
     {
         const FabricIndex fabricIndex = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-        FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        FabricInfo * fabricInfo       = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
 
         if (fabricInfo == nullptr)
         {
@@ -192,7 +193,7 @@ private:
     static Callback::Callback<OnDeviceConnectionFailure> sOnConnectionFailureCallback;
     static Shell::Engine sSubShell;
     FabricInfo * mFabricInfo = nullptr;
-    NodeId mNodeId = 0;
+    NodeId mNodeId           = 0;
 };
 
 } // namespace Shell
