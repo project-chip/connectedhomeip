@@ -51,4 +51,3 @@ target_cxx=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-li
 target_ar=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
 
 ninja -C "$2"
-
