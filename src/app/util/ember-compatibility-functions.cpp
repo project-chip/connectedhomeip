@@ -22,6 +22,7 @@
  */
 
 #include <access/AccessControl.h>
+#include <access/RequiredPrivilege.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
@@ -386,9 +387,10 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-        Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        Access::Privilege requestPrivilege =
+            Access::RequiredPrivilege::ForReadAttribute(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        err            = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
@@ -818,9 +820,10 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        Access::Privilege requestPrivilege =
+            Access::RequiredPrivilege::ForWriteAttribute(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        err            = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
