@@ -213,9 +213,17 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
 
 {{/if}}
     {{#unless async}}
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    {{#*inline "minCommandTimeout"~}}
+      {{#if (isTestOnlyCluster cluster)~}}
+        {{#if (isStrEqual command "WaitForMs")~}}
+          {{#chip_tests_item_parameters}}{{#if (isStrEqual name "ms")}}({{definedValue}} / 1000) + {{/if}}{{/chip_tests_item_parameters}}
+        {{~/if}}
+      {{~/if}}
+    {{~/inline}}
+    [self waitForExpectationsWithTimeout:{{#if stepTimeoutSecs}}{{stepTimeoutSecs}}{{else}}{{> minCommandTimeout}}kTimeoutInSeconds{{/if}} handler:nil];
     {{/unless}}
 }
 {{/chip_tests_items}}
 
 {{/chip_tests}}
+
