@@ -29,6 +29,8 @@
 
 #include "spake2p.h"
 
+#include <errno.h>
+
 #include <CHIPVersion.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
