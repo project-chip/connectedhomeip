@@ -82,7 +82,10 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+#include <OnOffCommands.h>
+
 using namespace ::chip;
+using namespace ::chip::Shell;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -514,6 +517,12 @@ void SetupPretendDevices()
     AddCluster("Occupancy Sensor");
     AddAttribute("Occupancy", "1");
     app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
+
+    AddDevice("Contact Sensor");
+    AddEndpoint("External");
+    AddCluster("Contact Sensor");
+    AddAttribute("BooleanState", "true");
+    app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
 }
 
 WiFiWidget pairingWindowLED;
@@ -587,6 +596,8 @@ extern "C" void app_main()
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
+    OnOffCommands & onOffCommands = OnOffCommands::GetInstance();
+    onOffCommands.Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
 #if CONFIG_OPENTHREAD_ENABLED

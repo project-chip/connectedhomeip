@@ -73,18 +73,6 @@ public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
-    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
-    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
-    bool HasWiFiCredentials() const { return mWiFiCreds.HasValue(); }
-    bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
-    bool HasNOCChainGenerationaParameters() const { return mNOCChainGenerationParameters.HasValue(); }
-    bool HasRootCert() const { return mRootCert.HasValue(); }
-    bool HasNoc() const { return mNoc.HasValue(); }
-    bool HasIcac() const { return mIcac.HasValue(); }
-    bool HasAttestationElements() const { return mAttestationElements.HasValue(); }
-    bool HasAttestationSignature() const { return mAttestationSignature.HasValue(); }
-    bool HasPAI() const { return mPAI.HasValue(); }
-    bool HasDAC() const { return mDAC.HasValue(); }
     uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
@@ -94,6 +82,11 @@ public:
     const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
     const Optional<ByteSpan> GetNoc() const { return mNoc; }
     const Optional<ByteSpan> GetIcac() const { return mIcac; }
+    const Optional<AesCcm128KeySpan> GetIpk() const
+    {
+        return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>();
+    }
+    const Optional<NodeId> GetAdminSubject() const { return mAdminSubject; }
     const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
     const Optional<ByteSpan> GetPAI() const { return mPAI; }
@@ -156,6 +149,16 @@ public:
         mIcac.SetValue(icac);
         return *this;
     }
+    CommissioningParameters & SetIpk(const AesCcm128KeySpan ipk)
+    {
+        mIpk.SetValue(AesCcm128Key(ipk));
+        return *this;
+    }
+    CommissioningParameters & SetAdminSubject(const NodeId adminSubject)
+    {
+        mAdminSubject.SetValue(adminSubject);
+        return *this;
+    }
     CommissioningParameters & SetAttestationElements(const ByteSpan & attestationElements)
     {
         mAttestationElements = MakeOptional(attestationElements);
@@ -188,6 +191,8 @@ private:
     Optional<ByteSpan> mRootCert;
     Optional<ByteSpan> mNoc;
     Optional<ByteSpan> mIcac;
+    Optional<AesCcm128Key> mIpk;
+    Optional<NodeId> mAdminSubject;
     Optional<ByteSpan> mAttestationElements;
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
@@ -212,10 +217,14 @@ struct AttestationResponse
 
 struct NocChain
 {
-    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac) : noc(newNoc), icac(newIcac), rcac(newRcac) {}
+    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) :
+        noc(newNoc), icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject)
+    {}
     ByteSpan noc;
     ByteSpan icac;
     ByteSpan rcac;
+    AesCcm128KeySpan ipk;
+    NodeId adminSubject;
 };
 
 struct OperationalNodeFoundData

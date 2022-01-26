@@ -39,7 +39,7 @@ void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsD
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
-    if (params.HasThreadOperationalDataset())
+    if (params.GetThreadOperationalDataset().HasValue())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
         if (dataset.size() > CommissioningParameters::kMaxThreadDatasetLen)
@@ -51,7 +51,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         ChipLogProgress(Controller, "Setting thread operational dataset from parameters");
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
     }
-    if (params.HasWiFiCredentials())
+    if (params.GetWiFiCredentials().HasValue())
     {
         WiFiCredentials creds = params.GetWiFiCredentials().Value();
         if (creds.ssid.size() > CommissioningParameters::kMaxSsidLen ||
@@ -67,7 +67,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
     // If the AttestationNonce is passed in, using that else using a random one..
-    if (params.HasAttestationNonce())
+    if (params.GetAttestationNonce().HasValue())
     {
         ChipLogProgress(Controller, "Setting attestation nonce from parameters");
         VerifyOrReturnError(params.GetAttestationNonce().Value().size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
@@ -80,7 +80,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
-    if (params.HasCSRNonce())
+    if (params.GetCSRNonce().HasValue())
     {
         ChipLogProgress(Controller, "Setting CSR nonce from parameters");
         VerifyOrReturnError(params.GetCSRNonce().Value().size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
@@ -128,11 +128,11 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-        if (mParams.HasWiFiCredentials())
+        if (mParams.GetWiFiCredentials().HasValue())
         {
             return CommissioningStage::kWiFiNetworkSetup;
         }
-        else if (mParams.HasThreadOperationalDataset())
+        else if (mParams.GetThreadOperationalDataset().HasValue())
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -145,7 +145,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 #endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
-        if (mParams.HasThreadOperationalDataset())
+        if (mParams.GetThreadOperationalDataset().HasValue())
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -154,7 +154,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.HasWiFiCredentials())
+        if (mParams.GetWiFiCredentials().HasValue())
         {
             return CommissioningStage::kWiFiNetworkEnable;
         }
@@ -164,7 +164,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
 
     case CommissioningStage::kWiFiNetworkEnable:
-        if (mParams.HasThreadOperationalDataset())
+        if (mParams.GetThreadOperationalDataset().HasValue())
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
@@ -211,7 +211,8 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
     }
 }
 
-CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac)
+CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk,
+                                               NodeId adminSubject)
 {
     // Reuse ICA Cert buffer for temporary store Root Cert.
     MutableByteSpan rootCert = MutableByteSpan(mICACertBuffer);
@@ -236,6 +237,9 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
     {
         mParams.SetIcac(ByteSpan());
     }
+
+    mParams.SetIpk(ipk);
+    mParams.SetAdminSubject(adminSubject);
 
     return CHIP_NO_ERROR;
 }
@@ -279,7 +283,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kGenerateNOCChain:
             // For NOC chain generation, we re-use the buffers. NOCChainGenerated triggers the next stage before
             // storing the returned certs, so just return here without triggering the next stage.
-            return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac);
+            return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
+                                     report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,8 +75,6 @@ public:
     CASESession();
     CASESession(CASESession &&)      = default;
     CASESession(const CASESession &) = default;
-    CASESession & operator=(const CASESession &) = default;
-    CASESession & operator=(CASESession &&) = default;
 
     virtual ~CASESession();
 

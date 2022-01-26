@@ -209,7 +209,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             NetworkInterface * ifp = new NetworkInterface();
             strncpy(ifp->Name, esp_netif_get_ifkey(ifa), Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-            ifp->name                                          = CharSpan(ifp->Name, strlen(ifp->Name));
+            ifp->name                                          = CharSpan::fromCharString(ifp->Name);
             ifp->fabricConnected                               = true;
             ifp->type                                          = GetInterfaceType(esp_netif_get_desc(ifa));
             ifp->offPremiseServicesReachableIPv4               = false;

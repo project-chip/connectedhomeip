@@ -24,7 +24,7 @@ limitations under the License.
     <item name="StackFreeMinimum" type="INT32U"/>
     <item name="StackSize" type="INT32U"/>
   </struct>
-  <struct name="SoftwareFault">
+  <struct name="SoftwareFaultStruct">
     <cluster code="0x0034"/>
     <item name="Id" type="INT64U"/>
     <item name="Name" type="CHAR_STRING" length="8"/>
@@ -45,7 +45,7 @@ limitations under the License.
     </command>
     <event side="server" code="0x00" name="SoftwareFault" priority="info" optional="true">
       <description>Indicate the last software fault that has taken place on the Node.</description>
-      <field id="0" name="SoftwareFault" type="SoftwareFault"/>
+      <field id="0" name="SoftwareFault" type="SoftwareFaultStruct"/>
     </event>    
   </cluster>
   <bitmap name="SoftwareDiagnosticsFeature" type="BITMAP32">
