@@ -405,8 +405,8 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     ConfigStatus configStatus = { .operational             = 1,
                                   .online                  = 1,
                                   .liftIsReversed          = 0,
-                                  .liftIsPA                = 1,
-                                  .tiltIsPA                = 1,
+                                  .liftIsPA                = HasFeaturePaLift(endpoint),
+                                  .tiltIsPA                = HasFeaturePaTilt(endpoint),
                                   .liftIsEncoderControlled = 1,
                                   .tiltIsEncoderControlled = 1 };
     ConfigStatusSet(endpoint, configStatus);
