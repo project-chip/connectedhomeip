@@ -282,7 +282,7 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     }
 
     ReturnErrorOnFailure(err);
-    return encoder.Encode(chip::CharSpan(buf, codeLen));
+    return aEncoder.Encode(chip::CharSpan(location, codeLen));
 }
 
 CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
