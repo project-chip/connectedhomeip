@@ -1035,7 +1035,7 @@ void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketBufferHandle bufferHandle;
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1] = {};
-    uint16_t lifetimeCounter = 0;
+    uint16_t lifetimeCounter                                            = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
@@ -1050,7 +1050,7 @@ void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
                                                                          bufferHandle, additionalDataFields);
     SuccessOrExit(err);
     p_data->msg_data.write.p_value = bufferHandle->Start();
-    p_data->msg_data.write.len = bufferHandle->DataLength();
+    p_data->msg_data.write.len     = bufferHandle->DataLength();
 
 exit:
     if (err != CHIP_NO_ERROR)
