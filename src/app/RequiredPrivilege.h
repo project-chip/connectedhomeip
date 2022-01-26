@@ -37,20 +37,10 @@ class RequiredPrivilege
     using Privilege = Access::Privilege;
 
 public:
-    static Privilege ForReadAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute);
-    static Privilege ForWriteAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute);
-    static Privilege ForInvokeCommand(ClusterId cluster, EndpointId endpoint, CommandId command);
-    static Privilege ForReadEvent(ClusterId cluster, EndpointId endpoint, EventId event);
-
-    static CHIP_ERROR OverrideForReadAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute, Privilege privilege);
-    static CHIP_ERROR OverrideForWriteAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute, Privilege privilege);
-    static CHIP_ERROR OverrideForInvokeCommand(ClusterId cluster, EndpointId endpoint, CommandId command, Privilege privilege);
-    static CHIP_ERROR OverrideForReadEvent(ClusterId cluster, EndpointId endpoint, EventId event, Privilege privilege);
-
-    static CHIP_ERROR UnoverrideForReadAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute);
-    static CHIP_ERROR UnoverrideForWriteAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute);
-    static CHIP_ERROR UnoverrideForInvokeCommand(ClusterId cluster, EndpointId endpoint, CommandId command);
-    static CHIP_ERROR UnoverrideForReadEvent(ClusterId cluster, EndpointId endpoint, EventId event);
+    static Privilege ForReadAttribute(const ConcreteAttributePath & path);
+    static Privilege ForWriteAttribute(const ConcreteAttributePath & path);
+    static Privilege ForInvokeCommand(const ConcreteCommandPath & path);
+    static Privilege ForReadEvent(const ConcreteEventPath & path);
 };
 
 } // namespace app
