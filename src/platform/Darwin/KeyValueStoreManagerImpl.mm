@@ -46,9 +46,7 @@
 @dynamic key;
 @dynamic value;
 
-- (instancetype)initWithContext:(nonnull NSManagedObjectContext *)context
-                            key:(nonnull NSString *)key
-                          value:(nonnull NSData *)value
+- (instancetype)initWithContext:(nonnull NSManagedObjectContext *)context key:(nonnull NSString *)key value:(nonnull NSData *)value
 {
     if (self = [super initWithContext:context]) {
         self.key = key;
@@ -216,14 +214,13 @@ namespace DeviceLayer {
 #if CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
                 fprintf(stderr, "GETTING VALUE FOR: '%s': ", key);
                 for (size_t i = 0; i < std::min<size_t>((item.value.length), value_size); ++i) {
-                  fprintf(stderr, "%02x ", static_cast<uint8_t*>(value)[i]);
+                    fprintf(stderr, "%02x ", static_cast<uint8_t *>(value)[i]);
                 }
                 fprintf(stderr, "\n");
 #endif
             }
 
-            if (item.value.length > value_size)
-            {
+            if (item.value.length > value_size) {
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
 
@@ -275,7 +272,7 @@ namespace DeviceLayer {
 #if CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
             fprintf(stderr, "PUT VALUE FOR: '%s': ", key);
             for (size_t i = 0; i < value_size; ++i) {
-              fprintf(stderr, "%02x ", static_cast<const uint8_t*>(value)[i]);
+                fprintf(stderr, "%02x ", static_cast<const uint8_t *>(value)[i]);
             }
             fprintf(stderr, "\n");
 #endif
