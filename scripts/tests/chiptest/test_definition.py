@@ -155,4 +155,4 @@ class TestDefinition:
         finally:
             if app_process:
                 app_process.kill()
-                app_process.wait(3)
+                app_process.wait(10)

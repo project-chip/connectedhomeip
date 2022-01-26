@@ -2060,54 +2060,6 @@ JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, BasicCluster, mfgSpecificPing)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    BasicCluster * cppCluster;
-
-    ListFreer listFreer;
-    chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type request;
-
-    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
-    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<BasicCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
 JNI_METHOD(void, BasicCluster, subscribeInteractionModelVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {

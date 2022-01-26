@@ -4831,17 +4831,6 @@ public class ClusterInfoMapping {
         "barrierControlStop", barrierControlbarrierControlStopInteractionInfo);
     commandMap.put("barrierControl", barrierControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> basicClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> basicmfgSpecificPingCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo basicmfgSpecificPingInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BasicCluster) cluster)
-                  .mfgSpecificPing((DefaultClusterCallback) callback);
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            basicmfgSpecificPingCommandParams);
-    basicClusterInteractionInfoMap.put("mfgSpecificPing", basicmfgSpecificPingInteractionInfo);
     commandMap.put("basic", basicClusterInteractionInfoMap);
     Map<String, InteractionInfo> binaryInputBasicClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("binaryInputBasic", binaryInputBasicClusterInteractionInfoMap);

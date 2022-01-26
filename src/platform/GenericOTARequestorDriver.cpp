@@ -103,6 +103,11 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     mImageProcessor->Abort();
 }
 
+void GenericOTARequestorDriver::UpdateCancelled()
+{
+    // Platform might choose to schedule a retry here
+}
+
 void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay,
                                                       System::TimerCompleteCallback action)
 {

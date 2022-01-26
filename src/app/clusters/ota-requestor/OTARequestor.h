@@ -120,13 +120,9 @@ public:
         mProviderEndpointId  = endpointId;
     }
 
-    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
-    // as the QueryImageResponse content) is preserved
-    void AbortImageUpdate();
-
-    // Application directs the Requestor to abort the download in progress. All the Requestor state is
-    // cleared, UploadState is reset to Idle
-    void AbortAndResetState();
+    // Application directs the Requestor to cancel image update in progress. All the Requestor state is
+    // cleared, UpdateState is reset to Idle
+    void CancelImageUpdate() override;
 
     // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
@@ -275,9 +271,9 @@ private:
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    NodeId mProviderNodeId                    = kUndefinedNodeId;
-    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
-    EndpointId mProviderEndpointId            = kRootEndpointId;
+    NodeId mProviderNodeId                    = kUndefinedNodeId;      // Only valid for the current update in progress
+    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex; // Only valid for the current update in progress
+    EndpointId mProviderEndpointId            = kRootEndpointId;       // Only valid for the current update in progress
     uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
