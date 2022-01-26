@@ -88,6 +88,38 @@ def attributesWithSupportedCallback(attrs, known_enum_types: List[matter_idl_typ
 
         yield attr
 
+def ClientClustersOnly(clusters: List[Cluster]):
+    for cluster in clusters:
+        if cluster.side == ClusterSide.CLIENT:
+            yield cluster
+
+def NamedFilter(choices: List, name: str):
+    print("%r %r\n" % (choices, name))
+    for choice in choices:
+        if choice.name == name:
+            return choice
+    raise Exception("No item named %s in %r" % (name, choices))
+
+def ToBoxedJavaType(field: Field):
+  if field.is_nullable:
+    return 'jobject'
+  elif field.data_type.name.lower() == 'octet_string':
+    return 'jbyteArray'
+  elif field.data_type.name.lower() == 'char_string':
+    return 'jstring'
+  else:
+    return 'jobject'
+
+def LowercaseFirst(name: str):
+  return name[0].lower() + name[1:]
+
+# FIXME: handle non-boxed types!
+#   if (useBoxedTypes) {
+#     return 'jobject';
+#   }
+#   return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(this.chipType));
+# }
+
 
 class JavaGenerator(CodeGenerator):
     """
@@ -99,11 +131,27 @@ class JavaGenerator(CodeGenerator):
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
+        self.jinja_env.filters['clientClustersOnly'] = ClientClustersOnly
+        self.jinja_env.filters['named'] = NamedFilter
+        self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
+        self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
+
 
     def internal_render_all(self):
         known_enums = self.idl.enums[:]
         for cluster in self.idl.clusters:
             known_enums.extend(cluster.enums)
+
+        # Single generation for compatibility check
+        # Split expected in a future PR
+        self.internal_render_one_output(
+            template_path="java/ChipClustersCpp.jinja",
+            output_file_name="jni/CHIPClusters.cpp",
+            vars={
+                'clusters': self.idl.clusters,
+                'known_enums': known_enums,
+            }
+        )
 
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
