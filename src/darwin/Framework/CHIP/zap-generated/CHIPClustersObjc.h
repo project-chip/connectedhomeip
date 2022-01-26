@@ -4336,6 +4336,26 @@ NS_ASSUME_NONNULL_BEGIN
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeGeneralErrorBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeGeneralErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeGeneralErrorBooleanWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClusterErrorBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeClusterErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeClusterErrorBooleanWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;

@@ -106,7 +106,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR InvokeGroupCommand(Messaging::ExchangeManager * exchangeManager, GroupId groupId, const RequestType & aRequestData)
+    CHIP_ERROR InvokeGroupCommand(Messaging::ExchangeManager * exchangeManager, FabricIndex fabric, GroupId groupId,
+                                  const RequestType & aRequestData)
     {
         app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, RequestType::GetClusterId(), RequestType::GetCommandId(),
                                                (app::CommandPathFlags::kGroupIdValid) };
@@ -116,7 +117,7 @@ public:
 
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
 
-        Optional<SessionHandle> session = exchangeManager->GetSessionManager()->CreateGroupSession(groupId);
+        Optional<SessionHandle> session = exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabric);
         if (!session.HasValue())
         {
             return CHIP_ERROR_NO_MEMORY;
@@ -231,7 +232,11 @@ CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
 
     // invoker will be deleted by the onDone call before the return of InvokeGroupCommand
     // invoker should not be used after the InvokeGroupCommand call
-    ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice->GetExchangeManager(), groupId, aRequestData));
+    //
+    //  We assume the aDevice already has a Case session which is way we can use he established Secure Session
+    ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice->GetExchangeManager(),
+                                                     aDevice->GetSecureSession().Value()->AsSecureSession()->GetFabricIndex(),
+                                                     groupId, aRequestData));
 
     //  invoker is already deleted and is not to be used
     invoker.release();

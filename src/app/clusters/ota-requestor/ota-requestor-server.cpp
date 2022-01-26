@@ -103,6 +103,11 @@ EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
     return status;
 }
 
+EmberAfStatus OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateStateEnum & value)
+{
+    return Attributes::UpdateState::Get(endpointId, &value);
+}
+
 EmberAfStatus OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -122,6 +127,11 @@ EmberAfStatus OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<
     }
 
     return status;
+}
+
+EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
+{
+    return Attributes::UpdateStateProgress::Get(endpointId, value);
 }
 
 void OtaRequestorServerOnStateTransition(DataModel::Nullable<OTAUpdateStateEnum> previousState, OTAUpdateStateEnum newState,

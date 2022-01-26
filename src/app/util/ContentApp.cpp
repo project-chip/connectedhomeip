@@ -243,7 +243,7 @@ app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type TargetNav
     ChipLogProgress(DeviceLayer, "TargetNavigator: NavigateTarget target=%d data=\"%s\"", target, data.c_str());
 
     app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type response;
-    response.data = chip::CharSpan("data response", strlen("data response"));
+    response.data = chip::CharSpan::fromCharString("data response");
 
     if (target >= mTargets.size())
     {

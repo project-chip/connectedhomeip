@@ -8,11 +8,9 @@ on:
         required: false
         type: boolean
         description: Enable, if you want to import all TODOs. Runs on checked out branch! Only use if you're sure what you are doing.
-# Disabled until I can resolve the backlog
-#   push:
-#     branches: # do not set multiple branches, todos might be added and then get referenced by themselves in case of a merge
-#       - main
-#       - master
+  push:
+    branches:
+      - master
 
 permissions:
   issues: write

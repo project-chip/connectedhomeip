@@ -37,6 +37,7 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
     CHIPErrorCodeUnsupportedAttribute = 0x86,
     CHIPErrorCodeConstraintError      = 0x87,
     CHIPErrorCodeUnsupportedWrite     = 0x88,
+    CHIPErrorCodeInvalidDataType      = 0x8D,
     CHIPErrorCodeUnsupportedCluster   = 0xC3,
 };
 // clang-format on

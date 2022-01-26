@@ -351,6 +351,7 @@ template("ti_simplelink_sdk") {
     ]
 
     defines = [
+      "INCLUDE_BGET_STATS",
       "USE_DMM",
       "FLASH_ROM_BUILD",
       "NVOCMP_FREERTOS_MUTEX=1",
