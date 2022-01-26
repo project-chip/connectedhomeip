@@ -279,7 +279,7 @@ function chip_cluster_command_arguments_with_structs_expanded(options)
   const filter = command => command.id == commandId;
   return asBlocks.call(this, commands.then(items => {
     const item = items.find(filter);
-    return item.expandedArguments || item.arguments;
+    return ((typeof item !== 'undefined') && (item.expandedArguments || item.arguments));
   }),
       options);
 }
