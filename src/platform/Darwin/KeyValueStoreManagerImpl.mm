@@ -109,9 +109,12 @@ namespace DeviceLayer {
                 return model;
             }
 
-            KeyValueItem * FindItemForKey(NSString * key, NSError ** error)
+            KeyValueItem * FindItemForKey(NSString * key, NSError ** error, BOOL returnsData)
             {
                 NSFetchRequest * request = [[NSFetchRequest alloc] initWithEntityName:@"KeyValue"];
+                if (returnsData) {
+                    [request setReturnsObjectsAsFaults:NO];
+                }
                 request.predicate = [NSPredicate predicateWithFormat:@"key = %@", key];
 
                 NSArray * result = [gContext executeFetchRequest:request error:error];
@@ -124,6 +127,8 @@ namespace DeviceLayer {
                 }
                 return (KeyValueItem *) [result objectAtIndex:0];
             }
+
+            KeyValueItem * FindItemForKey(NSString * key, NSError ** error) { return FindItemForKey(key, error, false); }
 
         }
 
@@ -196,7 +201,7 @@ namespace DeviceLayer {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
+            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil, true);
             if (!item) {
                 return CHIP_ERROR_KEY_NOT_FOUND;
             }
