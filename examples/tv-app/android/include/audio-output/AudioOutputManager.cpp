@@ -36,7 +36,7 @@ std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList()
     {
         chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-        outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
+        outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
         outputInfo.index      = static_cast<uint8_t>(1 + i);
         list.push_back(outputInfo);
     }
