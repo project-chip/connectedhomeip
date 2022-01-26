@@ -35,6 +35,10 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
@@ -131,6 +135,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::PowerSource::Structs::WiredFaultChangeType::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType & value);

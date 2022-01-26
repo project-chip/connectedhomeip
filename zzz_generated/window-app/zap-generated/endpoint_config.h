@@ -884,14 +884,14 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* Type */                                            \
-            { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                       \
+            { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
               ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionLift */                                                              \
-            { 0x00000004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                       \
-              ZAP_SIMPLE_DEFAULT(0x0000) },                                    /* CurrentPositionTilt */                           \
-            { 0x00000007, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x03) }, /* ConfigStatus */                                  \
-            { 0x00000008, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                      \
+            { 0x00000004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionTilt */                                                              \
+            { 0x00000007, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE), ZAP_SIMPLE_DEFAULT(0x03) }, /* ConfigStatus */       \
+            { 0x00000008, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
               ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercentage */                                                      \
-            { 0x00000009, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                      \
+            { 0x00000009, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
               ZAP_SIMPLE_DEFAULT(0xFF) },                                      /* CurrentPositionTiltPercentage */                 \
             { 0x0000000A, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OperationalStatus */                             \
             { 0x0000000B, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
@@ -899,15 +899,20 @@
             { 0x0000000C, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
               ZAP_SIMPLE_DEFAULT(0xFF) },                                    /* TargetPositionTiltPercent100ths */                 \
             { 0x0000000D, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* EndProductType */                                  \
-            { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
+            { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
               ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercent100ths */                                                   \
-            { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
-              ZAP_SIMPLE_DEFAULT(0xFF) },                                       /* CurrentPositionTiltPercent100ths */             \
-            { 0x00000010, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                       \
-            { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                     \
-            { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                       \
-            { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                     \
-            { 0x00000017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                        \
+            { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionTiltPercent100ths */                                                   \
+            { 0x00000010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                                                           \
+            { 0x00000011, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                                                         \
+            { 0x00000012, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                                                           \
+            { 0x00000013, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                                                         \
+            { 0x00000017, ZAP_TYPE(BITMAP8), 1,                                                                                    \
+              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                           \
               ZAP_MIN_MAX_DEFAULTS_INDEX(2) },                                      /* Mode */                                     \
             { 0x0000001A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* SafetyStatus */                             \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(640) }, /* FeatureMap */                               \
@@ -922,14 +927,14 @@
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Window Covering (server) */                                                                   \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* Type */                                            \
-            { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                       \
+            { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
               ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionLift */                                                              \
-            { 0x00000004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                       \
-              ZAP_SIMPLE_DEFAULT(0x0000) },                                    /* CurrentPositionTilt */                           \
-            { 0x00000007, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x03) }, /* ConfigStatus */                                  \
-            { 0x00000008, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                      \
+            { 0x00000004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionTilt */                                                              \
+            { 0x00000007, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE), ZAP_SIMPLE_DEFAULT(0x03) }, /* ConfigStatus */       \
+            { 0x00000008, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
               ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercentage */                                                      \
-            { 0x00000009, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                      \
+            { 0x00000009, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
               ZAP_SIMPLE_DEFAULT(0xFF) },                                      /* CurrentPositionTiltPercentage */                 \
             { 0x0000000A, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OperationalStatus */                             \
             { 0x0000000B, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
@@ -937,15 +942,20 @@
             { 0x0000000C, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
               ZAP_SIMPLE_DEFAULT(0xFF) },                                    /* TargetPositionTiltPercent100ths */                 \
             { 0x0000000D, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* EndProductType */                                  \
-            { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
+            { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
               ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercent100ths */                                                   \
-            { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
-              ZAP_SIMPLE_DEFAULT(0xFF) },                                       /* CurrentPositionTiltPercent100ths */             \
-            { 0x00000010, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                       \
-            { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                     \
-            { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                       \
-            { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                     \
-            { 0x00000017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                        \
+            { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionTiltPercent100ths */                                                   \
+            { 0x00000010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                                                           \
+            { 0x00000011, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                                                         \
+            { 0x00000012, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                                                           \
+            { 0x00000013, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                                                         \
+            { 0x00000017, ZAP_TYPE(BITMAP8), 1,                                                                                    \
+              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                           \
               ZAP_MIN_MAX_DEFAULTS_INDEX(3) },                                      /* Mode */                                     \
             { 0x0000001A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* SafetyStatus */                             \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(644) }, /* FeatureMap */                               \
