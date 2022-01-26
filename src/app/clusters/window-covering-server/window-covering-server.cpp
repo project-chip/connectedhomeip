@@ -444,6 +444,121 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
     return OperationalState::Stall;
 }
 
+void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoint)
+{
+    NPercent100ths position;
+    OperationalStatus opStatus = OperationalStatusGet(endpoint);
+    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpStatus=0x%02X", (unsigned char) opStatus.global);
+
+    /* Update position to simulate movement to pass the CI */
+    if (OperationalState::Stall != opStatus.lift)
+    {
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
+        if (!position.IsNull())
+        {
+            LiftPositionSet(endpoint, position.Value());
+        }
+    }
+
+    /* Update position to simulate movement to pass the CI */
+    if (OperationalState::Stall != opStatus.tilt)
+    {
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
+        if (!position.IsNull())
+        {
+            TiltPositionSet(endpoint, position.Value());
+        }
+    }
+}
+
+/**
+ * @brief Get event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * GetEventControl(EndpointId endpoint)
+{
+    static EmberEventControl eventControls[EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT];
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
+    EmberEventControl * event = nullptr;
+
+    if (index < ArraySize(eventControls))
+    {
+        event = &eventControls[index];
+    }
+    return event;
+}
+
+/**
+ * @brief Configure Fake Motion event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * ConfigureFakeMotionEventControl(EndpointId endpoint)
+{
+    EmberEventControl * controller = GetEventControl(endpoint);
+
+    controller->endpoint = endpoint;
+    controller->callback = &emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler;
+
+    return controller;
+}
+
+
+/* PostAttributeChange is used in all-cluster-app simulation and CI testing : otherwise it is bounded to manufacturer specific implementation */
+void __attribute__((weak)) PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    NPercent100ths current, target;
+    OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
+    OperationalStatus opStatus = prevOpStatus;
+
+    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u OpStatus global=0x%02X lift=0x%02X tilt=0x%02X", (unsigned int) attributeId, (unsigned int) opStatus.global, (unsigned int) opStatus.lift, (unsigned int) opStatus.tilt);
+
+    switch (attributeId)
+    {
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        if (OperationalState::Stall != opStatus.global) {
+            // Finish the fake motion attribute update:
+            emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), 6000);
+        }
+        break;
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+        if (OperationalState::Stall != opStatus.lift) {
+            opStatus.lift = OperationalState::Stall;
+            emberAfWindowCoveringClusterPrint("Lift stop");
+        }
+        break;
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        if (OperationalState::Stall != opStatus.tilt) {
+            opStatus.tilt = OperationalState::Stall;
+            emberAfWindowCoveringClusterPrint("Tilt stop");
+        }
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
+        opStatus.lift = ComputeOperationalState(target, current);
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
+        opStatus.tilt = ComputeOperationalState(target, current);
+        break;
+    default:
+        break;
+    }
+
+    /* This decides and triggers fake motion for the selected endpoint */
+    if ((opStatus.lift != prevOpStatus.lift) || (opStatus.tilt != prevOpStatus.tilt))
+        OperationalStatusSetWithGlobalUpdated(endpoint, opStatus);
+}
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
@@ -650,4 +765,15 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     return true;
 }
 
-void MatterWindowCoveringPluginServerInitCallback() {}
+/**
+ * @brief  Cluster Attribute Update Callback
+ */
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+{
+    PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+}
+
+void MatterWindowCoveringPluginServerInitCallback()
+{
+    emberAfWindowCoveringClusterPrint("Window Covering Cluster Plugin Init");
+}
