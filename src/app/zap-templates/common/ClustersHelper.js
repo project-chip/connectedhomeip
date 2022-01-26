@@ -399,6 +399,7 @@ function enhancedCommands(commands, types)
   commands.forEach(command => {
     command.arguments.forEach(argument => {
       enhancedItem(argument, types);
+      argument.isComplex = argument.isList || argument.isStruct || argument.isArray;
     });
   });
 
@@ -475,6 +476,7 @@ function enhancedAttributes(attributes, globalAttributes, types)
     attribute.isWritableAttribute   = attribute.isWritable === 1;
     attribute.isReportableAttribute = attribute.includedReportable === 1;
     attribute.chipCallback          = asChipCallback(attribute);
+    attribute.isComplex             = attribute.isList || attribute.isStruct || attribute.isArray;
   });
 
   attributes.forEach(attribute => {

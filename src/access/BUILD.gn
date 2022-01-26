@@ -23,6 +23,8 @@ static_library("access") {
     "AuthMode.h",
     "Privilege.h",
     "RequestPath.h",
+    "RequiredPrivilege.cpp",
+    "RequiredPrivilege.h",
     "SubjectDescriptor.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",

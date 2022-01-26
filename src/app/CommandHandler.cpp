@@ -28,6 +28,7 @@
 #include "messaging/ExchangeContext.h"
 
 #include <access/AccessControl.h>
+#include <access/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>

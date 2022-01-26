@@ -65,7 +65,7 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback
+class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public ReadHandler::Callback
 {
 public:
     /**
@@ -89,7 +89,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
 
     void Shutdown();
 
@@ -112,10 +112,15 @@ public:
     CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     uint32_t GetNumActiveReadHandlers() const;
+    uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
 
     uint32_t GetNumActiveWriteHandlers() const;
 
-    uint16_t GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const;
+    /**
+     * Returns the handler at a particular index within the active handler list.
+     */
+    ReadHandler * ActiveHandlerAt(unsigned int aIndex);
+
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
@@ -174,12 +179,52 @@ public:
      */
     size_t GetNumActiveReadClients();
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    //
+    // Get direct access to the underlying read handler pool
+    //
+    auto & GetReadHandlerPool() { return mReadHandlers; }
+
+    //
+    // Override the maximal capacity of the underlying read handler pool to mimic
+    // out of memory scenarios in unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
+
+    //
+    // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
+    // they don't provide for the ability to shut down those subscriptions after they've been established.
+    //
+    // So for the purposes of unit tests, add a helper here to shut down and clean-up all active handlers.
+    //
+    void ShutdownActiveReads()
+    {
+        for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+        {
+            readClient->mpImEngine = nullptr;
+            auto * tmpClient       = readClient->GetNextClient();
+            readClient->SetNextClient(nullptr);
+            readClient = tmpClient;
+        }
+
+        //
+        // After that, we just null out our tracker.
+        //
+        mpActiveReadClientList = nullptr;
+
+        mReadHandlers.ReleaseAll();
+    }
+#endif
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(ReadHandler & apReadObj) override;
 
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
@@ -236,18 +281,21 @@ private:
                                                      System::PacketBufferHandle && aPayload);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
-    ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
+    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
     BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
 
     ReadClient * mpActiveReadClientList = nullptr;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    int mReadHandlerCapacityOverride = -1;
+#endif
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.
