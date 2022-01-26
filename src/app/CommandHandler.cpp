@@ -27,6 +27,7 @@
 #include "messaging/ExchangeContext.h"
 
 #include <access/AccessControl.h>
+#include <access/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>
@@ -257,9 +258,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
-        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
-        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        Access::Privilege requestPrivilege =
+            Access::RequiredPrivilege::ForInvokeCommand(concretePath.mClusterId, concretePath.mEndpointId, concretePath.mCommandId);
+        err = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
