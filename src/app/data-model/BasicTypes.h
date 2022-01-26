@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <app/data-model/Nullable.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 
 #include <type_traits>
 
@@ -51,7 +50,7 @@ struct IsBasicType<ByteSpan>
 };
 
 template <>
-struct IsBasicType<Span<const char>>
+struct IsBasicType<CharSpan>
 {
     static constexpr bool value = true;
 };

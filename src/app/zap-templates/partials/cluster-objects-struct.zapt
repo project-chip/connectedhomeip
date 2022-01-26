@@ -17,7 +17,7 @@ namespace {{asUpperCamelCase name}} {
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
 
-        static constexpr bool kIsFabricScoped = {{#if struct_is_fabric_scoped}} true {{else}} false {{/if}};
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
 
         {{#if struct_is_fabric_scoped}}
         auto GetFabricIndex() const {
@@ -34,7 +34,7 @@ namespace {{asUpperCamelCase name}} {
         {{/zcl_struct_items}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
 
-        static constexpr bool kIsFabricScoped = {{#if struct_is_fabric_scoped}} true {{else}} false {{/if}};
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
 
         {{#if struct_is_fabric_scoped}}
         auto GetFabricIndex() const {

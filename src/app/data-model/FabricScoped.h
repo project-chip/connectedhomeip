@@ -19,9 +19,6 @@
 #pragma once
 
 #include <app/data-model/BasicTypes.h>
-#include <app/data-model/Nullable.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
 
 #include <type_traits>
 
@@ -30,11 +27,11 @@ namespace app {
 namespace DataModel {
 
 /**
- * IsFabricScoped checks whether the given type is fabric scoped, for non-basic types (i.e. cluster objects), it should provide a
- * static constexpr indicating whether it is a fabric scoped struct and basic types will never be fabric scoped.
+ * IsFabricScoped checks whether the given type is fabric scoped, non-basic types (i.e. cluster objects), should provide a
+ * static constexpr indicating whether the type is a fabric scoped struct, and basic types will never be fabric scoped.
  *
- * Using IsFabricScoped<X>::value without a basic type or cluster object with kIsFabricScoped will cause compile error, this is a
- * intended behavior to make users always encode expected values.
+ * Using IsFabricScoped<X>::value without a basic type or cluster object with kIsFabricScoped will cause a compile error.  This is
+ * an intended behavior to make users explicitly decide whether their cluster object is fabric-scoped or not.
  */
 template <typename X>
 class IsFabricScoped
@@ -54,13 +51,6 @@ private:
 
 public:
     static constexpr bool value = IsFabricScopedClusterObject<X>();
-};
-
-template <typename X>
-class IsFabricScoped<Nullable<X>>
-{
-public:
-    static constexpr bool value = IsFabricScoped<X>::value;
 };
 
 } // namespace DataModel
