@@ -18,17 +18,17 @@
 
 # Download webOS OSE NDK
 echo "##### Download webOS OSE NDK #####"
-wget http://10.178.94.187/ndk/opt/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.host.manifest
-wget http://10.178.94.187/ndk/opt/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
-wget http://10.178.94.187/ndk/opt/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.target.manifest
-wget http://10.178.94.187/ndk/opt/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.testdata.json
+wget https://sourceforge.net/projects/webos-iotivity-patches/files/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
+wget https://sourceforge.net/projects/webos-iotivity-patches/files/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.host.manifest
+wget https://sourceforge.net/projects/webos-iotivity-patches/files/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.target.manifest
+wget https://sourceforge.net/projects/webos-iotivity-patches/files/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.testdata.json
 
 # Grant execute permission for NDK install script
 chmod 555 webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
 
 # Install webOS OSE NDK
 echo "##### Install webOS OSE NDK #####"
-#sudo ./webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
+sudo ./webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
 
 # Activating connectedhomeip build environment
 source scripts/activate.sh
