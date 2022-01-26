@@ -141,13 +141,10 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-    mFabricIndex = params.fabricIndex;
-    mVendorId    = params.controllerVendorId;
-    if (mFabricIndex != kUndefinedFabricIndex)
+    mVendorId = params.controllerVendorId;
+    if (params.ephemeralKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
         ReturnErrorOnFailure(ProcessControllerNOCChain(params));
-        mFabricInfo = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-        VerifyOrReturnError(mFabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     DeviceProxyInitParams deviceInitParams = {
@@ -182,12 +179,13 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParams & params)
 {
     FabricInfo newFabric;
-
-    ReturnErrorCodeIf(params.ephemeralKeypair == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    newFabric.SetEphemeralKey(params.ephemeralKeypair);
-
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+    Credentials::P256PublicKeySpan rootPublicKey;
+    FabricId fabricId;
+
+    ReturnErrorOnFailure(newFabric.SetEphemeralKey(params.ephemeralKeypair));
+    newFabric.SetVendorId(params.controllerVendorId);
 
     ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
@@ -211,17 +209,27 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
 
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
-    newFabric.SetVendorId(params.controllerVendorId);
+    ReturnErrorOnFailure(ExtractFabricIdFromCert(chipCertSpan, &fabricId));
 
-    FabricInfo * fabric = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(newFabric.GetRootPubkey(rootPublicKey));
+    mFabricInfo = params.systemState->Fabrics()->FindFabric(rootPublicKey, fabricId);
+    if (mFabricInfo != nullptr)
+    {
+        ReturnErrorOnFailure(mFabricInfo->SetFabricInfo(newFabric));
+    }
+    else
+    {
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(params.systemState->Fabrics()->AddNewFabric(newFabric, &fabricIndex));
+        mFabricInfo = params.systemState->Fabrics()->FindFabricWithIndex(fabricIndex);
+        ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    }
 
-    ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
-    mLocalId  = fabric->GetPeerId();
-    mFabricId = fabric->GetFabricId();
+    mLocalId  = mFabricInfo->GetPeerId();
+    mFabricId = mFabricInfo->GetFabricId();
 
-    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, mFabricIndex,
-                    ChipLogValueX64(GetCompressedFabricId()));
+    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64,
+                    mFabricInfo->GetFabricIndex(), ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }
@@ -236,7 +244,10 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mStorageDelegate = nullptr;
 
-    mSystemState->Fabrics()->ReleaseFabricIndex(mFabricIndex);
+    if (mFabricInfo != nullptr)
+    {
+        mFabricInfo->Reset();
+    }
     mSystemState->Release();
     mSystemState = nullptr;
 
@@ -264,7 +275,7 @@ bool DeviceController::DoesDevicePairingExist(const PeerId & deviceId)
 
 void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
 {
-    VerifyOrReturn(mState == State::Initialized,
+    VerifyOrReturn(mState == State::Initialized && mFabricInfo != nullptr,
                    ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
     mCASESessionManager->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
 }
@@ -812,7 +823,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, mFabricIndex);
+    {
+        FabricIndex fabricIndex = mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
+        device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabricIndex);
+    }
 
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
@@ -1218,10 +1232,9 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan 
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
 
-    if (mFabricIndex != kUndefinedFabricIndex)
+    if (mFabricInfo != nullptr)
     {
-        FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
     }
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, dac, ByteSpan(), ByteSpan(),

@@ -30,10 +30,10 @@
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
-constexpr chip::FabricIndex kIdentityNullFabricId  = chip::kUndefinedFabricIndex;
-constexpr chip::FabricIndex kIdentityAlphaFabricId = 1;
-constexpr chip::FabricIndex kIdentityBetaFabricId  = 2;
-constexpr chip::FabricIndex kIdentityGammaFabricId = 3;
+constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
+constexpr chip::FabricId kIdentityAlphaFabricId = 1;
+constexpr chip::FabricId kIdentityBetaFabricId  = 2;
+constexpr chip::FabricId kIdentityGammaFabricId = 3;
 
 CHIP_ERROR CHIPCommand::Run()
 {
@@ -49,7 +49,7 @@ CHIP_ERROR CHIPCommand::Run()
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricStorage = &mFabricStorage;
-    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerIndex());
+    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));
@@ -127,26 +127,26 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
-chip::FabricIndex CHIPCommand::CurrentCommissionerIndex()
+chip::FabricId CHIPCommand::CurrentCommissionerId()
 {
-    chip::FabricIndex index;
+    chip::FabricId id;
 
     std::string name = GetIdentity();
     if (name.compare(kIdentityAlpha) == 0)
     {
-        index = kIdentityAlphaFabricId;
+        id = kIdentityAlphaFabricId;
     }
     else if (name.compare(kIdentityBeta) == 0)
     {
-        index = kIdentityBetaFabricId;
+        id = kIdentityBetaFabricId;
     }
     else if (name.compare(kIdentityGamma) == 0)
     {
-        index = kIdentityGammaFabricId;
+        id = kIdentityGammaFabricId;
     }
     else if (name.compare(kIdentityNull) == 0)
     {
-        index = kIdentityNullFabricId;
+        id = kIdentityNullFabricId;
     }
     else
     {
@@ -154,7 +154,7 @@ chip::FabricIndex CHIPCommand::CurrentCommissionerIndex()
                            kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     }
 
-    return index;
+    return id;
 }
 
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
@@ -168,7 +168,7 @@ CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
     return mCommissioners[key].get()->Shutdown();
 }
 
-CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricIndex fabricIndex)
+CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId)
 {
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
@@ -186,7 +186,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricInde
 
     chip::Crypto::P256Keypair ephemeralKey;
 
-    if (fabricIndex != chip::kUndefinedFabricIndex)
+    if (fabricId != chip::kUndefinedFabricId)
     {
 
         // TODO - OpCreds should only be generated for pairing command
@@ -200,7 +200,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricInde
         chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricIndex,
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.ephemeralKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC   = rcacSpan;
@@ -209,7 +209,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricInde
     }
 
     commissionerParams.storageDelegate                = &mCommissionerStorage;
-    commissionerParams.fabricIndex                    = fabricIndex;
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 

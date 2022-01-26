@@ -106,9 +106,9 @@ protected:
     ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricIndex fabricIndex);
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
     CHIP_ERROR ShutdownCommissioner(std::string key);
-    chip::FabricIndex CurrentCommissionerIndex();
+    chip::FabricId CurrentCommissionerId();
     std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
 
