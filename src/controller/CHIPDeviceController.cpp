@@ -890,7 +890,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    if (!params.HasWiFiCredentials() && !params.HasThreadOperationalDataset() && !mIsIPRendezvous)
+    if (!params.GetWiFiCredentials().HasValue() && !params.GetThreadOperationalDataset().HasValue() && !mIsIPRendezvous)
     {
         ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -1170,19 +1170,26 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
 }
 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                    const ByteSpan & rcac)
+                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk,
+                                                    Optional<NodeId> adminSubject)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     CommissioningDelegate::CommissioningReport report(CommissioningStage::kGenerateNOCChain);
 
+    // TODO(#13825): If not passed by the signer, the commissioner should
+    // provide its current IPK to the commissionee in the AddNOC command.
+    const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
 
-    report.Set<NocChain>(NocChain(noc, icac, rcac));
+    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
+                                  adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
     err = commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1222,7 +1229,8 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const ByteSpan & icaCertBuf)
+                                                          const ByteSpan & icaCertBuf, const AesCcm128KeySpan ipk,
+                                                          const NodeId adminSubject)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1231,8 +1239,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ByteSpan(nullptr, 0),
-                                        mLocalId.GetNodeId(), mVendorId));
+    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ipk, adminSubject, mVendorId));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1640,7 +1647,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     case CommissioningStage::kSendAttestationRequest:
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
-        if (!params.HasAttestationNonce())
+        if (!params.GetAttestationNonce().HasValue())
         {
             ChipLogError(Controller, "No attestation nonce found");
             CommissioningDelegate::CommissioningReport report(step);
@@ -1651,8 +1658,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     case CommissioningStage::kAttestationVerification:
         ChipLogProgress(Controller, "Verifying attestation");
-        if (!params.HasAttestationElements() || !params.HasAttestationSignature() || !params.HasAttestationNonce() ||
-            !params.HasDAC() || !params.HasPAI())
+        if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
+            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue())
         {
             ChipLogError(Controller, "Missing attestation information");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1668,7 +1675,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         break;
     case CommissioningStage::kSendOpCertSigningRequest:
-        if (!params.HasCSRNonce())
+        if (!params.GetCSRNonce().HasValue())
         {
             ChipLogError(Controller, "No CSR nonce found");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1677,7 +1684,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value());
         break;
     case CommissioningStage::kGenerateNOCChain: {
-        if (!params.HasNOCChainGenerationaParameters() || !params.HasDAC() || !params.HasCSRNonce())
+        if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetCSRNonce().HasValue())
         {
             ChipLogError(Controller, "Unable to generate NOC chain parameters");
             return CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1697,7 +1704,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendTrustedRootCert: {
-        if (!params.HasRootCert() || !params.HasNoc())
+        if (!params.GetRootCert().HasValue() || !params.GetNoc().HasValue())
         {
             ChipLogError(Controller, "No trusted root cert or NOC specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1726,20 +1733,22 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendNOC:
-        if (!params.HasNoc() || !params.HasIcac())
+        if (!params.GetNoc().HasValue() || !params.GetIcac().HasValue() || !params.GetIpk().HasValue() ||
+            !params.GetAdminSubject().HasValue())
         {
-            ChipLogError(Controller, "No node operational certs specified");
+            ChipLogError(Controller, "AddNOC contents not specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Sending operational certificate chain to the device");
-        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value());
+        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac().Value(), params.GetIpk().Value(),
+                                   params.GetAdminSubject().Value());
         break;
     case CommissioningStage::kConfigACL:
         // TODO: Implement
         break;
     case CommissioningStage::kWiFiNetworkSetup: {
-        if (!params.HasWiFiCredentials())
+        if (!params.GetWiFiCredentials().HasValue())
         {
             ChipLogError(Controller, "No wifi credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1753,7 +1762,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
-        if (!params.HasThreadOperationalDataset())
+        if (!params.GetThreadOperationalDataset().HasValue())
         {
             ChipLogError(Controller, "No thread credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1767,7 +1776,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kWiFiNetworkEnable: {
-        if (!params.HasWiFiCredentials())
+        if (!params.GetWiFiCredentials().HasValue())
         {
             ChipLogError(Controller, "No wifi credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1782,7 +1791,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kThreadNetworkEnable: {
         ByteSpan extendedPanId;
         chip::Thread::OperationalDataset operationalDataset;
-        if (!params.HasThreadOperationalDataset() ||
+        if (!params.GetThreadOperationalDataset().HasValue() ||
             operationalDataset.Init(params.GetThreadOperationalDataset().Value()) != CHIP_NO_ERROR ||
             operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
         {

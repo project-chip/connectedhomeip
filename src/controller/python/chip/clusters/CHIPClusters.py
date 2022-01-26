@@ -4502,6 +4502,20 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x00000031: {
+                    "attributeName": "GeneralErrorBoolean",
+                    "attributeId": 0x00000031,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000032: {
+                    "attributeName": "ClusterErrorBoolean",
+                    "attributeId": 0x00000032,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
                 0x000000FF: {
                     "attributeName": "Unsupported",
                     "attributeId": 0x000000FF,

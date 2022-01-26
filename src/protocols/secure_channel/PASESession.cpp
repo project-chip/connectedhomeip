@@ -237,7 +237,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t p
         ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
 
         // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
-        setupPIN = (setupPIN % 99999998) + 1;
+        setupPIN = (setupPIN % kSetupPINCodeMaximumValue) + 1;
     }
 
     return PASESession::ComputePASEVerifier(setupPIN, pbkdf2IterCount, salt, verifier);

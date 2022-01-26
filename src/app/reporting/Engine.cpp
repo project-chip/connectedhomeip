@@ -126,7 +126,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                              "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                              ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
 
-                if (encodeState.AllowPartialData())
+                if (encodeState.AllowPartialData() && ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY)))
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     apReadHandler->SetAttributeEncodeState(encodeState);
@@ -137,6 +137,14 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     // attributeReportIB to avoid any partial data.
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+
+                    // Try to encode our error as a status response.
+                    err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        // OK, just roll back again and give up.
+                        attributeReportIBs.Rollback(attributeBackup);
+                    }
                 }
             }
             SuccessOrExit(err);

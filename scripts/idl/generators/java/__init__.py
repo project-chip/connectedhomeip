@@ -89,12 +89,6 @@ def attributesWithSupportedCallback(attrs, known_enum_types: List[matter_idl_typ
         yield attr
 
 
-def ClientClustersOnly(clusters: List[Cluster]):
-    for cluster in clusters:
-        if cluster.side == ClusterSide.CLIENT:
-            yield cluster
-
-
 class JavaGenerator(CodeGenerator):
     """
     Generation of java code for matter.
@@ -105,20 +99,23 @@ class JavaGenerator(CodeGenerator):
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
-        self.jinja_env.filters['clientClustersOnly'] = ClientClustersOnly
 
     def internal_render_all(self):
-        # Renter a complete file currently
-        # this is to prove compatibility with zap generated code
         known_enums = self.idl.enums[:]
         for cluster in self.idl.clusters:
             known_enums.extend(cluster.enums)
 
-        self.internal_render_one_output(
-            template_path="java/ChipClustersRead.jinja",
-            output_file_name="jni/CHIPClustersRead.cpp",
-            vars={
-                'clusters': self.idl.clusters,
-                'known_enums': known_enums,
-            }
-        )
+        # Every cluster has its own impl, to avoid
+        # very large compilations (running out of RAM)
+        for cluster in self.idl.clusters:
+            if cluster.side != ClusterSide.CLIENT:
+                continue
+
+            self.internal_render_one_output(
+                template_path="java/ChipClustersRead.jinja",
+                output_file_name="jni/%sClient-ReadImpl.cpp" % cluster.name,
+                vars={
+                    'cluster': cluster,
+                    'known_enums': known_enums,
+                }
+            )

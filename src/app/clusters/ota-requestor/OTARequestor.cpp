@@ -402,12 +402,11 @@ void OTARequestor::ApplyUpdate()
 void OTARequestor::NotifyUpdateApplied(uint32_t version)
 {
     // New version is executing so update where applicable
-    VerifyOrReturn(Basic::Attributes::SoftwareVersion::Set(kRootEndpointId, version) == EMBER_ZCL_STATUS_SUCCESS);
     mCurrentVersion = version;
 
     // Log the VersionApplied event
     uint16_t productId;
-    VerifyOrReturn(Basic::Attributes::ProductID::Get(kRootEndpointId, &productId) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(DeviceLayer::ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR);
     OtaRequestorServerOnVersionApplied(version, productId);
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -505,28 +504,32 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
-    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &args.vendorId) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    uint16_t vendorId;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(vendorId));
+    args.vendorId = static_cast<VendorId>(vendorId);
 
-    VerifyOrReturnError(Basic::Attributes::ProductID::Get(kRootEndpointId, &args.productId) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(args.productId));
 
-    VerifyOrReturnError(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &args.softwareVersion) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (Basic::Attributes::HardwareVersion::Get(kRootEndpointId, &hardwareVersion) == EMBER_ZCL_STATUS_SUCCESS)
+    if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
-    if (Basic::Attributes::Location::Get(kRootEndpointId, MutableCharSpan(location)) == EMBER_ZCL_STATUS_SUCCESS)
+    size_t codeLen = 0;
+    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen > 0))
     {
-        args.location.SetValue(CharSpan(location));
+        args.location.SetValue(CharSpan(location, codeLen));
+    }
+    else
+    {
+        args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;

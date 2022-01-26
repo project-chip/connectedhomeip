@@ -163,6 +163,13 @@ namespace {{asUpperCamelCase label}} {
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
         static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
+        {{#unless isArray}}
+        {{#if (isString type)}}
+        {{#if maxLength}}
+        static constexpr size_t MaxLength() { return {{maxLength}}; }
+        {{/if}}
+        {{/if}}
+        {{/unless}}
     };
 } // namespace {{asUpperCamelCase label}}
 {{/zcl_attributes_server}}

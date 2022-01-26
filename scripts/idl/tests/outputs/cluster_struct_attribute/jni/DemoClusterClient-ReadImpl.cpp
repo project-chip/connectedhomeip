@@ -12,12 +12,11 @@
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
-
-JNI_METHOD(void, DemoClusterCluster, readSomeLabelsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, DemoClusterCluster, readArmFailsafesAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    using TypeInfo = chip::app::Clusters::DemoCluster::Attributes::SomeLabels::TypeInfo;
-    std::unique_ptr<CHIPDemoClusterSomeLabelsAttributeCallback, void (*)(CHIPDemoClusterSomeLabelsAttributeCallback *)> onSuccess(chip::Platform::New<CHIPDemoClusterSomeLabelsAttributeCallback>(callback, false), chip::Platform::Delete<CHIPDemoClusterSomeLabelsAttributeCallback>);
+    using TypeInfo = chip::app::Clusters::DemoCluster::Attributes::ArmFailsafes::TypeInfo;
+    std::unique_ptr<CHIPDemoClusterArmFailsafesAttributeCallback, void (*)(CHIPDemoClusterArmFailsafesAttributeCallback *)> onSuccess(chip::Platform::New<CHIPDemoClusterArmFailsafesAttributeCallback>(callback, false), chip::Platform::Delete<CHIPDemoClusterArmFailsafesAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
     std::unique_ptr<chip::CHIPDefaultFailureCallback, void (*)(chip::CHIPDefaultFailureCallback *)> onFailure(chip::Platform::New<chip::CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<chip::CHIPDefaultFailureCallback>);
@@ -27,7 +26,7 @@ JNI_METHOD(void, DemoClusterCluster, readSomeLabelsAttribute)(JNIEnv * env, jobj
     chip::Controller::DemoClusterCluster * cppCluster = reinterpret_cast<chip::Controller::DemoClusterCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPDemoClusterClusterSomeLabelsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn = chip::Callback::Callback<CHIPDemoClusterClusterArmFailsafesAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
     err = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error reading attribute", err));
@@ -35,5 +34,4 @@ JNI_METHOD(void, DemoClusterCluster, readSomeLabelsAttribute)(JNIEnv * env, jobj
     onSuccess.release();
     onFailure.release();
 }
-
 

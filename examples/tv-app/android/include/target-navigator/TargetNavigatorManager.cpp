@@ -30,7 +30,7 @@ std::list<Structs::TargetInfo::Type> TargetNavigatorManager::HandleGetTargetList
     {
         Structs::TargetInfo::Type outputInfo;
         outputInfo.identifier = static_cast<uint8_t>(i + 1);
-        outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
+        outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
         list.push_back(outputInfo);
     }
     return list;
@@ -46,7 +46,7 @@ Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTar
 {
     // TODO: Insert code here
     Commands::NavigateTargetResponse::Type response;
-    response.data   = chip::CharSpan("data response", strlen("data response"));
+    response.data   = chip::CharSpan::fromCharString("data response");
     response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
     return response;
 }

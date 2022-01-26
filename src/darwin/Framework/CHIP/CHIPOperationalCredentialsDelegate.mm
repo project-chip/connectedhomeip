@@ -28,6 +28,7 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TimeUtils.h>
@@ -275,7 +276,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
 
     ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcac, icac, noc));
 
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac);
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac, Optional<AesCcm128KeySpan>(), Optional<NodeId>());
 
     return CHIP_NO_ERROR;
 }
