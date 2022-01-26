@@ -517,6 +517,12 @@ void SetupPretendDevices()
     AddCluster("Occupancy Sensor");
     AddAttribute("Occupancy", "1");
     app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
+
+    AddDevice("Contact Sensor");
+    AddEndpoint("External");
+    AddCluster("Contact Sensor");
+    AddAttribute("BooleanState", "true");
+    app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
 }
 
 WiFiWidget pairingWindowLED;
