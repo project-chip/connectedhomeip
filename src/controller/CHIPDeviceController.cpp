@@ -1171,8 +1171,6 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                                     const ByteSpan & rcac)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
@@ -1182,7 +1180,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     }
     if (status != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in generating device's operational credentials. Error %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed in generating device's operational credentials. Error %s", ErrorStr(status));
     }
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
