@@ -170,7 +170,7 @@ async function if_in_global_responses(options)
   const globalResponses    = await getServerGlobalAttributeResponses(this);
   const responseTypeExists = globalResponses.find(
       // Some fields of item/attribute here may be undefined.
-      item => item.isList == attribute.isList && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
+      item => item.isArray == attribute.isArray && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
           && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
 
   if (responseTypeExists)
@@ -188,10 +188,10 @@ function getServerGlobalAttributeResponses(context)
   const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
 
   const reducer = (unique, item) => {
-    const { type, size, isList, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
+    const { type, size, isArray, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
 
     // List-typed elements have a dedicated callback
-    if (isList) {
+    if (isArray) {
       return unique;
     }
 
@@ -315,7 +315,7 @@ function chip_server_has_list_attributes(options)
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
   const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
-  const filter = attribute => attribute.isList;
+  const filter = attribute => attribute.isArray;
   return attributes.then(items => items.find(filter));
 }
 
@@ -332,7 +332,7 @@ function chip_client_has_list_attributes(options)
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
   const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
-  const filter = attribute => attribute.isList;
+  const filter = attribute => attribute.isArray;
   return attributes.then(items => items.find(filter));
 }
 
