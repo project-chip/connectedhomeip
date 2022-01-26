@@ -7460,6 +7460,98 @@ class PowerSource(Cluster):
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
+    class Enums:
+        class BatChargeFaultType(IntEnum):
+            kUnspecfied = 0x00
+            kAmbientTooHot = 0x01
+            kAmbientTooCold = 0x02
+            kBatteryTooHot = 0x03
+            kBatteryTooCold = 0x04
+            kBatteryAbsent = 0x05
+            kBatteryOverVoltage = 0x06
+            kBatteryUnderVoltage = 0x07
+            kChargerOverVoltage = 0x08
+            kChargerUnderVoltage = 0x09
+            kSafetyTimeout = 0x0A
+
+        class BatChargeLevel(IntEnum):
+            kOk = 0x00
+            kWarning = 0x01
+            kCritical = 0x02
+
+        class BatChargeState(IntEnum):
+            kUnknown = 0x00
+            kIsCharging = 0x01
+            kIsAtFullCharge = 0x02
+            kIsNotCharging = 0x03
+
+        class BatFaultType(IntEnum):
+            kUnspecfied = 0x00
+            kOverTemp = 0x01
+            kUnderTemp = 0x02
+
+        class BatReplaceability(IntEnum):
+            kUnspecified = 0x00
+            kNotReplaceable = 0x01
+            kUserReplaceable = 0x02
+            kFactoryReplaceable = 0x03
+
+        class PowerSourceStatus(IntEnum):
+            kUnspecfied = 0x00
+            kActive = 0x01
+            kStandby = 0x02
+            kUnavailable = 0x03
+
+        class WiredCurrentType(IntEnum):
+            kAc = 0x00
+            kDc = 0x01
+
+        class WiredFaultType(IntEnum):
+            kUnspecfied = 0x00
+            kOverVoltage = 0x01
+            kUnderVoltage = 0x02
+
+
+    class Structs:
+        @dataclass
+        class BatChargeFaultChangeType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatChargeFaultType]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatChargeFaultType]),
+                    ])
+
+            current: 'typing.List[PowerSource.Enums.BatChargeFaultType]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.BatChargeFaultType]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class BatFaultChangeType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatFaultType]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatFaultType]),
+                    ])
+
+            current: 'typing.List[PowerSource.Enums.BatFaultType]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.BatFaultType]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class WiredFaultChangeType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.WiredFaultType]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.WiredFaultType]),
+                    ])
+
+            current: 'typing.List[PowerSource.Enums.WiredFaultType]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.WiredFaultType]' = field(default_factory=lambda: [])
+
 
 
 
@@ -9269,7 +9361,7 @@ class SoftwareDiagnostics(Cluster):
 
     class Structs:
         @dataclass
-        class SoftwareFault(ClusterObject):
+        class SoftwareFaultStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -9448,10 +9540,10 @@ class SoftwareDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="softwareFault", Tag=0, Type=SoftwareDiagnostics.Structs.SoftwareFault),
+                            ClusterObjectFieldDescriptor(Label="softwareFault", Tag=0, Type=SoftwareDiagnostics.Structs.SoftwareFaultStruct),
                     ])
 
-            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFault' = field(default_factory=lambda: SoftwareDiagnostics.Structs.SoftwareFault())
+            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFaultStruct' = field(default_factory=lambda: SoftwareDiagnostics.Structs.SoftwareFaultStruct())
 
 
 @dataclass

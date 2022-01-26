@@ -29,7 +29,7 @@ public class ClusterReadMapping {
               {{/if_in_global_responses}}) callback
             );
           },
-          {{#if isList}}
+          {{#if isArray}}
             () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
           {{else}}
             () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),

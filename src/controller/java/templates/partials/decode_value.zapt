@@ -20,7 +20,7 @@ if ({{source}}.IsNull()) {
   while (iter_{{target}}_{{depth}}.Next())
   {
     auto & entry_{{depth}} = iter_{{target}}_{{depth}}.GetValue();
-    {{>decode_value target=(concat "newElement_" depth) source=(concat "entry_" depth) cluster=cluster depth=(incrementDepth depth) isList=false isArray=false forceNotList=true omitDeclaration=false}}
+    {{>decode_value target=(concat "newElement_" depth) source=(concat "entry_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false forceNotList=true omitDeclaration=false}}
     chip::JniReferences::GetInstance().AddToArrayList({{target}}, newElement_{{depth}});
   }
 {{else}}

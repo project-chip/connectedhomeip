@@ -23,7 +23,7 @@ using namespace chip::app::Clusters::ApplicationBasic;
 
 chip::CharSpan ApplicationBasicManager::HandleGetVendorName()
 {
-    return chip::CharSpan("exampleVendorName1", strlen("exampleVendorName1"));
+    return chip::CharSpan::fromCharString("exampleVendorName1");
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
@@ -33,7 +33,7 @@ uint16_t ApplicationBasicManager::HandleGetVendorId()
 
 chip::CharSpan ApplicationBasicManager::HandleGetApplicationName()
 {
-    return chip::CharSpan("exampleName1", strlen("exampleName1"));
+    return chip::CharSpan::fromCharString("exampleName1");
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
@@ -45,7 +45,7 @@ chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Typ
 {
     chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
     application.catalogVendorId = 123;
-    application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
+    application.applicationId   = chip::CharSpan::fromCharString("applicationId");
     return application;
 }
 
@@ -56,7 +56,7 @@ ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus()
 
 chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
 {
-    return chip::CharSpan("exampleVersion", strlen("exampleVersion"));
+    return chip::CharSpan::fromCharString("exampleVersion");
 }
 
 std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList()

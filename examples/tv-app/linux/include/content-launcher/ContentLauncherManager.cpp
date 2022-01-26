@@ -43,7 +43,7 @@ void ContentLauncherManager::HandleLaunchContent(
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     // TODO: Insert code here
-    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
+    response.data   = chip::CharSpan::fromCharString("exampleData");
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     responser.Success(response);
 }
@@ -60,7 +60,7 @@ void ContentLauncherManager::HandleLaunchUrl(
 
     // TODO: Insert code here
     Commands::LaunchResponse::Type response;
-    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
+    response.data   = chip::CharSpan::fromCharString("exampleData");
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     responser.Success(response);
 }
@@ -69,7 +69,7 @@ CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::Attribut
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        chip::CharSpan data = chip::CharSpan("example", strlen("example"));
+        chip::CharSpan data = chip::CharSpan::fromCharString("example");
         ReturnErrorOnFailure(encoder.Encode(data));
         ReturnErrorOnFailure(encoder.Encode(data));
         return CHIP_NO_ERROR;

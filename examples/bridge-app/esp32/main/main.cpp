@@ -178,8 +178,8 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
 {
     _LabelStruct labelStruct;
 
-    labelStruct.label = chip::CharSpan(label, strlen(label));
-    labelStruct.value = chip::CharSpan(value, strlen(value));
+    labelStruct.label = chip::CharSpan::fromCharString(label);
+    labelStruct.value = chip::CharSpan::fromCharString(value);
 
     // TODO: Need to set up an AttributeAccessInterface to handle the lists here.
 }

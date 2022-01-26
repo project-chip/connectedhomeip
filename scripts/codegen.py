@@ -26,7 +26,7 @@ except:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from idl.matter_idl_parser import CreateParser
 
-from idl.generators import FileSystemGeneratorStorage
+from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
 from idl.generators.java import JavaGenerator
 
 
@@ -40,6 +40,18 @@ class CodeGeneratorTypes(enum.Enum):
             raise Error("Unknown code generator type")
 
 
+class ListGeneratedFilesStorage(GeneratorStorage):
+    """
+    Output a list of files to be generated
+    """
+
+    def get_existing_data(self, relative_path: str):
+        return None  # stdout has no pre-existing data
+
+    def write_new_data(self, relative_path: str, content: str):
+        print(relative_path)
+
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
@@ -50,7 +62,7 @@ __LOG_LEVELS__ = {
 }
 
 __GENERATORS__ = {
-    'java': CodeGeneratorTypes.JAVA
+    'java': CodeGeneratorTypes.JAVA,
 }
 
 
@@ -75,10 +87,15 @@ __GENERATORS__ = {
     default=False,
     is_flag=True,
     help='If to actually generate')
+@click.option(
+    '--name-only',
+    default=False,
+    is_flag=True,
+    help='Output just a list of file names that would be generated')
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, idl_path):
+def main(log_level, generator, output_dir, dry_run, name_only, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -88,9 +105,14 @@ def main(log_level, generator, output_dir, dry_run, idl_path):
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
+    if name_only:
+        storage = ListGeneratedFilesStorage()
+    else:
+        storage = FileSystemGeneratorStorage(output_dir)
+
     logging.info("Running code generator %s" % generator)
-    generator = __GENERATORS__[generator].CreateGenerator(
-        storage=FileSystemGeneratorStorage(output_dir), idl=idl_tree)
+    generator = __GENERATORS__[
+        generator].CreateGenerator(storage, idl=idl_tree)
     generator.render(dry_run)
     logging.info("Done")
 

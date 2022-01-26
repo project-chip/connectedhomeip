@@ -1201,6 +1201,81 @@ public class ChipStructs {
     }
   }
 
+  public static class PowerSourceClusterBatChargeFaultChangeType {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatChargeFaultChangeType(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatChargeFaultChangeType {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatFaultChangeType {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatFaultChangeType(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatFaultChangeType {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterWiredFaultChangeType {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterWiredFaultChangeType(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterWiredFaultChangeType {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class ScenesClusterSceneExtensionFieldSet {
     public Long clusterId;
     public Integer length;
@@ -1230,12 +1305,13 @@ public class ChipStructs {
     }
   }
 
-  public static class SoftwareDiagnosticsClusterSoftwareFault {
+  public static class SoftwareDiagnosticsClusterSoftwareFaultStruct {
     public Long id;
     public String name;
     public byte[] faultRecording;
 
-    public SoftwareDiagnosticsClusterSoftwareFault(Long id, String name, byte[] faultRecording) {
+    public SoftwareDiagnosticsClusterSoftwareFaultStruct(
+        Long id, String name, byte[] faultRecording) {
       this.id = id;
       this.name = name;
       this.faultRecording = faultRecording;
@@ -1244,7 +1320,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterSoftwareFault {\n");
+      output.append("SoftwareDiagnosticsClusterSoftwareFaultStruct {\n");
       output.append("\tid: ");
       output.append(id);
       output.append("\n");
