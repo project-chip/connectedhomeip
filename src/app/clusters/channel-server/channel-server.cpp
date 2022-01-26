@@ -41,7 +41,9 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/clusters/channel-server/channel-delegate.h>
 #include <app/clusters/channel-server/channel-server.h>
 #include <app/data-model/Encode.h>
@@ -50,7 +52,9 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Channel;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation

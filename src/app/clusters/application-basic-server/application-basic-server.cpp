@@ -26,7 +26,9 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <list>
@@ -34,7 +36,9 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationBasic;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation

@@ -27,13 +27,18 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/af.h>
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::AccountLogin::Delegate;
 
 // -----------------------------------------------------------------------------
