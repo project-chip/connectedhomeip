@@ -1679,10 +1679,7 @@ private:
 class AccountLoginLogoutRequest : public ModelCommand
 {
 public:
-    AccountLoginLogoutRequest() : ModelCommand("logout-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    AccountLoginLogoutRequest() : ModelCommand("logout-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -1917,10 +1914,7 @@ private:
 class AdministratorCommissioningRevokeCommissioning : public ModelCommand
 {
 public:
-    AdministratorCommissioningRevokeCommissioning() : ModelCommand("revoke-commissioning")
-    {
-        ModelCommand::AddArguments();
-    }
+    AdministratorCommissioningRevokeCommissioning() : ModelCommand("revoke-commissioning") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -3678,10 +3672,7 @@ private:
 class BarrierControlBarrierControlStop : public ModelCommand
 {
 public:
-    BarrierControlBarrierControlStop() : ModelCommand("barrier-control-stop")
-    {
-        ModelCommand::AddArguments();
-    }
+    BarrierControlBarrierControlStop() : ModelCommand("barrier-control-stop") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -4795,10 +4786,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("Basic.ProductID report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("Basic.ProductID report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -5809,10 +5797,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        DataModelLogger::LogValue("Basic.Reachable report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("Basic.Reachable report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -6822,10 +6807,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        DataModelLogger::LogValue("BooleanState.StateValue report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("BooleanState.StateValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -15563,10 +15545,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("DoorLock.SoundVolume report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("DoorLock.SoundVolume report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -17170,10 +17149,7 @@ private:
 class EthernetNetworkDiagnosticsResetCounts : public ModelCommand
 {
 public:
-    EthernetNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts")
-    {
-        ModelCommand::AddArguments();
-    }
+    EthernetNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -18783,10 +18759,7 @@ private:
 class GeneralCommissioningCommissioningComplete : public ModelCommand
 {
 public:
-    GeneralCommissioningCommissioningComplete() : ModelCommand("commissioning-complete")
-    {
-        ModelCommand::AddArguments();
-    }
+    GeneralCommissioningCommissioningComplete() : ModelCommand("commissioning-complete") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -20996,10 +20969,7 @@ private:
 class GroupsRemoveAllGroups : public ModelCommand
 {
 public:
-    GroupsRemoveAllGroups() : ModelCommand("remove-all-groups")
-    {
-        ModelCommand::AddArguments();
-    }
+    GroupsRemoveAllGroups() : ModelCommand("remove-all-groups") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -21122,10 +21092,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("Groups.NameSupport report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Groups.NameSupport report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -21324,10 +21291,7 @@ private:
 class IdentifyIdentifyQuery : public ModelCommand
 {
 public:
-    IdentifyIdentifyQuery() : ModelCommand("identify-query")
-    {
-        ModelCommand::AddArguments();
-    }
+    IdentifyIdentifyQuery() : ModelCommand("identify-query") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -22613,10 +22577,7 @@ private:
 class LevelControlStopWithOnOff : public ModelCommand
 {
 public:
-    LevelControlStopWithOnOff() : ModelCommand("stop-with-on-off")
-    {
-        ModelCommand::AddArguments();
-    }
+    LevelControlStopWithOnOff() : ModelCommand("stop-with-on-off") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -23221,10 +23182,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("LevelControl.Options report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("LevelControl.Options report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -24310,10 +24268,7 @@ private:
 class LowPowerSleep : public ModelCommand
 {
 public:
-    LowPowerSleep() : ModelCommand("sleep")
-    {
-        ModelCommand::AddArguments();
-    }
+    LowPowerSleep() : ModelCommand("sleep") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24495,10 +24450,7 @@ private:
 class MediaInputHideInputStatusRequest : public ModelCommand
 {
 public:
-    MediaInputHideInputStatusRequest() : ModelCommand("hide-input-status-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaInputHideInputStatusRequest() : ModelCommand("hide-input-status-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24567,10 +24519,7 @@ private:
 class MediaInputShowInputStatusRequest : public ModelCommand
 {
 public:
-    MediaInputShowInputStatusRequest() : ModelCommand("show-input-status-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaInputShowInputStatusRequest() : ModelCommand("show-input-status-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24911,10 +24860,7 @@ private:
 class MediaPlaybackFastForwardRequest : public ModelCommand
 {
 public:
-    MediaPlaybackFastForwardRequest() : ModelCommand("fast-forward-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackFastForwardRequest() : ModelCommand("fast-forward-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24934,10 +24880,7 @@ private:
 class MediaPlaybackNextRequest : public ModelCommand
 {
 public:
-    MediaPlaybackNextRequest() : ModelCommand("next-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackNextRequest() : ModelCommand("next-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24957,10 +24900,7 @@ private:
 class MediaPlaybackPauseRequest : public ModelCommand
 {
 public:
-    MediaPlaybackPauseRequest() : ModelCommand("pause-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPauseRequest() : ModelCommand("pause-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -24980,10 +24920,7 @@ private:
 class MediaPlaybackPlayRequest : public ModelCommand
 {
 public:
-    MediaPlaybackPlayRequest() : ModelCommand("play-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPlayRequest() : ModelCommand("play-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -25003,10 +24940,7 @@ private:
 class MediaPlaybackPreviousRequest : public ModelCommand
 {
 public:
-    MediaPlaybackPreviousRequest() : ModelCommand("previous-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPreviousRequest() : ModelCommand("previous-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -25026,10 +24960,7 @@ private:
 class MediaPlaybackRewindRequest : public ModelCommand
 {
 public:
-    MediaPlaybackRewindRequest() : ModelCommand("rewind-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackRewindRequest() : ModelCommand("rewind-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -25121,10 +25052,7 @@ private:
 class MediaPlaybackStartOverRequest : public ModelCommand
 {
 public:
-    MediaPlaybackStartOverRequest() : ModelCommand("start-over-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackStartOverRequest() : ModelCommand("start-over-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -25144,10 +25072,7 @@ private:
 class MediaPlaybackStopRequest : public ModelCommand
 {
 public:
-    MediaPlaybackStopRequest() : ModelCommand("stop-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackStopRequest() : ModelCommand("stop-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -26016,10 +25941,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("ModeSelect.OnMode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("ModeSelect.OnMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -28631,10 +28553,7 @@ private:
 class OnOffOff : public ModelCommand
 {
 public:
-    OnOffOff() : ModelCommand("off")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffOff() : ModelCommand("off") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28681,10 +28600,7 @@ private:
 class OnOffOn : public ModelCommand
 {
 public:
-    OnOffOn() : ModelCommand("on")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffOn() : ModelCommand("on") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28704,10 +28620,7 @@ private:
 class OnOffOnWithRecallGlobalScene : public ModelCommand
 {
 public:
-    OnOffOnWithRecallGlobalScene() : ModelCommand("on-with-recall-global-scene")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffOnWithRecallGlobalScene() : ModelCommand("on-with-recall-global-scene") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28754,10 +28667,7 @@ private:
 class OnOffToggle : public ModelCommand
 {
 public:
-    OnOffToggle() : ModelCommand("toggle")
-    {
-        ModelCommand::AddArguments();
-    }
+    OnOffToggle() : ModelCommand("toggle") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -28832,10 +28742,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        DataModelLogger::LogValue("OnOff.OnOff report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("OnOff.OnOff report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29002,10 +28909,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("OnOff.OnTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("OnOff.OnTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29100,10 +29004,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("OnOff.OffWaitTime report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("OnOff.OffWaitTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29198,10 +29099,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("OnOff.StartUpOnOff report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("OnOff.StartUpOnOff report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29342,10 +29240,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        DataModelLogger::LogValue("OnOff.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("OnOff.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -30672,10 +30567,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("PowerSource.Status report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("PowerSource.Status report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -30744,10 +30636,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("PowerSource.Order report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("PowerSource.Order report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -36155,10 +36044,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("Scenes.SceneCount report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Scenes.SceneCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -36227,10 +36113,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("Scenes.CurrentScene report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Scenes.CurrentScene report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -36299,10 +36182,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("Scenes.CurrentGroup report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("Scenes.CurrentGroup report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -36371,10 +36251,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        DataModelLogger::LogValue("Scenes.SceneValid report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("Scenes.SceneValid report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -36443,10 +36320,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("Scenes.NameSupport report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Scenes.NameSupport report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -36623,10 +36497,7 @@ private:
 class SoftwareDiagnosticsResetWatermarks : public ModelCommand
 {
 public:
-    SoftwareDiagnosticsResetWatermarks() : ModelCommand("reset-watermarks")
-    {
-        ModelCommand::AddArguments();
-    }
+    SoftwareDiagnosticsResetWatermarks() : ModelCommand("reset-watermarks") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -37949,10 +37820,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("Switch.MultiPressMax report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Switch.MultiPressMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -38093,10 +37961,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        DataModelLogger::LogValue("Switch.FeatureMap report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("Switch.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39099,10 +38964,7 @@ private:
 class TestClusterTest : public ModelCommand
 {
 public:
-    TestClusterTest() : ModelCommand("test")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTest() : ModelCommand("test") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -39353,10 +39215,7 @@ private:
 class TestClusterTestNotHandled : public ModelCommand
 {
 public:
-    TestClusterTestNotHandled() : ModelCommand("test-not-handled")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTestNotHandled() : ModelCommand("test-not-handled") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -39424,10 +39283,7 @@ private:
 class TestClusterTestSpecific : public ModelCommand
 {
 public:
-    TestClusterTestSpecific() : ModelCommand("test-specific")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTestSpecific() : ModelCommand("test-specific") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -39472,10 +39328,7 @@ private:
 class TestClusterTestUnknownCommand : public ModelCommand
 {
 public:
-    TestClusterTestUnknownCommand() : ModelCommand("test-unknown-command")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTestUnknownCommand() : ModelCommand("test-unknown-command") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -39495,10 +39348,7 @@ private:
 class TestClusterTimedInvokeRequest : public ModelCommand
 {
 public:
-    TestClusterTimedInvokeRequest() : ModelCommand("timed-invoke-request")
-    {
-        ModelCommand::AddArguments();
-    }
+    TestClusterTimedInvokeRequest() : ModelCommand("timed-invoke-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -39743,10 +39593,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        DataModelLogger::LogValue("TestCluster.Boolean report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("TestCluster.Boolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39841,10 +39688,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Bitmap8 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("TestCluster.Bitmap8 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40233,10 +40077,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int8u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("TestCluster.Int8u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40331,10 +40172,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int16u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("TestCluster.Int16u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40429,10 +40267,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int24u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("TestCluster.Int24u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40527,10 +40362,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int32u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("TestCluster.Int32u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40625,10 +40457,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int40u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int40u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40723,10 +40552,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int48u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int48u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40821,10 +40647,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int56u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int56u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40919,10 +40742,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int64u report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int64u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41017,10 +40837,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int8s report", 0, value);
-    }
+    static void OnValueReport(void * context, int8_t value) { DataModelLogger::LogValue("TestCluster.Int8s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41115,10 +40932,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int16s report", 0, value);
-    }
+    static void OnValueReport(void * context, int16_t value) { DataModelLogger::LogValue("TestCluster.Int16s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41213,10 +41027,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int32_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int24s report", 0, value);
-    }
+    static void OnValueReport(void * context, int32_t value) { DataModelLogger::LogValue("TestCluster.Int24s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41311,10 +41122,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int32_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int32s report", 0, value);
-    }
+    static void OnValueReport(void * context, int32_t value) { DataModelLogger::LogValue("TestCluster.Int32s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41409,10 +41217,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int40s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int40s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41507,10 +41312,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int48s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int48s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41605,10 +41407,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int56s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int56s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41703,10 +41502,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Int64s report", 0, value);
-    }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int64s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41801,10 +41597,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Enum8 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("TestCluster.Enum8 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -41899,10 +41692,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.Enum16 report", 0, value);
-    }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("TestCluster.Enum16 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42889,10 +42679,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.EpochUs report", 0, value);
-    }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.EpochUs report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42987,10 +42774,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value)
-    {
-        DataModelLogger::LogValue("TestCluster.EpochS report", 0, value);
-    }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("TestCluster.EpochS report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44145,10 +43929,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value)
-    {
-        DataModelLogger::LogValue("TestCluster.Unsupported report", 0, value);
-    }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("TestCluster.Unsupported report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -47479,10 +47260,7 @@ private:
 class ThermostatClearWeeklySchedule : public ModelCommand
 {
 public:
-    ThermostatClearWeeklySchedule() : ModelCommand("clear-weekly-schedule")
-    {
-        ModelCommand::AddArguments();
-    }
+    ThermostatClearWeeklySchedule() : ModelCommand("clear-weekly-schedule") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -47502,10 +47280,7 @@ private:
 class ThermostatGetRelayStatusLog : public ModelCommand
 {
 public:
-    ThermostatGetRelayStatusLog() : ModelCommand("get-relay-status-log")
-    {
-        ModelCommand::AddArguments();
-    }
+    ThermostatGetRelayStatusLog() : ModelCommand("get-relay-status-log") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -49829,10 +49604,7 @@ private:
 class ThreadNetworkDiagnosticsResetCounts : public ModelCommand
 {
 public:
-    ThreadNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts")
-    {
-        ModelCommand::AddArguments();
-    }
+    ThreadNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -55526,10 +55298,7 @@ private:
 class WiFiNetworkDiagnosticsResetCounts : public ModelCommand
 {
 public:
-    WiFiNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts")
-    {
-        ModelCommand::AddArguments();
-    }
+    WiFiNetworkDiagnosticsResetCounts() : ModelCommand("reset-counts") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -56961,10 +56730,7 @@ private:
 class WindowCoveringDownOrClose : public ModelCommand
 {
 public:
-    WindowCoveringDownOrClose() : ModelCommand("down-or-close")
-    {
-        ModelCommand::AddArguments();
-    }
+    WindowCoveringDownOrClose() : ModelCommand("down-or-close") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -57082,10 +56848,7 @@ private:
 class WindowCoveringStopMotion : public ModelCommand
 {
 public:
-    WindowCoveringStopMotion() : ModelCommand("stop-motion")
-    {
-        ModelCommand::AddArguments();
-    }
+    WindowCoveringStopMotion() : ModelCommand("stop-motion") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -57105,10 +56868,7 @@ private:
 class WindowCoveringUpOrOpen : public ModelCommand
 {
 public:
-    WindowCoveringUpOrOpen() : ModelCommand("up-or-open")
-    {
-        ModelCommand::AddArguments();
-    }
+    WindowCoveringUpOrOpen() : ModelCommand("up-or-open") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -57183,10 +56943,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("WindowCovering.Type report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("WindowCovering.Type report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -58365,10 +58122,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        DataModelLogger::LogValue("WindowCovering.Mode report", 0, value);
-    }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("WindowCovering.Mode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
