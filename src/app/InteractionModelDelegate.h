@@ -46,20 +46,13 @@ class ReadHandler;
 /**
  * @brief
  *   This class defines the API for a delegate that an SDK consumer can use to interface with the interaction model.
+ *
+ *   TODO: This delegate is now deprecated given we've shifted to narrower delegates scoped to each interaction type. This will
+ * eventually be deleted.
  */
 class InteractionModelDelegate
 {
 public:
-    /**
-     * Notification that Subscription has been established successfully and application can do further work in handler.
-     */
-    virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * Notification that Subscription has been terminated in handler side.
-     */
-    virtual CHIP_ERROR SubscriptionTerminated(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
     virtual ~InteractionModelDelegate() = default;
 };
 
