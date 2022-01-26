@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
+#include <commands/clusters/DataModelLogger.h>
 #include <commands/clusters/ModelCommand.h>
 #include <commands/common/CommandInvoker.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -34,3550 +35,6 @@
 #include <lib/support/TypeTraits.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
-
-// Value logging functions.  The non-generated ones depend on the
-// generated ones, so are placed here.
-namespace {
-
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value);
-
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::PowerProfile::Structs::TransferredPhase::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AccessControl::Structs::Target::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType & value);
-CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ModeSelect::Structs::SemanticTag::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::Dimension::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::NestedStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::NestedStructList::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
-
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::StartUp::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::ShutDown::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::Leave::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::InitialPress::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::LongPress::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::LongRelease::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value);
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value);
-
-#if CHIP_PROGRESS_LOGGING
-std::string IndentStr(size_t indent)
-{
-    std::string str;
-    for (size_t i = 0; i < indent; ++i)
-    {
-        str.append("  ");
-    }
-    return str;
-}
-#endif // CHIP_PROGRESS_LOGGING
-
-template <typename X,
-          typename std::enable_if_t<
-              std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
-CHIP_ERROR LogValue(const char * label, size_t indent, X value)
-{
-    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
-    return CHIP_NO_ERROR;
-}
-
-template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
-CHIP_ERROR LogValue(const char * label, size_t indent, X value)
-{
-    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
-{
-    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, value ? "TRUE" : "FALSE");
-    return CHIP_NO_ERROR;
-}
-
-template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
-CHIP_ERROR LogValue(const char * label, size_t indent, X value)
-{
-    return LogValue(label, indent, chip::to_underlying(value));
-}
-
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::CharSpan value)
-{
-    ChipLogProgress(chipTool, "%s%s: %.*s", IndentStr(indent).c_str(), label, static_cast<int>(value.size()), value.data());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::ByteSpan value)
-{
-    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    if (CHIP_NO_ERROR ==
-        chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
-    {
-        ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, buffer);
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
-    }
-    return CHIP_NO_ERROR;
-}
-
-template <typename X>
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::BitFlags<X> value)
-{
-    return LogValue(label, indent, value.Raw());
-}
-
-template <typename T>
-CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::DecodableList<T> & value)
-{
-    size_t count   = 0;
-    CHIP_ERROR err = value.ComputeSize(&count);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    ChipLogProgress(chipTool, "%s%s: %zu entries", IndentStr(indent).c_str(), label, count);
-
-    auto iter = value.begin();
-    size_t i  = 0;
-    while (iter.Next())
-    {
-        ++i;
-        std::string itemLabel = std::string("[") + std::to_string(i) + "]";
-        ReturnErrorOnFailure(LogValue(itemLabel.c_str(), indent + 1, iter.GetValue()));
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "%sList truncated due to invalid value", IndentStr(indent + 1).c_str());
-    }
-    return iter.GetStatus();
-}
-
-template <typename T>
-CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::Nullable<T> & value)
-{
-    if (!value.IsNull())
-    {
-        return LogValue(label, indent, value.Value());
-    }
-    ChipLogProgress(chipTool, "%s%s: null", IndentStr(indent).c_str(), label);
-    return CHIP_NO_ERROR;
-}
-
-template <typename T>
-CHIP_ERROR LogValue(const char * label, size_t indent, const chip::Optional<T> & value)
-{
-    if (value.HasValue())
-    {
-        return LogValue(label, indent, value.Value());
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-// We output helpers for all structs here, including ones we might not actually
-// be logging.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Label'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ClusterId", indent + 1, value.clusterId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ClusterId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Length", indent + 1, value.length);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Length'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("PowerProfileId", indent + 1, value.powerProfileId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PowerProfileId'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EnergyPhaseId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerProfileRemoteControl", indent + 1, value.powerProfileRemoteControl);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PowerProfileRemoteControl'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerProfileState", indent + 1, value.powerProfileState);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PowerProfileState'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EnergyPhaseId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ScheduledTime", indent + 1, value.scheduledTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ScheduledTime'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::PowerProfile::Structs::TransferredPhase::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EnergyPhaseId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MacroPhaseId", indent + 1, value.macroPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MacroPhaseId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExpectedDuration", indent + 1, value.expectedDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExpectedDuration'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PeakPower", indent + 1, value.peakPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PeakPower'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Energy", indent + 1, value.energy);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Energy'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxActivationDelay", indent + 1, value.maxActivationDelay);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MaxActivationDelay'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Revision", indent + 1, value.revision);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Revision'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AccessControl::Structs::Target::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Cluster'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoint'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'DeviceType'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Privilege", indent + 1, value.privilege);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Privilege'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AuthMode", indent + 1, value.authMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'AuthMode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Subjects", indent + 1, value.subjects);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Subjects'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Targets", indent + 1, value.targets);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Targets'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Data", indent + 1, value.data);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Data'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ActionID", indent + 1, value.actionID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ActionID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EndpointListID", indent + 1, value.endpointListID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EndpointListID'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SupportedCommands", indent + 1, value.supportedCommands);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'SupportedCommands'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Status", indent + 1, value.status);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Status'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("EndpointListID", indent + 1, value.endpointListID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EndpointListID'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoints", indent + 1, value.endpoints);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoints'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ProviderNodeID", indent + 1, value.providerNodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ProviderNodeID'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoint'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FailSafeExpiryLengthMs", indent + 1, value.failSafeExpiryLengthMs);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FailSafeExpiryLengthMs'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NetworkID", indent + 1, value.networkID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NetworkID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Connected", indent + 1, value.connected);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Connected'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("PanId", indent + 1, value.panId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PanId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExtendedPanId", indent + 1, value.extendedPanId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtendedPanId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NetworkName", indent + 1, value.networkName);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NetworkName'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Channel", indent + 1, value.channel);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Channel'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Version", indent + 1, value.version);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Version'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExtendedAddress", indent + 1, value.extendedAddress);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtendedAddress'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Rssi", indent + 1, value.rssi);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Rssi'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Lqi", indent + 1, value.lqi);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Lqi'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Security", indent + 1, value.security);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Security'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Ssid", indent + 1, value.ssid);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Ssid'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Bssid", indent + 1, value.bssid);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Bssid'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Channel", indent + 1, value.channel);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Channel'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("WiFiBand", indent + 1, value.wiFiBand);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'WiFiBand'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Rssi", indent + 1, value.rssi);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Rssi'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricConnected", indent + 1, value.fabricConnected);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricConnected'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OffPremiseServicesReachableIPv4", indent + 1, value.offPremiseServicesReachableIPv4);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OffPremiseServicesReachableIPv4'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OffPremiseServicesReachableIPv6", indent + 1, value.offPremiseServicesReachableIPv6);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OffPremiseServicesReachableIPv6'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("HardwareAddress", indent + 1, value.hardwareAddress);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'HardwareAddress'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Id", indent + 1, value.id);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Id'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FaultRecording", indent + 1, value.faultRecording);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FaultRecording'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Id", indent + 1, value.id);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Id'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("StackFreeCurrent", indent + 1, value.stackFreeCurrent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'StackFreeCurrent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("StackFreeMinimum", indent + 1, value.stackFreeMinimum);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'StackFreeMinimum'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("StackSize", indent + 1, value.stackSize);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'StackSize'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ExtAddress", indent + 1, value.extAddress);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtAddress'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Age", indent + 1, value.age);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Age'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Rloc16", indent + 1, value.rloc16);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Rloc16'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LinkFrameCounter", indent + 1, value.linkFrameCounter);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LinkFrameCounter'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MleFrameCounter", indent + 1, value.mleFrameCounter);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MleFrameCounter'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Lqi", indent + 1, value.lqi);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Lqi'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AverageRssi", indent + 1, value.averageRssi);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'AverageRssi'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LastRssi", indent + 1, value.lastRssi);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LastRssi'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FrameErrorRate", indent + 1, value.frameErrorRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FrameErrorRate'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MessageErrorRate", indent + 1, value.messageErrorRate);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MessageErrorRate'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("RxOnWhenIdle", indent + 1, value.rxOnWhenIdle);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'RxOnWhenIdle'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FullThreadDevice", indent + 1, value.fullThreadDevice);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FullThreadDevice'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FullNetworkData", indent + 1, value.fullNetworkData);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FullNetworkData'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("IsChild", indent + 1, value.isChild);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'IsChild'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ActiveTimestampPresent", indent + 1, value.activeTimestampPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ActiveTimestampPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PendingTimestampPresent", indent + 1, value.pendingTimestampPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PendingTimestampPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MasterKeyPresent", indent + 1, value.masterKeyPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MasterKeyPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NetworkNamePresent", indent + 1, value.networkNamePresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NetworkNamePresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExtendedPanIdPresent", indent + 1, value.extendedPanIdPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtendedPanIdPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MeshLocalPrefixPresent", indent + 1, value.meshLocalPrefixPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MeshLocalPrefixPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("DelayPresent", indent + 1, value.delayPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'DelayPresent'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PanIdPresent", indent + 1, value.panIdPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PanIdPresent'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ChannelPresent", indent + 1, value.channelPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ChannelPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PskcPresent", indent + 1, value.pskcPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PskcPresent'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SecurityPolicyPresent", indent + 1, value.securityPolicyPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'SecurityPolicyPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ChannelMaskPresent", indent + 1, value.channelMaskPresent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ChannelMaskPresent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ExtAddress", indent + 1, value.extAddress);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtAddress'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Rloc16", indent + 1, value.rloc16);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Rloc16'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("RouterId", indent + 1, value.routerId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'RouterId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NextHop", indent + 1, value.nextHop);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NextHop'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PathCost", indent + 1, value.pathCost);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PathCost'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LQIIn", indent + 1, value.LQIIn);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LQIIn'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LQIOut", indent + 1, value.LQIOut);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LQIOut'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Age", indent + 1, value.age);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Age'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Allocated", indent + 1, value.allocated);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Allocated'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LinkEstablished", indent + 1, value.linkEstablished);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LinkEstablished'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("RotationTime", indent + 1, value.rotationTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'RotationTime'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Flags", indent + 1, value.flags);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Flags'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("RootPublicKey", indent + 1, value.rootPublicKey);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'RootPublicKey'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricId", indent + 1, value.fabricId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NodeId", indent + 1, value.nodeId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NodeId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Label'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Noc", indent + 1, value.noc);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Noc'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Icac", indent + 1, value.icac);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Icac'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupId", indent + 1, value.groupId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoints", indent + 1, value.endpoints);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoints'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupName", indent + 1, value.groupName);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupName'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupId", indent + 1, value.groupId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeySetID", indent + 1, value.groupKeySetID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySetID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("GroupKeySetID", indent + 1, value.groupKeySetID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySetID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SecurityPolicy", indent + 1, value.securityPolicy);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'SecurityPolicy'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochKey0", indent + 1, value.epochKey0);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochKey0'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochStartTime0", indent + 1, value.epochStartTime0);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochStartTime0'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochKey1", indent + 1, value.epochKey1);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochKey1'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochStartTime1", indent + 1, value.epochStartTime1);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochStartTime1'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochKey2", indent + 1, value.epochKey2);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochKey2'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EpochStartTime2", indent + 1, value.epochStartTime2);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochStartTime2'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Label'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Mode", indent + 1, value.mode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Mode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SemanticTag", indent + 1, value.semanticTag);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'SemanticTag'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ModeSelect::Structs::SemanticTag::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("MfgCode", indent + 1, value.mfgCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MfgCode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("CredentialType", indent + 1, value.credentialType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CredentialType'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CredentialIndex", indent + 1, value.credentialIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CredentialIndex'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ZoneId", indent + 1, value.zoneId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ZoneId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ZoneStatus", indent + 1, value.zoneStatus);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ZoneStatus'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("MajorNumber", indent + 1, value.majorNumber);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MajorNumber'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MinorNumber", indent + 1, value.minorNumber);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MinorNumber'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CallSign", indent + 1, value.callSign);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CallSign'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AffiliateCallSign", indent + 1, value.affiliateCallSign);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'AffiliateCallSign'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("OperatorName", indent + 1, value.operatorName);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OperatorName'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LineupName", indent + 1, value.lineupName);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LineupName'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PostalCode", indent + 1, value.postalCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PostalCode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LineupInfoType", indent + 1, value.lineupInfoType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LineupInfoType'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Identifier", indent + 1, value.identifier);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Identifier'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("UpdatedAt", indent + 1, value.updatedAt);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'UpdatedAt'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Position'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Index", indent + 1, value.index);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Index'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("InputType", indent + 1, value.inputType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'InputType'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Description", indent + 1, value.description);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Description'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::Dimension::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Width", indent + 1, value.width);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Width'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Height", indent + 1, value.height);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Height'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExternalIDList", indent + 1, value.externalIDList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExternalIDList'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ParameterList", indent + 1, value.parameterList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ParameterList'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ImageUrl", indent + 1, value.imageUrl);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ImageUrl'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Color", indent + 1, value.color);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Color'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Size", indent + 1, value.size);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Size'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ProviderName", indent + 1, value.providerName);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ProviderName'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Background", indent + 1, value.background);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Background'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Logo", indent + 1, value.logo);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Logo'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ProgressBar", indent + 1, value.progressBar);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ProgressBar'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Splash", indent + 1, value.splash);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Splash'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("WaterMark", indent + 1, value.waterMark);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'WaterMark'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Index", indent + 1, value.index);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Index'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OutputType", indent + 1, value.outputType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OutputType'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("CatalogVendorId", indent + 1, value.catalogVendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CatalogVendorId'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApplicationId", indent + 1, value.applicationId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ApplicationId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Application", indent + 1, value.application);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Application'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoint'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("CatalogVendorId", indent + 1, value.catalogVendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CatalogVendorId'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApplicationId", indent + 1, value.applicationId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ApplicationId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("A", indent + 1, value.a);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'A'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("B", indent + 1, value.b);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'B'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("C", indent + 1, value.c);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'C'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("D", indent + 1, value.d);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'D'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("E", indent + 1, value.e);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'E'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("F", indent + 1, value.f);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'F'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("G", indent + 1, value.g);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'G'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("H", indent + 1, value.h);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'H'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NullableInt", indent + 1, value.nullableInt);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableInt'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OptionalInt", indent + 1, value.optionalInt);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OptionalInt'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableOptionalInt", indent + 1, value.nullableOptionalInt);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableOptionalInt'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableString", indent + 1, value.nullableString);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableString'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OptionalString", indent + 1, value.optionalString);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OptionalString'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableOptionalString", indent + 1, value.nullableOptionalString);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableOptionalString'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableStruct", indent + 1, value.nullableStruct);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableStruct'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OptionalStruct", indent + 1, value.optionalStruct);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OptionalStruct'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableOptionalStruct", indent + 1, value.nullableOptionalStruct);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableOptionalStruct'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableList", indent + 1, value.nullableList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableList'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OptionalList", indent + 1, value.optionalList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OptionalList'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NullableOptionalList", indent + 1, value.nullableOptionalList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NullableOptionalList'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::NestedStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("A", indent + 1, value.a);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'A'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("B", indent + 1, value.b);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'B'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("C", indent + 1, value.c);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'C'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::NestedStructList::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("A", indent + 1, value.a);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'A'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("B", indent + 1, value.b);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'B'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("C", indent + 1, value.c);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'C'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("D", indent + 1, value.d);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'D'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("E", indent + 1, value.e);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'E'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("F", indent + 1, value.f);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'F'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("G", indent + 1, value.g);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'G'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("A", indent + 1, value.a);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'A'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OperationalCert", indent + 1, value.operationalCert);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OperationalCert'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-#pragma GCC diagnostic pop
-
-// We output helpers for all events here, including ones we might not actually
-// be logging.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminFabricIndex'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AdminNodeID", indent + 1, value.adminNodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminNodeID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminPasscodeID'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ChangeType", indent + 1, value.changeType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ChangeType'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LatestValue", indent + 1, value.latestValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LatestValue'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminFabricIndex'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AdminNodeID", indent + 1, value.adminNodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminNodeID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminPasscodeID'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ChangeType", indent + 1, value.changeType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ChangeType'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LatestValue", indent + 1, value.latestValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LatestValue'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ActionID", indent + 1, value.actionID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ActionID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("InvokeID", indent + 1, value.invokeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'InvokeID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NewState", indent + 1, value.newState);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewState'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ActionID", indent + 1, value.actionID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ActionID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("InvokeID", indent + 1, value.invokeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'InvokeID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NewState", indent + 1, value.newState);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewState'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Error", indent + 1, value.error);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Error'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::StartUp::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("SoftwareVersion", indent + 1, value.softwareVersion);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SoftwareVersion'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::ShutDown::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::Leave::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ReachableNewValue", indent + 1, value.reachableNewValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ReachableNewValue'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("PreviousState", indent + 1, value.previousState);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'PreviousState'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("NewState", indent + 1, value.newState);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewState'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Reason", indent + 1, value.reason);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Reason'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("TargetSoftwareVersion", indent + 1, value.targetSoftwareVersion);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'TargetSoftwareVersion'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("SoftwareVersion", indent + 1, value.softwareVersion);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SoftwareVersion'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ProductID", indent + 1, value.productID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ProductID'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("SoftwareVersion", indent + 1, value.softwareVersion);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SoftwareVersion'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("BytesDownloaded", indent + 1, value.bytesDownloaded);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'BytesDownloaded'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ProgressPercent", indent + 1, value.progressPercent);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ProgressPercent'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PlatformCode", indent + 1, value.platformCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'PlatformCode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Current", indent + 1, value.current);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Current'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Previous", indent + 1, value.previous);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Previous'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Current", indent + 1, value.current);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Current'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Previous", indent + 1, value.previous);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Previous'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Current", indent + 1, value.current);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Current'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Previous", indent + 1, value.previous);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Previous'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("BootReason", indent + 1, value.bootReason);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'BootReason'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("SoftwareFault", indent + 1, value.softwareFault);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SoftwareFault'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ConnectionStatus", indent + 1, value.connectionStatus);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ConnectionStatus'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ReasonCode", indent + 1, value.reasonCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ReasonCode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("AssociationFailure", indent + 1, value.associationFailure);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AssociationFailure'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Status", indent + 1, value.status);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Status'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ConnectionStatus", indent + 1, value.connectionStatus);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ConnectionStatus'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NewPosition", indent + 1, value.newPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewPosition'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::InitialPress::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NewPosition", indent + 1, value.newPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewPosition'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::LongPress::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NewPosition", indent + 1, value.newPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewPosition'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("PreviousPosition", indent + 1, value.previousPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'PreviousPosition'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::LongRelease::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("PreviousPosition", indent + 1, value.previousPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'PreviousPosition'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NewPosition", indent + 1, value.newPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewPosition'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CurrentNumberOfPressesCounted", indent + 1, value.currentNumberOfPressesCounted);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'CurrentNumberOfPressesCounted'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("NewPosition", indent + 1, value.newPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'NewPosition'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("TotalNumberOfPressesCounted", indent + 1, value.totalNumberOfPressesCounted);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'TotalNumberOfPressesCounted'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("StateValue", indent + 1, value.stateValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'StateValue'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("AlarmCode", indent + 1, value.alarmCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AlarmCode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("DoorState", indent + 1, value.doorState);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'DoorState'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("LockOperationType", indent + 1, value.lockOperationType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LockOperationType'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OperationSource", indent + 1, value.operationSource);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'OperationSource'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("UserIndex", indent + 1, value.userIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'UserIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SourceNode", indent + 1, value.sourceNode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SourceNode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Credentials", indent + 1, value.credentials);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Credentials'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("LockOperationType", indent + 1, value.lockOperationType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LockOperationType'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OperationSource", indent + 1, value.operationSource);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'OperationSource'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OperationError", indent + 1, value.operationError);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'OperationError'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("UserIndex", indent + 1, value.userIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'UserIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SourceNode", indent + 1, value.sourceNode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SourceNode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Credentials", indent + 1, value.credentials);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Credentials'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("LockDataType", indent + 1, value.lockDataType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LockDataType'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("DataOperationType", indent + 1, value.dataOperationType);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'DataOperationType'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("OperationSource", indent + 1, value.operationSource);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'OperationSource'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("UserIndex", indent + 1, value.userIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'UserIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SourceNode", indent + 1, value.sourceNode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'SourceNode'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("DataIndex", indent + 1, value.dataIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'DataIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Arg1", indent + 1, value.arg1);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg1'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Arg2", indent + 1, value.arg2);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg2'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Arg3", indent + 1, value.arg3);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg3'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Arg4", indent + 1, value.arg4);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg4'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Arg5", indent + 1, value.arg5);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg5'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Arg6", indent + 1, value.arg6);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg6'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-#pragma GCC diagnostic pop
-} // anonymous namespace
 
 static void OnDefaultSuccessResponseWithoutExit(void * context)
 {
@@ -3608,7 +65,7 @@ static void OnDefaultSuccess(void * context, const chip::app::DataModel::NullObj
 template <typename T>
 static void OnGeneralAttributeEventResponse(void * context, const char * label, T value)
 {
-    CHIP_ERROR err = LogValue(label, 0, value);
+    CHIP_ERROR err = DataModelLogger::LogValue(label, 0, value);
 
     auto * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
@@ -3621,7 +78,7 @@ static void OnAccountLoginGetSetupPINResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("setupPIN", 1, data.setupPIN);
+        err = DataModelLogger::LogValue("setupPIN", 1, data.setupPIN);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3635,11 +92,11 @@ static void OnApplicationLauncherLauncherResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = DataModelLogger::LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3654,11 +111,11 @@ OnChannelChangeChannelResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("channelMatch", 1, data.channelMatch);
+        err = DataModelLogger::LogValue("channelMatch", 1, data.channelMatch);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorType", 1, data.errorType);
+        err = DataModelLogger::LogValue("errorType", 1, data.errorType);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3673,11 +130,11 @@ OnContentLauncherLaunchResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = DataModelLogger::LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3691,19 +148,19 @@ static void OnDiagnosticLogsRetrieveLogsResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("content", 1, data.content);
+        err = DataModelLogger::LogValue("content", 1, data.content);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("timeStamp", 1, data.timeStamp);
+        err = DataModelLogger::LogValue("timeStamp", 1, data.timeStamp);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("timeSinceBoot", 1, data.timeSinceBoot);
+        err = DataModelLogger::LogValue("timeSinceBoot", 1, data.timeSinceBoot);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3717,15 +174,15 @@ static void OnDoorLockGetCredentialStatusResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("credentialExists", 1, data.credentialExists);
+        err = DataModelLogger::LogValue("credentialExists", 1, data.credentialExists);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userIndex", 1, data.userIndex);
+        err = DataModelLogger::LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
+        err = DataModelLogger::LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3739,43 +196,43 @@ static void OnDoorLockGetUserResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userIndex", 1, data.userIndex);
+        err = DataModelLogger::LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userName", 1, data.userName);
+        err = DataModelLogger::LogValue("userName", 1, data.userName);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userUniqueId", 1, data.userUniqueId);
+        err = DataModelLogger::LogValue("userUniqueId", 1, data.userUniqueId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userStatus", 1, data.userStatus);
+        err = DataModelLogger::LogValue("userStatus", 1, data.userStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userType", 1, data.userType);
+        err = DataModelLogger::LogValue("userType", 1, data.userType);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("credentialRule", 1, data.credentialRule);
+        err = DataModelLogger::LogValue("credentialRule", 1, data.credentialRule);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("credentials", 1, data.credentials);
+        err = DataModelLogger::LogValue("credentials", 1, data.credentials);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("creatorFabricIndex", 1, data.creatorFabricIndex);
+        err = DataModelLogger::LogValue("creatorFabricIndex", 1, data.creatorFabricIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("lastModifiedFabricIndex", 1, data.lastModifiedFabricIndex);
+        err = DataModelLogger::LogValue("lastModifiedFabricIndex", 1, data.lastModifiedFabricIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("nextUserIndex", 1, data.nextUserIndex);
+        err = DataModelLogger::LogValue("nextUserIndex", 1, data.nextUserIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3790,15 +247,15 @@ OnDoorLockSetCredentialResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userIndex", 1, data.userIndex);
+        err = DataModelLogger::LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
+        err = DataModelLogger::LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3812,11 +269,11 @@ static void OnGeneralCommissioningArmFailSafeResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorCode", 1, data.errorCode);
+        err = DataModelLogger::LogValue("errorCode", 1, data.errorCode);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3830,11 +287,11 @@ static void OnGeneralCommissioningCommissioningCompleteResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorCode", 1, data.errorCode);
+        err = DataModelLogger::LogValue("errorCode", 1, data.errorCode);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3848,11 +305,11 @@ static void OnGeneralCommissioningSetRegulatoryConfigResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorCode", 1, data.errorCode);
+        err = DataModelLogger::LogValue("errorCode", 1, data.errorCode);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3866,7 +323,7 @@ static void OnGroupKeyManagementKeySetReadAllIndicesResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupKeySetIDs", 1, data.groupKeySetIDs);
+        err = DataModelLogger::LogValue("groupKeySetIDs", 1, data.groupKeySetIDs);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3880,7 +337,7 @@ static void OnGroupKeyManagementKeySetReadResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupKeySet", 1, data.groupKeySet);
+        err = DataModelLogger::LogValue("groupKeySet", 1, data.groupKeySet);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3894,11 +351,11 @@ static void OnGroupsAddGroupResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3912,11 +369,11 @@ static void OnGroupsGetGroupMembershipResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("capacity", 1, data.capacity);
+        err = DataModelLogger::LogValue("capacity", 1, data.capacity);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupList", 1, data.groupList);
+        err = DataModelLogger::LogValue("groupList", 1, data.groupList);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3931,11 +388,11 @@ OnGroupsRemoveGroupResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3949,15 +406,15 @@ static void OnGroupsViewGroupResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupName", 1, data.groupName);
+        err = DataModelLogger::LogValue("groupName", 1, data.groupName);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3972,7 +429,7 @@ OnIdentifyIdentifyQueryResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("timeout", 1, data.timeout);
+        err = DataModelLogger::LogValue("timeout", 1, data.timeout);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3987,7 +444,7 @@ OnKeypadInputSendKeyResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4002,7 +459,7 @@ OnMediaPlaybackPlaybackResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4016,15 +473,15 @@ static void OnNetworkCommissioningConnectNetworkResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("networkingStatus", 1, data.networkingStatus);
+        err = DataModelLogger::LogValue("networkingStatus", 1, data.networkingStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorValue", 1, data.errorValue);
+        err = DataModelLogger::LogValue("errorValue", 1, data.errorValue);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4038,11 +495,11 @@ static void OnNetworkCommissioningNetworkConfigResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("networkingStatus", 1, data.networkingStatus);
+        err = DataModelLogger::LogValue("networkingStatus", 1, data.networkingStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4056,19 +513,19 @@ static void OnNetworkCommissioningScanNetworksResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("networkingStatus", 1, data.networkingStatus);
+        err = DataModelLogger::LogValue("networkingStatus", 1, data.networkingStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("wiFiScanResults", 1, data.wiFiScanResults);
+        err = DataModelLogger::LogValue("wiFiScanResults", 1, data.wiFiScanResults);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("threadScanResults", 1, data.threadScanResults);
+        err = DataModelLogger::LogValue("threadScanResults", 1, data.threadScanResults);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4082,11 +539,11 @@ static void OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("action", 1, data.action);
+        err = DataModelLogger::LogValue("action", 1, data.action);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("delayedActionTime", 1, data.delayedActionTime);
+        err = DataModelLogger::LogValue("delayedActionTime", 1, data.delayedActionTime);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4100,35 +557,35 @@ static void OnOtaSoftwareUpdateProviderQueryImageResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("delayedActionTime", 1, data.delayedActionTime);
+        err = DataModelLogger::LogValue("delayedActionTime", 1, data.delayedActionTime);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("imageURI", 1, data.imageURI);
+        err = DataModelLogger::LogValue("imageURI", 1, data.imageURI);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("softwareVersion", 1, data.softwareVersion);
+        err = DataModelLogger::LogValue("softwareVersion", 1, data.softwareVersion);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("softwareVersionString", 1, data.softwareVersionString);
+        err = DataModelLogger::LogValue("softwareVersionString", 1, data.softwareVersionString);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("updateToken", 1, data.updateToken);
+        err = DataModelLogger::LogValue("updateToken", 1, data.updateToken);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userConsentNeeded", 1, data.userConsentNeeded);
+        err = DataModelLogger::LogValue("userConsentNeeded", 1, data.userConsentNeeded);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("metadataForRequestor", 1, data.metadataForRequestor);
+        err = DataModelLogger::LogValue("metadataForRequestor", 1, data.metadataForRequestor);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4142,11 +599,11 @@ static void OnOperationalCredentialsAttestationResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("attestationElements", 1, data.attestationElements);
+        err = DataModelLogger::LogValue("attestationElements", 1, data.attestationElements);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("signature", 1, data.signature);
+        err = DataModelLogger::LogValue("signature", 1, data.signature);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4160,7 +617,7 @@ static void OnOperationalCredentialsCertificateChainResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("certificate", 1, data.certificate);
+        err = DataModelLogger::LogValue("certificate", 1, data.certificate);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4174,15 +631,15 @@ static void OnOperationalCredentialsNOCResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("statusCode", 1, data.statusCode);
+        err = DataModelLogger::LogValue("statusCode", 1, data.statusCode);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("fabricIndex", 1, data.fabricIndex);
+        err = DataModelLogger::LogValue("fabricIndex", 1, data.fabricIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("debugText", 1, data.debugText);
+        err = DataModelLogger::LogValue("debugText", 1, data.debugText);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4196,11 +653,11 @@ static void OnOperationalCredentialsOpCSRResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("NOCSRElements", 1, data.NOCSRElements);
+        err = DataModelLogger::LogValue("NOCSRElements", 1, data.NOCSRElements);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("attestationSignature", 1, data.attestationSignature);
+        err = DataModelLogger::LogValue("attestationSignature", 1, data.attestationSignature);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4214,15 +671,15 @@ static void OnScenesAddSceneResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneId", 1, data.sceneId);
+        err = DataModelLogger::LogValue("sceneId", 1, data.sceneId);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4236,23 +693,23 @@ static void OnScenesGetSceneMembershipResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("capacity", 1, data.capacity);
+        err = DataModelLogger::LogValue("capacity", 1, data.capacity);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneCount", 1, data.sceneCount);
+        err = DataModelLogger::LogValue("sceneCount", 1, data.sceneCount);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneList", 1, data.sceneList);
+        err = DataModelLogger::LogValue("sceneList", 1, data.sceneList);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4267,11 +724,11 @@ OnScenesRemoveAllScenesResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4286,15 +743,15 @@ OnScenesRemoveSceneResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneId", 1, data.sceneId);
+        err = DataModelLogger::LogValue("sceneId", 1, data.sceneId);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4308,15 +765,15 @@ static void OnScenesStoreSceneResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneId", 1, data.sceneId);
+        err = DataModelLogger::LogValue("sceneId", 1, data.sceneId);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4330,27 +787,27 @@ static void OnScenesViewSceneResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupId", 1, data.groupId);
+        err = DataModelLogger::LogValue("groupId", 1, data.groupId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneId", 1, data.sceneId);
+        err = DataModelLogger::LogValue("sceneId", 1, data.sceneId);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("transitionTime", 1, data.transitionTime);
+        err = DataModelLogger::LogValue("transitionTime", 1, data.transitionTime);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("sceneName", 1, data.sceneName);
+        err = DataModelLogger::LogValue("sceneName", 1, data.sceneName);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("extensionFieldSets", 1, data.extensionFieldSets);
+        err = DataModelLogger::LogValue("extensionFieldSets", 1, data.extensionFieldSets);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4364,11 +821,11 @@ static void OnTargetNavigatorNavigateTargetResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = DataModelLogger::LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = DataModelLogger::LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4383,7 +840,7 @@ OnTestClusterBooleanResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("value", 1, data.value);
+        err = DataModelLogger::LogValue("value", 1, data.value);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4397,7 +854,7 @@ static void OnTestClusterSimpleStructResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("arg1", 1, data.arg1);
+        err = DataModelLogger::LogValue("arg1", 1, data.arg1);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4411,7 +868,7 @@ static void OnTestClusterTestAddArgumentsResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("returnValue", 1, data.returnValue);
+        err = DataModelLogger::LogValue("returnValue", 1, data.returnValue);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4425,7 +882,7 @@ static void OnTestClusterTestEmitTestEventResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("value", 1, data.value);
+        err = DataModelLogger::LogValue("value", 1, data.value);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4440,11 +897,11 @@ OnTestClusterTestEnumsResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("arg1", 1, data.arg1);
+        err = DataModelLogger::LogValue("arg1", 1, data.arg1);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("arg2", 1, data.arg2);
+        err = DataModelLogger::LogValue("arg2", 1, data.arg2);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4458,7 +915,7 @@ static void OnTestClusterTestListInt8UReverseResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("arg1", 1, data.arg1);
+        err = DataModelLogger::LogValue("arg1", 1, data.arg1);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4472,19 +929,19 @@ static void OnTestClusterTestNullableOptionalResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("wasPresent", 1, data.wasPresent);
+        err = DataModelLogger::LogValue("wasPresent", 1, data.wasPresent);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("wasNull", 1, data.wasNull);
+        err = DataModelLogger::LogValue("wasNull", 1, data.wasNull);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("value", 1, data.value);
+        err = DataModelLogger::LogValue("value", 1, data.value);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("originalValue", 1, data.originalValue);
+        err = DataModelLogger::LogValue("originalValue", 1, data.originalValue);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4498,7 +955,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("returnValue", 1, data.returnValue);
+        err = DataModelLogger::LogValue("returnValue", 1, data.returnValue);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4512,27 +969,27 @@ static void OnThermostatGetRelayStatusLogResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("timeOfDay", 1, data.timeOfDay);
+        err = DataModelLogger::LogValue("timeOfDay", 1, data.timeOfDay);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("relayStatus", 1, data.relayStatus);
+        err = DataModelLogger::LogValue("relayStatus", 1, data.relayStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("localTemperature", 1, data.localTemperature);
+        err = DataModelLogger::LogValue("localTemperature", 1, data.localTemperature);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("humidityInPercentage", 1, data.humidityInPercentage);
+        err = DataModelLogger::LogValue("humidityInPercentage", 1, data.humidityInPercentage);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("setpoint", 1, data.setpoint);
+        err = DataModelLogger::LogValue("setpoint", 1, data.setpoint);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("unreadEntries", 1, data.unreadEntries);
+        err = DataModelLogger::LogValue("unreadEntries", 1, data.unreadEntries);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4546,19 +1003,19 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("numberOfTransitionsForSequence", 1, data.numberOfTransitionsForSequence);
+        err = DataModelLogger::LogValue("numberOfTransitionsForSequence", 1, data.numberOfTransitionsForSequence);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("dayOfWeekForSequence", 1, data.dayOfWeekForSequence);
+        err = DataModelLogger::LogValue("dayOfWeekForSequence", 1, data.dayOfWeekForSequence);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("modeForSequence", 1, data.modeForSequence);
+        err = DataModelLogger::LogValue("modeForSequence", 1, data.modeForSequence);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("payload", 1, data.payload);
+        err = DataModelLogger::LogValue("payload", 1, data.payload);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4713,7 +1170,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
     {
-        LogValue("AccessControl.AccessControlEntryChanged report", 0, value);
+        DataModelLogger::LogValue("AccessControl.AccessControlEntryChanged report", 0, value);
     }
 
 private:
@@ -4786,7 +1243,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
     {
-        LogValue("AccessControl.AccessControlExtensionChanged report", 0, value);
+        DataModelLogger::LogValue("AccessControl.AccessControlExtensionChanged report", 0, value);
     }
 
 private:
@@ -4864,7 +1321,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
             value)
     {
-        LogValue("AccessControl.Acl report", 0, value);
+        DataModelLogger::LogValue("AccessControl.Acl report", 0, value);
     }
 
 private:
@@ -4942,7 +1399,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
             value)
     {
-        LogValue("AccessControl.Extension report", 0, value);
+        DataModelLogger::LogValue("AccessControl.Extension report", 0, value);
     }
 
 private:
@@ -5014,7 +1471,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("AccessControl.AttributeList report", 0, value);
+        DataModelLogger::LogValue("AccessControl.AttributeList report", 0, value);
     }
 
 private:
@@ -5084,7 +1541,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("AccessControl.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("AccessControl.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -5239,7 +1699,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("AccountLogin.AttributeList report", 0, value);
+        DataModelLogger::LogValue("AccountLogin.AttributeList report", 0, value);
     }
 
 private:
@@ -5309,7 +1769,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("AccountLogin.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("AccountLogin.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -5471,7 +1934,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("AdministratorCommissioning.WindowStatus report", 0, value);
+        DataModelLogger::LogValue("AdministratorCommissioning.WindowStatus report", 0, value);
     }
 
 private:
@@ -5543,7 +2006,7 @@ public:
 
     static void OnValueReport(void * context, chip::FabricIndex value)
     {
-        LogValue("AdministratorCommissioning.AdminFabricIndex report", 0, value);
+        DataModelLogger::LogValue("AdministratorCommissioning.AdminFabricIndex report", 0, value);
     }
 
 private:
@@ -5615,7 +2078,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("AdministratorCommissioning.AdminVendorId report", 0, value);
+        DataModelLogger::LogValue("AdministratorCommissioning.AdminVendorId report", 0, value);
     }
 
 private:
@@ -5687,7 +2150,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("AdministratorCommissioning.AttributeList report", 0, value);
+        DataModelLogger::LogValue("AdministratorCommissioning.AttributeList report", 0, value);
     }
 
 private:
@@ -5759,7 +2222,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("AdministratorCommissioning.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("AdministratorCommissioning.ClusterRevision report", 0, value);
     }
 
 private:
@@ -5849,7 +2312,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ApplicationBasic.VendorName report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("ApplicationBasic.VendorName report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -5918,7 +2384,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.VendorId report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ApplicationBasic.VendorId report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -5989,7 +2458,7 @@ public:
 
     static void OnValueReport(void * context, chip::CharSpan value)
     {
-        LogValue("ApplicationBasic.ApplicationName report", 0, value);
+        DataModelLogger::LogValue("ApplicationBasic.ApplicationName report", 0, value);
     }
 
 private:
@@ -6059,7 +2528,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.ProductId report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ApplicationBasic.ProductId report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -6130,7 +2602,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
     {
-        LogValue("ApplicationBasic.ApplicationStatus report", 0, value);
+        DataModelLogger::LogValue("ApplicationBasic.ApplicationStatus report", 0, value);
     }
 
 private:
@@ -6202,7 +2674,7 @@ public:
 
     static void OnValueReport(void * context, chip::CharSpan value)
     {
-        LogValue("ApplicationBasic.ApplicationVersion report", 0, value);
+        DataModelLogger::LogValue("ApplicationBasic.ApplicationVersion report", 0, value);
     }
 
 private:
@@ -6274,7 +2746,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
     {
-        LogValue("ApplicationBasic.AllowedVendorList report", 0, value);
+        DataModelLogger::LogValue("ApplicationBasic.AllowedVendorList report", 0, value);
     }
 
 private:
@@ -6346,7 +2818,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ApplicationBasic.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ApplicationBasic.AttributeList report", 0, value);
     }
 
 private:
@@ -6416,7 +2888,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ApplicationBasic.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -6576,7 +3051,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
     {
-        LogValue("ApplicationLauncher.ApplicationLauncherList report", 0, value);
+        DataModelLogger::LogValue("ApplicationLauncher.ApplicationLauncherList report", 0, value);
     }
 
 private:
@@ -6648,7 +3123,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ApplicationLauncher.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ApplicationLauncher.AttributeList report", 0, value);
     }
 
 private:
@@ -6718,7 +3193,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationLauncher.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ApplicationLauncher.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -6858,7 +3336,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
     {
-        LogValue("AudioOutput.AudioOutputList report", 0, value);
+        DataModelLogger::LogValue("AudioOutput.AudioOutputList report", 0, value);
     }
 
 private:
@@ -6928,7 +3406,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("AudioOutput.CurrentAudioOutput report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("AudioOutput.CurrentAudioOutput report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -6999,7 +3480,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("AudioOutput.AttributeList report", 0, value);
+        DataModelLogger::LogValue("AudioOutput.AttributeList report", 0, value);
     }
 
 private:
@@ -7069,7 +3550,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("AudioOutput.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("AudioOutput.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -7200,7 +3684,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("BarrierControl.BarrierMovingState report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("BarrierControl.BarrierMovingState report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -7269,7 +3756,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("BarrierControl.BarrierSafetyStatus report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("BarrierControl.BarrierSafetyStatus report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -7338,7 +3828,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("BarrierControl.BarrierCapabilities report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("BarrierControl.BarrierCapabilities report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -7407,7 +3900,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("BarrierControl.BarrierPosition report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("BarrierControl.BarrierPosition report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -7478,7 +3974,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("BarrierControl.AttributeList report", 0, value);
+        DataModelLogger::LogValue("BarrierControl.AttributeList report", 0, value);
     }
 
 private:
@@ -7548,7 +4044,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("BarrierControl.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("BarrierControl.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -7675,7 +4174,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::StartUp::DecodableType value)
     {
-        LogValue("Basic.StartUp report", 0, value);
+        DataModelLogger::LogValue("Basic.StartUp report", 0, value);
     }
 
 private:
@@ -7746,7 +4245,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::ShutDown::DecodableType value)
     {
-        LogValue("Basic.ShutDown report", 0, value);
+        DataModelLogger::LogValue("Basic.ShutDown report", 0, value);
     }
 
 private:
@@ -7816,7 +4315,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::Leave::DecodableType value)
     {
-        LogValue("Basic.Leave report", 0, value);
+        DataModelLogger::LogValue("Basic.Leave report", 0, value);
     }
 
 private:
@@ -7887,7 +4386,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value)
     {
-        LogValue("Basic.ReachableChanged report", 0, value);
+        DataModelLogger::LogValue("Basic.ReachableChanged report", 0, value);
     }
 
 private:
@@ -7957,7 +4456,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.InteractionModelVersion report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Basic.InteractionModelVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8026,7 +4528,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.VendorName report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.VendorName report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8095,7 +4600,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::VendorId value) { LogValue("Basic.VendorID report", 0, value); }
+    static void OnValueReport(void * context, chip::VendorId value)
+    {
+        DataModelLogger::LogValue("Basic.VendorID report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8164,7 +4672,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ProductName report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.ProductName report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8233,7 +4744,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.ProductID report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("Basic.ProductID report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -8328,7 +4839,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.NodeLabel report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.NodeLabel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8423,7 +4937,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.Location report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.Location report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8492,7 +5009,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.HardwareVersion report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Basic.HardwareVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8561,7 +5081,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.HardwareVersionString report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.HardwareVersionString report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8630,7 +5153,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("Basic.SoftwareVersion report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("Basic.SoftwareVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8699,7 +5225,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.SoftwareVersionString report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.SoftwareVersionString report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8768,7 +5297,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ManufacturingDate report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.ManufacturingDate report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8837,7 +5369,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.PartNumber report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.PartNumber report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8906,7 +5441,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ProductURL report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.ProductURL report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -8975,7 +5513,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.ProductLabel report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.ProductLabel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9044,7 +5585,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.SerialNumber report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.SerialNumber report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9139,7 +5683,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("Basic.LocalConfigDisabled report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("Basic.LocalConfigDisabled report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9208,7 +5755,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("Basic.Reachable report", 0, value); }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("Basic.Reachable report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -9277,7 +5824,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.UniqueID report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("Basic.UniqueID report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9348,7 +5898,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Basic.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Basic.AttributeList report", 0, value);
     }
 
 private:
@@ -9418,7 +5968,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Basic.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9528,7 +6081,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("BinaryInputBasic.OutOfService report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("BinaryInputBasic.OutOfService report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9623,7 +6179,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("BinaryInputBasic.PresentValue report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("BinaryInputBasic.PresentValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9692,7 +6251,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("BinaryInputBasic.StatusFlags report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("BinaryInputBasic.StatusFlags report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9763,7 +6325,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("BinaryInputBasic.AttributeList report", 0, value);
+        DataModelLogger::LogValue("BinaryInputBasic.AttributeList report", 0, value);
     }
 
 private:
@@ -9833,7 +6395,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("BinaryInputBasic.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("BinaryInputBasic.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -9972,7 +6537,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Binding.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Binding.AttributeList report", 0, value);
     }
 
 private:
@@ -10042,7 +6607,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Binding.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Binding.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -10127,7 +6695,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value)
     {
-        LogValue("BooleanState.StateChange report", 0, value);
+        DataModelLogger::LogValue("BooleanState.StateChange report", 0, value);
     }
 
 private:
@@ -10197,7 +6765,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("BooleanState.StateValue report", 0, value); }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("BooleanState.StateValue report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -10268,7 +6836,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("BooleanState.AttributeList report", 0, value);
+        DataModelLogger::LogValue("BooleanState.AttributeList report", 0, value);
     }
 
 private:
@@ -10338,7 +6906,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("BooleanState.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("BooleanState.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -10743,7 +7314,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
     {
-        LogValue("BridgedActions.StateChanged report", 0, value);
+        DataModelLogger::LogValue("BridgedActions.StateChanged report", 0, value);
     }
 
 private:
@@ -10814,7 +7385,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value)
     {
-        LogValue("BridgedActions.ActionFailed report", 0, value);
+        DataModelLogger::LogValue("BridgedActions.ActionFailed report", 0, value);
     }
 
 private:
@@ -10892,7 +7463,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
             value)
     {
-        LogValue("BridgedActions.ActionList report", 0, value);
+        DataModelLogger::LogValue("BridgedActions.ActionList report", 0, value);
     }
 
 private:
@@ -10970,7 +7541,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
             value)
     {
-        LogValue("BridgedActions.EndpointList report", 0, value);
+        DataModelLogger::LogValue("BridgedActions.EndpointList report", 0, value);
     }
 
 private:
@@ -11040,7 +7611,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedActions.SetupUrl report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("BridgedActions.SetupUrl report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -11111,7 +7685,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("BridgedActions.AttributeList report", 0, value);
+        DataModelLogger::LogValue("BridgedActions.AttributeList report", 0, value);
     }
 
 private:
@@ -11181,7 +7755,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedActions.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("BridgedActions.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -11264,7 +7841,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("BridgedDeviceBasic.AttributeList report", 0, value);
+        DataModelLogger::LogValue("BridgedDeviceBasic.AttributeList report", 0, value);
     }
 
 private:
@@ -11334,7 +7911,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedDeviceBasic.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("BridgedDeviceBasic.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -11498,7 +8078,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
     {
-        LogValue("Channel.ChannelList report", 0, value);
+        DataModelLogger::LogValue("Channel.ChannelList report", 0, value);
     }
 
 private:
@@ -11570,7 +8150,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Channel.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Channel.AttributeList report", 0, value);
     }
 
 private:
@@ -11640,7 +8220,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Channel.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Channel.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12334,7 +8917,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.CurrentHue report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.CurrentHue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12403,7 +8989,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.CurrentSaturation report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.CurrentSaturation report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12472,7 +9061,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.RemainingTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.RemainingTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12541,7 +9133,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.CurrentX report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.CurrentX report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12610,7 +9205,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.CurrentY report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.CurrentY report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12679,7 +9277,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.DriftCompensation report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.DriftCompensation report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12748,7 +9349,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ColorControl.CompensationText report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("ColorControl.CompensationText report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12817,7 +9421,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorTemperature report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorTemperature report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12886,7 +9493,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorMode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorMode report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -12981,7 +9591,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorControlOptions report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorControlOptions report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13050,7 +9663,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.NumberOfPrimaries report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.NumberOfPrimaries report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13119,7 +9735,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary1X report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary1X report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13188,7 +9807,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary1Y report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary1Y report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13257,7 +9879,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary1Intensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary1Intensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13326,7 +9951,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary2X report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary2X report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13395,7 +10023,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary2Y report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary2Y report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13464,7 +10095,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary2Intensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary2Intensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13533,7 +10167,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary3X report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary3X report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13602,7 +10239,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary3Y report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary3Y report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13671,7 +10311,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary3Intensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary3Intensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13740,7 +10383,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary4X report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary4X report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13809,7 +10455,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary4Y report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary4Y report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13878,7 +10527,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary4Intensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary4Intensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -13947,7 +10599,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary5X report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary5X report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14016,7 +10671,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary5Y report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary5Y report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14085,7 +10743,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary5Intensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary5Intensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14154,7 +10815,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary6X report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary6X report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14223,7 +10887,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.Primary6Y report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary6Y report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14292,7 +10959,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.Primary6Intensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.Primary6Intensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14387,7 +11057,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.WhitePointX report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.WhitePointX report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14482,7 +11155,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.WhitePointY report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.WhitePointY report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14577,7 +11253,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointRX report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointRX report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14672,7 +11351,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointRY report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointRY report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14767,7 +11449,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorPointRIntensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointRIntensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14862,7 +11547,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointGX report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointGX report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -14957,7 +11645,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointGY report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointGY report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15052,7 +11743,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorPointGIntensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointGIntensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15147,7 +11841,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointBX report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointBX report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15242,7 +11939,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorPointBY report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointBY report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15337,7 +12037,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorPointBIntensity report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorPointBIntensity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15406,7 +12109,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.EnhancedCurrentHue report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.EnhancedCurrentHue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15475,7 +12181,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.EnhancedColorMode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.EnhancedColorMode report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15544,7 +12253,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorLoopActive report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorLoopActive report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15613,7 +12325,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ColorControl.ColorLoopDirection report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorLoopDirection report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15682,7 +12397,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorLoopTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorLoopTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15753,7 +12471,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ColorControl.ColorLoopStartEnhancedHue report", 0, value);
+        DataModelLogger::LogValue("ColorControl.ColorLoopStartEnhancedHue report", 0, value);
     }
 
 private:
@@ -15825,7 +12543,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ColorControl.ColorLoopStoredEnhancedHue report", 0, value);
+        DataModelLogger::LogValue("ColorControl.ColorLoopStoredEnhancedHue report", 0, value);
     }
 
 private:
@@ -15895,7 +12613,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorCapabilities report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorCapabilities report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -15964,7 +12685,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorTempPhysicalMin report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorTempPhysicalMin report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -16033,7 +12757,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ColorTempPhysicalMax report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ColorTempPhysicalMax report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -16104,7 +12831,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ColorControl.CoupleColorTempToLevelMinMireds report", 0, value);
+        DataModelLogger::LogValue("ColorControl.CoupleColorTempToLevelMinMireds report", 0, value);
     }
 
 private:
@@ -16202,7 +12929,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ColorControl.StartUpColorTemperatureMireds report", 0, value);
+        DataModelLogger::LogValue("ColorControl.StartUpColorTemperatureMireds report", 0, value);
     }
 
 private:
@@ -16274,7 +13001,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ColorControl.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ColorControl.AttributeList report", 0, value);
     }
 
 private:
@@ -16344,7 +13071,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ColorControl.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ColorControl.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -16483,7 +13213,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
-        LogValue("ContentLauncher.AcceptHeaderList report", 0, value);
+        DataModelLogger::LogValue("ContentLauncher.AcceptHeaderList report", 0, value);
     }
 
 private:
@@ -16581,7 +13311,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ContentLauncher.SupportedStreamingProtocols report", 0, value);
+        DataModelLogger::LogValue("ContentLauncher.SupportedStreamingProtocols report", 0, value);
     }
 
 private:
@@ -16653,7 +13383,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ContentLauncher.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ContentLauncher.AttributeList report", 0, value);
     }
 
 private:
@@ -16723,7 +13453,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ContentLauncher.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ContentLauncher.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -16814,7 +13547,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
     {
-        LogValue("Descriptor.DeviceList report", 0, value);
+        DataModelLogger::LogValue("Descriptor.DeviceList report", 0, value);
     }
 
 private:
@@ -16886,7 +13619,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
     {
-        LogValue("Descriptor.ServerList report", 0, value);
+        DataModelLogger::LogValue("Descriptor.ServerList report", 0, value);
     }
 
 private:
@@ -16958,7 +13691,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
     {
-        LogValue("Descriptor.ClientList report", 0, value);
+        DataModelLogger::LogValue("Descriptor.ClientList report", 0, value);
     }
 
 private:
@@ -17030,7 +13763,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
     {
-        LogValue("Descriptor.PartsList report", 0, value);
+        DataModelLogger::LogValue("Descriptor.PartsList report", 0, value);
     }
 
 private:
@@ -17102,7 +13835,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Descriptor.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Descriptor.AttributeList report", 0, value);
     }
 
 private:
@@ -17172,7 +13905,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Descriptor.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Descriptor.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -17283,7 +14019,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("DiagnosticLogs.AttributeList report", 0, value);
+        DataModelLogger::LogValue("DiagnosticLogs.AttributeList report", 0, value);
     }
 
 private:
@@ -17604,7 +14340,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value)
     {
-        LogValue("DoorLock.DoorLockAlarm report", 0, value);
+        DataModelLogger::LogValue("DoorLock.DoorLockAlarm report", 0, value);
     }
 
 private:
@@ -17675,7 +14411,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value)
     {
-        LogValue("DoorLock.DoorStateChange report", 0, value);
+        DataModelLogger::LogValue("DoorLock.DoorStateChange report", 0, value);
     }
 
 private:
@@ -17746,7 +14482,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value)
     {
-        LogValue("DoorLock.LockOperation report", 0, value);
+        DataModelLogger::LogValue("DoorLock.LockOperation report", 0, value);
     }
 
 private:
@@ -17817,7 +14553,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value)
     {
-        LogValue("DoorLock.LockOperationError report", 0, value);
+        DataModelLogger::LogValue("DoorLock.LockOperationError report", 0, value);
     }
 
 private:
@@ -17888,7 +14624,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value)
     {
-        LogValue("DoorLock.LockUserChange report", 0, value);
+        DataModelLogger::LogValue("DoorLock.LockUserChange report", 0, value);
     }
 
 private:
@@ -17962,7 +14698,7 @@ public:
     static void OnValueReport(void * context,
                               const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
     {
-        LogValue("DoorLock.LockState report", 0, value);
+        DataModelLogger::LogValue("DoorLock.LockState report", 0, value);
     }
 
 private:
@@ -18034,7 +14770,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::DlLockType value)
     {
-        LogValue("DoorLock.LockType report", 0, value);
+        DataModelLogger::LogValue("DoorLock.LockType report", 0, value);
     }
 
 private:
@@ -18104,7 +14840,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.ActuatorEnabled report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("DoorLock.ActuatorEnabled report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18177,7 +14916,7 @@ public:
     static void OnValueReport(void * context,
                               const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
     {
-        LogValue("DoorLock.DoorState report", 0, value);
+        DataModelLogger::LogValue("DoorLock.DoorState report", 0, value);
     }
 
 private:
@@ -18247,7 +14986,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfTotalUsersSupported report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.NumberOfTotalUsersSupported report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18316,7 +15058,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfPINUsersSupported report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.NumberOfPINUsersSupported report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18385,7 +15130,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MaxPINCodeLength report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.MaxPINCodeLength report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18454,7 +15202,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MinPINCodeLength report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.MinPINCodeLength report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18549,7 +15300,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("DoorLock.Language report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("DoorLock.Language report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18644,7 +15398,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("DoorLock.AutoRelockTime report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.AutoRelockTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -18739,7 +15496,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.SoundVolume report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("DoorLock.SoundVolume report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -18836,7 +15593,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
     {
-        LogValue("DoorLock.OperatingMode report", 0, value);
+        DataModelLogger::LogValue("DoorLock.OperatingMode report", 0, value);
     }
 
 private:
@@ -18906,7 +15663,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.SupportedOperatingModes report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.SupportedOperatingModes report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19001,7 +15761,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnableOneTouchLocking report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("DoorLock.EnableOneTouchLocking report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19096,7 +15859,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnablePrivacyModeButton report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("DoorLock.EnablePrivacyModeButton report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19191,7 +15957,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.WrongCodeEntryLimit report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.WrongCodeEntryLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19262,7 +16031,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("DoorLock.AttributeList report", 0, value);
+        DataModelLogger::LogValue("DoorLock.AttributeList report", 0, value);
     }
 
 private:
@@ -19332,7 +16101,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("DoorLock.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19426,7 +16198,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ElectricalMeasurement.MeasurementType report", 0, value);
+        DataModelLogger::LogValue("ElectricalMeasurement.MeasurementType report", 0, value);
     }
 
 private:
@@ -19498,7 +16270,7 @@ public:
 
     static void OnValueReport(void * context, int32_t value)
     {
-        LogValue("ElectricalMeasurement.TotalActivePower report", 0, value);
+        DataModelLogger::LogValue("ElectricalMeasurement.TotalActivePower report", 0, value);
     }
 
 private:
@@ -19568,7 +16340,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsVoltage report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.RmsVoltage report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19637,7 +16412,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsVoltageMin report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.RmsVoltageMin report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19706,7 +16484,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsVoltageMax report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.RmsVoltageMax report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19775,7 +16556,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsCurrent report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.RmsCurrent report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19844,7 +16628,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsCurrentMin report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.RmsCurrentMin report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19913,7 +16700,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ElectricalMeasurement.RmsCurrentMax report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.RmsCurrentMax report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -19982,7 +16772,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("ElectricalMeasurement.ActivePower report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.ActivePower report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -20051,7 +16844,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("ElectricalMeasurement.ActivePowerMin report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.ActivePowerMin report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -20120,7 +16916,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("ElectricalMeasurement.ActivePowerMax report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("ElectricalMeasurement.ActivePowerMax report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -20191,7 +16990,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ElectricalMeasurement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ElectricalMeasurement.AttributeList report", 0, value);
     }
 
 private:
@@ -20263,7 +17062,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ElectricalMeasurement.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("ElectricalMeasurement.ClusterRevision report", 0, value);
     }
 
 private:
@@ -20376,7 +17175,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("EthernetNetworkDiagnostics.PHYRate report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.PHYRate report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -20445,7 +17247,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("EthernetNetworkDiagnostics.FullDuplex report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.FullDuplex report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -20516,7 +17321,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.PacketRxCount report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.PacketRxCount report", 0, value);
     }
 
 private:
@@ -20588,7 +17393,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.PacketTxCount report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.PacketTxCount report", 0, value);
     }
 
 private:
@@ -20660,7 +17465,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.TxErrCount report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.TxErrCount report", 0, value);
     }
 
 private:
@@ -20732,7 +17537,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.CollisionCount report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.CollisionCount report", 0, value);
     }
 
 private:
@@ -20804,7 +17609,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.OverrunCount report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.OverrunCount report", 0, value);
     }
 
 private:
@@ -20874,7 +17679,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("EthernetNetworkDiagnostics.CarrierDetect report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.CarrierDetect report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -20945,7 +17753,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.TimeSinceReset report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.TimeSinceReset report", 0, value);
     }
 
 private:
@@ -21017,7 +17825,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("EthernetNetworkDiagnostics.AttributeList report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.AttributeList report", 0, value);
     }
 
 private:
@@ -21089,7 +17897,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.FeatureMap report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.FeatureMap report", 0, value);
     }
 
 private:
@@ -21161,7 +17969,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("EthernetNetworkDiagnostics.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("EthernetNetworkDiagnostics.ClusterRevision report", 0, value);
     }
 
 private:
@@ -21250,7 +18058,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
     {
-        LogValue("FixedLabel.LabelList report", 0, value);
+        DataModelLogger::LogValue("FixedLabel.LabelList report", 0, value);
     }
 
 private:
@@ -21322,7 +18130,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("FixedLabel.AttributeList report", 0, value);
+        DataModelLogger::LogValue("FixedLabel.AttributeList report", 0, value);
     }
 
 private:
@@ -21392,7 +18200,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("FixedLabel.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("FixedLabel.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -21477,7 +18288,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("FlowMeasurement.MeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("FlowMeasurement.MeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -21546,7 +18360,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("FlowMeasurement.MinMeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("FlowMeasurement.MinMeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -21615,7 +18432,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("FlowMeasurement.MaxMeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("FlowMeasurement.MaxMeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -21684,7 +18504,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("FlowMeasurement.Tolerance report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("FlowMeasurement.Tolerance report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -21755,7 +18578,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("FlowMeasurement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("FlowMeasurement.AttributeList report", 0, value);
     }
 
 private:
@@ -21825,7 +18648,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("FlowMeasurement.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("FlowMeasurement.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -22013,7 +18839,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("GeneralCommissioning.Breadcrumb report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("GeneralCommissioning.Breadcrumb report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -22091,7 +18920,7 @@ public:
                   const chip::app::DataModel::DecodableList<
                       chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value)
     {
-        LogValue("GeneralCommissioning.BasicCommissioningInfoList report", 0, value);
+        DataModelLogger::LogValue("GeneralCommissioning.BasicCommissioningInfoList report", 0, value);
     }
 
 private:
@@ -22161,7 +18990,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("GeneralCommissioning.RegulatoryConfig report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("GeneralCommissioning.RegulatoryConfig report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -22232,7 +19064,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("GeneralCommissioning.LocationCapability report", 0, value);
+        DataModelLogger::LogValue("GeneralCommissioning.LocationCapability report", 0, value);
     }
 
 private:
@@ -22304,7 +19136,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("GeneralCommissioning.AttributeList report", 0, value);
+        DataModelLogger::LogValue("GeneralCommissioning.AttributeList report", 0, value);
     }
 
 private:
@@ -22374,7 +19206,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("GeneralCommissioning.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("GeneralCommissioning.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -22471,7 +19306,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value)
     {
-        LogValue("GeneralDiagnostics.HardwareFaultChange report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.HardwareFaultChange report", 0, value);
     }
 
 private:
@@ -22544,7 +19379,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value)
     {
-        LogValue("GeneralDiagnostics.RadioFaultChange report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.RadioFaultChange report", 0, value);
     }
 
 private:
@@ -22617,7 +19452,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value)
     {
-        LogValue("GeneralDiagnostics.NetworkFaultChange report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.NetworkFaultChange report", 0, value);
     }
 
 private:
@@ -22688,7 +19523,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value)
     {
-        LogValue("GeneralDiagnostics.BootReason report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.BootReason report", 0, value);
     }
 
 private:
@@ -22765,7 +19600,7 @@ public:
                               const chip::app::DataModel::DecodableList<
                                   chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value)
     {
-        LogValue("GeneralDiagnostics.NetworkInterfaces report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.NetworkInterfaces report", 0, value);
     }
 
 private:
@@ -22835,7 +19670,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("GeneralDiagnostics.RebootCount report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("GeneralDiagnostics.RebootCount report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -22904,7 +19742,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("GeneralDiagnostics.UpTime report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("GeneralDiagnostics.UpTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -22975,7 +19816,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("GeneralDiagnostics.TotalOperationalHours report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.TotalOperationalHours report", 0, value);
     }
 
 private:
@@ -23045,7 +19886,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("GeneralDiagnostics.BootReasons report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("GeneralDiagnostics.BootReasons report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -23116,7 +19960,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        LogValue("GeneralDiagnostics.ActiveHardwareFaults report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.ActiveHardwareFaults report", 0, value);
     }
 
 private:
@@ -23188,7 +20032,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        LogValue("GeneralDiagnostics.ActiveRadioFaults report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.ActiveRadioFaults report", 0, value);
     }
 
 private:
@@ -23260,7 +20104,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        LogValue("GeneralDiagnostics.ActiveNetworkFaults report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.ActiveNetworkFaults report", 0, value);
     }
 
 private:
@@ -23332,7 +20176,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("GeneralDiagnostics.AttributeList report", 0, value);
+        DataModelLogger::LogValue("GeneralDiagnostics.AttributeList report", 0, value);
     }
 
 private:
@@ -23402,7 +20246,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("GeneralDiagnostics.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("GeneralDiagnostics.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -23595,7 +20442,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
             value)
     {
-        LogValue("GroupKeyManagement.GroupKeyMap report", 0, value);
+        DataModelLogger::LogValue("GroupKeyManagement.GroupKeyMap report", 0, value);
     }
 
 private:
@@ -23673,7 +20520,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
             value)
     {
-        LogValue("GroupKeyManagement.GroupTable report", 0, value);
+        DataModelLogger::LogValue("GroupKeyManagement.GroupTable report", 0, value);
     }
 
 private:
@@ -23745,7 +20592,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("GroupKeyManagement.MaxGroupsPerFabric report", 0, value);
+        DataModelLogger::LogValue("GroupKeyManagement.MaxGroupsPerFabric report", 0, value);
     }
 
 private:
@@ -23817,7 +20664,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("GroupKeyManagement.MaxGroupKeysPerFabric report", 0, value);
+        DataModelLogger::LogValue("GroupKeyManagement.MaxGroupKeysPerFabric report", 0, value);
     }
 
 private:
@@ -23889,7 +20736,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("GroupKeyManagement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("GroupKeyManagement.AttributeList report", 0, value);
     }
 
 private:
@@ -23959,7 +20806,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("GroupKeyManagement.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("GroupKeyManagement.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -24189,7 +21039,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Groups.NameSupport report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Groups.NameSupport report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -24260,7 +21110,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Groups.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Groups.AttributeList report", 0, value);
     }
 
 private:
@@ -24330,7 +21180,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Groups.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Groups.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -24513,7 +21366,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Identify.IdentifyTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Identify.IdentifyTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -24582,7 +21438,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Identify.IdentifyType report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Identify.IdentifyType report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -24653,7 +21512,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Identify.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Identify.AttributeList report", 0, value);
     }
 
 private:
@@ -24723,7 +21582,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Identify.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Identify.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -24811,7 +21673,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("IlluminanceMeasurement.MeasuredValue report", 0, value);
+        DataModelLogger::LogValue("IlluminanceMeasurement.MeasuredValue report", 0, value);
     }
 
 private:
@@ -24883,7 +21745,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("IlluminanceMeasurement.MinMeasuredValue report", 0, value);
+        DataModelLogger::LogValue("IlluminanceMeasurement.MinMeasuredValue report", 0, value);
     }
 
 private:
@@ -24955,7 +21817,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("IlluminanceMeasurement.MaxMeasuredValue report", 0, value);
+        DataModelLogger::LogValue("IlluminanceMeasurement.MaxMeasuredValue report", 0, value);
     }
 
 private:
@@ -25025,7 +21887,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("IlluminanceMeasurement.Tolerance report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("IlluminanceMeasurement.Tolerance report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -25096,7 +21961,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("IlluminanceMeasurement.LightSensorType report", 0, value);
+        DataModelLogger::LogValue("IlluminanceMeasurement.LightSensorType report", 0, value);
     }
 
 private:
@@ -25168,7 +22033,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("IlluminanceMeasurement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("IlluminanceMeasurement.AttributeList report", 0, value);
     }
 
 private:
@@ -25240,7 +22105,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("IlluminanceMeasurement.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("IlluminanceMeasurement.ClusterRevision report", 0, value);
     }
 
 private:
@@ -25350,7 +22215,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("KeypadInput.AttributeList report", 0, value);
+        DataModelLogger::LogValue("KeypadInput.AttributeList report", 0, value);
     }
 
 private:
@@ -25420,7 +22285,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("KeypadInput.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("KeypadInput.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -25731,7 +22599,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.CurrentLevel report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.CurrentLevel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -25800,7 +22671,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.RemainingTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.RemainingTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -25869,7 +22743,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.MinLevel report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.MinLevel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -25938,7 +22815,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.MaxLevel report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.MaxLevel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -26007,7 +22887,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.CurrentFrequency report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.CurrentFrequency report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -26076,7 +22959,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.MinFrequency report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.MinFrequency report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -26145,7 +23031,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.MaxFrequency report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.MaxFrequency report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -26240,7 +23129,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("LevelControl.Options report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("LevelControl.Options report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -26335,7 +23224,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.OnOffTransitionTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.OnOffTransitionTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -26432,7 +23324,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("LevelControl.OnLevel report", 0, value);
+        DataModelLogger::LogValue("LevelControl.OnLevel report", 0, value);
     }
 
 private:
@@ -26530,7 +23422,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("LevelControl.OnTransitionTime report", 0, value);
+        DataModelLogger::LogValue("LevelControl.OnTransitionTime report", 0, value);
     }
 
 private:
@@ -26628,7 +23520,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("LevelControl.OffTransitionTime report", 0, value);
+        DataModelLogger::LogValue("LevelControl.OffTransitionTime report", 0, value);
     }
 
 private:
@@ -26726,7 +23618,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("LevelControl.DefaultMoveRate report", 0, value);
+        DataModelLogger::LogValue("LevelControl.DefaultMoveRate report", 0, value);
     }
 
 private:
@@ -26824,7 +23716,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("LevelControl.StartUpCurrentLevel report", 0, value);
+        DataModelLogger::LogValue("LevelControl.StartUpCurrentLevel report", 0, value);
     }
 
 private:
@@ -26896,7 +23788,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("LevelControl.AttributeList report", 0, value);
+        DataModelLogger::LogValue("LevelControl.AttributeList report", 0, value);
     }
 
 private:
@@ -26966,7 +23858,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("LevelControl.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -27035,7 +23930,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LevelControl.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LevelControl.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -27145,7 +24043,7 @@ public:
 
     static void OnValueReport(void * context, chip::CharSpan value)
     {
-        LogValue("LocalizationConfiguration.ActiveLocale report", 0, value);
+        DataModelLogger::LogValue("LocalizationConfiguration.ActiveLocale report", 0, value);
     }
 
 private:
@@ -27217,7 +24115,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
-        LogValue("LocalizationConfiguration.SupportedLocales report", 0, value);
+        DataModelLogger::LogValue("LocalizationConfiguration.SupportedLocales report", 0, value);
     }
 
 private:
@@ -27289,7 +24187,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("LocalizationConfiguration.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("LocalizationConfiguration.ClusterRevision report", 0, value);
     }
 
 private:
@@ -27394,7 +24292,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("LowPower.AttributeList report", 0, value);
+        DataModelLogger::LogValue("LowPower.AttributeList report", 0, value);
     }
 
 private:
@@ -27464,7 +24362,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("LowPower.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("LowPower.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -27646,7 +24547,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
     {
-        LogValue("MediaInput.MediaInputList report", 0, value);
+        DataModelLogger::LogValue("MediaInput.MediaInputList report", 0, value);
     }
 
 private:
@@ -27716,7 +24617,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("MediaInput.CurrentMediaInput report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("MediaInput.CurrentMediaInput report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -27787,7 +24691,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("MediaInput.AttributeList report", 0, value);
+        DataModelLogger::LogValue("MediaInput.AttributeList report", 0, value);
     }
 
 private:
@@ -27857,7 +24761,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("MediaInput.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("MediaInput.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28189,7 +25096,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
     {
-        LogValue("MediaPlayback.PlaybackState report", 0, value);
+        DataModelLogger::LogValue("MediaPlayback.PlaybackState report", 0, value);
     }
 
 private:
@@ -28259,7 +25166,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.StartTime report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("MediaPlayback.StartTime report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28328,7 +25238,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.Duration report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("MediaPlayback.Duration report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28397,7 +25310,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, float value) { LogValue("MediaPlayback.PlaybackSpeed report", 0, value); }
+    static void OnValueReport(void * context, float value)
+    {
+        DataModelLogger::LogValue("MediaPlayback.PlaybackSpeed report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28466,7 +25382,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.SeekRangeEnd report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("MediaPlayback.SeekRangeEnd report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28535,7 +25454,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.SeekRangeStart report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("MediaPlayback.SeekRangeStart report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28606,7 +25528,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("MediaPlayback.AttributeList report", 0, value);
+        DataModelLogger::LogValue("MediaPlayback.AttributeList report", 0, value);
     }
 
 private:
@@ -28676,7 +25598,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("MediaPlayback.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("MediaPlayback.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28787,7 +25712,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ModeSelect.CurrentMode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ModeSelect.CurrentMode report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -28864,7 +25792,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
             value)
     {
-        LogValue("ModeSelect.SupportedModes report", 0, value);
+        DataModelLogger::LogValue("ModeSelect.SupportedModes report", 0, value);
     }
 
 private:
@@ -28960,7 +25888,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ModeSelect.OnMode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("ModeSelect.OnMode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -29029,7 +25957,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ModeSelect.StartUpMode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ModeSelect.StartUpMode report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -29098,7 +26029,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ModeSelect.Description report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("ModeSelect.Description report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -29169,7 +26103,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ModeSelect.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ModeSelect.AttributeList report", 0, value);
     }
 
 private:
@@ -29239,7 +26173,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ModeSelect.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ModeSelect.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -29486,7 +26423,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("NetworkCommissioning.MaxNetworks report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("NetworkCommissioning.MaxNetworks report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -29563,7 +26503,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
             value)
     {
-        LogValue("NetworkCommissioning.Networks report", 0, value);
+        DataModelLogger::LogValue("NetworkCommissioning.Networks report", 0, value);
     }
 
 private:
@@ -29635,7 +26575,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("NetworkCommissioning.ScanMaxTimeSeconds report", 0, value);
+        DataModelLogger::LogValue("NetworkCommissioning.ScanMaxTimeSeconds report", 0, value);
     }
 
 private:
@@ -29707,7 +26647,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("NetworkCommissioning.ConnectMaxTimeSeconds report", 0, value);
+        DataModelLogger::LogValue("NetworkCommissioning.ConnectMaxTimeSeconds report", 0, value);
     }
 
 private:
@@ -29803,7 +26743,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("NetworkCommissioning.InterfaceEnabled report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("NetworkCommissioning.InterfaceEnabled report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -29874,7 +26817,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
     {
-        LogValue("NetworkCommissioning.LastNetworkingStatus report", 0, value);
+        DataModelLogger::LogValue("NetworkCommissioning.LastNetworkingStatus report", 0, value);
     }
 
 private:
@@ -29946,7 +26889,7 @@ public:
 
     static void OnValueReport(void * context, chip::ByteSpan value)
     {
-        LogValue("NetworkCommissioning.LastNetworkID report", 0, value);
+        DataModelLogger::LogValue("NetworkCommissioning.LastNetworkID report", 0, value);
     }
 
 private:
@@ -30018,7 +26961,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("NetworkCommissioning.LastConnectErrorValue report", 0, value);
+        DataModelLogger::LogValue("NetworkCommissioning.LastConnectErrorValue report", 0, value);
     }
 
 private:
@@ -30088,7 +27031,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("NetworkCommissioning.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("NetworkCommissioning.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -30157,7 +27103,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("NetworkCommissioning.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("NetworkCommissioning.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -30324,7 +27273,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("OtaSoftwareUpdateProvider.AttributeList report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateProvider.AttributeList report", 0, value);
     }
 
 private:
@@ -30396,7 +27345,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("OtaSoftwareUpdateProvider.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateProvider.ClusterRevision report", 0, value);
     }
 
 private:
@@ -30520,7 +27469,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.StateTransition report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.StateTransition report", 0, value);
     }
 
 private:
@@ -30593,7 +27542,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.VersionApplied report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.VersionApplied report", 0, value);
     }
 
 private:
@@ -30666,7 +27615,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.DownloadError report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.DownloadError report", 0, value);
     }
 
 private:
@@ -30745,7 +27694,7 @@ public:
                   const chip::app::DataModel::DecodableList<
                       chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.DefaultOtaProviders report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.DefaultOtaProviders report", 0, value);
     }
 
 private:
@@ -30817,7 +27766,7 @@ public:
 
     static void OnValueReport(void * context, bool value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.UpdatePossible report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.UpdatePossible report", 0, value);
     }
 
 private:
@@ -30889,7 +27838,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.UpdateState report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.UpdateState report", 0, value);
     }
 
 private:
@@ -30962,7 +27911,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.UpdateStateProgress report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.UpdateStateProgress report", 0, value);
     }
 
 private:
@@ -31034,7 +27983,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.AttributeList report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.AttributeList report", 0, value);
     }
 
 private:
@@ -31106,7 +28055,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("OtaSoftwareUpdateRequestor.ClusterRevision report", 0, value);
     }
 
 private:
@@ -31191,7 +28140,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("OccupancySensing.Occupancy report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("OccupancySensing.Occupancy report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -31260,7 +28212,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("OccupancySensing.OccupancySensorType report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("OccupancySensing.OccupancySensorType report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -31331,7 +28286,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("OccupancySensing.OccupancySensorTypeBitmap report", 0, value);
+        DataModelLogger::LogValue("OccupancySensing.OccupancySensorTypeBitmap report", 0, value);
     }
 
 private:
@@ -31403,7 +28358,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("OccupancySensing.AttributeList report", 0, value);
+        DataModelLogger::LogValue("OccupancySensing.AttributeList report", 0, value);
     }
 
 private:
@@ -31473,7 +28428,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("OccupancySensing.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("OccupancySensing.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -31700,7 +28658,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("OnOff.OnOff report", 0, value); }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("OnOff.OnOff report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -31769,7 +28727,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("OnOff.GlobalSceneControl report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("OnOff.GlobalSceneControl report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -31864,7 +28825,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("OnOff.OnTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("OnOff.OnTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -31959,7 +28920,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("OnOff.OffWaitTime report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("OnOff.OffWaitTime report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32054,7 +29015,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("OnOff.StartUpOnOff report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("OnOff.StartUpOnOff report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32125,7 +29086,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("OnOff.AttributeList report", 0, value);
+        DataModelLogger::LogValue("OnOff.AttributeList report", 0, value);
     }
 
 private:
@@ -32195,7 +29156,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("OnOff.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("OnOff.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32264,7 +29225,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("OnOff.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("OnOff.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -32347,7 +29311,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("OnOffSwitchConfiguration.SwitchType report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("OnOffSwitchConfiguration.SwitchType report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -32444,7 +29411,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("OnOffSwitchConfiguration.SwitchActions report", 0, value);
+        DataModelLogger::LogValue("OnOffSwitchConfiguration.SwitchActions report", 0, value);
     }
 
 private:
@@ -32516,7 +29483,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("OnOffSwitchConfiguration.AttributeList report", 0, value);
+        DataModelLogger::LogValue("OnOffSwitchConfiguration.AttributeList report", 0, value);
     }
 
 private:
@@ -32588,7 +29555,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("OnOffSwitchConfiguration.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("OnOffSwitchConfiguration.ClusterRevision report", 0, value);
     }
 
 private:
@@ -32914,7 +29881,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
             value)
     {
-        LogValue("OperationalCredentials.NOCs report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.NOCs report", 0, value);
     }
 
 private:
@@ -32991,7 +29958,7 @@ public:
                               const chip::app::DataModel::DecodableList<
                                   chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
     {
-        LogValue("OperationalCredentials.FabricsList report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.FabricsList report", 0, value);
     }
 
 private:
@@ -33063,7 +30030,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("OperationalCredentials.SupportedFabrics report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.SupportedFabrics report", 0, value);
     }
 
 private:
@@ -33135,7 +30102,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("OperationalCredentials.CommissionedFabrics report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.CommissionedFabrics report", 0, value);
     }
 
 private:
@@ -33208,7 +30175,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
     {
-        LogValue("OperationalCredentials.TrustedRootCertificates report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.TrustedRootCertificates report", 0, value);
     }
 
 private:
@@ -33280,7 +30247,7 @@ public:
 
     static void OnValueReport(void * context, chip::FabricIndex value)
     {
-        LogValue("OperationalCredentials.CurrentFabricIndex report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.CurrentFabricIndex report", 0, value);
     }
 
 private:
@@ -33352,7 +30319,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("OperationalCredentials.AttributeList report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.AttributeList report", 0, value);
     }
 
 private:
@@ -33424,7 +30391,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("OperationalCredentials.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("OperationalCredentials.ClusterRevision report", 0, value);
     }
 
 private:
@@ -33516,7 +30483,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.Status report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("PowerSource.Status report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -33585,7 +30552,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.Order report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("PowerSource.Order report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -33654,7 +30621,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("PowerSource.Description report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("PowerSource.Description report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -33723,7 +30693,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("PowerSource.BatteryVoltage report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.BatteryVoltage report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -33792,7 +30765,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.BatteryPercentRemaining report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.BatteryPercentRemaining report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -33861,7 +30837,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("PowerSource.BatteryTimeRemaining report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.BatteryTimeRemaining report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -33930,7 +30909,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.BatteryChargeLevel report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.BatteryChargeLevel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34001,7 +30983,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        LogValue("PowerSource.ActiveBatteryFaults report", 0, value);
+        DataModelLogger::LogValue("PowerSource.ActiveBatteryFaults report", 0, value);
     }
 
 private:
@@ -34071,7 +31053,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("PowerSource.BatteryChargeState report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.BatteryChargeState report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34142,7 +31127,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("PowerSource.AttributeList report", 0, value);
+        DataModelLogger::LogValue("PowerSource.AttributeList report", 0, value);
     }
 
 private:
@@ -34212,7 +31197,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("PowerSource.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34281,7 +31269,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("PowerSource.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("PowerSource.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34365,7 +31356,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        LogValue("PowerSourceConfiguration.Sources report", 0, value);
+        DataModelLogger::LogValue("PowerSourceConfiguration.Sources report", 0, value);
     }
 
 private:
@@ -34437,7 +31428,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("PowerSourceConfiguration.AttributeList report", 0, value);
+        DataModelLogger::LogValue("PowerSourceConfiguration.AttributeList report", 0, value);
     }
 
 private:
@@ -34509,7 +31500,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PowerSourceConfiguration.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("PowerSourceConfiguration.ClusterRevision report", 0, value);
     }
 
 private:
@@ -34594,7 +31585,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("PressureMeasurement.MeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("PressureMeasurement.MeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34663,7 +31657,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("PressureMeasurement.MinMeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("PressureMeasurement.MinMeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34732,7 +31729,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("PressureMeasurement.MaxMeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("PressureMeasurement.MaxMeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -34803,7 +31803,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("PressureMeasurement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("PressureMeasurement.AttributeList report", 0, value);
     }
 
 private:
@@ -34873,7 +31873,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("PressureMeasurement.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("PressureMeasurement.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -35000,7 +32003,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.SupplyVoltageLow report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.SupplyVoltageLow report", 0, value);
     }
 
 private:
@@ -35073,7 +32076,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.SupplyVoltageHigh report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.SupplyVoltageHigh report", 0, value);
     }
 
 private:
@@ -35146,7 +32149,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.PowerMissingPhase report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.PowerMissingPhase report", 0, value);
     }
 
 private:
@@ -35219,7 +32222,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.SystemPressureLow report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.SystemPressureLow report", 0, value);
     }
 
 private:
@@ -35292,7 +32295,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.SystemPressureHigh report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.SystemPressureHigh report", 0, value);
     }
 
 private:
@@ -35365,7 +32368,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.DryRunning report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.DryRunning report", 0, value);
     }
 
 private:
@@ -35439,7 +32442,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.MotorTemperatureHigh report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MotorTemperatureHigh report", 0, value);
     }
 
 private:
@@ -35514,7 +32517,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.PumpMotorFatalFailure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.PumpMotorFatalFailure report", 0, value);
     }
 
 private:
@@ -35591,7 +32594,7 @@ public:
     OnValueReport(void * context,
                   chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.ElectronicTemperatureHigh report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.ElectronicTemperatureHigh report", 0, value);
     }
 
 private:
@@ -35664,7 +32667,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.PumpBlocked report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.PumpBlocked report", 0, value);
     }
 
 private:
@@ -35737,7 +32740,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.SensorFailure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.SensorFailure report", 0, value);
     }
 
 private:
@@ -35814,7 +32817,7 @@ public:
     OnValueReport(void * context,
                   chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.ElectronicNonFatalFailure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.ElectronicNonFatalFailure report", 0, value);
     }
 
 private:
@@ -35889,7 +32892,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.ElectronicFatalFailure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.ElectronicFatalFailure report", 0, value);
     }
 
 private:
@@ -35962,7 +32965,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.GeneralFault report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.GeneralFault report", 0, value);
     }
 
 private:
@@ -36035,7 +33038,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.Leakage report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.Leakage report", 0, value);
     }
 
 private:
@@ -36108,7 +33111,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.AirDetection report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.AirDetection report", 0, value);
     }
 
 private:
@@ -36181,7 +33184,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value)
     {
-        LogValue("PumpConfigurationAndControl.TurbineOperation report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.TurbineOperation report", 0, value);
     }
 
 private:
@@ -36253,7 +33256,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MaxPressure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxPressure report", 0, value);
     }
 
 private:
@@ -36323,7 +33326,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("PumpConfigurationAndControl.MaxSpeed report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxSpeed report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -36392,7 +33398,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("PumpConfigurationAndControl.MaxFlow report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxFlow report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -36463,7 +33472,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MinConstPressure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MinConstPressure report", 0, value);
     }
 
 private:
@@ -36535,7 +33544,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MaxConstPressure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxConstPressure report", 0, value);
     }
 
 private:
@@ -36607,7 +33616,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MinCompPressure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MinCompPressure report", 0, value);
     }
 
 private:
@@ -36679,7 +33688,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MaxCompPressure report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxCompPressure report", 0, value);
     }
 
 private:
@@ -36751,7 +33760,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MinConstSpeed report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MinConstSpeed report", 0, value);
     }
 
 private:
@@ -36823,7 +33832,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MaxConstSpeed report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxConstSpeed report", 0, value);
     }
 
 private:
@@ -36895,7 +33904,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MinConstFlow report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MinConstFlow report", 0, value);
     }
 
 private:
@@ -36967,7 +33976,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MaxConstFlow report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxConstFlow report", 0, value);
     }
 
 private:
@@ -37039,7 +34048,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MinConstTemp report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MinConstTemp report", 0, value);
     }
 
 private:
@@ -37111,7 +34120,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("PumpConfigurationAndControl.MaxConstTemp report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.MaxConstTemp report", 0, value);
     }
 
 private:
@@ -37183,7 +34192,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.PumpStatus report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.PumpStatus report", 0, value);
     }
 
 private:
@@ -37257,7 +34266,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("PumpConfigurationAndControl.EffectiveOperationMode report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.EffectiveOperationMode report", 0, value);
     }
 
 private:
@@ -37330,7 +34339,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("PumpConfigurationAndControl.EffectiveControlMode report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.EffectiveControlMode report", 0, value);
     }
 
 private:
@@ -37400,7 +34409,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("PumpConfigurationAndControl.Capacity report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("PumpConfigurationAndControl.Capacity report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -37469,7 +34481,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("PumpConfigurationAndControl.Speed report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("PumpConfigurationAndControl.Speed report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -37567,7 +34582,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        LogValue("PumpConfigurationAndControl.LifetimeRunningHours report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.LifetimeRunningHours report", 0, value);
     }
 
 private:
@@ -37637,7 +34652,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("PumpConfigurationAndControl.Power report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("PumpConfigurationAndControl.Power report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -37737,7 +34755,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        LogValue("PumpConfigurationAndControl.LifetimeEnergyConsumed report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.LifetimeEnergyConsumed report", 0, value);
     }
 
 private:
@@ -37835,7 +34853,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("PumpConfigurationAndControl.OperationMode report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.OperationMode report", 0, value);
     }
 
 private:
@@ -37933,7 +34951,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("PumpConfigurationAndControl.ControlMode report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.ControlMode report", 0, value);
     }
 
 private:
@@ -38005,7 +35023,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.AlarmMask report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.AlarmMask report", 0, value);
     }
 
 private:
@@ -38077,7 +35095,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("PumpConfigurationAndControl.AttributeList report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.AttributeList report", 0, value);
     }
 
 private:
@@ -38149,7 +35167,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("PumpConfigurationAndControl.FeatureMap report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.FeatureMap report", 0, value);
     }
 
 private:
@@ -38221,7 +35239,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("PumpConfigurationAndControl.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("PumpConfigurationAndControl.ClusterRevision report", 0, value);
     }
 
 private:
@@ -38309,7 +35327,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("RelativeHumidityMeasurement.MeasuredValue report", 0, value);
+        DataModelLogger::LogValue("RelativeHumidityMeasurement.MeasuredValue report", 0, value);
     }
 
 private:
@@ -38381,7 +35399,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("RelativeHumidityMeasurement.MinMeasuredValue report", 0, value);
+        DataModelLogger::LogValue("RelativeHumidityMeasurement.MinMeasuredValue report", 0, value);
     }
 
 private:
@@ -38453,7 +35471,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("RelativeHumidityMeasurement.MaxMeasuredValue report", 0, value);
+        DataModelLogger::LogValue("RelativeHumidityMeasurement.MaxMeasuredValue report", 0, value);
     }
 
 private:
@@ -38525,7 +35543,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("RelativeHumidityMeasurement.Tolerance report", 0, value);
+        DataModelLogger::LogValue("RelativeHumidityMeasurement.Tolerance report", 0, value);
     }
 
 private:
@@ -38597,7 +35615,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("RelativeHumidityMeasurement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("RelativeHumidityMeasurement.AttributeList report", 0, value);
     }
 
 private:
@@ -38669,7 +35687,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("RelativeHumidityMeasurement.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("RelativeHumidityMeasurement.ClusterRevision report", 0, value);
     }
 
 private:
@@ -38940,7 +35958,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.SceneCount report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Scenes.SceneCount report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39009,7 +36027,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.CurrentScene report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Scenes.CurrentScene report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39078,7 +36096,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Scenes.CurrentGroup report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("Scenes.CurrentGroup report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39147,7 +36165,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("Scenes.SceneValid report", 0, value); }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("Scenes.SceneValid report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39216,7 +36234,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Scenes.NameSupport report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Scenes.NameSupport report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -39287,7 +36305,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Scenes.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Scenes.AttributeList report", 0, value);
     }
 
 private:
@@ -39357,7 +36375,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Scenes.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Scenes.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -39468,7 +36489,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value)
     {
-        LogValue("SoftwareDiagnostics.SoftwareFault report", 0, value);
+        DataModelLogger::LogValue("SoftwareDiagnostics.SoftwareFault report", 0, value);
     }
 
 private:
@@ -39546,7 +36567,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
             value)
     {
-        LogValue("SoftwareDiagnostics.ThreadMetrics report", 0, value);
+        DataModelLogger::LogValue("SoftwareDiagnostics.ThreadMetrics report", 0, value);
     }
 
 private:
@@ -39616,7 +36637,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("SoftwareDiagnostics.CurrentHeapFree report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("SoftwareDiagnostics.CurrentHeapFree report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -39685,7 +36709,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("SoftwareDiagnostics.CurrentHeapUsed report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("SoftwareDiagnostics.CurrentHeapUsed report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -39756,7 +36783,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("SoftwareDiagnostics.CurrentHeapHighWatermark report", 0, value);
+        DataModelLogger::LogValue("SoftwareDiagnostics.CurrentHeapHighWatermark report", 0, value);
     }
 
 private:
@@ -39828,7 +36855,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("SoftwareDiagnostics.AttributeList report", 0, value);
+        DataModelLogger::LogValue("SoftwareDiagnostics.AttributeList report", 0, value);
     }
 
 private:
@@ -39898,7 +36925,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("SoftwareDiagnostics.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("SoftwareDiagnostics.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -39967,7 +36997,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("SoftwareDiagnostics.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("SoftwareDiagnostics.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -40061,7 +37094,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value)
     {
-        LogValue("Switch.SwitchLatched report", 0, value);
+        DataModelLogger::LogValue("Switch.SwitchLatched report", 0, value);
     }
 
 private:
@@ -40132,7 +37165,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::InitialPress::DecodableType value)
     {
-        LogValue("Switch.InitialPress report", 0, value);
+        DataModelLogger::LogValue("Switch.InitialPress report", 0, value);
     }
 
 private:
@@ -40203,7 +37236,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::LongPress::DecodableType value)
     {
-        LogValue("Switch.LongPress report", 0, value);
+        DataModelLogger::LogValue("Switch.LongPress report", 0, value);
     }
 
 private:
@@ -40274,7 +37307,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value)
     {
-        LogValue("Switch.ShortRelease report", 0, value);
+        DataModelLogger::LogValue("Switch.ShortRelease report", 0, value);
     }
 
 private:
@@ -40345,7 +37378,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::LongRelease::DecodableType value)
     {
-        LogValue("Switch.LongRelease report", 0, value);
+        DataModelLogger::LogValue("Switch.LongRelease report", 0, value);
     }
 
 private:
@@ -40416,7 +37449,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value)
     {
-        LogValue("Switch.MultiPressOngoing report", 0, value);
+        DataModelLogger::LogValue("Switch.MultiPressOngoing report", 0, value);
     }
 
 private:
@@ -40487,7 +37520,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value)
     {
-        LogValue("Switch.MultiPressComplete report", 0, value);
+        DataModelLogger::LogValue("Switch.MultiPressComplete report", 0, value);
     }
 
 private:
@@ -40557,7 +37590,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Switch.NumberOfPositions report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Switch.NumberOfPositions report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -40626,7 +37662,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Switch.CurrentPosition report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Switch.CurrentPosition report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -40695,7 +37734,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Switch.MultiPressMax report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("Switch.MultiPressMax report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40766,7 +37805,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Switch.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Switch.AttributeList report", 0, value);
     }
 
 private:
@@ -40836,7 +37875,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("Switch.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("Switch.FeatureMap report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -40905,7 +37944,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Switch.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Switch.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -41020,7 +38062,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
     {
-        LogValue("TargetNavigator.TargetNavigatorList report", 0, value);
+        DataModelLogger::LogValue("TargetNavigator.TargetNavigatorList report", 0, value);
     }
 
 private:
@@ -41092,7 +38134,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("TargetNavigator.CurrentNavigatorTarget report", 0, value);
+        DataModelLogger::LogValue("TargetNavigator.CurrentNavigatorTarget report", 0, value);
     }
 
 private:
@@ -41164,7 +38206,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("TargetNavigator.AttributeList report", 0, value);
+        DataModelLogger::LogValue("TargetNavigator.AttributeList report", 0, value);
     }
 
 private:
@@ -41234,7 +38276,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TargetNavigator.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("TargetNavigator.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -41319,7 +38364,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("TemperatureMeasurement.MeasuredValue report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("TemperatureMeasurement.MeasuredValue report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -41390,7 +38438,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("TemperatureMeasurement.MinMeasuredValue report", 0, value);
+        DataModelLogger::LogValue("TemperatureMeasurement.MinMeasuredValue report", 0, value);
     }
 
 private:
@@ -41462,7 +38510,7 @@ public:
 
     static void OnValueReport(void * context, int16_t value)
     {
-        LogValue("TemperatureMeasurement.MaxMeasuredValue report", 0, value);
+        DataModelLogger::LogValue("TemperatureMeasurement.MaxMeasuredValue report", 0, value);
     }
 
 private:
@@ -41532,7 +38580,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TemperatureMeasurement.Tolerance report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("TemperatureMeasurement.Tolerance report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -41603,7 +38654,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("TemperatureMeasurement.AttributeList report", 0, value);
+        DataModelLogger::LogValue("TemperatureMeasurement.AttributeList report", 0, value);
     }
 
 private:
@@ -41675,7 +38726,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("TemperatureMeasurement.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("TemperatureMeasurement.ClusterRevision report", 0, value);
     }
 
 private:
@@ -42274,7 +39325,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
     {
-        LogValue("TestCluster.TestEvent report", 0, value);
+        DataModelLogger::LogValue("TestCluster.TestEvent report", 0, value);
     }
 
 private:
@@ -42370,7 +39421,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.Boolean report", 0, value); }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("TestCluster.Boolean report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42465,7 +39516,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.Bitmap8 report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("TestCluster.Bitmap8 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42560,7 +39611,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.Bitmap16 report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.Bitmap16 report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -42655,7 +39709,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.Bitmap32 report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.Bitmap32 report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -42750,7 +39807,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Bitmap64 report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.Bitmap64 report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -42845,7 +39905,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.Int8u report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("TestCluster.Int8u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -42940,7 +40000,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.Int16u report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("TestCluster.Int16u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43035,7 +40095,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.Int24u report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("TestCluster.Int24u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43130,7 +40190,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.Int32u report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("TestCluster.Int32u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43225,7 +40285,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int40u report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int40u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43320,7 +40380,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int48u report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int48u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43415,7 +40475,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int56u report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int56u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43510,7 +40570,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.Int64u report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.Int64u report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43605,7 +40665,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value) { LogValue("TestCluster.Int8s report", 0, value); }
+    static void OnValueReport(void * context, int8_t value) { DataModelLogger::LogValue("TestCluster.Int8s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43700,7 +40760,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("TestCluster.Int16s report", 0, value); }
+    static void OnValueReport(void * context, int16_t value) { DataModelLogger::LogValue("TestCluster.Int16s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43795,7 +40855,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int32_t value) { LogValue("TestCluster.Int24s report", 0, value); }
+    static void OnValueReport(void * context, int32_t value) { DataModelLogger::LogValue("TestCluster.Int24s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43890,7 +40950,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int32_t value) { LogValue("TestCluster.Int32s report", 0, value); }
+    static void OnValueReport(void * context, int32_t value) { DataModelLogger::LogValue("TestCluster.Int32s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -43985,7 +41045,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int40s report", 0, value); }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int40s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44080,7 +41140,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int48s report", 0, value); }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int48s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44175,7 +41235,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int56s report", 0, value); }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int56s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44270,7 +41330,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int64_t value) { LogValue("TestCluster.Int64s report", 0, value); }
+    static void OnValueReport(void * context, int64_t value) { DataModelLogger::LogValue("TestCluster.Int64s report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44365,7 +41425,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.Enum8 report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("TestCluster.Enum8 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44460,7 +41520,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.Enum16 report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value) { DataModelLogger::LogValue("TestCluster.Enum16 report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -44555,7 +41615,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, float value) { LogValue("TestCluster.FloatSingle report", 0, value); }
+    static void OnValueReport(void * context, float value)
+    {
+        DataModelLogger::LogValue("TestCluster.FloatSingle report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -44650,7 +41713,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, double value) { LogValue("TestCluster.FloatDouble report", 0, value); }
+    static void OnValueReport(void * context, double value)
+    {
+        DataModelLogger::LogValue("TestCluster.FloatDouble report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -44745,7 +41811,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TestCluster.OctetString report", 0, value); }
+    static void OnValueReport(void * context, chip::ByteSpan value)
+    {
+        DataModelLogger::LogValue("TestCluster.OctetString report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -44816,7 +41885,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        LogValue("TestCluster.ListInt8u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.ListInt8u report", 0, value);
     }
 
 private:
@@ -44888,7 +41957,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
     {
-        LogValue("TestCluster.ListOctetString report", 0, value);
+        DataModelLogger::LogValue("TestCluster.ListOctetString report", 0, value);
     }
 
 private:
@@ -44966,7 +42035,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
             value)
     {
-        LogValue("TestCluster.ListStructOctetString report", 0, value);
+        DataModelLogger::LogValue("TestCluster.ListStructOctetString report", 0, value);
     }
 
 private:
@@ -45062,7 +42131,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TestCluster.LongOctetString report", 0, value); }
+    static void OnValueReport(void * context, chip::ByteSpan value)
+    {
+        DataModelLogger::LogValue("TestCluster.LongOctetString report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -45157,7 +42229,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("TestCluster.CharString report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("TestCluster.CharString report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -45252,7 +42327,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("TestCluster.LongCharString report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("TestCluster.LongCharString report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -45347,7 +42425,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("TestCluster.EpochUs report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value) { DataModelLogger::LogValue("TestCluster.EpochUs report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45442,7 +42520,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("TestCluster.EpochS report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value) { DataModelLogger::LogValue("TestCluster.EpochS report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -45537,7 +42615,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::VendorId value) { LogValue("TestCluster.VendorId report", 0, value); }
+    static void OnValueReport(void * context, chip::VendorId value)
+    {
+        DataModelLogger::LogValue("TestCluster.VendorId report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -45613,7 +42694,7 @@ public:
                               const chip::app::DataModel::DecodableList<
                                   chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
     {
-        LogValue("TestCluster.ListNullablesAndOptionalsStruct report", 0, value);
+        DataModelLogger::LogValue("TestCluster.ListNullablesAndOptionalsStruct report", 0, value);
     }
 
 private:
@@ -45711,7 +42792,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
     {
-        LogValue("TestCluster.EnumAttr report", 0, value);
+        DataModelLogger::LogValue("TestCluster.EnumAttr report", 0, value);
     }
 
 private:
@@ -45807,7 +42888,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("TestCluster.RangeRestrictedInt8u report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.RangeRestrictedInt8u report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -45902,7 +42986,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value) { LogValue("TestCluster.RangeRestrictedInt8s report", 0, value); }
+    static void OnValueReport(void * context, int8_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.RangeRestrictedInt8s report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -45997,7 +43084,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.RangeRestrictedInt16u report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.RangeRestrictedInt16u report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -46092,7 +43182,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("TestCluster.RangeRestrictedInt16s report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.RangeRestrictedInt16s report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -46163,7 +43256,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
     {
-        LogValue("TestCluster.ListLongOctetString report", 0, value);
+        DataModelLogger::LogValue("TestCluster.ListLongOctetString report", 0, value);
     }
 
 private:
@@ -46259,7 +43352,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.TimedWriteBoolean report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("TestCluster.TimedWriteBoolean report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -46354,7 +43450,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.GeneralErrorBoolean report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("TestCluster.GeneralErrorBoolean report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -46449,7 +43548,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.ClusterErrorBoolean report", 0, value); }
+    static void OnValueReport(void * context, bool value)
+    {
+        DataModelLogger::LogValue("TestCluster.ClusterErrorBoolean report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -46544,7 +43646,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.Unsupported report", 0, value); }
+    static void OnValueReport(void * context, bool value) { DataModelLogger::LogValue("TestCluster.Unsupported report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -46641,7 +43743,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<bool> & value)
     {
-        LogValue("TestCluster.NullableBoolean report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableBoolean report", 0, value);
     }
 
 private:
@@ -46739,7 +43841,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("TestCluster.NullableBitmap8 report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableBitmap8 report", 0, value);
     }
 
 private:
@@ -46837,7 +43939,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("TestCluster.NullableBitmap16 report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableBitmap16 report", 0, value);
     }
 
 private:
@@ -46935,7 +44037,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        LogValue("TestCluster.NullableBitmap32 report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableBitmap32 report", 0, value);
     }
 
 private:
@@ -47033,7 +44135,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        LogValue("TestCluster.NullableBitmap64 report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableBitmap64 report", 0, value);
     }
 
 private:
@@ -47131,7 +44233,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("TestCluster.NullableInt8u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt8u report", 0, value);
     }
 
 private:
@@ -47229,7 +44331,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("TestCluster.NullableInt16u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt16u report", 0, value);
     }
 
 private:
@@ -47327,7 +44429,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        LogValue("TestCluster.NullableInt24u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt24u report", 0, value);
     }
 
 private:
@@ -47425,7 +44527,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        LogValue("TestCluster.NullableInt32u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt32u report", 0, value);
     }
 
 private:
@@ -47523,7 +44625,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        LogValue("TestCluster.NullableInt40u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt40u report", 0, value);
     }
 
 private:
@@ -47621,7 +44723,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        LogValue("TestCluster.NullableInt48u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt48u report", 0, value);
     }
 
 private:
@@ -47719,7 +44821,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        LogValue("TestCluster.NullableInt56u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt56u report", 0, value);
     }
 
 private:
@@ -47817,7 +44919,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        LogValue("TestCluster.NullableInt64u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt64u report", 0, value);
     }
 
 private:
@@ -47915,7 +45017,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
     {
-        LogValue("TestCluster.NullableInt8s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt8s report", 0, value);
     }
 
 private:
@@ -48013,7 +45115,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
     {
-        LogValue("TestCluster.NullableInt16s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt16s report", 0, value);
     }
 
 private:
@@ -48111,7 +45213,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
     {
-        LogValue("TestCluster.NullableInt24s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt24s report", 0, value);
     }
 
 private:
@@ -48209,7 +45311,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
     {
-        LogValue("TestCluster.NullableInt32s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt32s report", 0, value);
     }
 
 private:
@@ -48307,7 +45409,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        LogValue("TestCluster.NullableInt40s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt40s report", 0, value);
     }
 
 private:
@@ -48405,7 +45507,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        LogValue("TestCluster.NullableInt48s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt48s report", 0, value);
     }
 
 private:
@@ -48503,7 +45605,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        LogValue("TestCluster.NullableInt56s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt56s report", 0, value);
     }
 
 private:
@@ -48601,7 +45703,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        LogValue("TestCluster.NullableInt64s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableInt64s report", 0, value);
     }
 
 private:
@@ -48699,7 +45801,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("TestCluster.NullableEnum8 report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableEnum8 report", 0, value);
     }
 
 private:
@@ -48797,7 +45899,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("TestCluster.NullableEnum16 report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableEnum16 report", 0, value);
     }
 
 private:
@@ -48895,7 +45997,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<float> & value)
     {
-        LogValue("TestCluster.NullableFloatSingle report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableFloatSingle report", 0, value);
     }
 
 private:
@@ -48993,7 +46095,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<double> & value)
     {
-        LogValue("TestCluster.NullableFloatDouble report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableFloatDouble report", 0, value);
     }
 
 private:
@@ -49091,7 +46193,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
     {
-        LogValue("TestCluster.NullableOctetString report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableOctetString report", 0, value);
     }
 
 private:
@@ -49189,7 +46291,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
     {
-        LogValue("TestCluster.NullableCharString report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableCharString report", 0, value);
     }
 
 private:
@@ -49289,7 +46391,7 @@ public:
     static void OnValueReport(void * context,
                               const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
     {
-        LogValue("TestCluster.NullableEnumAttr report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableEnumAttr report", 0, value);
     }
 
 private:
@@ -49387,7 +46489,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        LogValue("TestCluster.NullableRangeRestrictedInt8u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableRangeRestrictedInt8u report", 0, value);
     }
 
 private:
@@ -49485,7 +46587,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
     {
-        LogValue("TestCluster.NullableRangeRestrictedInt8s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableRangeRestrictedInt8s report", 0, value);
     }
 
 private:
@@ -49583,7 +46685,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("TestCluster.NullableRangeRestrictedInt16u report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableRangeRestrictedInt16u report", 0, value);
     }
 
 private:
@@ -49681,7 +46783,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
     {
-        LogValue("TestCluster.NullableRangeRestrictedInt16s report", 0, value);
+        DataModelLogger::LogValue("TestCluster.NullableRangeRestrictedInt16s report", 0, value);
     }
 
 private:
@@ -49753,7 +46855,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("TestCluster.AttributeList report", 0, value);
+        DataModelLogger::LogValue("TestCluster.AttributeList report", 0, value);
     }
 
 private:
@@ -49823,7 +46925,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TestCluster.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("TestCluster.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50051,7 +47156,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.LocalTemperature report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.LocalTemperature report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50120,7 +47228,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMinHeatSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.AbsMinHeatSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50189,7 +47300,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMaxHeatSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.AbsMaxHeatSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50258,7 +47372,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMinCoolSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.AbsMinCoolSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50327,7 +47444,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.AbsMaxCoolSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.AbsMaxCoolSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50422,7 +47542,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.OccupiedCoolingSetpoint report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.OccupiedCoolingSetpoint report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50517,7 +47640,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.OccupiedHeatingSetpoint report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.OccupiedHeatingSetpoint report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50612,7 +47738,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MinHeatSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.MinHeatSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50707,7 +47836,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MaxHeatSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.MaxHeatSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50802,7 +47934,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MinCoolSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.MinCoolSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50897,7 +48032,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int16_t value) { LogValue("Thermostat.MaxCoolSetpointLimit report", 0, value); }
+    static void OnValueReport(void * context, int16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.MaxCoolSetpointLimit report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50992,7 +48130,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value) { LogValue("Thermostat.MinSetpointDeadBand report", 0, value); }
+    static void OnValueReport(void * context, int8_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.MinSetpointDeadBand report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51087,7 +48228,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.ControlSequenceOfOperation report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.ControlSequenceOfOperation report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51182,7 +48326,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.SystemMode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.SystemMode report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51251,7 +48398,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.StartOfWeek report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.StartOfWeek report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51320,7 +48470,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.NumberOfWeeklyTransitions report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.NumberOfWeeklyTransitions report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51389,7 +48542,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("Thermostat.NumberOfDailyTransitions report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.NumberOfDailyTransitions report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51460,7 +48616,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("Thermostat.AttributeList report", 0, value);
+        DataModelLogger::LogValue("Thermostat.AttributeList report", 0, value);
     }
 
 private:
@@ -51530,7 +48686,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("Thermostat.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51599,7 +48758,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Thermostat.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("Thermostat.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -51714,7 +48876,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("ThermostatUserInterfaceConfiguration.TemperatureDisplayMode report", 0, value);
+        DataModelLogger::LogValue("ThermostatUserInterfaceConfiguration.TemperatureDisplayMode report", 0, value);
     }
 
 private:
@@ -51815,7 +48977,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("ThermostatUserInterfaceConfiguration.KeypadLockout report", 0, value);
+        DataModelLogger::LogValue("ThermostatUserInterfaceConfiguration.KeypadLockout report", 0, value);
     }
 
 private:
@@ -51917,7 +49079,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("ThermostatUserInterfaceConfiguration.ScheduleProgrammingVisibility report", 0, value);
+        DataModelLogger::LogValue("ThermostatUserInterfaceConfiguration.ScheduleProgrammingVisibility report", 0, value);
     }
 
 private:
@@ -51991,7 +49153,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ThermostatUserInterfaceConfiguration.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ThermostatUserInterfaceConfiguration.AttributeList report", 0, value);
     }
 
 private:
@@ -52065,7 +49227,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThermostatUserInterfaceConfiguration.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("ThermostatUserInterfaceConfiguration.ClusterRevision report", 0, value);
     }
 
 private:
@@ -52237,7 +49399,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
     {
-        LogValue("ThreadNetworkDiagnostics.ConnectionStatus report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ConnectionStatus report", 0, value);
     }
 
 private:
@@ -52307,7 +49469,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ThreadNetworkDiagnostics.Channel report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.Channel report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -52376,7 +49541,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ThreadNetworkDiagnostics.RoutingRole report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RoutingRole report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -52447,7 +49615,7 @@ public:
 
     static void OnValueReport(void * context, chip::ByteSpan value)
     {
-        LogValue("ThreadNetworkDiagnostics.NetworkName report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.NetworkName report", 0, value);
     }
 
 private:
@@ -52517,7 +49685,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ThreadNetworkDiagnostics.PanId report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.PanId report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -52588,7 +49759,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.ExtendedPanId report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ExtendedPanId report", 0, value);
     }
 
 private:
@@ -52660,7 +49831,7 @@ public:
 
     static void OnValueReport(void * context, chip::ByteSpan value)
     {
-        LogValue("ThreadNetworkDiagnostics.MeshLocalPrefix report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.MeshLocalPrefix report", 0, value);
     }
 
 private:
@@ -52732,7 +49903,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.OverrunCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.OverrunCount report", 0, value);
     }
 
 private:
@@ -52809,7 +49980,7 @@ public:
                               const chip::app::DataModel::DecodableList<
                                   chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
     {
-        LogValue("ThreadNetworkDiagnostics.NeighborTableList report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.NeighborTableList report", 0, value);
     }
 
 private:
@@ -52885,7 +50056,7 @@ public:
                               const chip::app::DataModel::DecodableList<
                                   chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value)
     {
-        LogValue("ThreadNetworkDiagnostics.RouteTableList report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RouteTableList report", 0, value);
     }
 
 private:
@@ -52955,7 +50126,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.PartitionId report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.PartitionId report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -53024,7 +50198,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ThreadNetworkDiagnostics.Weighting report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.Weighting report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -53093,7 +50270,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ThreadNetworkDiagnostics.DataVersion report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.DataVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -53164,7 +50344,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.StableDataVersion report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.StableDataVersion report", 0, value);
     }
 
 private:
@@ -53236,7 +50416,7 @@ public:
 
     static void OnValueReport(void * context, uint8_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.LeaderRouterId report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.LeaderRouterId report", 0, value);
     }
 
 private:
@@ -53308,7 +50488,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.DetachedRoleCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.DetachedRoleCount report", 0, value);
     }
 
 private:
@@ -53380,7 +50560,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.ChildRoleCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ChildRoleCount report", 0, value);
     }
 
 private:
@@ -53452,7 +50632,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RouterRoleCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RouterRoleCount report", 0, value);
     }
 
 private:
@@ -53524,7 +50704,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.LeaderRoleCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.LeaderRoleCount report", 0, value);
     }
 
 private:
@@ -53596,7 +50776,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.AttachAttemptCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.AttachAttemptCount report", 0, value);
     }
 
 private:
@@ -53669,7 +50849,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.PartitionIdChangeCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.PartitionIdChangeCount report", 0, value);
     }
 
 private:
@@ -53743,7 +50923,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.BetterPartitionAttachAttemptCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.BetterPartitionAttachAttemptCount report", 0, value);
     }
 
 private:
@@ -53815,7 +50995,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.ParentChangeCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ParentChangeCount report", 0, value);
     }
 
 private:
@@ -53887,7 +51067,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxTotalCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxTotalCount report", 0, value);
     }
 
 private:
@@ -53959,7 +51139,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxUnicastCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxUnicastCount report", 0, value);
     }
 
 private:
@@ -54031,7 +51211,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxBroadcastCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxBroadcastCount report", 0, value);
     }
 
 private:
@@ -54103,7 +51283,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxAckRequestedCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxAckRequestedCount report", 0, value);
     }
 
 private:
@@ -54175,7 +51355,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxAckedCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxAckedCount report", 0, value);
     }
 
 private:
@@ -54248,7 +51428,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxNoAckRequestedCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxNoAckRequestedCount report", 0, value);
     }
 
 private:
@@ -54318,7 +51498,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.TxDataCount report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxDataCount report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -54389,7 +51572,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxDataPollCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxDataPollCount report", 0, value);
     }
 
 private:
@@ -54461,7 +51644,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxBeaconCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxBeaconCount report", 0, value);
     }
 
 private:
@@ -54534,7 +51717,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxBeaconRequestCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxBeaconRequestCount report", 0, value);
     }
 
 private:
@@ -54606,7 +51789,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxOtherCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxOtherCount report", 0, value);
     }
 
 private:
@@ -54678,7 +51861,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxRetryCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxRetryCount report", 0, value);
     }
 
 private:
@@ -54752,7 +51935,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount report", 0, value);
     }
 
 private:
@@ -54826,7 +52009,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount report", 0, value);
     }
 
 private:
@@ -54898,7 +52081,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxErrCcaCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxErrCcaCount report", 0, value);
     }
 
 private:
@@ -54970,7 +52153,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxErrAbortCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxErrAbortCount report", 0, value);
     }
 
 private:
@@ -55043,7 +52226,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.TxErrBusyChannelCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.TxErrBusyChannelCount report", 0, value);
     }
 
 private:
@@ -55115,7 +52298,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxTotalCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxTotalCount report", 0, value);
     }
 
 private:
@@ -55187,7 +52370,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxUnicastCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxUnicastCount report", 0, value);
     }
 
 private:
@@ -55259,7 +52442,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxBroadcastCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxBroadcastCount report", 0, value);
     }
 
 private:
@@ -55329,7 +52512,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.RxDataCount report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxDataCount report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -55400,7 +52586,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxDataPollCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxDataPollCount report", 0, value);
     }
 
 private:
@@ -55472,7 +52658,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxBeaconCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxBeaconCount report", 0, value);
     }
 
 private:
@@ -55545,7 +52731,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxBeaconRequestCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxBeaconRequestCount report", 0, value);
     }
 
 private:
@@ -55617,7 +52803,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxOtherCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxOtherCount report", 0, value);
     }
 
 private:
@@ -55690,7 +52876,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxAddressFilteredCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxAddressFilteredCount report", 0, value);
     }
 
 private:
@@ -55763,7 +52949,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxDestAddrFilteredCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxDestAddrFilteredCount report", 0, value);
     }
 
 private:
@@ -55835,7 +53021,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxDuplicatedCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxDuplicatedCount report", 0, value);
     }
 
 private:
@@ -55907,7 +53093,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxErrNoFrameCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxErrNoFrameCount report", 0, value);
     }
 
 private:
@@ -55981,7 +53167,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxErrUnknownNeighborCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxErrUnknownNeighborCount report", 0, value);
     }
 
 private:
@@ -56054,7 +53240,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount report", 0, value);
     }
 
 private:
@@ -56126,7 +53312,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxErrSecCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxErrSecCount report", 0, value);
     }
 
 private:
@@ -56198,7 +53384,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxErrFcsCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxErrFcsCount report", 0, value);
     }
 
 private:
@@ -56270,7 +53456,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.RxErrOtherCount report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.RxErrOtherCount report", 0, value);
     }
 
 private:
@@ -56342,7 +53528,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.ActiveTimestamp report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ActiveTimestamp report", 0, value);
     }
 
 private:
@@ -56414,7 +53600,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.PendingTimestamp report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.PendingTimestamp report", 0, value);
     }
 
 private:
@@ -56484,7 +53670,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.Delay report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.Delay report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -56560,7 +53749,7 @@ public:
                               const chip::app::DataModel::DecodableList<
                                   chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
     {
-        LogValue("ThreadNetworkDiagnostics.SecurityPolicy report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.SecurityPolicy report", 0, value);
     }
 
 private:
@@ -56632,7 +53821,7 @@ public:
 
     static void OnValueReport(void * context, chip::ByteSpan value)
     {
-        LogValue("ThreadNetworkDiagnostics.ChannelMask report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ChannelMask report", 0, value);
     }
 
 private:
@@ -56712,7 +53901,7 @@ public:
                   const chip::app::DataModel::DecodableList<
                       chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
     {
-        LogValue("ThreadNetworkDiagnostics.OperationalDatasetComponents report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.OperationalDatasetComponents report", 0, value);
     }
 
 private:
@@ -56789,7 +53978,7 @@ public:
     OnValueReport(void * context,
                   const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
     {
-        LogValue("ThreadNetworkDiagnostics.ActiveNetworkFaultsList report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ActiveNetworkFaultsList report", 0, value);
     }
 
 private:
@@ -56861,7 +54050,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("ThreadNetworkDiagnostics.AttributeList report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.AttributeList report", 0, value);
     }
 
 private:
@@ -56931,7 +54120,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -57002,7 +54194,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("ThreadNetworkDiagnostics.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("ThreadNetworkDiagnostics.ClusterRevision report", 0, value);
     }
 
 private:
@@ -57114,7 +54306,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
     {
-        LogValue("TimeFormatLocalization.HourFormat report", 0, value);
+        DataModelLogger::LogValue("TimeFormatLocalization.HourFormat report", 0, value);
     }
 
 private:
@@ -57212,7 +54404,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
     {
-        LogValue("TimeFormatLocalization.ActiveCalendarType report", 0, value);
+        DataModelLogger::LogValue("TimeFormatLocalization.ActiveCalendarType report", 0, value);
     }
 
 private:
@@ -57289,7 +54481,7 @@ public:
     OnValueReport(void * context,
                   const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
     {
-        LogValue("TimeFormatLocalization.SupportedCalendarTypes report", 0, value);
+        DataModelLogger::LogValue("TimeFormatLocalization.SupportedCalendarTypes report", 0, value);
     }
 
 private:
@@ -57361,7 +54553,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("TimeFormatLocalization.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("TimeFormatLocalization.ClusterRevision report", 0, value);
     }
 
 private:
@@ -57449,7 +54641,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
     {
-        LogValue("UserLabel.LabelList report", 0, value);
+        DataModelLogger::LogValue("UserLabel.LabelList report", 0, value);
     }
 
 private:
@@ -57519,7 +54711,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("UserLabel.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("UserLabel.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -57601,7 +54796,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("WakeOnLan.WakeOnLanMacAddress report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        DataModelLogger::LogValue("WakeOnLan.WakeOnLanMacAddress report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -57672,7 +54870,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("WakeOnLan.AttributeList report", 0, value);
+        DataModelLogger::LogValue("WakeOnLan.AttributeList report", 0, value);
     }
 
 private:
@@ -57742,7 +54940,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("WakeOnLan.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("WakeOnLan.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -57865,7 +55066,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value)
     {
-        LogValue("WiFiNetworkDiagnostics.Disconnection report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.Disconnection report", 0, value);
     }
 
 private:
@@ -57938,7 +55139,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value)
     {
-        LogValue("WiFiNetworkDiagnostics.AssociationFailure report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.AssociationFailure report", 0, value);
     }
 
 private:
@@ -58011,7 +55212,7 @@ public:
     static void OnValueReport(void * context,
                               chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
     {
-        LogValue("WiFiNetworkDiagnostics.ConnectionStatus report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.ConnectionStatus report", 0, value);
     }
 
 private:
@@ -58081,7 +55282,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("WiFiNetworkDiagnostics.Bssid report", 0, value); }
+    static void OnValueReport(void * context, chip::ByteSpan value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.Bssid report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -58150,7 +55354,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WiFiNetworkDiagnostics.SecurityType report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.SecurityType report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -58219,7 +55426,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WiFiNetworkDiagnostics.WiFiVersion report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.WiFiVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -58288,7 +55498,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("WiFiNetworkDiagnostics.ChannelNumber report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.ChannelNumber report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -58357,7 +55570,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, int8_t value) { LogValue("WiFiNetworkDiagnostics.Rssi report", 0, value); }
+    static void OnValueReport(void * context, int8_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.Rssi report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -58428,7 +55644,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.BeaconLostCount report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.BeaconLostCount report", 0, value);
     }
 
 private:
@@ -58498,7 +55714,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("WiFiNetworkDiagnostics.BeaconRxCount report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.BeaconRxCount report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -58570,7 +55789,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.PacketMulticastRxCount report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.PacketMulticastRxCount report", 0, value);
     }
 
 private:
@@ -58643,7 +55862,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.PacketMulticastTxCount report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.PacketMulticastTxCount report", 0, value);
     }
 
 private:
@@ -58715,7 +55934,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.PacketUnicastRxCount report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.PacketUnicastRxCount report", 0, value);
     }
 
 private:
@@ -58787,7 +56006,7 @@ public:
 
     static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.PacketUnicastTxCount report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.PacketUnicastTxCount report", 0, value);
     }
 
 private:
@@ -58859,7 +56078,7 @@ public:
 
     static void OnValueReport(void * context, uint64_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.CurrentMaxRate report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.CurrentMaxRate report", 0, value);
     }
 
 private:
@@ -58929,7 +56148,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint64_t value) { LogValue("WiFiNetworkDiagnostics.OverrunCount report", 0, value); }
+    static void OnValueReport(void * context, uint64_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.OverrunCount report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -59000,7 +56222,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("WiFiNetworkDiagnostics.AttributeList report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.AttributeList report", 0, value);
     }
 
 private:
@@ -59070,7 +56292,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("WiFiNetworkDiagnostics.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -59141,7 +56366,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("WiFiNetworkDiagnostics.ClusterRevision report", 0, value);
+        DataModelLogger::LogValue("WiFiNetworkDiagnostics.ClusterRevision report", 0, value);
     }
 
 private:
@@ -59407,7 +56632,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.Type report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("WindowCovering.Type report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -59478,7 +56703,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("WindowCovering.CurrentPositionLift report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.CurrentPositionLift report", 0, value);
     }
 
 private:
@@ -59550,7 +56775,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        LogValue("WindowCovering.CurrentPositionTilt report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.CurrentPositionTilt report", 0, value);
     }
 
 private:
@@ -59620,7 +56845,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.ConfigStatus report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("WindowCovering.ConfigStatus report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -59691,7 +56919,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
-        LogValue("WindowCovering.CurrentPositionLiftPercentage report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.CurrentPositionLiftPercentage report", 0, value);
     }
 
 private:
@@ -59763,7 +56991,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
-        LogValue("WindowCovering.CurrentPositionTiltPercentage report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.CurrentPositionTiltPercentage report", 0, value);
     }
 
 private:
@@ -59833,7 +57061,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.OperationalStatus report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("WindowCovering.OperationalStatus report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -59905,7 +57136,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        LogValue("WindowCovering.TargetPositionLiftPercent100ths report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.TargetPositionLiftPercent100ths report", 0, value);
     }
 
 private:
@@ -59978,7 +57209,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        LogValue("WindowCovering.TargetPositionTiltPercent100ths report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.TargetPositionTiltPercent100ths report", 0, value);
     }
 
 private:
@@ -60048,7 +57279,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.EndProductType report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        DataModelLogger::LogValue("WindowCovering.EndProductType report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -60120,7 +57354,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        LogValue("WindowCovering.CurrentPositionLiftPercent100ths report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.CurrentPositionLiftPercent100ths report", 0, value);
     }
 
 private:
@@ -60193,7 +57427,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        LogValue("WindowCovering.CurrentPositionTiltPercent100ths report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.CurrentPositionTiltPercent100ths report", 0, value);
     }
 
 private:
@@ -60265,7 +57499,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("WindowCovering.InstalledOpenLimitLift report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.InstalledOpenLimitLift report", 0, value);
     }
 
 private:
@@ -60337,7 +57571,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("WindowCovering.InstalledClosedLimitLift report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.InstalledClosedLimitLift report", 0, value);
     }
 
 private:
@@ -60409,7 +57643,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("WindowCovering.InstalledOpenLimitTilt report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.InstalledOpenLimitTilt report", 0, value);
     }
 
 private:
@@ -60481,7 +57715,7 @@ public:
 
     static void OnValueReport(void * context, uint16_t value)
     {
-        LogValue("WindowCovering.InstalledClosedLimitTilt report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.InstalledClosedLimitTilt report", 0, value);
     }
 
 private:
@@ -60577,7 +57811,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("WindowCovering.Mode report", 0, value); }
+    static void OnValueReport(void * context, uint8_t value) { DataModelLogger::LogValue("WindowCovering.Mode report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -60646,7 +57880,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("WindowCovering.SafetyStatus report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("WindowCovering.SafetyStatus report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -60717,7 +57954,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        LogValue("WindowCovering.AttributeList report", 0, value);
+        DataModelLogger::LogValue("WindowCovering.AttributeList report", 0, value);
     }
 
 private:
@@ -60787,7 +58024,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint32_t value) { LogValue("WindowCovering.FeatureMap report", 0, value); }
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("WindowCovering.FeatureMap report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -60856,7 +58096,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("WindowCovering.ClusterRevision report", 0, value); }
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("WindowCovering.ClusterRevision report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
