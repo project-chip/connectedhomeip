@@ -7262,6 +7262,8 @@ exit:
 
 // TimeFormatLocalization Cluster Commands
 
+// UnitLocalization Cluster Commands
+
 // UserLabel Cluster Commands
 
 // WakeOnLan Cluster Commands

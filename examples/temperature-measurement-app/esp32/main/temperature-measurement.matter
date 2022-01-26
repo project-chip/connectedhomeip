@@ -573,6 +573,18 @@ server cluster TimeFormatLocalization = 44 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+server cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -654,6 +666,7 @@ endpoint 0 {
   server  cluster OperationalCredentials;
   server  cluster SoftwareDiagnostics;
   server  cluster TimeFormatLocalization;
+  server  cluster UnitLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

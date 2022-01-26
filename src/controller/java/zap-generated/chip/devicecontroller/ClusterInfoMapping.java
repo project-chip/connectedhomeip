@@ -4420,6 +4420,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.TimeFormatLocalizationCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("timeFormatLocalization", timeFormatLocalizationClusterInfo);
+    ClusterInfo unitLocalizationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.UnitLocalizationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("unitLocalization", unitLocalizationClusterInfo);
     ClusterInfo userLabelClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.UserLabelCluster(ptr, endpointId),
@@ -4525,6 +4530,7 @@ public class ClusterInfoMapping {
         .get("threadNetworkDiagnostics")
         .combineCommands(source.get("threadNetworkDiagnostics"));
     destination.get("timeFormatLocalization").combineCommands(source.get("timeFormatLocalization"));
+    destination.get("unitLocalization").combineCommands(source.get("unitLocalization"));
     destination.get("userLabel").combineCommands(source.get("userLabel"));
     destination.get("wakeOnLan").combineCommands(source.get("wakeOnLan"));
     destination.get("wiFiNetworkDiagnostics").combineCommands(source.get("wiFiNetworkDiagnostics"));
@@ -8624,6 +8630,8 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> timeFormatLocalizationClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("timeFormatLocalization", timeFormatLocalizationClusterInteractionInfoMap);
+    Map<String, InteractionInfo> unitLocalizationClusterInteractionInfoMap = new LinkedHashMap<>();
+    commandMap.put("unitLocalization", unitLocalizationClusterInteractionInfoMap);
     Map<String, InteractionInfo> userLabelClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("userLabel", userLabelClusterInteractionInfoMap);
     Map<String, InteractionInfo> wakeOnLanClusterInteractionInfoMap = new LinkedHashMap<>();

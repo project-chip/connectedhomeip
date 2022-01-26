@@ -809,6 +809,13 @@ public:
     ~TimeFormatLocalizationCluster() {}
 };
 
+class DLL_EXPORT UnitLocalizationCluster : public ClusterBase
+{
+public:
+    UnitLocalizationCluster() : ClusterBase(app::Clusters::UnitLocalization::Id) {}
+    ~UnitLocalizationCluster() {}
+};
+
 class DLL_EXPORT UserLabelCluster : public ClusterBase
 {
 public:
