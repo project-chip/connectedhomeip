@@ -152,6 +152,28 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
+{
+#ifdef CHIP_DEVICE_CONFIG_UNIQUE_ID
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_UNIQUE_ID), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_UNIQUE_ID);
+	return CHIP_NO_ERROR;
+#else
+    char temp[32];
+    int i = 0, j = 0;
+
+    wifi_get_mac_address(temp);
+
+	for(i = 0; i < bufSize ; i++)
+	{
+		if(temp[i] != ':')
+			buf[j++] = temp[i];
+	}
+
+    return CHIP_NO_ERROR;
+#endif
+}
+
 bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.

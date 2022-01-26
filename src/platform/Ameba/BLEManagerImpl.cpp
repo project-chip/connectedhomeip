@@ -25,6 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <ble/CHIPBleServiceData.h>
@@ -48,7 +49,9 @@
 #include "wifi_conf.h"
 //#include "complete_ble_service.h"
 #include "app_msg.h"
-
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
 extern void wifi_bt_coex_set_bt_on(void);
 /*******************************************************************************
  * Local data types
@@ -116,6 +119,7 @@ typedef struct
 } ble_uuid16_t;
 
 const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
+
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -153,7 +157,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleTXCharRead(struct ble_gatt_char_context * param)
+void BLEManagerImpl::HandleTXCharRead(void * param)
 {
     /* Not supported */
     ChipLogError(DeviceLayer, "BLEManagerImpl::HandleTXCharRead() not supported");
@@ -614,6 +618,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ExitNow();
     }
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    deviceIdInfo.SetAdditionalDataFlag(true);
+#endif
+
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
     memcpy(&advData[index], &deviceIdInfo, sizeof(deviceIdInfo));
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
@@ -935,9 +943,7 @@ CHIP_ERROR BLEManagerImpl::ble_svr_gap_event(void * param, int cb_type, void * p
 
 CHIP_ERROR BLEManagerImpl::gatt_svr_chr_access(void * param, T_SERVER_ID service_id, TBTCONFIG_CALLBACK_DATA * p_data)
 {
-
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     if (service_id == SERVICE_PROFILE_GENERAL_ID)
     {
         T_SERVER_APP_CB_DATA * p_param = (T_SERVER_APP_CB_DATA *) p_data;
@@ -961,9 +967,13 @@ CHIP_ERROR BLEManagerImpl::gatt_svr_chr_access(void * param, T_SERVER_ID service
         uint8_t * p_value                = p_data->msg_data.write.p_value;
         uint16_t len                     = p_data->msg_data.write.len;
         BLEManagerImpl * blemgr          = static_cast<BLEManagerImpl *>(param);
+
         switch (msg_type)
         {
         case SERVICE_CALLBACK_TYPE_READ_CHAR_VALUE:
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            sInstance.HandleC3CharRead(p_data);
+#endif
             break;
 
         case SERVICE_CALLBACK_TYPE_WRITE_CHAR_VALUE:
@@ -1018,6 +1028,38 @@ void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t 
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
     }
 }
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PacketBufferHandle bufferHandle;
+    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1] = {};
+    uint16_t lifetimeCounter = 0;
+    BitFlags<AdditionalDataFields> additionalDataFields;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
+
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
+                                                                         bufferHandle, additionalDataFields);
+    SuccessOrExit(err);
+    p_data->msg_data.write.p_value = bufferHandle->Start();
+    p_data->msg_data.write.len = bufferHandle->DataLength();
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+    }
+    return;
+}
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
 int BLEManagerImpl::ble_callback_dispatcher(void * param, void * p_cb_data, int type, T_CHIP_BLEMGR_CALLBACK_TYPE callback_type)
 {

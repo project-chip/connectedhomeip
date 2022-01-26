@@ -111,6 +111,11 @@ string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/
 string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"\n")
 string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert:impl\", \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log:impl\"]\n")
 
+if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
+    string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising"   "true")
+    string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id"            "true")
+endif()
+
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
 ExternalProject_Add(

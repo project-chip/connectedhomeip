@@ -70,6 +70,7 @@ public:
     static const Key kConfigKey_Breadcrumb;
 
     // Counter keys
+    static const Key kConfigKey_UniqueId;
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
