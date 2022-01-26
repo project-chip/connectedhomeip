@@ -39,6 +39,8 @@ zclHelper['isEvent'] = function(db, event_name, packageId) {
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
 const kGlobalAttributes = [
+  0xfff8, // ServerGeneratedCommandList
+  0xfff9, // ClientGeneratedCommandList
   0xfffb, // AttributeList
   0xfffc, // ClusterRevision
   0xfffd, // FeatureMap
