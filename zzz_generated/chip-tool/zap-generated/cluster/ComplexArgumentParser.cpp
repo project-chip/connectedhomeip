@@ -228,6 +228,54 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralCommissioning::
     ComplexArgumentParser::Finalize(request.failSafeExpiryLengthMs);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BatChargeFaultChangeType.current", value.isMember("current")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BatChargeFaultChangeType.previous", value.isMember("previous")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "current");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.current, value["current"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "previous");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.previous, value["previous"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.current);
+    ComplexArgumentParser::Finalize(request.previous);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BatFaultChangeType.current", value.isMember("current")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BatFaultChangeType.previous", value.isMember("previous")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "current");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.current, value["current"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "previous");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.previous, value["previous"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.current);
+    ComplexArgumentParser::Finalize(request.previous);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request,
                                         Json::Value & value)
 {
@@ -1966,4 +2014,28 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::
     ComplexArgumentParser::Finalize(request.channel);
     ComplexArgumentParser::Finalize(request.wiFiBand);
     ComplexArgumentParser::Finalize(request.rssi);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::PowerSource::Structs::WiredFaultChangeType::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WiredFaultChangeType.current", value.isMember("current")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WiredFaultChangeType.previous", value.isMember("previous")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "current");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.current, value["current"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "previous");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.previous, value["previous"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerSource::Structs::WiredFaultChangeType::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.current);
+    ComplexArgumentParser::Finalize(request.previous);
 }

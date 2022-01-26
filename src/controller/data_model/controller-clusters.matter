@@ -277,8 +277,6 @@ client cluster Basic = 40 {
   readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 client cluster BinaryInputBasic = 15 {

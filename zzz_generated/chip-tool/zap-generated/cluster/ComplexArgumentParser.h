@@ -48,6 +48,14 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request,
                         Json::Value & value);
 
@@ -238,3 +246,7 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerSource::Structs::WiredFaultChangeType::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PowerSource::Structs::WiredFaultChangeType::Type & request);

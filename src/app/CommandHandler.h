@@ -185,14 +185,6 @@ public:
      */
     bool IsTimedInvoke() const { return mTimedRequest; }
 
-    /*
-     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
-     * not arise during normal message processing flows that all normally call Close() above. This can only
-     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
-     * message payloads.
-     */
-    void Abort();
-
     /**
      * Gets the inner exchange context object, without ownership.
      *
@@ -217,6 +209,15 @@ private:
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
+
     /**
      * IncrementHoldOff will increase the inner refcount of the CommandHandler.
      *

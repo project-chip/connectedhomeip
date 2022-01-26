@@ -174,7 +174,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Basic (client) */                                                                             \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(SINGLETON),                         \
-              ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                                                       \
+              ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: OTA Software Update Provider (client) */                                                      \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */     \
