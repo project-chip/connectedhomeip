@@ -4122,7 +4122,6 @@ private:
 | Cluster Basic                                                       | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * MfgSpecificPing                                                   |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InteractionModelVersion                                           | 0x0000 |
@@ -4153,26 +4152,6 @@ private:
 | * Leave                                                             | 0x0002 |
 | * ReachableChanged                                                  | 0x0003 |
 \*----------------------------------------------------------------------------*/
-
-/*
- * Command MfgSpecificPing
- */
-class BasicMfgSpecificPing : public ModelCommand
-{
-public:
-    BasicMfgSpecificPing() : ModelCommand("mfg-specific-ping") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type mRequest;
-};
 
 /*
  * Event StartUp
@@ -58522,7 +58501,6 @@ void registerClusterBasic(Commands & commands)
     const char * clusterName = "Basic";
 
     commands_list clusterCommands = {
-        make_unique<BasicMfgSpecificPing>(),               //
         make_unique<ReadBasicInteractionModelVersion>(),   //
         make_unique<ReportBasicInteractionModelVersion>(), //
         make_unique<ReadBasicVendorName>(),                //
