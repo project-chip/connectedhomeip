@@ -4682,7 +4682,7 @@ public:
 class ReportAccessControlAccessControlEntryChanged : public ModelCommand
 {
 public:
-    ReportAccessControlAccessControlEntryChanged() : ModelCommand("subscribe-event")
+    ReportAccessControlAccessControlEntryChanged() : ModelCommand("report-event")
     {
         AddArgument("event-name", "access-control-entry-changed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -4755,7 +4755,7 @@ public:
 class ReportAccessControlAccessControlExtensionChanged : public ModelCommand
 {
 public:
-    ReportAccessControlAccessControlExtensionChanged() : ModelCommand("subscribe-event")
+    ReportAccessControlAccessControlExtensionChanged() : ModelCommand("report-event")
     {
         AddArgument("event-name", "access-control-extension-changed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -4831,7 +4831,7 @@ public:
 class ReportAccessControlAcl : public ModelCommand
 {
 public:
-    ReportAccessControlAcl() : ModelCommand("subscribe")
+    ReportAccessControlAcl() : ModelCommand("report")
     {
         AddArgument("attr-name", "acl");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -4909,7 +4909,7 @@ public:
 class ReportAccessControlExtension : public ModelCommand
 {
 public:
-    ReportAccessControlExtension() : ModelCommand("subscribe")
+    ReportAccessControlExtension() : ModelCommand("report")
     {
         AddArgument("attr-name", "extension");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -4984,7 +4984,7 @@ public:
 class ReportAccessControlAttributeList : public ModelCommand
 {
 public:
-    ReportAccessControlAttributeList() : ModelCommand("subscribe")
+    ReportAccessControlAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5056,7 +5056,7 @@ public:
 class ReportAccessControlClusterRevision : public ModelCommand
 {
 public:
-    ReportAccessControlClusterRevision() : ModelCommand("subscribe")
+    ReportAccessControlClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5209,7 +5209,7 @@ public:
 class ReportAccountLoginAttributeList : public ModelCommand
 {
 public:
-    ReportAccountLoginAttributeList() : ModelCommand("subscribe")
+    ReportAccountLoginAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5281,7 +5281,7 @@ public:
 class ReportAccountLoginClusterRevision : public ModelCommand
 {
 public:
-    ReportAccountLoginClusterRevision() : ModelCommand("subscribe")
+    ReportAccountLoginClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5441,7 +5441,7 @@ public:
 class ReportAdministratorCommissioningWindowStatus : public ModelCommand
 {
 public:
-    ReportAdministratorCommissioningWindowStatus() : ModelCommand("subscribe")
+    ReportAdministratorCommissioningWindowStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "window-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5513,7 +5513,7 @@ public:
 class ReportAdministratorCommissioningAdminFabricIndex : public ModelCommand
 {
 public:
-    ReportAdministratorCommissioningAdminFabricIndex() : ModelCommand("subscribe")
+    ReportAdministratorCommissioningAdminFabricIndex() : ModelCommand("report")
     {
         AddArgument("attr-name", "admin-fabric-index");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5585,7 +5585,7 @@ public:
 class ReportAdministratorCommissioningAdminVendorId : public ModelCommand
 {
 public:
-    ReportAdministratorCommissioningAdminVendorId() : ModelCommand("subscribe")
+    ReportAdministratorCommissioningAdminVendorId() : ModelCommand("report")
     {
         AddArgument("attr-name", "admin-vendor-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5657,7 +5657,7 @@ public:
 class ReportAdministratorCommissioningAttributeList : public ModelCommand
 {
 public:
-    ReportAdministratorCommissioningAttributeList() : ModelCommand("subscribe")
+    ReportAdministratorCommissioningAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5729,7 +5729,7 @@ public:
 class ReportAdministratorCommissioningClusterRevision : public ModelCommand
 {
 public:
-    ReportAdministratorCommissioningClusterRevision() : ModelCommand("subscribe")
+    ReportAdministratorCommissioningClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5821,7 +5821,7 @@ public:
 class ReportApplicationBasicVendorName : public ModelCommand
 {
 public:
-    ReportApplicationBasicVendorName() : ModelCommand("subscribe")
+    ReportApplicationBasicVendorName() : ModelCommand("report")
     {
         AddArgument("attr-name", "vendor-name");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5890,7 +5890,7 @@ public:
 class ReportApplicationBasicVendorId : public ModelCommand
 {
 public:
-    ReportApplicationBasicVendorId() : ModelCommand("subscribe")
+    ReportApplicationBasicVendorId() : ModelCommand("report")
     {
         AddArgument("attr-name", "vendor-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -5959,7 +5959,7 @@ public:
 class ReportApplicationBasicApplicationName : public ModelCommand
 {
 public:
-    ReportApplicationBasicApplicationName() : ModelCommand("subscribe")
+    ReportApplicationBasicApplicationName() : ModelCommand("report")
     {
         AddArgument("attr-name", "application-name");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6031,7 +6031,7 @@ public:
 class ReportApplicationBasicProductId : public ModelCommand
 {
 public:
-    ReportApplicationBasicProductId() : ModelCommand("subscribe")
+    ReportApplicationBasicProductId() : ModelCommand("report")
     {
         AddArgument("attr-name", "product-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6100,7 +6100,7 @@ public:
 class ReportApplicationBasicApplicationStatus : public ModelCommand
 {
 public:
-    ReportApplicationBasicApplicationStatus() : ModelCommand("subscribe")
+    ReportApplicationBasicApplicationStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "application-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6172,7 +6172,7 @@ public:
 class ReportApplicationBasicApplicationVersion : public ModelCommand
 {
 public:
-    ReportApplicationBasicApplicationVersion() : ModelCommand("subscribe")
+    ReportApplicationBasicApplicationVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "application-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6244,7 +6244,7 @@ public:
 class ReportApplicationBasicAllowedVendorList : public ModelCommand
 {
 public:
-    ReportApplicationBasicAllowedVendorList() : ModelCommand("subscribe")
+    ReportApplicationBasicAllowedVendorList() : ModelCommand("report")
     {
         AddArgument("attr-name", "allowed-vendor-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6316,7 +6316,7 @@ public:
 class ReportApplicationBasicAttributeList : public ModelCommand
 {
 public:
-    ReportApplicationBasicAttributeList() : ModelCommand("subscribe")
+    ReportApplicationBasicAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6388,7 +6388,7 @@ public:
 class ReportApplicationBasicClusterRevision : public ModelCommand
 {
 public:
-    ReportApplicationBasicClusterRevision() : ModelCommand("subscribe")
+    ReportApplicationBasicClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6546,7 +6546,7 @@ public:
 class ReportApplicationLauncherApplicationLauncherList : public ModelCommand
 {
 public:
-    ReportApplicationLauncherApplicationLauncherList() : ModelCommand("subscribe")
+    ReportApplicationLauncherApplicationLauncherList() : ModelCommand("report")
     {
         AddArgument("attr-name", "application-launcher-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6618,7 +6618,7 @@ public:
 class ReportApplicationLauncherAttributeList : public ModelCommand
 {
 public:
-    ReportApplicationLauncherAttributeList() : ModelCommand("subscribe")
+    ReportApplicationLauncherAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6690,7 +6690,7 @@ public:
 class ReportApplicationLauncherClusterRevision : public ModelCommand
 {
 public:
-    ReportApplicationLauncherClusterRevision() : ModelCommand("subscribe")
+    ReportApplicationLauncherClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6826,7 +6826,7 @@ public:
 class ReportAudioOutputAudioOutputList : public ModelCommand
 {
 public:
-    ReportAudioOutputAudioOutputList() : ModelCommand("subscribe")
+    ReportAudioOutputAudioOutputList() : ModelCommand("report")
     {
         AddArgument("attr-name", "audio-output-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6900,7 +6900,7 @@ public:
 class ReportAudioOutputCurrentAudioOutput : public ModelCommand
 {
 public:
-    ReportAudioOutputCurrentAudioOutput() : ModelCommand("subscribe")
+    ReportAudioOutputCurrentAudioOutput() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-audio-output");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -6969,7 +6969,7 @@ public:
 class ReportAudioOutputAttributeList : public ModelCommand
 {
 public:
-    ReportAudioOutputAttributeList() : ModelCommand("subscribe")
+    ReportAudioOutputAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7041,7 +7041,7 @@ public:
 class ReportAudioOutputClusterRevision : public ModelCommand
 {
 public:
-    ReportAudioOutputClusterRevision() : ModelCommand("subscribe")
+    ReportAudioOutputClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7172,7 +7172,7 @@ public:
 class ReportBarrierControlBarrierMovingState : public ModelCommand
 {
 public:
-    ReportBarrierControlBarrierMovingState() : ModelCommand("subscribe")
+    ReportBarrierControlBarrierMovingState() : ModelCommand("report")
     {
         AddArgument("attr-name", "barrier-moving-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7241,7 +7241,7 @@ public:
 class ReportBarrierControlBarrierSafetyStatus : public ModelCommand
 {
 public:
-    ReportBarrierControlBarrierSafetyStatus() : ModelCommand("subscribe")
+    ReportBarrierControlBarrierSafetyStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "barrier-safety-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7310,7 +7310,7 @@ public:
 class ReportBarrierControlBarrierCapabilities : public ModelCommand
 {
 public:
-    ReportBarrierControlBarrierCapabilities() : ModelCommand("subscribe")
+    ReportBarrierControlBarrierCapabilities() : ModelCommand("report")
     {
         AddArgument("attr-name", "barrier-capabilities");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7379,7 +7379,7 @@ public:
 class ReportBarrierControlBarrierPosition : public ModelCommand
 {
 public:
-    ReportBarrierControlBarrierPosition() : ModelCommand("subscribe")
+    ReportBarrierControlBarrierPosition() : ModelCommand("report")
     {
         AddArgument("attr-name", "barrier-position");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7448,7 +7448,7 @@ public:
 class ReportBarrierControlAttributeList : public ModelCommand
 {
 public:
-    ReportBarrierControlAttributeList() : ModelCommand("subscribe")
+    ReportBarrierControlAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7520,7 +7520,7 @@ public:
 class ReportBarrierControlClusterRevision : public ModelCommand
 {
 public:
-    ReportBarrierControlClusterRevision() : ModelCommand("subscribe")
+    ReportBarrierControlClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7645,7 +7645,7 @@ public:
 class ReportBasicStartUp : public ModelCommand
 {
 public:
-    ReportBasicStartUp() : ModelCommand("subscribe-event")
+    ReportBasicStartUp() : ModelCommand("report-event")
     {
         AddArgument("event-name", "start-up");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7716,7 +7716,7 @@ public:
 class ReportBasicShutDown : public ModelCommand
 {
 public:
-    ReportBasicShutDown() : ModelCommand("subscribe-event")
+    ReportBasicShutDown() : ModelCommand("report-event")
     {
         AddArgument("event-name", "shut-down");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7786,7 +7786,7 @@ public:
 class ReportBasicLeave : public ModelCommand
 {
 public:
-    ReportBasicLeave() : ModelCommand("subscribe-event")
+    ReportBasicLeave() : ModelCommand("report-event")
     {
         AddArgument("event-name", "leave");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7857,7 +7857,7 @@ public:
 class ReportBasicReachableChanged : public ModelCommand
 {
 public:
-    ReportBasicReachableChanged() : ModelCommand("subscribe-event")
+    ReportBasicReachableChanged() : ModelCommand("report-event")
     {
         AddArgument("event-name", "reachable-changed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7929,7 +7929,7 @@ public:
 class ReportBasicInteractionModelVersion : public ModelCommand
 {
 public:
-    ReportBasicInteractionModelVersion() : ModelCommand("subscribe")
+    ReportBasicInteractionModelVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "interaction-model-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -7998,7 +7998,7 @@ public:
 class ReportBasicVendorName : public ModelCommand
 {
 public:
-    ReportBasicVendorName() : ModelCommand("subscribe")
+    ReportBasicVendorName() : ModelCommand("report")
     {
         AddArgument("attr-name", "vendor-name");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8067,7 +8067,7 @@ public:
 class ReportBasicVendorID : public ModelCommand
 {
 public:
-    ReportBasicVendorID() : ModelCommand("subscribe")
+    ReportBasicVendorID() : ModelCommand("report")
     {
         AddArgument("attr-name", "vendor-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8136,7 +8136,7 @@ public:
 class ReportBasicProductName : public ModelCommand
 {
 public:
-    ReportBasicProductName() : ModelCommand("subscribe")
+    ReportBasicProductName() : ModelCommand("report")
     {
         AddArgument("attr-name", "product-name");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8205,7 +8205,7 @@ public:
 class ReportBasicProductID : public ModelCommand
 {
 public:
-    ReportBasicProductID() : ModelCommand("subscribe")
+    ReportBasicProductID() : ModelCommand("report")
     {
         AddArgument("attr-name", "product-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8300,7 +8300,7 @@ private:
 class ReportBasicNodeLabel : public ModelCommand
 {
 public:
-    ReportBasicNodeLabel() : ModelCommand("subscribe")
+    ReportBasicNodeLabel() : ModelCommand("report")
     {
         AddArgument("attr-name", "node-label");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8395,7 +8395,7 @@ private:
 class ReportBasicLocation : public ModelCommand
 {
 public:
-    ReportBasicLocation() : ModelCommand("subscribe")
+    ReportBasicLocation() : ModelCommand("report")
     {
         AddArgument("attr-name", "location");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8464,7 +8464,7 @@ public:
 class ReportBasicHardwareVersion : public ModelCommand
 {
 public:
-    ReportBasicHardwareVersion() : ModelCommand("subscribe")
+    ReportBasicHardwareVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "hardware-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8533,7 +8533,7 @@ public:
 class ReportBasicHardwareVersionString : public ModelCommand
 {
 public:
-    ReportBasicHardwareVersionString() : ModelCommand("subscribe")
+    ReportBasicHardwareVersionString() : ModelCommand("report")
     {
         AddArgument("attr-name", "hardware-version-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8602,7 +8602,7 @@ public:
 class ReportBasicSoftwareVersion : public ModelCommand
 {
 public:
-    ReportBasicSoftwareVersion() : ModelCommand("subscribe")
+    ReportBasicSoftwareVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "software-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8671,7 +8671,7 @@ public:
 class ReportBasicSoftwareVersionString : public ModelCommand
 {
 public:
-    ReportBasicSoftwareVersionString() : ModelCommand("subscribe")
+    ReportBasicSoftwareVersionString() : ModelCommand("report")
     {
         AddArgument("attr-name", "software-version-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8740,7 +8740,7 @@ public:
 class ReportBasicManufacturingDate : public ModelCommand
 {
 public:
-    ReportBasicManufacturingDate() : ModelCommand("subscribe")
+    ReportBasicManufacturingDate() : ModelCommand("report")
     {
         AddArgument("attr-name", "manufacturing-date");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8809,7 +8809,7 @@ public:
 class ReportBasicPartNumber : public ModelCommand
 {
 public:
-    ReportBasicPartNumber() : ModelCommand("subscribe")
+    ReportBasicPartNumber() : ModelCommand("report")
     {
         AddArgument("attr-name", "part-number");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8878,7 +8878,7 @@ public:
 class ReportBasicProductURL : public ModelCommand
 {
 public:
-    ReportBasicProductURL() : ModelCommand("subscribe")
+    ReportBasicProductURL() : ModelCommand("report")
     {
         AddArgument("attr-name", "product-url");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -8947,7 +8947,7 @@ public:
 class ReportBasicProductLabel : public ModelCommand
 {
 public:
-    ReportBasicProductLabel() : ModelCommand("subscribe")
+    ReportBasicProductLabel() : ModelCommand("report")
     {
         AddArgument("attr-name", "product-label");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9016,7 +9016,7 @@ public:
 class ReportBasicSerialNumber : public ModelCommand
 {
 public:
-    ReportBasicSerialNumber() : ModelCommand("subscribe")
+    ReportBasicSerialNumber() : ModelCommand("report")
     {
         AddArgument("attr-name", "serial-number");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9111,7 +9111,7 @@ private:
 class ReportBasicLocalConfigDisabled : public ModelCommand
 {
 public:
-    ReportBasicLocalConfigDisabled() : ModelCommand("subscribe")
+    ReportBasicLocalConfigDisabled() : ModelCommand("report")
     {
         AddArgument("attr-name", "local-config-disabled");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9180,7 +9180,7 @@ public:
 class ReportBasicReachable : public ModelCommand
 {
 public:
-    ReportBasicReachable() : ModelCommand("subscribe")
+    ReportBasicReachable() : ModelCommand("report")
     {
         AddArgument("attr-name", "reachable");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9249,7 +9249,7 @@ public:
 class ReportBasicUniqueID : public ModelCommand
 {
 public:
-    ReportBasicUniqueID() : ModelCommand("subscribe")
+    ReportBasicUniqueID() : ModelCommand("report")
     {
         AddArgument("attr-name", "unique-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9318,7 +9318,7 @@ public:
 class ReportBasicAttributeList : public ModelCommand
 {
 public:
-    ReportBasicAttributeList() : ModelCommand("subscribe")
+    ReportBasicAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9390,7 +9390,7 @@ public:
 class ReportBasicClusterRevision : public ModelCommand
 {
 public:
-    ReportBasicClusterRevision() : ModelCommand("subscribe")
+    ReportBasicClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9500,7 +9500,7 @@ private:
 class ReportBinaryInputBasicOutOfService : public ModelCommand
 {
 public:
-    ReportBinaryInputBasicOutOfService() : ModelCommand("subscribe")
+    ReportBinaryInputBasicOutOfService() : ModelCommand("report")
     {
         AddArgument("attr-name", "out-of-service");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9595,7 +9595,7 @@ private:
 class ReportBinaryInputBasicPresentValue : public ModelCommand
 {
 public:
-    ReportBinaryInputBasicPresentValue() : ModelCommand("subscribe")
+    ReportBinaryInputBasicPresentValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "present-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9664,7 +9664,7 @@ public:
 class ReportBinaryInputBasicStatusFlags : public ModelCommand
 {
 public:
-    ReportBinaryInputBasicStatusFlags() : ModelCommand("subscribe")
+    ReportBinaryInputBasicStatusFlags() : ModelCommand("report")
     {
         AddArgument("attr-name", "status-flags");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9733,7 +9733,7 @@ public:
 class ReportBinaryInputBasicAttributeList : public ModelCommand
 {
 public:
-    ReportBinaryInputBasicAttributeList() : ModelCommand("subscribe")
+    ReportBinaryInputBasicAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9805,7 +9805,7 @@ public:
 class ReportBinaryInputBasicClusterRevision : public ModelCommand
 {
 public:
-    ReportBinaryInputBasicClusterRevision() : ModelCommand("subscribe")
+    ReportBinaryInputBasicClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -9942,7 +9942,7 @@ public:
 class ReportBindingAttributeList : public ModelCommand
 {
 public:
-    ReportBindingAttributeList() : ModelCommand("subscribe")
+    ReportBindingAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10014,7 +10014,7 @@ public:
 class ReportBindingClusterRevision : public ModelCommand
 {
 public:
-    ReportBindingClusterRevision() : ModelCommand("subscribe")
+    ReportBindingClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10097,7 +10097,7 @@ public:
 class ReportBooleanStateStateChange : public ModelCommand
 {
 public:
-    ReportBooleanStateStateChange() : ModelCommand("subscribe-event")
+    ReportBooleanStateStateChange() : ModelCommand("report-event")
     {
         AddArgument("event-name", "state-change");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10169,7 +10169,7 @@ public:
 class ReportBooleanStateStateValue : public ModelCommand
 {
 public:
-    ReportBooleanStateStateValue() : ModelCommand("subscribe")
+    ReportBooleanStateStateValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "state-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10238,7 +10238,7 @@ public:
 class ReportBooleanStateAttributeList : public ModelCommand
 {
 public:
-    ReportBooleanStateAttributeList() : ModelCommand("subscribe")
+    ReportBooleanStateAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10310,7 +10310,7 @@ public:
 class ReportBooleanStateClusterRevision : public ModelCommand
 {
 public:
-    ReportBooleanStateClusterRevision() : ModelCommand("subscribe")
+    ReportBooleanStateClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10713,7 +10713,7 @@ public:
 class ReportBridgedActionsStateChanged : public ModelCommand
 {
 public:
-    ReportBridgedActionsStateChanged() : ModelCommand("subscribe-event")
+    ReportBridgedActionsStateChanged() : ModelCommand("report-event")
     {
         AddArgument("event-name", "state-changed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10784,7 +10784,7 @@ public:
 class ReportBridgedActionsActionFailed : public ModelCommand
 {
 public:
-    ReportBridgedActionsActionFailed() : ModelCommand("subscribe-event")
+    ReportBridgedActionsActionFailed() : ModelCommand("report-event")
     {
         AddArgument("event-name", "action-failed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10859,7 +10859,7 @@ public:
 class ReportBridgedActionsActionList : public ModelCommand
 {
 public:
-    ReportBridgedActionsActionList() : ModelCommand("subscribe")
+    ReportBridgedActionsActionList() : ModelCommand("report")
     {
         AddArgument("attr-name", "action-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -10937,7 +10937,7 @@ public:
 class ReportBridgedActionsEndpointList : public ModelCommand
 {
 public:
-    ReportBridgedActionsEndpointList() : ModelCommand("subscribe")
+    ReportBridgedActionsEndpointList() : ModelCommand("report")
     {
         AddArgument("attr-name", "endpoint-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11012,7 +11012,7 @@ public:
 class ReportBridgedActionsSetupUrl : public ModelCommand
 {
 public:
-    ReportBridgedActionsSetupUrl() : ModelCommand("subscribe")
+    ReportBridgedActionsSetupUrl() : ModelCommand("report")
     {
         AddArgument("attr-name", "setup-url");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11081,7 +11081,7 @@ public:
 class ReportBridgedActionsAttributeList : public ModelCommand
 {
 public:
-    ReportBridgedActionsAttributeList() : ModelCommand("subscribe")
+    ReportBridgedActionsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11153,7 +11153,7 @@ public:
 class ReportBridgedActionsClusterRevision : public ModelCommand
 {
 public:
-    ReportBridgedActionsClusterRevision() : ModelCommand("subscribe")
+    ReportBridgedActionsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11234,7 +11234,7 @@ public:
 class ReportBridgedDeviceBasicAttributeList : public ModelCommand
 {
 public:
-    ReportBridgedDeviceBasicAttributeList() : ModelCommand("subscribe")
+    ReportBridgedDeviceBasicAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11306,7 +11306,7 @@ public:
 class ReportBridgedDeviceBasicClusterRevision : public ModelCommand
 {
 public:
-    ReportBridgedDeviceBasicClusterRevision() : ModelCommand("subscribe")
+    ReportBridgedDeviceBasicClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11466,7 +11466,7 @@ public:
 class ReportChannelChannelList : public ModelCommand
 {
 public:
-    ReportChannelChannelList() : ModelCommand("subscribe")
+    ReportChannelChannelList() : ModelCommand("report")
     {
         AddArgument("attr-name", "channel-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11540,7 +11540,7 @@ public:
 class ReportChannelAttributeList : public ModelCommand
 {
 public:
-    ReportChannelAttributeList() : ModelCommand("subscribe")
+    ReportChannelAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -11612,7 +11612,7 @@ public:
 class ReportChannelClusterRevision : public ModelCommand
 {
 public:
-    ReportChannelClusterRevision() : ModelCommand("subscribe")
+    ReportChannelClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12306,7 +12306,7 @@ public:
 class ReportColorControlCurrentHue : public ModelCommand
 {
 public:
-    ReportColorControlCurrentHue() : ModelCommand("subscribe")
+    ReportColorControlCurrentHue() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-hue");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12375,7 +12375,7 @@ public:
 class ReportColorControlCurrentSaturation : public ModelCommand
 {
 public:
-    ReportColorControlCurrentSaturation() : ModelCommand("subscribe")
+    ReportColorControlCurrentSaturation() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-saturation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12444,7 +12444,7 @@ public:
 class ReportColorControlRemainingTime : public ModelCommand
 {
 public:
-    ReportColorControlRemainingTime() : ModelCommand("subscribe")
+    ReportColorControlRemainingTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "remaining-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12513,7 +12513,7 @@ public:
 class ReportColorControlCurrentX : public ModelCommand
 {
 public:
-    ReportColorControlCurrentX() : ModelCommand("subscribe")
+    ReportColorControlCurrentX() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12582,7 +12582,7 @@ public:
 class ReportColorControlCurrentY : public ModelCommand
 {
 public:
-    ReportColorControlCurrentY() : ModelCommand("subscribe")
+    ReportColorControlCurrentY() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12651,7 +12651,7 @@ public:
 class ReportColorControlDriftCompensation : public ModelCommand
 {
 public:
-    ReportColorControlDriftCompensation() : ModelCommand("subscribe")
+    ReportColorControlDriftCompensation() : ModelCommand("report")
     {
         AddArgument("attr-name", "drift-compensation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12720,7 +12720,7 @@ public:
 class ReportColorControlCompensationText : public ModelCommand
 {
 public:
-    ReportColorControlCompensationText() : ModelCommand("subscribe")
+    ReportColorControlCompensationText() : ModelCommand("report")
     {
         AddArgument("attr-name", "compensation-text");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12789,7 +12789,7 @@ public:
 class ReportColorControlColorTemperature : public ModelCommand
 {
 public:
-    ReportColorControlColorTemperature() : ModelCommand("subscribe")
+    ReportColorControlColorTemperature() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-temperature");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12858,7 +12858,7 @@ public:
 class ReportColorControlColorMode : public ModelCommand
 {
 public:
-    ReportColorControlColorMode() : ModelCommand("subscribe")
+    ReportColorControlColorMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -12953,7 +12953,7 @@ private:
 class ReportColorControlColorControlOptions : public ModelCommand
 {
 public:
-    ReportColorControlColorControlOptions() : ModelCommand("subscribe")
+    ReportColorControlColorControlOptions() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-control-options");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13022,7 +13022,7 @@ public:
 class ReportColorControlNumberOfPrimaries : public ModelCommand
 {
 public:
-    ReportColorControlNumberOfPrimaries() : ModelCommand("subscribe")
+    ReportColorControlNumberOfPrimaries() : ModelCommand("report")
     {
         AddArgument("attr-name", "number-of-primaries");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13091,7 +13091,7 @@ public:
 class ReportColorControlPrimary1X : public ModelCommand
 {
 public:
-    ReportColorControlPrimary1X() : ModelCommand("subscribe")
+    ReportColorControlPrimary1X() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary1x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13160,7 +13160,7 @@ public:
 class ReportColorControlPrimary1Y : public ModelCommand
 {
 public:
-    ReportColorControlPrimary1Y() : ModelCommand("subscribe")
+    ReportColorControlPrimary1Y() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary1y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13229,7 +13229,7 @@ public:
 class ReportColorControlPrimary1Intensity : public ModelCommand
 {
 public:
-    ReportColorControlPrimary1Intensity() : ModelCommand("subscribe")
+    ReportColorControlPrimary1Intensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary1intensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13298,7 +13298,7 @@ public:
 class ReportColorControlPrimary2X : public ModelCommand
 {
 public:
-    ReportColorControlPrimary2X() : ModelCommand("subscribe")
+    ReportColorControlPrimary2X() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary2x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13367,7 +13367,7 @@ public:
 class ReportColorControlPrimary2Y : public ModelCommand
 {
 public:
-    ReportColorControlPrimary2Y() : ModelCommand("subscribe")
+    ReportColorControlPrimary2Y() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary2y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13436,7 +13436,7 @@ public:
 class ReportColorControlPrimary2Intensity : public ModelCommand
 {
 public:
-    ReportColorControlPrimary2Intensity() : ModelCommand("subscribe")
+    ReportColorControlPrimary2Intensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary2intensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13505,7 +13505,7 @@ public:
 class ReportColorControlPrimary3X : public ModelCommand
 {
 public:
-    ReportColorControlPrimary3X() : ModelCommand("subscribe")
+    ReportColorControlPrimary3X() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary3x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13574,7 +13574,7 @@ public:
 class ReportColorControlPrimary3Y : public ModelCommand
 {
 public:
-    ReportColorControlPrimary3Y() : ModelCommand("subscribe")
+    ReportColorControlPrimary3Y() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary3y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13643,7 +13643,7 @@ public:
 class ReportColorControlPrimary3Intensity : public ModelCommand
 {
 public:
-    ReportColorControlPrimary3Intensity() : ModelCommand("subscribe")
+    ReportColorControlPrimary3Intensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary3intensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13712,7 +13712,7 @@ public:
 class ReportColorControlPrimary4X : public ModelCommand
 {
 public:
-    ReportColorControlPrimary4X() : ModelCommand("subscribe")
+    ReportColorControlPrimary4X() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary4x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13781,7 +13781,7 @@ public:
 class ReportColorControlPrimary4Y : public ModelCommand
 {
 public:
-    ReportColorControlPrimary4Y() : ModelCommand("subscribe")
+    ReportColorControlPrimary4Y() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary4y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13850,7 +13850,7 @@ public:
 class ReportColorControlPrimary4Intensity : public ModelCommand
 {
 public:
-    ReportColorControlPrimary4Intensity() : ModelCommand("subscribe")
+    ReportColorControlPrimary4Intensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary4intensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13919,7 +13919,7 @@ public:
 class ReportColorControlPrimary5X : public ModelCommand
 {
 public:
-    ReportColorControlPrimary5X() : ModelCommand("subscribe")
+    ReportColorControlPrimary5X() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary5x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -13988,7 +13988,7 @@ public:
 class ReportColorControlPrimary5Y : public ModelCommand
 {
 public:
-    ReportColorControlPrimary5Y() : ModelCommand("subscribe")
+    ReportColorControlPrimary5Y() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary5y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14057,7 +14057,7 @@ public:
 class ReportColorControlPrimary5Intensity : public ModelCommand
 {
 public:
-    ReportColorControlPrimary5Intensity() : ModelCommand("subscribe")
+    ReportColorControlPrimary5Intensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary5intensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14126,7 +14126,7 @@ public:
 class ReportColorControlPrimary6X : public ModelCommand
 {
 public:
-    ReportColorControlPrimary6X() : ModelCommand("subscribe")
+    ReportColorControlPrimary6X() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary6x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14195,7 +14195,7 @@ public:
 class ReportColorControlPrimary6Y : public ModelCommand
 {
 public:
-    ReportColorControlPrimary6Y() : ModelCommand("subscribe")
+    ReportColorControlPrimary6Y() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary6y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14264,7 +14264,7 @@ public:
 class ReportColorControlPrimary6Intensity : public ModelCommand
 {
 public:
-    ReportColorControlPrimary6Intensity() : ModelCommand("subscribe")
+    ReportColorControlPrimary6Intensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "primary6intensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14359,7 +14359,7 @@ private:
 class ReportColorControlWhitePointX : public ModelCommand
 {
 public:
-    ReportColorControlWhitePointX() : ModelCommand("subscribe")
+    ReportColorControlWhitePointX() : ModelCommand("report")
     {
         AddArgument("attr-name", "white-point-x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14454,7 +14454,7 @@ private:
 class ReportColorControlWhitePointY : public ModelCommand
 {
 public:
-    ReportColorControlWhitePointY() : ModelCommand("subscribe")
+    ReportColorControlWhitePointY() : ModelCommand("report")
     {
         AddArgument("attr-name", "white-point-y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14549,7 +14549,7 @@ private:
 class ReportColorControlColorPointRX : public ModelCommand
 {
 public:
-    ReportColorControlColorPointRX() : ModelCommand("subscribe")
+    ReportColorControlColorPointRX() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-rx");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14644,7 +14644,7 @@ private:
 class ReportColorControlColorPointRY : public ModelCommand
 {
 public:
-    ReportColorControlColorPointRY() : ModelCommand("subscribe")
+    ReportColorControlColorPointRY() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-ry");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14739,7 +14739,7 @@ private:
 class ReportColorControlColorPointRIntensity : public ModelCommand
 {
 public:
-    ReportColorControlColorPointRIntensity() : ModelCommand("subscribe")
+    ReportColorControlColorPointRIntensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-rintensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14834,7 +14834,7 @@ private:
 class ReportColorControlColorPointGX : public ModelCommand
 {
 public:
-    ReportColorControlColorPointGX() : ModelCommand("subscribe")
+    ReportColorControlColorPointGX() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-gx");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -14929,7 +14929,7 @@ private:
 class ReportColorControlColorPointGY : public ModelCommand
 {
 public:
-    ReportColorControlColorPointGY() : ModelCommand("subscribe")
+    ReportColorControlColorPointGY() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-gy");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15024,7 +15024,7 @@ private:
 class ReportColorControlColorPointGIntensity : public ModelCommand
 {
 public:
-    ReportColorControlColorPointGIntensity() : ModelCommand("subscribe")
+    ReportColorControlColorPointGIntensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-gintensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15119,7 +15119,7 @@ private:
 class ReportColorControlColorPointBX : public ModelCommand
 {
 public:
-    ReportColorControlColorPointBX() : ModelCommand("subscribe")
+    ReportColorControlColorPointBX() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-bx");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15214,7 +15214,7 @@ private:
 class ReportColorControlColorPointBY : public ModelCommand
 {
 public:
-    ReportColorControlColorPointBY() : ModelCommand("subscribe")
+    ReportColorControlColorPointBY() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-by");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15309,7 +15309,7 @@ private:
 class ReportColorControlColorPointBIntensity : public ModelCommand
 {
 public:
-    ReportColorControlColorPointBIntensity() : ModelCommand("subscribe")
+    ReportColorControlColorPointBIntensity() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-point-bintensity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15378,7 +15378,7 @@ public:
 class ReportColorControlEnhancedCurrentHue : public ModelCommand
 {
 public:
-    ReportColorControlEnhancedCurrentHue() : ModelCommand("subscribe")
+    ReportColorControlEnhancedCurrentHue() : ModelCommand("report")
     {
         AddArgument("attr-name", "enhanced-current-hue");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15447,7 +15447,7 @@ public:
 class ReportColorControlEnhancedColorMode : public ModelCommand
 {
 public:
-    ReportColorControlEnhancedColorMode() : ModelCommand("subscribe")
+    ReportColorControlEnhancedColorMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "enhanced-color-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15516,7 +15516,7 @@ public:
 class ReportColorControlColorLoopActive : public ModelCommand
 {
 public:
-    ReportColorControlColorLoopActive() : ModelCommand("subscribe")
+    ReportColorControlColorLoopActive() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-loop-active");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15585,7 +15585,7 @@ public:
 class ReportColorControlColorLoopDirection : public ModelCommand
 {
 public:
-    ReportColorControlColorLoopDirection() : ModelCommand("subscribe")
+    ReportColorControlColorLoopDirection() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-loop-direction");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15654,7 +15654,7 @@ public:
 class ReportColorControlColorLoopTime : public ModelCommand
 {
 public:
-    ReportColorControlColorLoopTime() : ModelCommand("subscribe")
+    ReportColorControlColorLoopTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-loop-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15723,7 +15723,7 @@ public:
 class ReportColorControlColorLoopStartEnhancedHue : public ModelCommand
 {
 public:
-    ReportColorControlColorLoopStartEnhancedHue() : ModelCommand("subscribe")
+    ReportColorControlColorLoopStartEnhancedHue() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-loop-start-enhanced-hue");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15795,7 +15795,7 @@ public:
 class ReportColorControlColorLoopStoredEnhancedHue : public ModelCommand
 {
 public:
-    ReportColorControlColorLoopStoredEnhancedHue() : ModelCommand("subscribe")
+    ReportColorControlColorLoopStoredEnhancedHue() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-loop-stored-enhanced-hue");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15867,7 +15867,7 @@ public:
 class ReportColorControlColorCapabilities : public ModelCommand
 {
 public:
-    ReportColorControlColorCapabilities() : ModelCommand("subscribe")
+    ReportColorControlColorCapabilities() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-capabilities");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -15936,7 +15936,7 @@ public:
 class ReportColorControlColorTempPhysicalMin : public ModelCommand
 {
 public:
-    ReportColorControlColorTempPhysicalMin() : ModelCommand("subscribe")
+    ReportColorControlColorTempPhysicalMin() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-temp-physical-min");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16005,7 +16005,7 @@ public:
 class ReportColorControlColorTempPhysicalMax : public ModelCommand
 {
 public:
-    ReportColorControlColorTempPhysicalMax() : ModelCommand("subscribe")
+    ReportColorControlColorTempPhysicalMax() : ModelCommand("report")
     {
         AddArgument("attr-name", "color-temp-physical-max");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16074,7 +16074,7 @@ public:
 class ReportColorControlCoupleColorTempToLevelMinMireds : public ModelCommand
 {
 public:
-    ReportColorControlCoupleColorTempToLevelMinMireds() : ModelCommand("subscribe")
+    ReportColorControlCoupleColorTempToLevelMinMireds() : ModelCommand("report")
     {
         AddArgument("attr-name", "couple-color-temp-to-level-min-mireds");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16172,7 +16172,7 @@ private:
 class ReportColorControlStartUpColorTemperatureMireds : public ModelCommand
 {
 public:
-    ReportColorControlStartUpColorTemperatureMireds() : ModelCommand("subscribe")
+    ReportColorControlStartUpColorTemperatureMireds() : ModelCommand("report")
     {
         AddArgument("attr-name", "start-up-color-temperature-mireds");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16244,7 +16244,7 @@ public:
 class ReportColorControlAttributeList : public ModelCommand
 {
 public:
-    ReportColorControlAttributeList() : ModelCommand("subscribe")
+    ReportColorControlAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16316,7 +16316,7 @@ public:
 class ReportColorControlClusterRevision : public ModelCommand
 {
 public:
-    ReportColorControlClusterRevision() : ModelCommand("subscribe")
+    ReportColorControlClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16453,7 +16453,7 @@ public:
 class ReportContentLauncherAcceptHeaderList : public ModelCommand
 {
 public:
-    ReportContentLauncherAcceptHeaderList() : ModelCommand("subscribe")
+    ReportContentLauncherAcceptHeaderList() : ModelCommand("report")
     {
         AddArgument("attr-name", "accept-header-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16551,7 +16551,7 @@ private:
 class ReportContentLauncherSupportedStreamingProtocols : public ModelCommand
 {
 public:
-    ReportContentLauncherSupportedStreamingProtocols() : ModelCommand("subscribe")
+    ReportContentLauncherSupportedStreamingProtocols() : ModelCommand("report")
     {
         AddArgument("attr-name", "supported-streaming-protocols");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16623,7 +16623,7 @@ public:
 class ReportContentLauncherAttributeList : public ModelCommand
 {
 public:
-    ReportContentLauncherAttributeList() : ModelCommand("subscribe")
+    ReportContentLauncherAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16695,7 +16695,7 @@ public:
 class ReportContentLauncherClusterRevision : public ModelCommand
 {
 public:
-    ReportContentLauncherClusterRevision() : ModelCommand("subscribe")
+    ReportContentLauncherClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16782,7 +16782,7 @@ public:
 class ReportDescriptorDeviceList : public ModelCommand
 {
 public:
-    ReportDescriptorDeviceList() : ModelCommand("subscribe")
+    ReportDescriptorDeviceList() : ModelCommand("report")
     {
         AddArgument("attr-name", "device-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16856,7 +16856,7 @@ public:
 class ReportDescriptorServerList : public ModelCommand
 {
 public:
-    ReportDescriptorServerList() : ModelCommand("subscribe")
+    ReportDescriptorServerList() : ModelCommand("report")
     {
         AddArgument("attr-name", "server-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -16928,7 +16928,7 @@ public:
 class ReportDescriptorClientList : public ModelCommand
 {
 public:
-    ReportDescriptorClientList() : ModelCommand("subscribe")
+    ReportDescriptorClientList() : ModelCommand("report")
     {
         AddArgument("attr-name", "client-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17000,7 +17000,7 @@ public:
 class ReportDescriptorPartsList : public ModelCommand
 {
 public:
-    ReportDescriptorPartsList() : ModelCommand("subscribe")
+    ReportDescriptorPartsList() : ModelCommand("report")
     {
         AddArgument("attr-name", "parts-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17072,7 +17072,7 @@ public:
 class ReportDescriptorAttributeList : public ModelCommand
 {
 public:
-    ReportDescriptorAttributeList() : ModelCommand("subscribe")
+    ReportDescriptorAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17144,7 +17144,7 @@ public:
 class ReportDescriptorClusterRevision : public ModelCommand
 {
 public:
-    ReportDescriptorClusterRevision() : ModelCommand("subscribe")
+    ReportDescriptorClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17253,7 +17253,7 @@ public:
 class ReportDiagnosticLogsAttributeList : public ModelCommand
 {
 public:
-    ReportDiagnosticLogsAttributeList() : ModelCommand("subscribe")
+    ReportDiagnosticLogsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17574,7 +17574,7 @@ public:
 class ReportDoorLockDoorLockAlarm : public ModelCommand
 {
 public:
-    ReportDoorLockDoorLockAlarm() : ModelCommand("subscribe-event")
+    ReportDoorLockDoorLockAlarm() : ModelCommand("report-event")
     {
         AddArgument("event-name", "door-lock-alarm");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17645,7 +17645,7 @@ public:
 class ReportDoorLockDoorStateChange : public ModelCommand
 {
 public:
-    ReportDoorLockDoorStateChange() : ModelCommand("subscribe-event")
+    ReportDoorLockDoorStateChange() : ModelCommand("report-event")
     {
         AddArgument("event-name", "door-state-change");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17716,7 +17716,7 @@ public:
 class ReportDoorLockLockOperation : public ModelCommand
 {
 public:
-    ReportDoorLockLockOperation() : ModelCommand("subscribe-event")
+    ReportDoorLockLockOperation() : ModelCommand("report-event")
     {
         AddArgument("event-name", "lock-operation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17787,7 +17787,7 @@ public:
 class ReportDoorLockLockOperationError : public ModelCommand
 {
 public:
-    ReportDoorLockLockOperationError() : ModelCommand("subscribe-event")
+    ReportDoorLockLockOperationError() : ModelCommand("report-event")
     {
         AddArgument("event-name", "lock-operation-error");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17858,7 +17858,7 @@ public:
 class ReportDoorLockLockUserChange : public ModelCommand
 {
 public:
-    ReportDoorLockLockUserChange() : ModelCommand("subscribe-event")
+    ReportDoorLockLockUserChange() : ModelCommand("report-event")
     {
         AddArgument("event-name", "lock-user-change");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -17931,7 +17931,7 @@ public:
 class ReportDoorLockLockState : public ModelCommand
 {
 public:
-    ReportDoorLockLockState() : ModelCommand("subscribe")
+    ReportDoorLockLockState() : ModelCommand("report")
     {
         AddArgument("attr-name", "lock-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18004,7 +18004,7 @@ public:
 class ReportDoorLockLockType : public ModelCommand
 {
 public:
-    ReportDoorLockLockType() : ModelCommand("subscribe")
+    ReportDoorLockLockType() : ModelCommand("report")
     {
         AddArgument("attr-name", "lock-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18076,7 +18076,7 @@ public:
 class ReportDoorLockActuatorEnabled : public ModelCommand
 {
 public:
-    ReportDoorLockActuatorEnabled() : ModelCommand("subscribe")
+    ReportDoorLockActuatorEnabled() : ModelCommand("report")
     {
         AddArgument("attr-name", "actuator-enabled");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18146,7 +18146,7 @@ public:
 class ReportDoorLockDoorState : public ModelCommand
 {
 public:
-    ReportDoorLockDoorState() : ModelCommand("subscribe")
+    ReportDoorLockDoorState() : ModelCommand("report")
     {
         AddArgument("attr-name", "door-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18219,7 +18219,7 @@ public:
 class ReportDoorLockNumberOfTotalUsersSupported : public ModelCommand
 {
 public:
-    ReportDoorLockNumberOfTotalUsersSupported() : ModelCommand("subscribe")
+    ReportDoorLockNumberOfTotalUsersSupported() : ModelCommand("report")
     {
         AddArgument("attr-name", "number-of-total-users-supported");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18288,7 +18288,7 @@ public:
 class ReportDoorLockNumberOfPINUsersSupported : public ModelCommand
 {
 public:
-    ReportDoorLockNumberOfPINUsersSupported() : ModelCommand("subscribe")
+    ReportDoorLockNumberOfPINUsersSupported() : ModelCommand("report")
     {
         AddArgument("attr-name", "number-of-pinusers-supported");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18357,7 +18357,7 @@ public:
 class ReportDoorLockMaxPINCodeLength : public ModelCommand
 {
 public:
-    ReportDoorLockMaxPINCodeLength() : ModelCommand("subscribe")
+    ReportDoorLockMaxPINCodeLength() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-pincode-length");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18426,7 +18426,7 @@ public:
 class ReportDoorLockMinPINCodeLength : public ModelCommand
 {
 public:
-    ReportDoorLockMinPINCodeLength() : ModelCommand("subscribe")
+    ReportDoorLockMinPINCodeLength() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-pincode-length");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18521,7 +18521,7 @@ private:
 class ReportDoorLockLanguage : public ModelCommand
 {
 public:
-    ReportDoorLockLanguage() : ModelCommand("subscribe")
+    ReportDoorLockLanguage() : ModelCommand("report")
     {
         AddArgument("attr-name", "language");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18616,7 +18616,7 @@ private:
 class ReportDoorLockAutoRelockTime : public ModelCommand
 {
 public:
-    ReportDoorLockAutoRelockTime() : ModelCommand("subscribe")
+    ReportDoorLockAutoRelockTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "auto-relock-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18711,7 +18711,7 @@ private:
 class ReportDoorLockSoundVolume : public ModelCommand
 {
 public:
-    ReportDoorLockSoundVolume() : ModelCommand("subscribe")
+    ReportDoorLockSoundVolume() : ModelCommand("report")
     {
         AddArgument("attr-name", "sound-volume");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18806,7 +18806,7 @@ private:
 class ReportDoorLockOperatingMode : public ModelCommand
 {
 public:
-    ReportDoorLockOperatingMode() : ModelCommand("subscribe")
+    ReportDoorLockOperatingMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "operating-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18878,7 +18878,7 @@ public:
 class ReportDoorLockSupportedOperatingModes : public ModelCommand
 {
 public:
-    ReportDoorLockSupportedOperatingModes() : ModelCommand("subscribe")
+    ReportDoorLockSupportedOperatingModes() : ModelCommand("report")
     {
         AddArgument("attr-name", "supported-operating-modes");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -18973,7 +18973,7 @@ private:
 class ReportDoorLockEnableOneTouchLocking : public ModelCommand
 {
 public:
-    ReportDoorLockEnableOneTouchLocking() : ModelCommand("subscribe")
+    ReportDoorLockEnableOneTouchLocking() : ModelCommand("report")
     {
         AddArgument("attr-name", "enable-one-touch-locking");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19068,7 +19068,7 @@ private:
 class ReportDoorLockEnablePrivacyModeButton : public ModelCommand
 {
 public:
-    ReportDoorLockEnablePrivacyModeButton() : ModelCommand("subscribe")
+    ReportDoorLockEnablePrivacyModeButton() : ModelCommand("report")
     {
         AddArgument("attr-name", "enable-privacy-mode-button");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19163,7 +19163,7 @@ private:
 class ReportDoorLockWrongCodeEntryLimit : public ModelCommand
 {
 public:
-    ReportDoorLockWrongCodeEntryLimit() : ModelCommand("subscribe")
+    ReportDoorLockWrongCodeEntryLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "wrong-code-entry-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19232,7 +19232,7 @@ public:
 class ReportDoorLockAttributeList : public ModelCommand
 {
 public:
-    ReportDoorLockAttributeList() : ModelCommand("subscribe")
+    ReportDoorLockAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19304,7 +19304,7 @@ public:
 class ReportDoorLockClusterRevision : public ModelCommand
 {
 public:
-    ReportDoorLockClusterRevision() : ModelCommand("subscribe")
+    ReportDoorLockClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19396,7 +19396,7 @@ public:
 class ReportElectricalMeasurementMeasurementType : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementMeasurementType() : ModelCommand("subscribe")
+    ReportElectricalMeasurementMeasurementType() : ModelCommand("report")
     {
         AddArgument("attr-name", "measurement-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19468,7 +19468,7 @@ public:
 class ReportElectricalMeasurementTotalActivePower : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementTotalActivePower() : ModelCommand("subscribe")
+    ReportElectricalMeasurementTotalActivePower() : ModelCommand("report")
     {
         AddArgument("attr-name", "total-active-power");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19540,7 +19540,7 @@ public:
 class ReportElectricalMeasurementRmsVoltage : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementRmsVoltage() : ModelCommand("subscribe")
+    ReportElectricalMeasurementRmsVoltage() : ModelCommand("report")
     {
         AddArgument("attr-name", "rms-voltage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19609,7 +19609,7 @@ public:
 class ReportElectricalMeasurementRmsVoltageMin : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementRmsVoltageMin() : ModelCommand("subscribe")
+    ReportElectricalMeasurementRmsVoltageMin() : ModelCommand("report")
     {
         AddArgument("attr-name", "rms-voltage-min");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19678,7 +19678,7 @@ public:
 class ReportElectricalMeasurementRmsVoltageMax : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementRmsVoltageMax() : ModelCommand("subscribe")
+    ReportElectricalMeasurementRmsVoltageMax() : ModelCommand("report")
     {
         AddArgument("attr-name", "rms-voltage-max");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19747,7 +19747,7 @@ public:
 class ReportElectricalMeasurementRmsCurrent : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementRmsCurrent() : ModelCommand("subscribe")
+    ReportElectricalMeasurementRmsCurrent() : ModelCommand("report")
     {
         AddArgument("attr-name", "rms-current");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19816,7 +19816,7 @@ public:
 class ReportElectricalMeasurementRmsCurrentMin : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementRmsCurrentMin() : ModelCommand("subscribe")
+    ReportElectricalMeasurementRmsCurrentMin() : ModelCommand("report")
     {
         AddArgument("attr-name", "rms-current-min");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19885,7 +19885,7 @@ public:
 class ReportElectricalMeasurementRmsCurrentMax : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementRmsCurrentMax() : ModelCommand("subscribe")
+    ReportElectricalMeasurementRmsCurrentMax() : ModelCommand("report")
     {
         AddArgument("attr-name", "rms-current-max");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -19954,7 +19954,7 @@ public:
 class ReportElectricalMeasurementActivePower : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementActivePower() : ModelCommand("subscribe")
+    ReportElectricalMeasurementActivePower() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-power");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20023,7 +20023,7 @@ public:
 class ReportElectricalMeasurementActivePowerMin : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementActivePowerMin() : ModelCommand("subscribe")
+    ReportElectricalMeasurementActivePowerMin() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-power-min");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20092,7 +20092,7 @@ public:
 class ReportElectricalMeasurementActivePowerMax : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementActivePowerMax() : ModelCommand("subscribe")
+    ReportElectricalMeasurementActivePowerMax() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-power-max");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20161,7 +20161,7 @@ public:
 class ReportElectricalMeasurementAttributeList : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementAttributeList() : ModelCommand("subscribe")
+    ReportElectricalMeasurementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20233,7 +20233,7 @@ public:
 class ReportElectricalMeasurementClusterRevision : public ModelCommand
 {
 public:
-    ReportElectricalMeasurementClusterRevision() : ModelCommand("subscribe")
+    ReportElectricalMeasurementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20348,7 +20348,7 @@ public:
 class ReportEthernetNetworkDiagnosticsPHYRate : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsPHYRate() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsPHYRate() : ModelCommand("report")
     {
         AddArgument("attr-name", "phyrate");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20417,7 +20417,7 @@ public:
 class ReportEthernetNetworkDiagnosticsFullDuplex : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsFullDuplex() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsFullDuplex() : ModelCommand("report")
     {
         AddArgument("attr-name", "full-duplex");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20486,7 +20486,7 @@ public:
 class ReportEthernetNetworkDiagnosticsPacketRxCount : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsPacketRxCount() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsPacketRxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "packet-rx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20558,7 +20558,7 @@ public:
 class ReportEthernetNetworkDiagnosticsPacketTxCount : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsPacketTxCount() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsPacketTxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "packet-tx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20630,7 +20630,7 @@ public:
 class ReportEthernetNetworkDiagnosticsTxErrCount : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsTxErrCount() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsTxErrCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-err-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20702,7 +20702,7 @@ public:
 class ReportEthernetNetworkDiagnosticsCollisionCount : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsCollisionCount() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsCollisionCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "collision-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20774,7 +20774,7 @@ public:
 class ReportEthernetNetworkDiagnosticsOverrunCount : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsOverrunCount() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsOverrunCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "overrun-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20846,7 +20846,7 @@ public:
 class ReportEthernetNetworkDiagnosticsCarrierDetect : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsCarrierDetect() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsCarrierDetect() : ModelCommand("report")
     {
         AddArgument("attr-name", "carrier-detect");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20915,7 +20915,7 @@ public:
 class ReportEthernetNetworkDiagnosticsTimeSinceReset : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsTimeSinceReset() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsTimeSinceReset() : ModelCommand("report")
     {
         AddArgument("attr-name", "time-since-reset");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -20987,7 +20987,7 @@ public:
 class ReportEthernetNetworkDiagnosticsAttributeList : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsAttributeList() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21059,7 +21059,7 @@ public:
 class ReportEthernetNetworkDiagnosticsFeatureMap : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsFeatureMap() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21131,7 +21131,7 @@ public:
 class ReportEthernetNetworkDiagnosticsClusterRevision : public ModelCommand
 {
 public:
-    ReportEthernetNetworkDiagnosticsClusterRevision() : ModelCommand("subscribe")
+    ReportEthernetNetworkDiagnosticsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21218,7 +21218,7 @@ public:
 class ReportFixedLabelLabelList : public ModelCommand
 {
 public:
-    ReportFixedLabelLabelList() : ModelCommand("subscribe")
+    ReportFixedLabelLabelList() : ModelCommand("report")
     {
         AddArgument("attr-name", "label-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21292,7 +21292,7 @@ public:
 class ReportFixedLabelAttributeList : public ModelCommand
 {
 public:
-    ReportFixedLabelAttributeList() : ModelCommand("subscribe")
+    ReportFixedLabelAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21364,7 +21364,7 @@ public:
 class ReportFixedLabelClusterRevision : public ModelCommand
 {
 public:
-    ReportFixedLabelClusterRevision() : ModelCommand("subscribe")
+    ReportFixedLabelClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21449,7 +21449,7 @@ public:
 class ReportFlowMeasurementMeasuredValue : public ModelCommand
 {
 public:
-    ReportFlowMeasurementMeasuredValue() : ModelCommand("subscribe")
+    ReportFlowMeasurementMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21518,7 +21518,7 @@ public:
 class ReportFlowMeasurementMinMeasuredValue : public ModelCommand
 {
 public:
-    ReportFlowMeasurementMinMeasuredValue() : ModelCommand("subscribe")
+    ReportFlowMeasurementMinMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21587,7 +21587,7 @@ public:
 class ReportFlowMeasurementMaxMeasuredValue : public ModelCommand
 {
 public:
-    ReportFlowMeasurementMaxMeasuredValue() : ModelCommand("subscribe")
+    ReportFlowMeasurementMaxMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21656,7 +21656,7 @@ public:
 class ReportFlowMeasurementTolerance : public ModelCommand
 {
 public:
-    ReportFlowMeasurementTolerance() : ModelCommand("subscribe")
+    ReportFlowMeasurementTolerance() : ModelCommand("report")
     {
         AddArgument("attr-name", "tolerance");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21725,7 +21725,7 @@ public:
 class ReportFlowMeasurementAttributeList : public ModelCommand
 {
 public:
-    ReportFlowMeasurementAttributeList() : ModelCommand("subscribe")
+    ReportFlowMeasurementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21797,7 +21797,7 @@ public:
 class ReportFlowMeasurementClusterRevision : public ModelCommand
 {
 public:
-    ReportFlowMeasurementClusterRevision() : ModelCommand("subscribe")
+    ReportFlowMeasurementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -21985,7 +21985,7 @@ private:
 class ReportGeneralCommissioningBreadcrumb : public ModelCommand
 {
 public:
-    ReportGeneralCommissioningBreadcrumb() : ModelCommand("subscribe")
+    ReportGeneralCommissioningBreadcrumb() : ModelCommand("report")
     {
         AddArgument("attr-name", "breadcrumb");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22057,7 +22057,7 @@ public:
 class ReportGeneralCommissioningBasicCommissioningInfoList : public ModelCommand
 {
 public:
-    ReportGeneralCommissioningBasicCommissioningInfoList() : ModelCommand("subscribe")
+    ReportGeneralCommissioningBasicCommissioningInfoList() : ModelCommand("report")
     {
         AddArgument("attr-name", "basic-commissioning-info-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22133,7 +22133,7 @@ public:
 class ReportGeneralCommissioningRegulatoryConfig : public ModelCommand
 {
 public:
-    ReportGeneralCommissioningRegulatoryConfig() : ModelCommand("subscribe")
+    ReportGeneralCommissioningRegulatoryConfig() : ModelCommand("report")
     {
         AddArgument("attr-name", "regulatory-config");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22202,7 +22202,7 @@ public:
 class ReportGeneralCommissioningLocationCapability : public ModelCommand
 {
 public:
-    ReportGeneralCommissioningLocationCapability() : ModelCommand("subscribe")
+    ReportGeneralCommissioningLocationCapability() : ModelCommand("report")
     {
         AddArgument("attr-name", "location-capability");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22274,7 +22274,7 @@ public:
 class ReportGeneralCommissioningAttributeList : public ModelCommand
 {
 public:
-    ReportGeneralCommissioningAttributeList() : ModelCommand("subscribe")
+    ReportGeneralCommissioningAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22346,7 +22346,7 @@ public:
 class ReportGeneralCommissioningClusterRevision : public ModelCommand
 {
 public:
-    ReportGeneralCommissioningClusterRevision() : ModelCommand("subscribe")
+    ReportGeneralCommissioningClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22440,7 +22440,7 @@ public:
 class ReportGeneralDiagnosticsHardwareFaultChange : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsHardwareFaultChange() : ModelCommand("subscribe-event")
+    ReportGeneralDiagnosticsHardwareFaultChange() : ModelCommand("report-event")
     {
         AddArgument("event-name", "hardware-fault-change");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22513,7 +22513,7 @@ public:
 class ReportGeneralDiagnosticsRadioFaultChange : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsRadioFaultChange() : ModelCommand("subscribe-event")
+    ReportGeneralDiagnosticsRadioFaultChange() : ModelCommand("report-event")
     {
         AddArgument("event-name", "radio-fault-change");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22586,7 +22586,7 @@ public:
 class ReportGeneralDiagnosticsNetworkFaultChange : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsNetworkFaultChange() : ModelCommand("subscribe-event")
+    ReportGeneralDiagnosticsNetworkFaultChange() : ModelCommand("report-event")
     {
         AddArgument("event-name", "network-fault-change");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22658,7 +22658,7 @@ public:
 class ReportGeneralDiagnosticsBootReason : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsBootReason() : ModelCommand("subscribe-event")
+    ReportGeneralDiagnosticsBootReason() : ModelCommand("report-event")
     {
         AddArgument("event-name", "boot-reason");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22733,7 +22733,7 @@ public:
 class ReportGeneralDiagnosticsNetworkInterfaces : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsNetworkInterfaces() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsNetworkInterfaces() : ModelCommand("report")
     {
         AddArgument("attr-name", "network-interfaces");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22807,7 +22807,7 @@ public:
 class ReportGeneralDiagnosticsRebootCount : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsRebootCount() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsRebootCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "reboot-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22876,7 +22876,7 @@ public:
 class ReportGeneralDiagnosticsUpTime : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsUpTime() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsUpTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "up-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -22945,7 +22945,7 @@ public:
 class ReportGeneralDiagnosticsTotalOperationalHours : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsTotalOperationalHours() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsTotalOperationalHours() : ModelCommand("report")
     {
         AddArgument("attr-name", "total-operational-hours");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23017,7 +23017,7 @@ public:
 class ReportGeneralDiagnosticsBootReasons : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsBootReasons() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsBootReasons() : ModelCommand("report")
     {
         AddArgument("attr-name", "boot-reasons");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23086,7 +23086,7 @@ public:
 class ReportGeneralDiagnosticsActiveHardwareFaults : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsActiveHardwareFaults() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsActiveHardwareFaults() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-hardware-faults");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23158,7 +23158,7 @@ public:
 class ReportGeneralDiagnosticsActiveRadioFaults : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsActiveRadioFaults() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsActiveRadioFaults() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-radio-faults");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23230,7 +23230,7 @@ public:
 class ReportGeneralDiagnosticsActiveNetworkFaults : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsActiveNetworkFaults() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsActiveNetworkFaults() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-network-faults");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23302,7 +23302,7 @@ public:
 class ReportGeneralDiagnosticsAttributeList : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsAttributeList() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23374,7 +23374,7 @@ public:
 class ReportGeneralDiagnosticsClusterRevision : public ModelCommand
 {
 public:
-    ReportGeneralDiagnosticsClusterRevision() : ModelCommand("subscribe")
+    ReportGeneralDiagnosticsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23562,7 +23562,7 @@ public:
 class ReportGroupKeyManagementGroupKeyMap : public ModelCommand
 {
 public:
-    ReportGroupKeyManagementGroupKeyMap() : ModelCommand("subscribe")
+    ReportGroupKeyManagementGroupKeyMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "group-key-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23640,7 +23640,7 @@ public:
 class ReportGroupKeyManagementGroupTable : public ModelCommand
 {
 public:
-    ReportGroupKeyManagementGroupTable() : ModelCommand("subscribe")
+    ReportGroupKeyManagementGroupTable() : ModelCommand("report")
     {
         AddArgument("attr-name", "group-table");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23715,7 +23715,7 @@ public:
 class ReportGroupKeyManagementMaxGroupsPerFabric : public ModelCommand
 {
 public:
-    ReportGroupKeyManagementMaxGroupsPerFabric() : ModelCommand("subscribe")
+    ReportGroupKeyManagementMaxGroupsPerFabric() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-groups-per-fabric");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23787,7 +23787,7 @@ public:
 class ReportGroupKeyManagementMaxGroupKeysPerFabric : public ModelCommand
 {
 public:
-    ReportGroupKeyManagementMaxGroupKeysPerFabric() : ModelCommand("subscribe")
+    ReportGroupKeyManagementMaxGroupKeysPerFabric() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-group-keys-per-fabric");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23859,7 +23859,7 @@ public:
 class ReportGroupKeyManagementAttributeList : public ModelCommand
 {
 public:
-    ReportGroupKeyManagementAttributeList() : ModelCommand("subscribe")
+    ReportGroupKeyManagementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -23931,7 +23931,7 @@ public:
 class ReportGroupKeyManagementClusterRevision : public ModelCommand
 {
 public:
-    ReportGroupKeyManagementClusterRevision() : ModelCommand("subscribe")
+    ReportGroupKeyManagementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24161,7 +24161,7 @@ public:
 class ReportGroupsNameSupport : public ModelCommand
 {
 public:
-    ReportGroupsNameSupport() : ModelCommand("subscribe")
+    ReportGroupsNameSupport() : ModelCommand("report")
     {
         AddArgument("attr-name", "name-support");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24230,7 +24230,7 @@ public:
 class ReportGroupsAttributeList : public ModelCommand
 {
 public:
-    ReportGroupsAttributeList() : ModelCommand("subscribe")
+    ReportGroupsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24302,7 +24302,7 @@ public:
 class ReportGroupsClusterRevision : public ModelCommand
 {
 public:
-    ReportGroupsClusterRevision() : ModelCommand("subscribe")
+    ReportGroupsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24485,7 +24485,7 @@ private:
 class ReportIdentifyIdentifyTime : public ModelCommand
 {
 public:
-    ReportIdentifyIdentifyTime() : ModelCommand("subscribe")
+    ReportIdentifyIdentifyTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "identify-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24554,7 +24554,7 @@ public:
 class ReportIdentifyIdentifyType : public ModelCommand
 {
 public:
-    ReportIdentifyIdentifyType() : ModelCommand("subscribe")
+    ReportIdentifyIdentifyType() : ModelCommand("report")
     {
         AddArgument("attr-name", "identify-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24623,7 +24623,7 @@ public:
 class ReportIdentifyAttributeList : public ModelCommand
 {
 public:
-    ReportIdentifyAttributeList() : ModelCommand("subscribe")
+    ReportIdentifyAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24695,7 +24695,7 @@ public:
 class ReportIdentifyClusterRevision : public ModelCommand
 {
 public:
-    ReportIdentifyClusterRevision() : ModelCommand("subscribe")
+    ReportIdentifyClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24781,7 +24781,7 @@ public:
 class ReportIlluminanceMeasurementMeasuredValue : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementMeasuredValue() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24853,7 +24853,7 @@ public:
 class ReportIlluminanceMeasurementMinMeasuredValue : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementMinMeasuredValue() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementMinMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24925,7 +24925,7 @@ public:
 class ReportIlluminanceMeasurementMaxMeasuredValue : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementMaxMeasuredValue() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementMaxMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -24997,7 +24997,7 @@ public:
 class ReportIlluminanceMeasurementTolerance : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementTolerance() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementTolerance() : ModelCommand("report")
     {
         AddArgument("attr-name", "tolerance");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25066,7 +25066,7 @@ public:
 class ReportIlluminanceMeasurementLightSensorType : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementLightSensorType() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementLightSensorType() : ModelCommand("report")
     {
         AddArgument("attr-name", "light-sensor-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25138,7 +25138,7 @@ public:
 class ReportIlluminanceMeasurementAttributeList : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementAttributeList() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25210,7 +25210,7 @@ public:
 class ReportIlluminanceMeasurementClusterRevision : public ModelCommand
 {
 public:
-    ReportIlluminanceMeasurementClusterRevision() : ModelCommand("subscribe")
+    ReportIlluminanceMeasurementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25320,7 +25320,7 @@ public:
 class ReportKeypadInputAttributeList : public ModelCommand
 {
 public:
-    ReportKeypadInputAttributeList() : ModelCommand("subscribe")
+    ReportKeypadInputAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25392,7 +25392,7 @@ public:
 class ReportKeypadInputClusterRevision : public ModelCommand
 {
 public:
-    ReportKeypadInputClusterRevision() : ModelCommand("subscribe")
+    ReportKeypadInputClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25703,7 +25703,7 @@ public:
 class ReportLevelControlCurrentLevel : public ModelCommand
 {
 public:
-    ReportLevelControlCurrentLevel() : ModelCommand("subscribe")
+    ReportLevelControlCurrentLevel() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25772,7 +25772,7 @@ public:
 class ReportLevelControlRemainingTime : public ModelCommand
 {
 public:
-    ReportLevelControlRemainingTime() : ModelCommand("subscribe")
+    ReportLevelControlRemainingTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "remaining-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25841,7 +25841,7 @@ public:
 class ReportLevelControlMinLevel : public ModelCommand
 {
 public:
-    ReportLevelControlMinLevel() : ModelCommand("subscribe")
+    ReportLevelControlMinLevel() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25910,7 +25910,7 @@ public:
 class ReportLevelControlMaxLevel : public ModelCommand
 {
 public:
-    ReportLevelControlMaxLevel() : ModelCommand("subscribe")
+    ReportLevelControlMaxLevel() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -25979,7 +25979,7 @@ public:
 class ReportLevelControlCurrentFrequency : public ModelCommand
 {
 public:
-    ReportLevelControlCurrentFrequency() : ModelCommand("subscribe")
+    ReportLevelControlCurrentFrequency() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-frequency");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26048,7 +26048,7 @@ public:
 class ReportLevelControlMinFrequency : public ModelCommand
 {
 public:
-    ReportLevelControlMinFrequency() : ModelCommand("subscribe")
+    ReportLevelControlMinFrequency() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-frequency");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26117,7 +26117,7 @@ public:
 class ReportLevelControlMaxFrequency : public ModelCommand
 {
 public:
-    ReportLevelControlMaxFrequency() : ModelCommand("subscribe")
+    ReportLevelControlMaxFrequency() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-frequency");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26212,7 +26212,7 @@ private:
 class ReportLevelControlOptions : public ModelCommand
 {
 public:
-    ReportLevelControlOptions() : ModelCommand("subscribe")
+    ReportLevelControlOptions() : ModelCommand("report")
     {
         AddArgument("attr-name", "options");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26307,7 +26307,7 @@ private:
 class ReportLevelControlOnOffTransitionTime : public ModelCommand
 {
 public:
-    ReportLevelControlOnOffTransitionTime() : ModelCommand("subscribe")
+    ReportLevelControlOnOffTransitionTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "on-off-transition-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26402,7 +26402,7 @@ private:
 class ReportLevelControlOnLevel : public ModelCommand
 {
 public:
-    ReportLevelControlOnLevel() : ModelCommand("subscribe")
+    ReportLevelControlOnLevel() : ModelCommand("report")
     {
         AddArgument("attr-name", "on-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26500,7 +26500,7 @@ private:
 class ReportLevelControlOnTransitionTime : public ModelCommand
 {
 public:
-    ReportLevelControlOnTransitionTime() : ModelCommand("subscribe")
+    ReportLevelControlOnTransitionTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "on-transition-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26598,7 +26598,7 @@ private:
 class ReportLevelControlOffTransitionTime : public ModelCommand
 {
 public:
-    ReportLevelControlOffTransitionTime() : ModelCommand("subscribe")
+    ReportLevelControlOffTransitionTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "off-transition-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26696,7 +26696,7 @@ private:
 class ReportLevelControlDefaultMoveRate : public ModelCommand
 {
 public:
-    ReportLevelControlDefaultMoveRate() : ModelCommand("subscribe")
+    ReportLevelControlDefaultMoveRate() : ModelCommand("report")
     {
         AddArgument("attr-name", "default-move-rate");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26794,7 +26794,7 @@ private:
 class ReportLevelControlStartUpCurrentLevel : public ModelCommand
 {
 public:
-    ReportLevelControlStartUpCurrentLevel() : ModelCommand("subscribe")
+    ReportLevelControlStartUpCurrentLevel() : ModelCommand("report")
     {
         AddArgument("attr-name", "start-up-current-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26866,7 +26866,7 @@ public:
 class ReportLevelControlAttributeList : public ModelCommand
 {
 public:
-    ReportLevelControlAttributeList() : ModelCommand("subscribe")
+    ReportLevelControlAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -26938,7 +26938,7 @@ public:
 class ReportLevelControlFeatureMap : public ModelCommand
 {
 public:
-    ReportLevelControlFeatureMap() : ModelCommand("subscribe")
+    ReportLevelControlFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27007,7 +27007,7 @@ public:
 class ReportLevelControlClusterRevision : public ModelCommand
 {
 public:
-    ReportLevelControlClusterRevision() : ModelCommand("subscribe")
+    ReportLevelControlClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27115,7 +27115,7 @@ private:
 class ReportLocalizationConfigurationActiveLocale : public ModelCommand
 {
 public:
-    ReportLocalizationConfigurationActiveLocale() : ModelCommand("subscribe")
+    ReportLocalizationConfigurationActiveLocale() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-locale");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27187,7 +27187,7 @@ public:
 class ReportLocalizationConfigurationSupportedLocales : public ModelCommand
 {
 public:
-    ReportLocalizationConfigurationSupportedLocales() : ModelCommand("subscribe")
+    ReportLocalizationConfigurationSupportedLocales() : ModelCommand("report")
     {
         AddArgument("attr-name", "supported-locales");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27259,7 +27259,7 @@ public:
 class ReportLocalizationConfigurationClusterRevision : public ModelCommand
 {
 public:
-    ReportLocalizationConfigurationClusterRevision() : ModelCommand("subscribe")
+    ReportLocalizationConfigurationClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27364,7 +27364,7 @@ public:
 class ReportLowPowerAttributeList : public ModelCommand
 {
 public:
-    ReportLowPowerAttributeList() : ModelCommand("subscribe")
+    ReportLowPowerAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27436,7 +27436,7 @@ public:
 class ReportLowPowerClusterRevision : public ModelCommand
 {
 public:
-    ReportLowPowerClusterRevision() : ModelCommand("subscribe")
+    ReportLowPowerClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27614,7 +27614,7 @@ public:
 class ReportMediaInputMediaInputList : public ModelCommand
 {
 public:
-    ReportMediaInputMediaInputList() : ModelCommand("subscribe")
+    ReportMediaInputMediaInputList() : ModelCommand("report")
     {
         AddArgument("attr-name", "media-input-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27688,7 +27688,7 @@ public:
 class ReportMediaInputCurrentMediaInput : public ModelCommand
 {
 public:
-    ReportMediaInputCurrentMediaInput() : ModelCommand("subscribe")
+    ReportMediaInputCurrentMediaInput() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-media-input");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27757,7 +27757,7 @@ public:
 class ReportMediaInputAttributeList : public ModelCommand
 {
 public:
-    ReportMediaInputAttributeList() : ModelCommand("subscribe")
+    ReportMediaInputAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -27829,7 +27829,7 @@ public:
 class ReportMediaInputClusterRevision : public ModelCommand
 {
 public:
-    ReportMediaInputClusterRevision() : ModelCommand("subscribe")
+    ReportMediaInputClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28159,7 +28159,7 @@ public:
 class ReportMediaPlaybackPlaybackState : public ModelCommand
 {
 public:
-    ReportMediaPlaybackPlaybackState() : ModelCommand("subscribe")
+    ReportMediaPlaybackPlaybackState() : ModelCommand("report")
     {
         AddArgument("attr-name", "playback-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28231,7 +28231,7 @@ public:
 class ReportMediaPlaybackStartTime : public ModelCommand
 {
 public:
-    ReportMediaPlaybackStartTime() : ModelCommand("subscribe")
+    ReportMediaPlaybackStartTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "start-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28300,7 +28300,7 @@ public:
 class ReportMediaPlaybackDuration : public ModelCommand
 {
 public:
-    ReportMediaPlaybackDuration() : ModelCommand("subscribe")
+    ReportMediaPlaybackDuration() : ModelCommand("report")
     {
         AddArgument("attr-name", "duration");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28369,7 +28369,7 @@ public:
 class ReportMediaPlaybackPlaybackSpeed : public ModelCommand
 {
 public:
-    ReportMediaPlaybackPlaybackSpeed() : ModelCommand("subscribe")
+    ReportMediaPlaybackPlaybackSpeed() : ModelCommand("report")
     {
         AddArgument("attr-name", "playback-speed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28438,7 +28438,7 @@ public:
 class ReportMediaPlaybackSeekRangeEnd : public ModelCommand
 {
 public:
-    ReportMediaPlaybackSeekRangeEnd() : ModelCommand("subscribe")
+    ReportMediaPlaybackSeekRangeEnd() : ModelCommand("report")
     {
         AddArgument("attr-name", "seek-range-end");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28507,7 +28507,7 @@ public:
 class ReportMediaPlaybackSeekRangeStart : public ModelCommand
 {
 public:
-    ReportMediaPlaybackSeekRangeStart() : ModelCommand("subscribe")
+    ReportMediaPlaybackSeekRangeStart() : ModelCommand("report")
     {
         AddArgument("attr-name", "seek-range-start");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28576,7 +28576,7 @@ public:
 class ReportMediaPlaybackAttributeList : public ModelCommand
 {
 public:
-    ReportMediaPlaybackAttributeList() : ModelCommand("subscribe")
+    ReportMediaPlaybackAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28648,7 +28648,7 @@ public:
 class ReportMediaPlaybackClusterRevision : public ModelCommand
 {
 public:
-    ReportMediaPlaybackClusterRevision() : ModelCommand("subscribe")
+    ReportMediaPlaybackClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28759,7 +28759,7 @@ public:
 class ReportModeSelectCurrentMode : public ModelCommand
 {
 public:
-    ReportModeSelectCurrentMode() : ModelCommand("subscribe")
+    ReportModeSelectCurrentMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28831,7 +28831,7 @@ public:
 class ReportModeSelectSupportedModes : public ModelCommand
 {
 public:
-    ReportModeSelectSupportedModes() : ModelCommand("subscribe")
+    ReportModeSelectSupportedModes() : ModelCommand("report")
     {
         AddArgument("attr-name", "supported-modes");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -28932,7 +28932,7 @@ private:
 class ReportModeSelectOnMode : public ModelCommand
 {
 public:
-    ReportModeSelectOnMode() : ModelCommand("subscribe")
+    ReportModeSelectOnMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "on-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29001,7 +29001,7 @@ public:
 class ReportModeSelectStartUpMode : public ModelCommand
 {
 public:
-    ReportModeSelectStartUpMode() : ModelCommand("subscribe")
+    ReportModeSelectStartUpMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "start-up-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29070,7 +29070,7 @@ public:
 class ReportModeSelectDescription : public ModelCommand
 {
 public:
-    ReportModeSelectDescription() : ModelCommand("subscribe")
+    ReportModeSelectDescription() : ModelCommand("report")
     {
         AddArgument("attr-name", "description");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29139,7 +29139,7 @@ public:
 class ReportModeSelectAttributeList : public ModelCommand
 {
 public:
-    ReportModeSelectAttributeList() : ModelCommand("subscribe")
+    ReportModeSelectAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29211,7 +29211,7 @@ public:
 class ReportModeSelectClusterRevision : public ModelCommand
 {
 public:
-    ReportModeSelectClusterRevision() : ModelCommand("subscribe")
+    ReportModeSelectClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29458,7 +29458,7 @@ public:
 class ReportNetworkCommissioningMaxNetworks : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningMaxNetworks() : ModelCommand("subscribe")
+    ReportNetworkCommissioningMaxNetworks() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-networks");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29530,7 +29530,7 @@ public:
 class ReportNetworkCommissioningNetworks : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningNetworks() : ModelCommand("subscribe")
+    ReportNetworkCommissioningNetworks() : ModelCommand("report")
     {
         AddArgument("attr-name", "networks");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29605,7 +29605,7 @@ public:
 class ReportNetworkCommissioningScanMaxTimeSeconds : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningScanMaxTimeSeconds() : ModelCommand("subscribe")
+    ReportNetworkCommissioningScanMaxTimeSeconds() : ModelCommand("report")
     {
         AddArgument("attr-name", "scan-max-time-seconds");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29677,7 +29677,7 @@ public:
 class ReportNetworkCommissioningConnectMaxTimeSeconds : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningConnectMaxTimeSeconds() : ModelCommand("subscribe")
+    ReportNetworkCommissioningConnectMaxTimeSeconds() : ModelCommand("report")
     {
         AddArgument("attr-name", "connect-max-time-seconds");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29775,7 +29775,7 @@ private:
 class ReportNetworkCommissioningInterfaceEnabled : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningInterfaceEnabled() : ModelCommand("subscribe")
+    ReportNetworkCommissioningInterfaceEnabled() : ModelCommand("report")
     {
         AddArgument("attr-name", "interface-enabled");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29844,7 +29844,7 @@ public:
 class ReportNetworkCommissioningLastNetworkingStatus : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningLastNetworkingStatus() : ModelCommand("subscribe")
+    ReportNetworkCommissioningLastNetworkingStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "last-networking-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29916,7 +29916,7 @@ public:
 class ReportNetworkCommissioningLastNetworkID : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningLastNetworkID() : ModelCommand("subscribe")
+    ReportNetworkCommissioningLastNetworkID() : ModelCommand("report")
     {
         AddArgument("attr-name", "last-network-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -29988,7 +29988,7 @@ public:
 class ReportNetworkCommissioningLastConnectErrorValue : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningLastConnectErrorValue() : ModelCommand("subscribe")
+    ReportNetworkCommissioningLastConnectErrorValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "last-connect-error-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30060,7 +30060,7 @@ public:
 class ReportNetworkCommissioningFeatureMap : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningFeatureMap() : ModelCommand("subscribe")
+    ReportNetworkCommissioningFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30129,7 +30129,7 @@ public:
 class ReportNetworkCommissioningClusterRevision : public ModelCommand
 {
 public:
-    ReportNetworkCommissioningClusterRevision() : ModelCommand("subscribe")
+    ReportNetworkCommissioningClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30294,7 +30294,7 @@ public:
 class ReportOtaSoftwareUpdateProviderAttributeList : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateProviderAttributeList() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateProviderAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30366,7 +30366,7 @@ public:
 class ReportOtaSoftwareUpdateProviderClusterRevision : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateProviderClusterRevision() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateProviderClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30489,7 +30489,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorStateTransition : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorStateTransition() : ModelCommand("subscribe-event")
+    ReportOtaSoftwareUpdateRequestorStateTransition() : ModelCommand("report-event")
     {
         AddArgument("event-name", "state-transition");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30562,7 +30562,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorVersionApplied : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorVersionApplied() : ModelCommand("subscribe-event")
+    ReportOtaSoftwareUpdateRequestorVersionApplied() : ModelCommand("report-event")
     {
         AddArgument("event-name", "version-applied");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30635,7 +30635,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorDownloadError : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorDownloadError() : ModelCommand("subscribe-event")
+    ReportOtaSoftwareUpdateRequestorDownloadError() : ModelCommand("report-event")
     {
         AddArgument("event-name", "download-error");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30711,7 +30711,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorDefaultOtaProviders() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateRequestorDefaultOtaProviders() : ModelCommand("report")
     {
         AddArgument("attr-name", "default-ota-providers");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30787,7 +30787,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorUpdatePossible : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorUpdatePossible() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateRequestorUpdatePossible() : ModelCommand("report")
     {
         AddArgument("attr-name", "update-possible");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30859,7 +30859,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorUpdateState : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorUpdateState() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateRequestorUpdateState() : ModelCommand("report")
     {
         AddArgument("attr-name", "update-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -30931,7 +30931,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorUpdateStateProgress : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorUpdateStateProgress() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateRequestorUpdateStateProgress() : ModelCommand("report")
     {
         AddArgument("attr-name", "update-state-progress");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31004,7 +31004,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorAttributeList : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorAttributeList() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateRequestorAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31076,7 +31076,7 @@ public:
 class ReportOtaSoftwareUpdateRequestorClusterRevision : public ModelCommand
 {
 public:
-    ReportOtaSoftwareUpdateRequestorClusterRevision() : ModelCommand("subscribe")
+    ReportOtaSoftwareUpdateRequestorClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31163,7 +31163,7 @@ public:
 class ReportOccupancySensingOccupancy : public ModelCommand
 {
 public:
-    ReportOccupancySensingOccupancy() : ModelCommand("subscribe")
+    ReportOccupancySensingOccupancy() : ModelCommand("report")
     {
         AddArgument("attr-name", "occupancy");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31232,7 +31232,7 @@ public:
 class ReportOccupancySensingOccupancySensorType : public ModelCommand
 {
 public:
-    ReportOccupancySensingOccupancySensorType() : ModelCommand("subscribe")
+    ReportOccupancySensingOccupancySensorType() : ModelCommand("report")
     {
         AddArgument("attr-name", "occupancy-sensor-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31301,7 +31301,7 @@ public:
 class ReportOccupancySensingOccupancySensorTypeBitmap : public ModelCommand
 {
 public:
-    ReportOccupancySensingOccupancySensorTypeBitmap() : ModelCommand("subscribe")
+    ReportOccupancySensingOccupancySensorTypeBitmap() : ModelCommand("report")
     {
         AddArgument("attr-name", "occupancy-sensor-type-bitmap");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31373,7 +31373,7 @@ public:
 class ReportOccupancySensingAttributeList : public ModelCommand
 {
 public:
-    ReportOccupancySensingAttributeList() : ModelCommand("subscribe")
+    ReportOccupancySensingAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31445,7 +31445,7 @@ public:
 class ReportOccupancySensingClusterRevision : public ModelCommand
 {
 public:
-    ReportOccupancySensingClusterRevision() : ModelCommand("subscribe")
+    ReportOccupancySensingClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31672,7 +31672,7 @@ public:
 class ReportOnOffOnOff : public ModelCommand
 {
 public:
-    ReportOnOffOnOff() : ModelCommand("subscribe")
+    ReportOnOffOnOff() : ModelCommand("report")
     {
         AddArgument("attr-name", "on-off");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31741,7 +31741,7 @@ public:
 class ReportOnOffGlobalSceneControl : public ModelCommand
 {
 public:
-    ReportOnOffGlobalSceneControl() : ModelCommand("subscribe")
+    ReportOnOffGlobalSceneControl() : ModelCommand("report")
     {
         AddArgument("attr-name", "global-scene-control");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31836,7 +31836,7 @@ private:
 class ReportOnOffOnTime : public ModelCommand
 {
 public:
-    ReportOnOffOnTime() : ModelCommand("subscribe")
+    ReportOnOffOnTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "on-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -31931,7 +31931,7 @@ private:
 class ReportOnOffOffWaitTime : public ModelCommand
 {
 public:
-    ReportOnOffOffWaitTime() : ModelCommand("subscribe")
+    ReportOnOffOffWaitTime() : ModelCommand("report")
     {
         AddArgument("attr-name", "off-wait-time");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32026,7 +32026,7 @@ private:
 class ReportOnOffStartUpOnOff : public ModelCommand
 {
 public:
-    ReportOnOffStartUpOnOff() : ModelCommand("subscribe")
+    ReportOnOffStartUpOnOff() : ModelCommand("report")
     {
         AddArgument("attr-name", "start-up-on-off");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32095,7 +32095,7 @@ public:
 class ReportOnOffAttributeList : public ModelCommand
 {
 public:
-    ReportOnOffAttributeList() : ModelCommand("subscribe")
+    ReportOnOffAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32167,7 +32167,7 @@ public:
 class ReportOnOffFeatureMap : public ModelCommand
 {
 public:
-    ReportOnOffFeatureMap() : ModelCommand("subscribe")
+    ReportOnOffFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32236,7 +32236,7 @@ public:
 class ReportOnOffClusterRevision : public ModelCommand
 {
 public:
-    ReportOnOffClusterRevision() : ModelCommand("subscribe")
+    ReportOnOffClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32319,7 +32319,7 @@ public:
 class ReportOnOffSwitchConfigurationSwitchType : public ModelCommand
 {
 public:
-    ReportOnOffSwitchConfigurationSwitchType() : ModelCommand("subscribe")
+    ReportOnOffSwitchConfigurationSwitchType() : ModelCommand("report")
     {
         AddArgument("attr-name", "switch-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32414,7 +32414,7 @@ private:
 class ReportOnOffSwitchConfigurationSwitchActions : public ModelCommand
 {
 public:
-    ReportOnOffSwitchConfigurationSwitchActions() : ModelCommand("subscribe")
+    ReportOnOffSwitchConfigurationSwitchActions() : ModelCommand("report")
     {
         AddArgument("attr-name", "switch-actions");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32486,7 +32486,7 @@ public:
 class ReportOnOffSwitchConfigurationAttributeList : public ModelCommand
 {
 public:
-    ReportOnOffSwitchConfigurationAttributeList() : ModelCommand("subscribe")
+    ReportOnOffSwitchConfigurationAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32558,7 +32558,7 @@ public:
 class ReportOnOffSwitchConfigurationClusterRevision : public ModelCommand
 {
 public:
-    ReportOnOffSwitchConfigurationClusterRevision() : ModelCommand("subscribe")
+    ReportOnOffSwitchConfigurationClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32881,7 +32881,7 @@ public:
 class ReportOperationalCredentialsNOCs : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsNOCs() : ModelCommand("subscribe")
+    ReportOperationalCredentialsNOCs() : ModelCommand("report")
     {
         AddArgument("attr-name", "nocs");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -32959,7 +32959,7 @@ public:
 class ReportOperationalCredentialsFabricsList : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsFabricsList() : ModelCommand("subscribe")
+    ReportOperationalCredentialsFabricsList() : ModelCommand("report")
     {
         AddArgument("attr-name", "fabrics-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33033,7 +33033,7 @@ public:
 class ReportOperationalCredentialsSupportedFabrics : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsSupportedFabrics() : ModelCommand("subscribe")
+    ReportOperationalCredentialsSupportedFabrics() : ModelCommand("report")
     {
         AddArgument("attr-name", "supported-fabrics");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33105,7 +33105,7 @@ public:
 class ReportOperationalCredentialsCommissionedFabrics : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsCommissionedFabrics() : ModelCommand("subscribe")
+    ReportOperationalCredentialsCommissionedFabrics() : ModelCommand("report")
     {
         AddArgument("attr-name", "commissioned-fabrics");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33177,7 +33177,7 @@ public:
 class ReportOperationalCredentialsTrustedRootCertificates : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsTrustedRootCertificates() : ModelCommand("subscribe")
+    ReportOperationalCredentialsTrustedRootCertificates() : ModelCommand("report")
     {
         AddArgument("attr-name", "trusted-root-certificates");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33250,7 +33250,7 @@ public:
 class ReportOperationalCredentialsCurrentFabricIndex : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsCurrentFabricIndex() : ModelCommand("subscribe")
+    ReportOperationalCredentialsCurrentFabricIndex() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-fabric-index");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33322,7 +33322,7 @@ public:
 class ReportOperationalCredentialsAttributeList : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsAttributeList() : ModelCommand("subscribe")
+    ReportOperationalCredentialsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33394,7 +33394,7 @@ public:
 class ReportOperationalCredentialsClusterRevision : public ModelCommand
 {
 public:
-    ReportOperationalCredentialsClusterRevision() : ModelCommand("subscribe")
+    ReportOperationalCredentialsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33488,7 +33488,7 @@ public:
 class ReportPowerSourceStatus : public ModelCommand
 {
 public:
-    ReportPowerSourceStatus() : ModelCommand("subscribe")
+    ReportPowerSourceStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33557,7 +33557,7 @@ public:
 class ReportPowerSourceOrder : public ModelCommand
 {
 public:
-    ReportPowerSourceOrder() : ModelCommand("subscribe")
+    ReportPowerSourceOrder() : ModelCommand("report")
     {
         AddArgument("attr-name", "order");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33626,7 +33626,7 @@ public:
 class ReportPowerSourceDescription : public ModelCommand
 {
 public:
-    ReportPowerSourceDescription() : ModelCommand("subscribe")
+    ReportPowerSourceDescription() : ModelCommand("report")
     {
         AddArgument("attr-name", "description");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33695,7 +33695,7 @@ public:
 class ReportPowerSourceBatteryVoltage : public ModelCommand
 {
 public:
-    ReportPowerSourceBatteryVoltage() : ModelCommand("subscribe")
+    ReportPowerSourceBatteryVoltage() : ModelCommand("report")
     {
         AddArgument("attr-name", "battery-voltage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33764,7 +33764,7 @@ public:
 class ReportPowerSourceBatteryPercentRemaining : public ModelCommand
 {
 public:
-    ReportPowerSourceBatteryPercentRemaining() : ModelCommand("subscribe")
+    ReportPowerSourceBatteryPercentRemaining() : ModelCommand("report")
     {
         AddArgument("attr-name", "battery-percent-remaining");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33833,7 +33833,7 @@ public:
 class ReportPowerSourceBatteryTimeRemaining : public ModelCommand
 {
 public:
-    ReportPowerSourceBatteryTimeRemaining() : ModelCommand("subscribe")
+    ReportPowerSourceBatteryTimeRemaining() : ModelCommand("report")
     {
         AddArgument("attr-name", "battery-time-remaining");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33902,7 +33902,7 @@ public:
 class ReportPowerSourceBatteryChargeLevel : public ModelCommand
 {
 public:
-    ReportPowerSourceBatteryChargeLevel() : ModelCommand("subscribe")
+    ReportPowerSourceBatteryChargeLevel() : ModelCommand("report")
     {
         AddArgument("attr-name", "battery-charge-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -33971,7 +33971,7 @@ public:
 class ReportPowerSourceActiveBatteryFaults : public ModelCommand
 {
 public:
-    ReportPowerSourceActiveBatteryFaults() : ModelCommand("subscribe")
+    ReportPowerSourceActiveBatteryFaults() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-battery-faults");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34043,7 +34043,7 @@ public:
 class ReportPowerSourceBatteryChargeState : public ModelCommand
 {
 public:
-    ReportPowerSourceBatteryChargeState() : ModelCommand("subscribe")
+    ReportPowerSourceBatteryChargeState() : ModelCommand("report")
     {
         AddArgument("attr-name", "battery-charge-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34112,7 +34112,7 @@ public:
 class ReportPowerSourceAttributeList : public ModelCommand
 {
 public:
-    ReportPowerSourceAttributeList() : ModelCommand("subscribe")
+    ReportPowerSourceAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34184,7 +34184,7 @@ public:
 class ReportPowerSourceFeatureMap : public ModelCommand
 {
 public:
-    ReportPowerSourceFeatureMap() : ModelCommand("subscribe")
+    ReportPowerSourceFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34253,7 +34253,7 @@ public:
 class ReportPowerSourceClusterRevision : public ModelCommand
 {
 public:
-    ReportPowerSourceClusterRevision() : ModelCommand("subscribe")
+    ReportPowerSourceClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34335,7 +34335,7 @@ public:
 class ReportPowerSourceConfigurationSources : public ModelCommand
 {
 public:
-    ReportPowerSourceConfigurationSources() : ModelCommand("subscribe")
+    ReportPowerSourceConfigurationSources() : ModelCommand("report")
     {
         AddArgument("attr-name", "sources");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34407,7 +34407,7 @@ public:
 class ReportPowerSourceConfigurationAttributeList : public ModelCommand
 {
 public:
-    ReportPowerSourceConfigurationAttributeList() : ModelCommand("subscribe")
+    ReportPowerSourceConfigurationAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34479,7 +34479,7 @@ public:
 class ReportPowerSourceConfigurationClusterRevision : public ModelCommand
 {
 public:
-    ReportPowerSourceConfigurationClusterRevision() : ModelCommand("subscribe")
+    ReportPowerSourceConfigurationClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34566,7 +34566,7 @@ public:
 class ReportPressureMeasurementMeasuredValue : public ModelCommand
 {
 public:
-    ReportPressureMeasurementMeasuredValue() : ModelCommand("subscribe")
+    ReportPressureMeasurementMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34635,7 +34635,7 @@ public:
 class ReportPressureMeasurementMinMeasuredValue : public ModelCommand
 {
 public:
-    ReportPressureMeasurementMinMeasuredValue() : ModelCommand("subscribe")
+    ReportPressureMeasurementMinMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34704,7 +34704,7 @@ public:
 class ReportPressureMeasurementMaxMeasuredValue : public ModelCommand
 {
 public:
-    ReportPressureMeasurementMaxMeasuredValue() : ModelCommand("subscribe")
+    ReportPressureMeasurementMaxMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34773,7 +34773,7 @@ public:
 class ReportPressureMeasurementAttributeList : public ModelCommand
 {
 public:
-    ReportPressureMeasurementAttributeList() : ModelCommand("subscribe")
+    ReportPressureMeasurementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34845,7 +34845,7 @@ public:
 class ReportPressureMeasurementClusterRevision : public ModelCommand
 {
 public:
-    ReportPressureMeasurementClusterRevision() : ModelCommand("subscribe")
+    ReportPressureMeasurementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -34969,7 +34969,7 @@ public:
 class ReportPumpConfigurationAndControlSupplyVoltageLow : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlSupplyVoltageLow() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlSupplyVoltageLow() : ModelCommand("report-event")
     {
         AddArgument("event-name", "supply-voltage-low");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35042,7 +35042,7 @@ public:
 class ReportPumpConfigurationAndControlSupplyVoltageHigh : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlSupplyVoltageHigh() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlSupplyVoltageHigh() : ModelCommand("report-event")
     {
         AddArgument("event-name", "supply-voltage-high");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35115,7 +35115,7 @@ public:
 class ReportPumpConfigurationAndControlPowerMissingPhase : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlPowerMissingPhase() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlPowerMissingPhase() : ModelCommand("report-event")
     {
         AddArgument("event-name", "power-missing-phase");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35188,7 +35188,7 @@ public:
 class ReportPumpConfigurationAndControlSystemPressureLow : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlSystemPressureLow() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlSystemPressureLow() : ModelCommand("report-event")
     {
         AddArgument("event-name", "system-pressure-low");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35261,7 +35261,7 @@ public:
 class ReportPumpConfigurationAndControlSystemPressureHigh : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlSystemPressureHigh() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlSystemPressureHigh() : ModelCommand("report-event")
     {
         AddArgument("event-name", "system-pressure-high");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35334,7 +35334,7 @@ public:
 class ReportPumpConfigurationAndControlDryRunning : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlDryRunning() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlDryRunning() : ModelCommand("report-event")
     {
         AddArgument("event-name", "dry-running");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35407,7 +35407,7 @@ public:
 class ReportPumpConfigurationAndControlMotorTemperatureHigh : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMotorTemperatureHigh() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlMotorTemperatureHigh() : ModelCommand("report-event")
     {
         AddArgument("event-name", "motor-temperature-high");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35482,7 +35482,7 @@ public:
 class ReportPumpConfigurationAndControlPumpMotorFatalFailure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlPumpMotorFatalFailure() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlPumpMotorFatalFailure() : ModelCommand("report-event")
     {
         AddArgument("event-name", "pump-motor-fatal-failure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35558,7 +35558,7 @@ public:
 class ReportPumpConfigurationAndControlElectronicTemperatureHigh : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlElectronicTemperatureHigh() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlElectronicTemperatureHigh() : ModelCommand("report-event")
     {
         AddArgument("event-name", "electronic-temperature-high");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35633,7 +35633,7 @@ public:
 class ReportPumpConfigurationAndControlPumpBlocked : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlPumpBlocked() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlPumpBlocked() : ModelCommand("report-event")
     {
         AddArgument("event-name", "pump-blocked");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35706,7 +35706,7 @@ public:
 class ReportPumpConfigurationAndControlSensorFailure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlSensorFailure() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlSensorFailure() : ModelCommand("report-event")
     {
         AddArgument("event-name", "sensor-failure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35781,7 +35781,7 @@ public:
 class ReportPumpConfigurationAndControlElectronicNonFatalFailure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlElectronicNonFatalFailure() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlElectronicNonFatalFailure() : ModelCommand("report-event")
     {
         AddArgument("event-name", "electronic-non-fatal-failure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35857,7 +35857,7 @@ public:
 class ReportPumpConfigurationAndControlElectronicFatalFailure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlElectronicFatalFailure() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlElectronicFatalFailure() : ModelCommand("report-event")
     {
         AddArgument("event-name", "electronic-fatal-failure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -35931,7 +35931,7 @@ public:
 class ReportPumpConfigurationAndControlGeneralFault : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlGeneralFault() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlGeneralFault() : ModelCommand("report-event")
     {
         AddArgument("event-name", "general-fault");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36004,7 +36004,7 @@ public:
 class ReportPumpConfigurationAndControlLeakage : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlLeakage() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlLeakage() : ModelCommand("report-event")
     {
         AddArgument("event-name", "leakage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36077,7 +36077,7 @@ public:
 class ReportPumpConfigurationAndControlAirDetection : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlAirDetection() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlAirDetection() : ModelCommand("report-event")
     {
         AddArgument("event-name", "air-detection");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36150,7 +36150,7 @@ public:
 class ReportPumpConfigurationAndControlTurbineOperation : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlTurbineOperation() : ModelCommand("subscribe-event")
+    ReportPumpConfigurationAndControlTurbineOperation() : ModelCommand("report-event")
     {
         AddArgument("event-name", "turbine-operation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36223,7 +36223,7 @@ public:
 class ReportPumpConfigurationAndControlMaxPressure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxPressure() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxPressure() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-pressure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36295,7 +36295,7 @@ public:
 class ReportPumpConfigurationAndControlMaxSpeed : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxSpeed() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxSpeed() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-speed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36364,7 +36364,7 @@ public:
 class ReportPumpConfigurationAndControlMaxFlow : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxFlow() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxFlow() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-flow");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36433,7 +36433,7 @@ public:
 class ReportPumpConfigurationAndControlMinConstPressure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMinConstPressure() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMinConstPressure() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-const-pressure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36505,7 +36505,7 @@ public:
 class ReportPumpConfigurationAndControlMaxConstPressure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxConstPressure() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxConstPressure() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-const-pressure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36577,7 +36577,7 @@ public:
 class ReportPumpConfigurationAndControlMinCompPressure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMinCompPressure() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMinCompPressure() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-comp-pressure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36649,7 +36649,7 @@ public:
 class ReportPumpConfigurationAndControlMaxCompPressure : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxCompPressure() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxCompPressure() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-comp-pressure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36721,7 +36721,7 @@ public:
 class ReportPumpConfigurationAndControlMinConstSpeed : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMinConstSpeed() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMinConstSpeed() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-const-speed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36793,7 +36793,7 @@ public:
 class ReportPumpConfigurationAndControlMaxConstSpeed : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxConstSpeed() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxConstSpeed() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-const-speed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36865,7 +36865,7 @@ public:
 class ReportPumpConfigurationAndControlMinConstFlow : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMinConstFlow() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMinConstFlow() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-const-flow");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -36937,7 +36937,7 @@ public:
 class ReportPumpConfigurationAndControlMaxConstFlow : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxConstFlow() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxConstFlow() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-const-flow");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37009,7 +37009,7 @@ public:
 class ReportPumpConfigurationAndControlMinConstTemp : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMinConstTemp() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMinConstTemp() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-const-temp");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37081,7 +37081,7 @@ public:
 class ReportPumpConfigurationAndControlMaxConstTemp : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlMaxConstTemp() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlMaxConstTemp() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-const-temp");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37153,7 +37153,7 @@ public:
 class ReportPumpConfigurationAndControlPumpStatus : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlPumpStatus() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlPumpStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "pump-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37226,7 +37226,7 @@ public:
 class ReportPumpConfigurationAndControlEffectiveOperationMode : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlEffectiveOperationMode() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlEffectiveOperationMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "effective-operation-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37299,7 +37299,7 @@ public:
 class ReportPumpConfigurationAndControlEffectiveControlMode : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlEffectiveControlMode() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlEffectiveControlMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "effective-control-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37372,7 +37372,7 @@ public:
 class ReportPumpConfigurationAndControlCapacity : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlCapacity() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlCapacity() : ModelCommand("report")
     {
         AddArgument("attr-name", "capacity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37441,7 +37441,7 @@ public:
 class ReportPumpConfigurationAndControlSpeed : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlSpeed() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlSpeed() : ModelCommand("report")
     {
         AddArgument("attr-name", "speed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37536,7 +37536,7 @@ private:
 class ReportPumpConfigurationAndControlLifetimeRunningHours : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlLifetimeRunningHours() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlLifetimeRunningHours() : ModelCommand("report")
     {
         AddArgument("attr-name", "lifetime-running-hours");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37609,7 +37609,7 @@ public:
 class ReportPumpConfigurationAndControlPower : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlPower() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlPower() : ModelCommand("report")
     {
         AddArgument("attr-name", "power");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37706,7 +37706,7 @@ private:
 class ReportPumpConfigurationAndControlLifetimeEnergyConsumed : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlLifetimeEnergyConsumed() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlLifetimeEnergyConsumed() : ModelCommand("report")
     {
         AddArgument("attr-name", "lifetime-energy-consumed");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37805,7 +37805,7 @@ private:
 class ReportPumpConfigurationAndControlOperationMode : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlOperationMode() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlOperationMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "operation-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37903,7 +37903,7 @@ private:
 class ReportPumpConfigurationAndControlControlMode : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlControlMode() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlControlMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "control-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -37975,7 +37975,7 @@ public:
 class ReportPumpConfigurationAndControlAlarmMask : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlAlarmMask() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlAlarmMask() : ModelCommand("report")
     {
         AddArgument("attr-name", "alarm-mask");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38047,7 +38047,7 @@ public:
 class ReportPumpConfigurationAndControlAttributeList : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlAttributeList() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38119,7 +38119,7 @@ public:
 class ReportPumpConfigurationAndControlFeatureMap : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlFeatureMap() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38191,7 +38191,7 @@ public:
 class ReportPumpConfigurationAndControlClusterRevision : public ModelCommand
 {
 public:
-    ReportPumpConfigurationAndControlClusterRevision() : ModelCommand("subscribe")
+    ReportPumpConfigurationAndControlClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38279,7 +38279,7 @@ public:
 class ReportRelativeHumidityMeasurementMeasuredValue : public ModelCommand
 {
 public:
-    ReportRelativeHumidityMeasurementMeasuredValue() : ModelCommand("subscribe")
+    ReportRelativeHumidityMeasurementMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38351,7 +38351,7 @@ public:
 class ReportRelativeHumidityMeasurementMinMeasuredValue : public ModelCommand
 {
 public:
-    ReportRelativeHumidityMeasurementMinMeasuredValue() : ModelCommand("subscribe")
+    ReportRelativeHumidityMeasurementMinMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38423,7 +38423,7 @@ public:
 class ReportRelativeHumidityMeasurementMaxMeasuredValue : public ModelCommand
 {
 public:
-    ReportRelativeHumidityMeasurementMaxMeasuredValue() : ModelCommand("subscribe")
+    ReportRelativeHumidityMeasurementMaxMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38495,7 +38495,7 @@ public:
 class ReportRelativeHumidityMeasurementTolerance : public ModelCommand
 {
 public:
-    ReportRelativeHumidityMeasurementTolerance() : ModelCommand("subscribe")
+    ReportRelativeHumidityMeasurementTolerance() : ModelCommand("report")
     {
         AddArgument("attr-name", "tolerance");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38567,7 +38567,7 @@ public:
 class ReportRelativeHumidityMeasurementAttributeList : public ModelCommand
 {
 public:
-    ReportRelativeHumidityMeasurementAttributeList() : ModelCommand("subscribe")
+    ReportRelativeHumidityMeasurementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38639,7 +38639,7 @@ public:
 class ReportRelativeHumidityMeasurementClusterRevision : public ModelCommand
 {
 public:
-    ReportRelativeHumidityMeasurementClusterRevision() : ModelCommand("subscribe")
+    ReportRelativeHumidityMeasurementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38912,7 +38912,7 @@ public:
 class ReportScenesSceneCount : public ModelCommand
 {
 public:
-    ReportScenesSceneCount() : ModelCommand("subscribe")
+    ReportScenesSceneCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "scene-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -38981,7 +38981,7 @@ public:
 class ReportScenesCurrentScene : public ModelCommand
 {
 public:
-    ReportScenesCurrentScene() : ModelCommand("subscribe")
+    ReportScenesCurrentScene() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-scene");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39050,7 +39050,7 @@ public:
 class ReportScenesCurrentGroup : public ModelCommand
 {
 public:
-    ReportScenesCurrentGroup() : ModelCommand("subscribe")
+    ReportScenesCurrentGroup() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-group");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39119,7 +39119,7 @@ public:
 class ReportScenesSceneValid : public ModelCommand
 {
 public:
-    ReportScenesSceneValid() : ModelCommand("subscribe")
+    ReportScenesSceneValid() : ModelCommand("report")
     {
         AddArgument("attr-name", "scene-valid");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39188,7 +39188,7 @@ public:
 class ReportScenesNameSupport : public ModelCommand
 {
 public:
-    ReportScenesNameSupport() : ModelCommand("subscribe")
+    ReportScenesNameSupport() : ModelCommand("report")
     {
         AddArgument("attr-name", "name-support");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39257,7 +39257,7 @@ public:
 class ReportScenesAttributeList : public ModelCommand
 {
 public:
-    ReportScenesAttributeList() : ModelCommand("subscribe")
+    ReportScenesAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39329,7 +39329,7 @@ public:
 class ReportScenesClusterRevision : public ModelCommand
 {
 public:
-    ReportScenesClusterRevision() : ModelCommand("subscribe")
+    ReportScenesClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39438,7 +39438,7 @@ public:
 class ReportSoftwareDiagnosticsSoftwareFault : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsSoftwareFault() : ModelCommand("subscribe-event")
+    ReportSoftwareDiagnosticsSoftwareFault() : ModelCommand("report-event")
     {
         AddArgument("event-name", "software-fault");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39513,7 +39513,7 @@ public:
 class ReportSoftwareDiagnosticsThreadMetrics : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsThreadMetrics() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsThreadMetrics() : ModelCommand("report")
     {
         AddArgument("attr-name", "thread-metrics");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39588,7 +39588,7 @@ public:
 class ReportSoftwareDiagnosticsCurrentHeapFree : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsCurrentHeapFree() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsCurrentHeapFree() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-heap-free");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39657,7 +39657,7 @@ public:
 class ReportSoftwareDiagnosticsCurrentHeapUsed : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsCurrentHeapUsed() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsCurrentHeapUsed() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-heap-used");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39726,7 +39726,7 @@ public:
 class ReportSoftwareDiagnosticsCurrentHeapHighWatermark : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsCurrentHeapHighWatermark() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsCurrentHeapHighWatermark() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-heap-high-watermark");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39798,7 +39798,7 @@ public:
 class ReportSoftwareDiagnosticsAttributeList : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsAttributeList() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39870,7 +39870,7 @@ public:
 class ReportSoftwareDiagnosticsFeatureMap : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsFeatureMap() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -39939,7 +39939,7 @@ public:
 class ReportSoftwareDiagnosticsClusterRevision : public ModelCommand
 {
 public:
-    ReportSoftwareDiagnosticsClusterRevision() : ModelCommand("subscribe")
+    ReportSoftwareDiagnosticsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40031,7 +40031,7 @@ public:
 class ReportSwitchSwitchLatched : public ModelCommand
 {
 public:
-    ReportSwitchSwitchLatched() : ModelCommand("subscribe-event")
+    ReportSwitchSwitchLatched() : ModelCommand("report-event")
     {
         AddArgument("event-name", "switch-latched");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40102,7 +40102,7 @@ public:
 class ReportSwitchInitialPress : public ModelCommand
 {
 public:
-    ReportSwitchInitialPress() : ModelCommand("subscribe-event")
+    ReportSwitchInitialPress() : ModelCommand("report-event")
     {
         AddArgument("event-name", "initial-press");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40173,7 +40173,7 @@ public:
 class ReportSwitchLongPress : public ModelCommand
 {
 public:
-    ReportSwitchLongPress() : ModelCommand("subscribe-event")
+    ReportSwitchLongPress() : ModelCommand("report-event")
     {
         AddArgument("event-name", "long-press");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40244,7 +40244,7 @@ public:
 class ReportSwitchShortRelease : public ModelCommand
 {
 public:
-    ReportSwitchShortRelease() : ModelCommand("subscribe-event")
+    ReportSwitchShortRelease() : ModelCommand("report-event")
     {
         AddArgument("event-name", "short-release");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40315,7 +40315,7 @@ public:
 class ReportSwitchLongRelease : public ModelCommand
 {
 public:
-    ReportSwitchLongRelease() : ModelCommand("subscribe-event")
+    ReportSwitchLongRelease() : ModelCommand("report-event")
     {
         AddArgument("event-name", "long-release");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40386,7 +40386,7 @@ public:
 class ReportSwitchMultiPressOngoing : public ModelCommand
 {
 public:
-    ReportSwitchMultiPressOngoing() : ModelCommand("subscribe-event")
+    ReportSwitchMultiPressOngoing() : ModelCommand("report-event")
     {
         AddArgument("event-name", "multi-press-ongoing");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40457,7 +40457,7 @@ public:
 class ReportSwitchMultiPressComplete : public ModelCommand
 {
 public:
-    ReportSwitchMultiPressComplete() : ModelCommand("subscribe-event")
+    ReportSwitchMultiPressComplete() : ModelCommand("report-event")
     {
         AddArgument("event-name", "multi-press-complete");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40529,7 +40529,7 @@ public:
 class ReportSwitchNumberOfPositions : public ModelCommand
 {
 public:
-    ReportSwitchNumberOfPositions() : ModelCommand("subscribe")
+    ReportSwitchNumberOfPositions() : ModelCommand("report")
     {
         AddArgument("attr-name", "number-of-positions");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40598,7 +40598,7 @@ public:
 class ReportSwitchCurrentPosition : public ModelCommand
 {
 public:
-    ReportSwitchCurrentPosition() : ModelCommand("subscribe")
+    ReportSwitchCurrentPosition() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40667,7 +40667,7 @@ public:
 class ReportSwitchMultiPressMax : public ModelCommand
 {
 public:
-    ReportSwitchMultiPressMax() : ModelCommand("subscribe")
+    ReportSwitchMultiPressMax() : ModelCommand("report")
     {
         AddArgument("attr-name", "multi-press-max");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40736,7 +40736,7 @@ public:
 class ReportSwitchAttributeList : public ModelCommand
 {
 public:
-    ReportSwitchAttributeList() : ModelCommand("subscribe")
+    ReportSwitchAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40808,7 +40808,7 @@ public:
 class ReportSwitchFeatureMap : public ModelCommand
 {
 public:
-    ReportSwitchFeatureMap() : ModelCommand("subscribe")
+    ReportSwitchFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40877,7 +40877,7 @@ public:
 class ReportSwitchClusterRevision : public ModelCommand
 {
 public:
-    ReportSwitchClusterRevision() : ModelCommand("subscribe")
+    ReportSwitchClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -40988,7 +40988,7 @@ public:
 class ReportTargetNavigatorTargetNavigatorList : public ModelCommand
 {
 public:
-    ReportTargetNavigatorTargetNavigatorList() : ModelCommand("subscribe")
+    ReportTargetNavigatorTargetNavigatorList() : ModelCommand("report")
     {
         AddArgument("attr-name", "target-navigator-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41062,7 +41062,7 @@ public:
 class ReportTargetNavigatorCurrentNavigatorTarget : public ModelCommand
 {
 public:
-    ReportTargetNavigatorCurrentNavigatorTarget() : ModelCommand("subscribe")
+    ReportTargetNavigatorCurrentNavigatorTarget() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-navigator-target");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41134,7 +41134,7 @@ public:
 class ReportTargetNavigatorAttributeList : public ModelCommand
 {
 public:
-    ReportTargetNavigatorAttributeList() : ModelCommand("subscribe")
+    ReportTargetNavigatorAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41206,7 +41206,7 @@ public:
 class ReportTargetNavigatorClusterRevision : public ModelCommand
 {
 public:
-    ReportTargetNavigatorClusterRevision() : ModelCommand("subscribe")
+    ReportTargetNavigatorClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41291,7 +41291,7 @@ public:
 class ReportTemperatureMeasurementMeasuredValue : public ModelCommand
 {
 public:
-    ReportTemperatureMeasurementMeasuredValue() : ModelCommand("subscribe")
+    ReportTemperatureMeasurementMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41360,7 +41360,7 @@ public:
 class ReportTemperatureMeasurementMinMeasuredValue : public ModelCommand
 {
 public:
-    ReportTemperatureMeasurementMinMeasuredValue() : ModelCommand("subscribe")
+    ReportTemperatureMeasurementMinMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41432,7 +41432,7 @@ public:
 class ReportTemperatureMeasurementMaxMeasuredValue : public ModelCommand
 {
 public:
-    ReportTemperatureMeasurementMaxMeasuredValue() : ModelCommand("subscribe")
+    ReportTemperatureMeasurementMaxMeasuredValue() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41504,7 +41504,7 @@ public:
 class ReportTemperatureMeasurementTolerance : public ModelCommand
 {
 public:
-    ReportTemperatureMeasurementTolerance() : ModelCommand("subscribe")
+    ReportTemperatureMeasurementTolerance() : ModelCommand("report")
     {
         AddArgument("attr-name", "tolerance");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41573,7 +41573,7 @@ public:
 class ReportTemperatureMeasurementAttributeList : public ModelCommand
 {
 public:
-    ReportTemperatureMeasurementAttributeList() : ModelCommand("subscribe")
+    ReportTemperatureMeasurementAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -41645,7 +41645,7 @@ public:
 class ReportTemperatureMeasurementClusterRevision : public ModelCommand
 {
 public:
-    ReportTemperatureMeasurementClusterRevision() : ModelCommand("subscribe")
+    ReportTemperatureMeasurementClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42244,7 +42244,7 @@ public:
 class ReportTestClusterTestEvent : public ModelCommand
 {
 public:
-    ReportTestClusterTestEvent() : ModelCommand("subscribe-event")
+    ReportTestClusterTestEvent() : ModelCommand("report-event")
     {
         AddArgument("event-name", "test-event");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42342,7 +42342,7 @@ private:
 class ReportTestClusterBoolean : public ModelCommand
 {
 public:
-    ReportTestClusterBoolean() : ModelCommand("subscribe")
+    ReportTestClusterBoolean() : ModelCommand("report")
     {
         AddArgument("attr-name", "boolean");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42437,7 +42437,7 @@ private:
 class ReportTestClusterBitmap8 : public ModelCommand
 {
 public:
-    ReportTestClusterBitmap8() : ModelCommand("subscribe")
+    ReportTestClusterBitmap8() : ModelCommand("report")
     {
         AddArgument("attr-name", "bitmap8");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42532,7 +42532,7 @@ private:
 class ReportTestClusterBitmap16 : public ModelCommand
 {
 public:
-    ReportTestClusterBitmap16() : ModelCommand("subscribe")
+    ReportTestClusterBitmap16() : ModelCommand("report")
     {
         AddArgument("attr-name", "bitmap16");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42627,7 +42627,7 @@ private:
 class ReportTestClusterBitmap32 : public ModelCommand
 {
 public:
-    ReportTestClusterBitmap32() : ModelCommand("subscribe")
+    ReportTestClusterBitmap32() : ModelCommand("report")
     {
         AddArgument("attr-name", "bitmap32");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42722,7 +42722,7 @@ private:
 class ReportTestClusterBitmap64 : public ModelCommand
 {
 public:
-    ReportTestClusterBitmap64() : ModelCommand("subscribe")
+    ReportTestClusterBitmap64() : ModelCommand("report")
     {
         AddArgument("attr-name", "bitmap64");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42817,7 +42817,7 @@ private:
 class ReportTestClusterInt8u : public ModelCommand
 {
 public:
-    ReportTestClusterInt8u() : ModelCommand("subscribe")
+    ReportTestClusterInt8u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int8u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -42912,7 +42912,7 @@ private:
 class ReportTestClusterInt16u : public ModelCommand
 {
 public:
-    ReportTestClusterInt16u() : ModelCommand("subscribe")
+    ReportTestClusterInt16u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int16u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43007,7 +43007,7 @@ private:
 class ReportTestClusterInt24u : public ModelCommand
 {
 public:
-    ReportTestClusterInt24u() : ModelCommand("subscribe")
+    ReportTestClusterInt24u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int24u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43102,7 +43102,7 @@ private:
 class ReportTestClusterInt32u : public ModelCommand
 {
 public:
-    ReportTestClusterInt32u() : ModelCommand("subscribe")
+    ReportTestClusterInt32u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int32u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43197,7 +43197,7 @@ private:
 class ReportTestClusterInt40u : public ModelCommand
 {
 public:
-    ReportTestClusterInt40u() : ModelCommand("subscribe")
+    ReportTestClusterInt40u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int40u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43292,7 +43292,7 @@ private:
 class ReportTestClusterInt48u : public ModelCommand
 {
 public:
-    ReportTestClusterInt48u() : ModelCommand("subscribe")
+    ReportTestClusterInt48u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int48u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43387,7 +43387,7 @@ private:
 class ReportTestClusterInt56u : public ModelCommand
 {
 public:
-    ReportTestClusterInt56u() : ModelCommand("subscribe")
+    ReportTestClusterInt56u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int56u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43482,7 +43482,7 @@ private:
 class ReportTestClusterInt64u : public ModelCommand
 {
 public:
-    ReportTestClusterInt64u() : ModelCommand("subscribe")
+    ReportTestClusterInt64u() : ModelCommand("report")
     {
         AddArgument("attr-name", "int64u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43577,7 +43577,7 @@ private:
 class ReportTestClusterInt8s : public ModelCommand
 {
 public:
-    ReportTestClusterInt8s() : ModelCommand("subscribe")
+    ReportTestClusterInt8s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int8s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43672,7 +43672,7 @@ private:
 class ReportTestClusterInt16s : public ModelCommand
 {
 public:
-    ReportTestClusterInt16s() : ModelCommand("subscribe")
+    ReportTestClusterInt16s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int16s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43767,7 +43767,7 @@ private:
 class ReportTestClusterInt24s : public ModelCommand
 {
 public:
-    ReportTestClusterInt24s() : ModelCommand("subscribe")
+    ReportTestClusterInt24s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int24s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43862,7 +43862,7 @@ private:
 class ReportTestClusterInt32s : public ModelCommand
 {
 public:
-    ReportTestClusterInt32s() : ModelCommand("subscribe")
+    ReportTestClusterInt32s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int32s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -43957,7 +43957,7 @@ private:
 class ReportTestClusterInt40s : public ModelCommand
 {
 public:
-    ReportTestClusterInt40s() : ModelCommand("subscribe")
+    ReportTestClusterInt40s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int40s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44052,7 +44052,7 @@ private:
 class ReportTestClusterInt48s : public ModelCommand
 {
 public:
-    ReportTestClusterInt48s() : ModelCommand("subscribe")
+    ReportTestClusterInt48s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int48s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44147,7 +44147,7 @@ private:
 class ReportTestClusterInt56s : public ModelCommand
 {
 public:
-    ReportTestClusterInt56s() : ModelCommand("subscribe")
+    ReportTestClusterInt56s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int56s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44242,7 +44242,7 @@ private:
 class ReportTestClusterInt64s : public ModelCommand
 {
 public:
-    ReportTestClusterInt64s() : ModelCommand("subscribe")
+    ReportTestClusterInt64s() : ModelCommand("report")
     {
         AddArgument("attr-name", "int64s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44337,7 +44337,7 @@ private:
 class ReportTestClusterEnum8 : public ModelCommand
 {
 public:
-    ReportTestClusterEnum8() : ModelCommand("subscribe")
+    ReportTestClusterEnum8() : ModelCommand("report")
     {
         AddArgument("attr-name", "enum8");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44432,7 +44432,7 @@ private:
 class ReportTestClusterEnum16 : public ModelCommand
 {
 public:
-    ReportTestClusterEnum16() : ModelCommand("subscribe")
+    ReportTestClusterEnum16() : ModelCommand("report")
     {
         AddArgument("attr-name", "enum16");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44527,7 +44527,7 @@ private:
 class ReportTestClusterFloatSingle : public ModelCommand
 {
 public:
-    ReportTestClusterFloatSingle() : ModelCommand("subscribe")
+    ReportTestClusterFloatSingle() : ModelCommand("report")
     {
         AddArgument("attr-name", "float-single");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44622,7 +44622,7 @@ private:
 class ReportTestClusterFloatDouble : public ModelCommand
 {
 public:
-    ReportTestClusterFloatDouble() : ModelCommand("subscribe")
+    ReportTestClusterFloatDouble() : ModelCommand("report")
     {
         AddArgument("attr-name", "float-double");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44717,7 +44717,7 @@ private:
 class ReportTestClusterOctetString : public ModelCommand
 {
 public:
-    ReportTestClusterOctetString() : ModelCommand("subscribe")
+    ReportTestClusterOctetString() : ModelCommand("report")
     {
         AddArgument("attr-name", "octet-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44786,7 +44786,7 @@ public:
 class ReportTestClusterListInt8u : public ModelCommand
 {
 public:
-    ReportTestClusterListInt8u() : ModelCommand("subscribe")
+    ReportTestClusterListInt8u() : ModelCommand("report")
     {
         AddArgument("attr-name", "list-int8u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44858,7 +44858,7 @@ public:
 class ReportTestClusterListOctetString : public ModelCommand
 {
 public:
-    ReportTestClusterListOctetString() : ModelCommand("subscribe")
+    ReportTestClusterListOctetString() : ModelCommand("report")
     {
         AddArgument("attr-name", "list-octet-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -44933,7 +44933,7 @@ public:
 class ReportTestClusterListStructOctetString : public ModelCommand
 {
 public:
-    ReportTestClusterListStructOctetString() : ModelCommand("subscribe")
+    ReportTestClusterListStructOctetString() : ModelCommand("report")
     {
         AddArgument("attr-name", "list-struct-octet-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45034,7 +45034,7 @@ private:
 class ReportTestClusterLongOctetString : public ModelCommand
 {
 public:
-    ReportTestClusterLongOctetString() : ModelCommand("subscribe")
+    ReportTestClusterLongOctetString() : ModelCommand("report")
     {
         AddArgument("attr-name", "long-octet-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45129,7 +45129,7 @@ private:
 class ReportTestClusterCharString : public ModelCommand
 {
 public:
-    ReportTestClusterCharString() : ModelCommand("subscribe")
+    ReportTestClusterCharString() : ModelCommand("report")
     {
         AddArgument("attr-name", "char-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45224,7 +45224,7 @@ private:
 class ReportTestClusterLongCharString : public ModelCommand
 {
 public:
-    ReportTestClusterLongCharString() : ModelCommand("subscribe")
+    ReportTestClusterLongCharString() : ModelCommand("report")
     {
         AddArgument("attr-name", "long-char-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45319,7 +45319,7 @@ private:
 class ReportTestClusterEpochUs : public ModelCommand
 {
 public:
-    ReportTestClusterEpochUs() : ModelCommand("subscribe")
+    ReportTestClusterEpochUs() : ModelCommand("report")
     {
         AddArgument("attr-name", "epoch-us");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45414,7 +45414,7 @@ private:
 class ReportTestClusterEpochS : public ModelCommand
 {
 public:
-    ReportTestClusterEpochS() : ModelCommand("subscribe")
+    ReportTestClusterEpochS() : ModelCommand("report")
     {
         AddArgument("attr-name", "epoch-s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45509,7 +45509,7 @@ private:
 class ReportTestClusterVendorId : public ModelCommand
 {
 public:
-    ReportTestClusterVendorId() : ModelCommand("subscribe")
+    ReportTestClusterVendorId() : ModelCommand("report")
     {
         AddArgument("attr-name", "vendor-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45581,7 +45581,7 @@ public:
 class ReportTestClusterListNullablesAndOptionalsStruct : public ModelCommand
 {
 public:
-    ReportTestClusterListNullablesAndOptionalsStruct() : ModelCommand("subscribe")
+    ReportTestClusterListNullablesAndOptionalsStruct() : ModelCommand("report")
     {
         AddArgument("attr-name", "list-nullables-and-optionals-struct");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45681,7 +45681,7 @@ private:
 class ReportTestClusterEnumAttr : public ModelCommand
 {
 public:
-    ReportTestClusterEnumAttr() : ModelCommand("subscribe")
+    ReportTestClusterEnumAttr() : ModelCommand("report")
     {
         AddArgument("attr-name", "enum-attr");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45779,7 +45779,7 @@ private:
 class ReportTestClusterRangeRestrictedInt8u : public ModelCommand
 {
 public:
-    ReportTestClusterRangeRestrictedInt8u() : ModelCommand("subscribe")
+    ReportTestClusterRangeRestrictedInt8u() : ModelCommand("report")
     {
         AddArgument("attr-name", "range-restricted-int8u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45874,7 +45874,7 @@ private:
 class ReportTestClusterRangeRestrictedInt8s : public ModelCommand
 {
 public:
-    ReportTestClusterRangeRestrictedInt8s() : ModelCommand("subscribe")
+    ReportTestClusterRangeRestrictedInt8s() : ModelCommand("report")
     {
         AddArgument("attr-name", "range-restricted-int8s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -45969,7 +45969,7 @@ private:
 class ReportTestClusterRangeRestrictedInt16u : public ModelCommand
 {
 public:
-    ReportTestClusterRangeRestrictedInt16u() : ModelCommand("subscribe")
+    ReportTestClusterRangeRestrictedInt16u() : ModelCommand("report")
     {
         AddArgument("attr-name", "range-restricted-int16u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46064,7 +46064,7 @@ private:
 class ReportTestClusterRangeRestrictedInt16s : public ModelCommand
 {
 public:
-    ReportTestClusterRangeRestrictedInt16s() : ModelCommand("subscribe")
+    ReportTestClusterRangeRestrictedInt16s() : ModelCommand("report")
     {
         AddArgument("attr-name", "range-restricted-int16s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46133,7 +46133,7 @@ public:
 class ReportTestClusterListLongOctetString : public ModelCommand
 {
 public:
-    ReportTestClusterListLongOctetString() : ModelCommand("subscribe")
+    ReportTestClusterListLongOctetString() : ModelCommand("report")
     {
         AddArgument("attr-name", "list-long-octet-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46231,7 +46231,7 @@ private:
 class ReportTestClusterTimedWriteBoolean : public ModelCommand
 {
 public:
-    ReportTestClusterTimedWriteBoolean() : ModelCommand("subscribe")
+    ReportTestClusterTimedWriteBoolean() : ModelCommand("report")
     {
         AddArgument("attr-name", "timed-write-boolean");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46516,7 +46516,7 @@ private:
 class ReportTestClusterUnsupported : public ModelCommand
 {
 public:
-    ReportTestClusterUnsupported() : ModelCommand("subscribe")
+    ReportTestClusterUnsupported() : ModelCommand("report")
     {
         AddArgument("attr-name", "unsupported");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46611,7 +46611,7 @@ private:
 class ReportTestClusterNullableBoolean : public ModelCommand
 {
 public:
-    ReportTestClusterNullableBoolean() : ModelCommand("subscribe")
+    ReportTestClusterNullableBoolean() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-boolean");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46709,7 +46709,7 @@ private:
 class ReportTestClusterNullableBitmap8 : public ModelCommand
 {
 public:
-    ReportTestClusterNullableBitmap8() : ModelCommand("subscribe")
+    ReportTestClusterNullableBitmap8() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-bitmap8");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46807,7 +46807,7 @@ private:
 class ReportTestClusterNullableBitmap16 : public ModelCommand
 {
 public:
-    ReportTestClusterNullableBitmap16() : ModelCommand("subscribe")
+    ReportTestClusterNullableBitmap16() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-bitmap16");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46905,7 +46905,7 @@ private:
 class ReportTestClusterNullableBitmap32 : public ModelCommand
 {
 public:
-    ReportTestClusterNullableBitmap32() : ModelCommand("subscribe")
+    ReportTestClusterNullableBitmap32() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-bitmap32");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47003,7 +47003,7 @@ private:
 class ReportTestClusterNullableBitmap64 : public ModelCommand
 {
 public:
-    ReportTestClusterNullableBitmap64() : ModelCommand("subscribe")
+    ReportTestClusterNullableBitmap64() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-bitmap64");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47101,7 +47101,7 @@ private:
 class ReportTestClusterNullableInt8u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt8u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt8u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int8u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47199,7 +47199,7 @@ private:
 class ReportTestClusterNullableInt16u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt16u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt16u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int16u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47297,7 +47297,7 @@ private:
 class ReportTestClusterNullableInt24u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt24u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt24u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int24u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47395,7 +47395,7 @@ private:
 class ReportTestClusterNullableInt32u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt32u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt32u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int32u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47493,7 +47493,7 @@ private:
 class ReportTestClusterNullableInt40u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt40u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt40u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int40u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47591,7 +47591,7 @@ private:
 class ReportTestClusterNullableInt48u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt48u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt48u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int48u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47689,7 +47689,7 @@ private:
 class ReportTestClusterNullableInt56u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt56u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt56u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int56u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47787,7 +47787,7 @@ private:
 class ReportTestClusterNullableInt64u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt64u() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt64u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int64u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47885,7 +47885,7 @@ private:
 class ReportTestClusterNullableInt8s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt8s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt8s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int8s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -47983,7 +47983,7 @@ private:
 class ReportTestClusterNullableInt16s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt16s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt16s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int16s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48081,7 +48081,7 @@ private:
 class ReportTestClusterNullableInt24s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt24s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt24s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int24s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48179,7 +48179,7 @@ private:
 class ReportTestClusterNullableInt32s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt32s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt32s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int32s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48277,7 +48277,7 @@ private:
 class ReportTestClusterNullableInt40s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt40s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt40s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int40s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48375,7 +48375,7 @@ private:
 class ReportTestClusterNullableInt48s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt48s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt48s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int48s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48473,7 +48473,7 @@ private:
 class ReportTestClusterNullableInt56s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt56s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt56s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int56s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48571,7 +48571,7 @@ private:
 class ReportTestClusterNullableInt64s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableInt64s() : ModelCommand("subscribe")
+    ReportTestClusterNullableInt64s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-int64s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48669,7 +48669,7 @@ private:
 class ReportTestClusterNullableEnum8 : public ModelCommand
 {
 public:
-    ReportTestClusterNullableEnum8() : ModelCommand("subscribe")
+    ReportTestClusterNullableEnum8() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-enum8");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48767,7 +48767,7 @@ private:
 class ReportTestClusterNullableEnum16 : public ModelCommand
 {
 public:
-    ReportTestClusterNullableEnum16() : ModelCommand("subscribe")
+    ReportTestClusterNullableEnum16() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-enum16");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48865,7 +48865,7 @@ private:
 class ReportTestClusterNullableFloatSingle : public ModelCommand
 {
 public:
-    ReportTestClusterNullableFloatSingle() : ModelCommand("subscribe")
+    ReportTestClusterNullableFloatSingle() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-float-single");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -48963,7 +48963,7 @@ private:
 class ReportTestClusterNullableFloatDouble : public ModelCommand
 {
 public:
-    ReportTestClusterNullableFloatDouble() : ModelCommand("subscribe")
+    ReportTestClusterNullableFloatDouble() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-float-double");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49061,7 +49061,7 @@ private:
 class ReportTestClusterNullableOctetString : public ModelCommand
 {
 public:
-    ReportTestClusterNullableOctetString() : ModelCommand("subscribe")
+    ReportTestClusterNullableOctetString() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-octet-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49159,7 +49159,7 @@ private:
 class ReportTestClusterNullableCharString : public ModelCommand
 {
 public:
-    ReportTestClusterNullableCharString() : ModelCommand("subscribe")
+    ReportTestClusterNullableCharString() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-char-string");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49258,7 +49258,7 @@ private:
 class ReportTestClusterNullableEnumAttr : public ModelCommand
 {
 public:
-    ReportTestClusterNullableEnumAttr() : ModelCommand("subscribe")
+    ReportTestClusterNullableEnumAttr() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-enum-attr");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49357,7 +49357,7 @@ private:
 class ReportTestClusterNullableRangeRestrictedInt8u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableRangeRestrictedInt8u() : ModelCommand("subscribe")
+    ReportTestClusterNullableRangeRestrictedInt8u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-range-restricted-int8u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49455,7 +49455,7 @@ private:
 class ReportTestClusterNullableRangeRestrictedInt8s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableRangeRestrictedInt8s() : ModelCommand("subscribe")
+    ReportTestClusterNullableRangeRestrictedInt8s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-range-restricted-int8s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49553,7 +49553,7 @@ private:
 class ReportTestClusterNullableRangeRestrictedInt16u : public ModelCommand
 {
 public:
-    ReportTestClusterNullableRangeRestrictedInt16u() : ModelCommand("subscribe")
+    ReportTestClusterNullableRangeRestrictedInt16u() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-range-restricted-int16u");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49651,7 +49651,7 @@ private:
 class ReportTestClusterNullableRangeRestrictedInt16s : public ModelCommand
 {
 public:
-    ReportTestClusterNullableRangeRestrictedInt16s() : ModelCommand("subscribe")
+    ReportTestClusterNullableRangeRestrictedInt16s() : ModelCommand("report")
     {
         AddArgument("attr-name", "nullable-range-restricted-int16s");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49723,7 +49723,7 @@ public:
 class ReportTestClusterAttributeList : public ModelCommand
 {
 public:
-    ReportTestClusterAttributeList() : ModelCommand("subscribe")
+    ReportTestClusterAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -49795,7 +49795,7 @@ public:
 class ReportTestClusterClusterRevision : public ModelCommand
 {
 public:
-    ReportTestClusterClusterRevision() : ModelCommand("subscribe")
+    ReportTestClusterClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50023,7 +50023,7 @@ public:
 class ReportThermostatLocalTemperature : public ModelCommand
 {
 public:
-    ReportThermostatLocalTemperature() : ModelCommand("subscribe")
+    ReportThermostatLocalTemperature() : ModelCommand("report")
     {
         AddArgument("attr-name", "local-temperature");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50092,7 +50092,7 @@ public:
 class ReportThermostatAbsMinHeatSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatAbsMinHeatSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatAbsMinHeatSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "abs-min-heat-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50161,7 +50161,7 @@ public:
 class ReportThermostatAbsMaxHeatSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatAbsMaxHeatSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatAbsMaxHeatSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "abs-max-heat-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50230,7 +50230,7 @@ public:
 class ReportThermostatAbsMinCoolSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatAbsMinCoolSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatAbsMinCoolSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "abs-min-cool-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50299,7 +50299,7 @@ public:
 class ReportThermostatAbsMaxCoolSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatAbsMaxCoolSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatAbsMaxCoolSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "abs-max-cool-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50394,7 +50394,7 @@ private:
 class ReportThermostatOccupiedCoolingSetpoint : public ModelCommand
 {
 public:
-    ReportThermostatOccupiedCoolingSetpoint() : ModelCommand("subscribe")
+    ReportThermostatOccupiedCoolingSetpoint() : ModelCommand("report")
     {
         AddArgument("attr-name", "occupied-cooling-setpoint");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50489,7 +50489,7 @@ private:
 class ReportThermostatOccupiedHeatingSetpoint : public ModelCommand
 {
 public:
-    ReportThermostatOccupiedHeatingSetpoint() : ModelCommand("subscribe")
+    ReportThermostatOccupiedHeatingSetpoint() : ModelCommand("report")
     {
         AddArgument("attr-name", "occupied-heating-setpoint");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50584,7 +50584,7 @@ private:
 class ReportThermostatMinHeatSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatMinHeatSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatMinHeatSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-heat-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50679,7 +50679,7 @@ private:
 class ReportThermostatMaxHeatSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatMaxHeatSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatMaxHeatSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-heat-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50774,7 +50774,7 @@ private:
 class ReportThermostatMinCoolSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatMinCoolSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatMinCoolSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-cool-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50869,7 +50869,7 @@ private:
 class ReportThermostatMaxCoolSetpointLimit : public ModelCommand
 {
 public:
-    ReportThermostatMaxCoolSetpointLimit() : ModelCommand("subscribe")
+    ReportThermostatMaxCoolSetpointLimit() : ModelCommand("report")
     {
         AddArgument("attr-name", "max-cool-setpoint-limit");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -50964,7 +50964,7 @@ private:
 class ReportThermostatMinSetpointDeadBand : public ModelCommand
 {
 public:
-    ReportThermostatMinSetpointDeadBand() : ModelCommand("subscribe")
+    ReportThermostatMinSetpointDeadBand() : ModelCommand("report")
     {
         AddArgument("attr-name", "min-setpoint-dead-band");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51059,7 +51059,7 @@ private:
 class ReportThermostatControlSequenceOfOperation : public ModelCommand
 {
 public:
-    ReportThermostatControlSequenceOfOperation() : ModelCommand("subscribe")
+    ReportThermostatControlSequenceOfOperation() : ModelCommand("report")
     {
         AddArgument("attr-name", "control-sequence-of-operation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51154,7 +51154,7 @@ private:
 class ReportThermostatSystemMode : public ModelCommand
 {
 public:
-    ReportThermostatSystemMode() : ModelCommand("subscribe")
+    ReportThermostatSystemMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "system-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51223,7 +51223,7 @@ public:
 class ReportThermostatStartOfWeek : public ModelCommand
 {
 public:
-    ReportThermostatStartOfWeek() : ModelCommand("subscribe")
+    ReportThermostatStartOfWeek() : ModelCommand("report")
     {
         AddArgument("attr-name", "start-of-week");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51292,7 +51292,7 @@ public:
 class ReportThermostatNumberOfWeeklyTransitions : public ModelCommand
 {
 public:
-    ReportThermostatNumberOfWeeklyTransitions() : ModelCommand("subscribe")
+    ReportThermostatNumberOfWeeklyTransitions() : ModelCommand("report")
     {
         AddArgument("attr-name", "number-of-weekly-transitions");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51361,7 +51361,7 @@ public:
 class ReportThermostatNumberOfDailyTransitions : public ModelCommand
 {
 public:
-    ReportThermostatNumberOfDailyTransitions() : ModelCommand("subscribe")
+    ReportThermostatNumberOfDailyTransitions() : ModelCommand("report")
     {
         AddArgument("attr-name", "number-of-daily-transitions");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51430,7 +51430,7 @@ public:
 class ReportThermostatAttributeList : public ModelCommand
 {
 public:
-    ReportThermostatAttributeList() : ModelCommand("subscribe")
+    ReportThermostatAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51502,7 +51502,7 @@ public:
 class ReportThermostatFeatureMap : public ModelCommand
 {
 public:
-    ReportThermostatFeatureMap() : ModelCommand("subscribe")
+    ReportThermostatFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51571,7 +51571,7 @@ public:
 class ReportThermostatClusterRevision : public ModelCommand
 {
 public:
-    ReportThermostatClusterRevision() : ModelCommand("subscribe")
+    ReportThermostatClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51683,7 +51683,7 @@ private:
 class ReportThermostatUserInterfaceConfigurationTemperatureDisplayMode : public ModelCommand
 {
 public:
-    ReportThermostatUserInterfaceConfigurationTemperatureDisplayMode() : ModelCommand("subscribe")
+    ReportThermostatUserInterfaceConfigurationTemperatureDisplayMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "temperature-display-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51784,7 +51784,7 @@ private:
 class ReportThermostatUserInterfaceConfigurationKeypadLockout : public ModelCommand
 {
 public:
-    ReportThermostatUserInterfaceConfigurationKeypadLockout() : ModelCommand("subscribe")
+    ReportThermostatUserInterfaceConfigurationKeypadLockout() : ModelCommand("report")
     {
         AddArgument("attr-name", "keypad-lockout");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51886,7 +51886,7 @@ private:
 class ReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : public ModelCommand
 {
 public:
-    ReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() : ModelCommand("subscribe")
+    ReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() : ModelCommand("report")
     {
         AddArgument("attr-name", "schedule-programming-visibility");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -51960,7 +51960,7 @@ public:
 class ReportThermostatUserInterfaceConfigurationAttributeList : public ModelCommand
 {
 public:
-    ReportThermostatUserInterfaceConfigurationAttributeList() : ModelCommand("subscribe")
+    ReportThermostatUserInterfaceConfigurationAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52034,7 +52034,7 @@ public:
 class ReportThermostatUserInterfaceConfigurationClusterRevision : public ModelCommand
 {
 public:
-    ReportThermostatUserInterfaceConfigurationClusterRevision() : ModelCommand("subscribe")
+    ReportThermostatUserInterfaceConfigurationClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52206,7 +52206,7 @@ public:
 class ReportThreadNetworkDiagnosticsConnectionStatus : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsConnectionStatus() : ModelCommand("subscribe-event")
+    ReportThreadNetworkDiagnosticsConnectionStatus() : ModelCommand("report-event")
     {
         AddArgument("event-name", "connection-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52279,7 +52279,7 @@ public:
 class ReportThreadNetworkDiagnosticsChannel : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsChannel() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsChannel() : ModelCommand("report")
     {
         AddArgument("attr-name", "channel");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52348,7 +52348,7 @@ public:
 class ReportThreadNetworkDiagnosticsRoutingRole : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRoutingRole() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRoutingRole() : ModelCommand("report")
     {
         AddArgument("attr-name", "routing-role");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52417,7 +52417,7 @@ public:
 class ReportThreadNetworkDiagnosticsNetworkName : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsNetworkName() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsNetworkName() : ModelCommand("report")
     {
         AddArgument("attr-name", "network-name");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52489,7 +52489,7 @@ public:
 class ReportThreadNetworkDiagnosticsPanId : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsPanId() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsPanId() : ModelCommand("report")
     {
         AddArgument("attr-name", "pan-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52558,7 +52558,7 @@ public:
 class ReportThreadNetworkDiagnosticsExtendedPanId : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsExtendedPanId() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsExtendedPanId() : ModelCommand("report")
     {
         AddArgument("attr-name", "extended-pan-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52630,7 +52630,7 @@ public:
 class ReportThreadNetworkDiagnosticsMeshLocalPrefix : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsMeshLocalPrefix() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsMeshLocalPrefix() : ModelCommand("report")
     {
         AddArgument("attr-name", "mesh-local-prefix");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52702,7 +52702,7 @@ public:
 class ReportThreadNetworkDiagnosticsOverrunCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsOverrunCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsOverrunCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "overrun-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52777,7 +52777,7 @@ public:
 class ReportThreadNetworkDiagnosticsNeighborTableList : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsNeighborTableList() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsNeighborTableList() : ModelCommand("report")
     {
         AddArgument("attr-name", "neighbor-table-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52853,7 +52853,7 @@ public:
 class ReportThreadNetworkDiagnosticsRouteTableList : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRouteTableList() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRouteTableList() : ModelCommand("report")
     {
         AddArgument("attr-name", "route-table-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52927,7 +52927,7 @@ public:
 class ReportThreadNetworkDiagnosticsPartitionId : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsPartitionId() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsPartitionId() : ModelCommand("report")
     {
         AddArgument("attr-name", "partition-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -52996,7 +52996,7 @@ public:
 class ReportThreadNetworkDiagnosticsWeighting : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsWeighting() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsWeighting() : ModelCommand("report")
     {
         AddArgument("attr-name", "weighting");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53065,7 +53065,7 @@ public:
 class ReportThreadNetworkDiagnosticsDataVersion : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsDataVersion() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsDataVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "data-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53134,7 +53134,7 @@ public:
 class ReportThreadNetworkDiagnosticsStableDataVersion : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsStableDataVersion() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsStableDataVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "stable-data-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53206,7 +53206,7 @@ public:
 class ReportThreadNetworkDiagnosticsLeaderRouterId : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsLeaderRouterId() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsLeaderRouterId() : ModelCommand("report")
     {
         AddArgument("attr-name", "leader-router-id");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53278,7 +53278,7 @@ public:
 class ReportThreadNetworkDiagnosticsDetachedRoleCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsDetachedRoleCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsDetachedRoleCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "detached-role-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53350,7 +53350,7 @@ public:
 class ReportThreadNetworkDiagnosticsChildRoleCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsChildRoleCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsChildRoleCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "child-role-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53422,7 +53422,7 @@ public:
 class ReportThreadNetworkDiagnosticsRouterRoleCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRouterRoleCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRouterRoleCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "router-role-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53494,7 +53494,7 @@ public:
 class ReportThreadNetworkDiagnosticsLeaderRoleCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsLeaderRoleCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsLeaderRoleCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "leader-role-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53566,7 +53566,7 @@ public:
 class ReportThreadNetworkDiagnosticsAttachAttemptCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsAttachAttemptCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsAttachAttemptCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "attach-attempt-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53638,7 +53638,7 @@ public:
 class ReportThreadNetworkDiagnosticsPartitionIdChangeCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsPartitionIdChangeCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsPartitionIdChangeCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "partition-id-change-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53712,7 +53712,7 @@ public:
 class ReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "better-partition-attach-attempt-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53785,7 +53785,7 @@ public:
 class ReportThreadNetworkDiagnosticsParentChangeCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsParentChangeCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsParentChangeCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "parent-change-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53857,7 +53857,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxTotalCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxTotalCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxTotalCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-total-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -53929,7 +53929,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxUnicastCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxUnicastCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxUnicastCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-unicast-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54001,7 +54001,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxBroadcastCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxBroadcastCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxBroadcastCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-broadcast-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54073,7 +54073,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxAckRequestedCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxAckRequestedCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxAckRequestedCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-ack-requested-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54145,7 +54145,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxAckedCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxAckedCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxAckedCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-acked-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54217,7 +54217,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxNoAckRequestedCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxNoAckRequestedCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxNoAckRequestedCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-no-ack-requested-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54290,7 +54290,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxDataCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxDataCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxDataCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-data-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54359,7 +54359,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxDataPollCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxDataPollCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxDataPollCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-data-poll-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54431,7 +54431,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxBeaconCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxBeaconCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxBeaconCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-beacon-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54503,7 +54503,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxBeaconRequestCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxBeaconRequestCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxBeaconRequestCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-beacon-request-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54576,7 +54576,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxOtherCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxOtherCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxOtherCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-other-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54648,7 +54648,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxRetryCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxRetryCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxRetryCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-retry-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54721,7 +54721,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-direct-max-retry-expiry-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54795,7 +54795,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-indirect-max-retry-expiry-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54868,7 +54868,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxErrCcaCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxErrCcaCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxErrCcaCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-err-cca-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -54940,7 +54940,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxErrAbortCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxErrAbortCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxErrAbortCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-err-abort-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55012,7 +55012,7 @@ public:
 class ReportThreadNetworkDiagnosticsTxErrBusyChannelCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsTxErrBusyChannelCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsTxErrBusyChannelCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "tx-err-busy-channel-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55085,7 +55085,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxTotalCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxTotalCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxTotalCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-total-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55157,7 +55157,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxUnicastCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxUnicastCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxUnicastCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-unicast-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55229,7 +55229,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxBroadcastCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxBroadcastCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxBroadcastCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-broadcast-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55301,7 +55301,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxDataCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxDataCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxDataCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-data-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55370,7 +55370,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxDataPollCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxDataPollCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxDataPollCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-data-poll-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55442,7 +55442,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxBeaconCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxBeaconCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxBeaconCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-beacon-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55514,7 +55514,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxBeaconRequestCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxBeaconRequestCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxBeaconRequestCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-beacon-request-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55587,7 +55587,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxOtherCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxOtherCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxOtherCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-other-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55659,7 +55659,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxAddressFilteredCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxAddressFilteredCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxAddressFilteredCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-address-filtered-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55732,7 +55732,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxDestAddrFilteredCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxDestAddrFilteredCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxDestAddrFilteredCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-dest-addr-filtered-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55805,7 +55805,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxDuplicatedCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxDuplicatedCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxDuplicatedCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-duplicated-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55877,7 +55877,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxErrNoFrameCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxErrNoFrameCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxErrNoFrameCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-err-no-frame-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -55950,7 +55950,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxErrUnknownNeighborCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxErrUnknownNeighborCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxErrUnknownNeighborCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-err-unknown-neighbor-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56023,7 +56023,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-err-invalid-src-addr-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56096,7 +56096,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxErrSecCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxErrSecCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxErrSecCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-err-sec-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56168,7 +56168,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxErrFcsCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxErrFcsCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxErrFcsCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-err-fcs-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56240,7 +56240,7 @@ public:
 class ReportThreadNetworkDiagnosticsRxErrOtherCount : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsRxErrOtherCount() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsRxErrOtherCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "rx-err-other-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56312,7 +56312,7 @@ public:
 class ReportThreadNetworkDiagnosticsActiveTimestamp : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsActiveTimestamp() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsActiveTimestamp() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-timestamp");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56384,7 +56384,7 @@ public:
 class ReportThreadNetworkDiagnosticsPendingTimestamp : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsPendingTimestamp() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsPendingTimestamp() : ModelCommand("report")
     {
         AddArgument("attr-name", "pending-timestamp");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56456,7 +56456,7 @@ public:
 class ReportThreadNetworkDiagnosticsDelay : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsDelay() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsDelay() : ModelCommand("report")
     {
         AddArgument("attr-name", "delay");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56528,7 +56528,7 @@ public:
 class ReportThreadNetworkDiagnosticsSecurityPolicy : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsSecurityPolicy() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsSecurityPolicy() : ModelCommand("report")
     {
         AddArgument("attr-name", "security-policy");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56602,7 +56602,7 @@ public:
 class ReportThreadNetworkDiagnosticsChannelMask : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsChannelMask() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsChannelMask() : ModelCommand("report")
     {
         AddArgument("attr-name", "channel-mask");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56678,7 +56678,7 @@ public:
 class ReportThreadNetworkDiagnosticsOperationalDatasetComponents : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsOperationalDatasetComponents() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsOperationalDatasetComponents() : ModelCommand("report")
     {
         AddArgument("attr-name", "operational-dataset-components");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56756,7 +56756,7 @@ public:
 class ReportThreadNetworkDiagnosticsActiveNetworkFaultsList : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsActiveNetworkFaultsList() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsActiveNetworkFaultsList() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-network-faults-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56831,7 +56831,7 @@ public:
 class ReportThreadNetworkDiagnosticsAttributeList : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsAttributeList() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56903,7 +56903,7 @@ public:
 class ReportThreadNetworkDiagnosticsFeatureMap : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsFeatureMap() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -56972,7 +56972,7 @@ public:
 class ReportThreadNetworkDiagnosticsClusterRevision : public ModelCommand
 {
 public:
-    ReportThreadNetworkDiagnosticsClusterRevision() : ModelCommand("subscribe")
+    ReportThreadNetworkDiagnosticsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57084,7 +57084,7 @@ private:
 class ReportTimeFormatLocalizationHourFormat : public ModelCommand
 {
 public:
-    ReportTimeFormatLocalizationHourFormat() : ModelCommand("subscribe")
+    ReportTimeFormatLocalizationHourFormat() : ModelCommand("report")
     {
         AddArgument("attr-name", "hour-format");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57182,7 +57182,7 @@ private:
 class ReportTimeFormatLocalizationActiveCalendarType : public ModelCommand
 {
 public:
-    ReportTimeFormatLocalizationActiveCalendarType() : ModelCommand("subscribe")
+    ReportTimeFormatLocalizationActiveCalendarType() : ModelCommand("report")
     {
         AddArgument("attr-name", "active-calendar-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57256,7 +57256,7 @@ public:
 class ReportTimeFormatLocalizationSupportedCalendarTypes : public ModelCommand
 {
 public:
-    ReportTimeFormatLocalizationSupportedCalendarTypes() : ModelCommand("subscribe")
+    ReportTimeFormatLocalizationSupportedCalendarTypes() : ModelCommand("report")
     {
         AddArgument("attr-name", "supported-calendar-types");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57331,7 +57331,7 @@ public:
 class ReportTimeFormatLocalizationClusterRevision : public ModelCommand
 {
 public:
-    ReportTimeFormatLocalizationClusterRevision() : ModelCommand("subscribe")
+    ReportTimeFormatLocalizationClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57417,7 +57417,7 @@ public:
 class ReportUserLabelLabelList : public ModelCommand
 {
 public:
-    ReportUserLabelLabelList() : ModelCommand("subscribe")
+    ReportUserLabelLabelList() : ModelCommand("report")
     {
         AddArgument("attr-name", "label-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57491,7 +57491,7 @@ public:
 class ReportUserLabelClusterRevision : public ModelCommand
 {
 public:
-    ReportUserLabelClusterRevision() : ModelCommand("subscribe")
+    ReportUserLabelClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57573,7 +57573,7 @@ public:
 class ReportWakeOnLanWakeOnLanMacAddress : public ModelCommand
 {
 public:
-    ReportWakeOnLanWakeOnLanMacAddress() : ModelCommand("subscribe")
+    ReportWakeOnLanWakeOnLanMacAddress() : ModelCommand("report")
     {
         AddArgument("attr-name", "wake-on-lan-mac-address");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57642,7 +57642,7 @@ public:
 class ReportWakeOnLanAttributeList : public ModelCommand
 {
 public:
-    ReportWakeOnLanAttributeList() : ModelCommand("subscribe")
+    ReportWakeOnLanAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57714,7 +57714,7 @@ public:
 class ReportWakeOnLanClusterRevision : public ModelCommand
 {
 public:
-    ReportWakeOnLanClusterRevision() : ModelCommand("subscribe")
+    ReportWakeOnLanClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57834,7 +57834,7 @@ public:
 class ReportWiFiNetworkDiagnosticsDisconnection : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsDisconnection() : ModelCommand("subscribe-event")
+    ReportWiFiNetworkDiagnosticsDisconnection() : ModelCommand("report-event")
     {
         AddArgument("event-name", "disconnection");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57907,7 +57907,7 @@ public:
 class ReportWiFiNetworkDiagnosticsAssociationFailure : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsAssociationFailure() : ModelCommand("subscribe-event")
+    ReportWiFiNetworkDiagnosticsAssociationFailure() : ModelCommand("report-event")
     {
         AddArgument("event-name", "association-failure");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -57980,7 +57980,7 @@ public:
 class ReportWiFiNetworkDiagnosticsConnectionStatus : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsConnectionStatus() : ModelCommand("subscribe-event")
+    ReportWiFiNetworkDiagnosticsConnectionStatus() : ModelCommand("report-event")
     {
         AddArgument("event-name", "connection-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58053,7 +58053,7 @@ public:
 class ReportWiFiNetworkDiagnosticsBssid : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsBssid() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsBssid() : ModelCommand("report")
     {
         AddArgument("attr-name", "bssid");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58122,7 +58122,7 @@ public:
 class ReportWiFiNetworkDiagnosticsSecurityType : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsSecurityType() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsSecurityType() : ModelCommand("report")
     {
         AddArgument("attr-name", "security-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58191,7 +58191,7 @@ public:
 class ReportWiFiNetworkDiagnosticsWiFiVersion : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsWiFiVersion() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsWiFiVersion() : ModelCommand("report")
     {
         AddArgument("attr-name", "wi-fi-version");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58260,7 +58260,7 @@ public:
 class ReportWiFiNetworkDiagnosticsChannelNumber : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsChannelNumber() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsChannelNumber() : ModelCommand("report")
     {
         AddArgument("attr-name", "channel-number");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58329,7 +58329,7 @@ public:
 class ReportWiFiNetworkDiagnosticsRssi : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsRssi() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsRssi() : ModelCommand("report")
     {
         AddArgument("attr-name", "rssi");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58398,7 +58398,7 @@ public:
 class ReportWiFiNetworkDiagnosticsBeaconLostCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsBeaconLostCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsBeaconLostCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "beacon-lost-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58470,7 +58470,7 @@ public:
 class ReportWiFiNetworkDiagnosticsBeaconRxCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsBeaconRxCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsBeaconRxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "beacon-rx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58539,7 +58539,7 @@ public:
 class ReportWiFiNetworkDiagnosticsPacketMulticastRxCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsPacketMulticastRxCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsPacketMulticastRxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "packet-multicast-rx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58612,7 +58612,7 @@ public:
 class ReportWiFiNetworkDiagnosticsPacketMulticastTxCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsPacketMulticastTxCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsPacketMulticastTxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "packet-multicast-tx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58685,7 +58685,7 @@ public:
 class ReportWiFiNetworkDiagnosticsPacketUnicastRxCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsPacketUnicastRxCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsPacketUnicastRxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "packet-unicast-rx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58757,7 +58757,7 @@ public:
 class ReportWiFiNetworkDiagnosticsPacketUnicastTxCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsPacketUnicastTxCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsPacketUnicastTxCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "packet-unicast-tx-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58829,7 +58829,7 @@ public:
 class ReportWiFiNetworkDiagnosticsCurrentMaxRate : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsCurrentMaxRate() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsCurrentMaxRate() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-max-rate");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58901,7 +58901,7 @@ public:
 class ReportWiFiNetworkDiagnosticsOverrunCount : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsOverrunCount() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsOverrunCount() : ModelCommand("report")
     {
         AddArgument("attr-name", "overrun-count");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -58970,7 +58970,7 @@ public:
 class ReportWiFiNetworkDiagnosticsAttributeList : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsAttributeList() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59042,7 +59042,7 @@ public:
 class ReportWiFiNetworkDiagnosticsFeatureMap : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsFeatureMap() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59111,7 +59111,7 @@ public:
 class ReportWiFiNetworkDiagnosticsClusterRevision : public ModelCommand
 {
 public:
-    ReportWiFiNetworkDiagnosticsClusterRevision() : ModelCommand("subscribe")
+    ReportWiFiNetworkDiagnosticsClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59379,7 +59379,7 @@ public:
 class ReportWindowCoveringType : public ModelCommand
 {
 public:
-    ReportWindowCoveringType() : ModelCommand("subscribe")
+    ReportWindowCoveringType() : ModelCommand("report")
     {
         AddArgument("attr-name", "type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59448,7 +59448,7 @@ public:
 class ReportWindowCoveringCurrentPositionLift : public ModelCommand
 {
 public:
-    ReportWindowCoveringCurrentPositionLift() : ModelCommand("subscribe")
+    ReportWindowCoveringCurrentPositionLift() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position-lift");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59520,7 +59520,7 @@ public:
 class ReportWindowCoveringCurrentPositionTilt : public ModelCommand
 {
 public:
-    ReportWindowCoveringCurrentPositionTilt() : ModelCommand("subscribe")
+    ReportWindowCoveringCurrentPositionTilt() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position-tilt");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59592,7 +59592,7 @@ public:
 class ReportWindowCoveringConfigStatus : public ModelCommand
 {
 public:
-    ReportWindowCoveringConfigStatus() : ModelCommand("subscribe")
+    ReportWindowCoveringConfigStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "config-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59661,7 +59661,7 @@ public:
 class ReportWindowCoveringCurrentPositionLiftPercentage : public ModelCommand
 {
 public:
-    ReportWindowCoveringCurrentPositionLiftPercentage() : ModelCommand("subscribe")
+    ReportWindowCoveringCurrentPositionLiftPercentage() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position-lift-percentage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59733,7 +59733,7 @@ public:
 class ReportWindowCoveringCurrentPositionTiltPercentage : public ModelCommand
 {
 public:
-    ReportWindowCoveringCurrentPositionTiltPercentage() : ModelCommand("subscribe")
+    ReportWindowCoveringCurrentPositionTiltPercentage() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position-tilt-percentage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59805,7 +59805,7 @@ public:
 class ReportWindowCoveringOperationalStatus : public ModelCommand
 {
 public:
-    ReportWindowCoveringOperationalStatus() : ModelCommand("subscribe")
+    ReportWindowCoveringOperationalStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "operational-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59874,7 +59874,7 @@ public:
 class ReportWindowCoveringTargetPositionLiftPercent100ths : public ModelCommand
 {
 public:
-    ReportWindowCoveringTargetPositionLiftPercent100ths() : ModelCommand("subscribe")
+    ReportWindowCoveringTargetPositionLiftPercent100ths() : ModelCommand("report")
     {
         AddArgument("attr-name", "target-position-lift-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -59947,7 +59947,7 @@ public:
 class ReportWindowCoveringTargetPositionTiltPercent100ths : public ModelCommand
 {
 public:
-    ReportWindowCoveringTargetPositionTiltPercent100ths() : ModelCommand("subscribe")
+    ReportWindowCoveringTargetPositionTiltPercent100ths() : ModelCommand("report")
     {
         AddArgument("attr-name", "target-position-tilt-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60020,7 +60020,7 @@ public:
 class ReportWindowCoveringEndProductType : public ModelCommand
 {
 public:
-    ReportWindowCoveringEndProductType() : ModelCommand("subscribe")
+    ReportWindowCoveringEndProductType() : ModelCommand("report")
     {
         AddArgument("attr-name", "end-product-type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60089,7 +60089,7 @@ public:
 class ReportWindowCoveringCurrentPositionLiftPercent100ths : public ModelCommand
 {
 public:
-    ReportWindowCoveringCurrentPositionLiftPercent100ths() : ModelCommand("subscribe")
+    ReportWindowCoveringCurrentPositionLiftPercent100ths() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position-lift-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60162,7 +60162,7 @@ public:
 class ReportWindowCoveringCurrentPositionTiltPercent100ths : public ModelCommand
 {
 public:
-    ReportWindowCoveringCurrentPositionTiltPercent100ths() : ModelCommand("subscribe")
+    ReportWindowCoveringCurrentPositionTiltPercent100ths() : ModelCommand("report")
     {
         AddArgument("attr-name", "current-position-tilt-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60235,7 +60235,7 @@ public:
 class ReportWindowCoveringInstalledOpenLimitLift : public ModelCommand
 {
 public:
-    ReportWindowCoveringInstalledOpenLimitLift() : ModelCommand("subscribe")
+    ReportWindowCoveringInstalledOpenLimitLift() : ModelCommand("report")
     {
         AddArgument("attr-name", "installed-open-limit-lift");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60307,7 +60307,7 @@ public:
 class ReportWindowCoveringInstalledClosedLimitLift : public ModelCommand
 {
 public:
-    ReportWindowCoveringInstalledClosedLimitLift() : ModelCommand("subscribe")
+    ReportWindowCoveringInstalledClosedLimitLift() : ModelCommand("report")
     {
         AddArgument("attr-name", "installed-closed-limit-lift");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60379,7 +60379,7 @@ public:
 class ReportWindowCoveringInstalledOpenLimitTilt : public ModelCommand
 {
 public:
-    ReportWindowCoveringInstalledOpenLimitTilt() : ModelCommand("subscribe")
+    ReportWindowCoveringInstalledOpenLimitTilt() : ModelCommand("report")
     {
         AddArgument("attr-name", "installed-open-limit-tilt");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60451,7 +60451,7 @@ public:
 class ReportWindowCoveringInstalledClosedLimitTilt : public ModelCommand
 {
 public:
-    ReportWindowCoveringInstalledClosedLimitTilt() : ModelCommand("subscribe")
+    ReportWindowCoveringInstalledClosedLimitTilt() : ModelCommand("report")
     {
         AddArgument("attr-name", "installed-closed-limit-tilt");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60549,7 +60549,7 @@ private:
 class ReportWindowCoveringMode : public ModelCommand
 {
 public:
-    ReportWindowCoveringMode() : ModelCommand("subscribe")
+    ReportWindowCoveringMode() : ModelCommand("report")
     {
         AddArgument("attr-name", "mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60618,7 +60618,7 @@ public:
 class ReportWindowCoveringSafetyStatus : public ModelCommand
 {
 public:
-    ReportWindowCoveringSafetyStatus() : ModelCommand("subscribe")
+    ReportWindowCoveringSafetyStatus() : ModelCommand("report")
     {
         AddArgument("attr-name", "safety-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60687,7 +60687,7 @@ public:
 class ReportWindowCoveringAttributeList : public ModelCommand
 {
 public:
-    ReportWindowCoveringAttributeList() : ModelCommand("subscribe")
+    ReportWindowCoveringAttributeList() : ModelCommand("report")
     {
         AddArgument("attr-name", "attribute-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60759,7 +60759,7 @@ public:
 class ReportWindowCoveringFeatureMap : public ModelCommand
 {
 public:
-    ReportWindowCoveringFeatureMap() : ModelCommand("subscribe")
+    ReportWindowCoveringFeatureMap() : ModelCommand("report")
     {
         AddArgument("attr-name", "feature-map");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -60828,7 +60828,7 @@ public:
 class ReportWindowCoveringClusterRevision : public ModelCommand
 {
 public:
-    ReportWindowCoveringClusterRevision() : ModelCommand("subscribe")
+    ReportWindowCoveringClusterRevision() : ModelCommand("report")
     {
         AddArgument("attr-name", "cluster-revision");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
