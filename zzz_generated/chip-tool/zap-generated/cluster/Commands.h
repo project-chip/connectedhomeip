@@ -11195,11 +11195,1102 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * VendorName                                                        | 0x0001 |
+| * VendorID                                                          | 0x0002 |
+| * ProductName                                                       | 0x0003 |
+| * NodeLabel                                                         | 0x0005 |
+| * HardwareVersion                                                   | 0x0007 |
+| * HardwareVersionString                                             | 0x0008 |
+| * SoftwareVersion                                                   | 0x0009 |
+| * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * Reachable                                                         | 0x0011 |
+| * UniqueID                                                          | 0x0012 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute VendorName
+ */
+class ReadBridgedDeviceBasicVendorName : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicVendorName() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "vendor-name");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicVendorName() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.VendorName response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicVendorName : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicVendorName() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "vendor-name");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicVendorName() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedDeviceBasic.VendorName report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute VendorID
+ */
+class ReadBridgedDeviceBasicVendorID : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicVendorID() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "vendor-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicVendorID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorID::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.VendorID response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicVendorID : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicVendorID() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "vendor-id");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicVendorID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorID::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedDeviceBasic.VendorID report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ProductName
+ */
+class ReadBridgedDeviceBasicProductName : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicProductName() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "product-name");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicProductName() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.ProductName response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicProductName : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicProductName() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "product-name");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicProductName() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedDeviceBasic.ProductName report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NodeLabel
+ */
+class ReadBridgedDeviceBasicNodeLabel : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicNodeLabel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "node-label");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicNodeLabel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::NodeLabel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.NodeLabel response", value);
+    }
+};
+
+class WriteBridgedDeviceBasicNodeLabel : public ModelCommand
+{
+public:
+    WriteBridgedDeviceBasicNodeLabel() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "node-label");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBridgedDeviceBasicNodeLabel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::NodeLabel::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+class ReportBridgedDeviceBasicNodeLabel : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicNodeLabel() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "node-label");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicNodeLabel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::NodeLabel::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedDeviceBasic.NodeLabel report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute HardwareVersion
+ */
+class ReadBridgedDeviceBasicHardwareVersion : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicHardwareVersion() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "hardware-version");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicHardwareVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.HardwareVersion response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicHardwareVersion : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicHardwareVersion() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "hardware-version");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicHardwareVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedDeviceBasic.HardwareVersion report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute HardwareVersionString
+ */
+class ReadBridgedDeviceBasicHardwareVersionString : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicHardwareVersionString() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "hardware-version-string");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicHardwareVersionString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.HardwareVersionString response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicHardwareVersionString : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicHardwareVersionString() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "hardware-version-string");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicHardwareVersionString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("BridgedDeviceBasic.HardwareVersionString report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SoftwareVersion
+ */
+class ReadBridgedDeviceBasicSoftwareVersion : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicSoftwareVersion() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "software-version");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicSoftwareVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.SoftwareVersion response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicSoftwareVersion : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicSoftwareVersion() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "software-version");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicSoftwareVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value) { LogValue("BridgedDeviceBasic.SoftwareVersion report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SoftwareVersionString
+ */
+class ReadBridgedDeviceBasicSoftwareVersionString : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicSoftwareVersionString() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "software-version-string");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicSoftwareVersionString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.SoftwareVersionString response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicSoftwareVersionString : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicSoftwareVersionString() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "software-version-string");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicSoftwareVersionString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("BridgedDeviceBasic.SoftwareVersionString report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ManufacturingDate
+ */
+class ReadBridgedDeviceBasicManufacturingDate : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicManufacturingDate() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "manufacturing-date");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicManufacturingDate() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.ManufacturingDate response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicManufacturingDate : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicManufacturingDate() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "manufacturing-date");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicManufacturingDate() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("BridgedDeviceBasic.ManufacturingDate report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute PartNumber
+ */
+class ReadBridgedDeviceBasicPartNumber : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicPartNumber() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "part-number");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicPartNumber() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.PartNumber response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicPartNumber : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicPartNumber() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "part-number");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicPartNumber() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedDeviceBasic.PartNumber report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ProductURL
+ */
+class ReadBridgedDeviceBasicProductURL : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicProductURL() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "product-url");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicProductURL() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.ProductURL response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicProductURL : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicProductURL() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "product-url");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicProductURL() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedDeviceBasic.ProductURL report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ProductLabel
+ */
+class ReadBridgedDeviceBasicProductLabel : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicProductLabel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "product-label");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicProductLabel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.ProductLabel response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicProductLabel : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicProductLabel() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "product-label");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicProductLabel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("BridgedDeviceBasic.ProductLabel report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SerialNumber
+ */
+class ReadBridgedDeviceBasicSerialNumber : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicSerialNumber() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "serial-number");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicSerialNumber() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.SerialNumber response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicSerialNumber : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicSerialNumber() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "serial-number");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicSerialNumber() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("BridgedDeviceBasic.SerialNumber report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Reachable
+ */
+class ReadBridgedDeviceBasicReachable : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicReachable() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "reachable");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicReachable() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.Reachable response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicReachable : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicReachable() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "reachable");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicReachable() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("BridgedDeviceBasic.Reachable report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute UniqueID
+ */
+class ReadBridgedDeviceBasicUniqueID : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicUniqueID() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "unique-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicUniqueID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReadAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::UniqueID::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.UniqueID response", value);
+    }
+};
+
+class ReportBridgedDeviceBasicUniqueID : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicUniqueID() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "unique-id");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicUniqueID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000039) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::UniqueID::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("BridgedDeviceBasic.UniqueID report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
 
 /*
  * Attribute AttributeList
@@ -61169,10 +62260,41 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
     const char * clusterName = "BridgedDeviceBasic";
 
     commands_list clusterCommands = {
-        make_unique<ReadBridgedDeviceBasicAttributeList>(),     //
-        make_unique<ReportBridgedDeviceBasicAttributeList>(),   //
-        make_unique<ReadBridgedDeviceBasicClusterRevision>(),   //
-        make_unique<ReportBridgedDeviceBasicClusterRevision>(), //
+        make_unique<ReadBridgedDeviceBasicVendorName>(),              //
+        make_unique<ReportBridgedDeviceBasicVendorName>(),            //
+        make_unique<ReadBridgedDeviceBasicVendorID>(),                //
+        make_unique<ReportBridgedDeviceBasicVendorID>(),              //
+        make_unique<ReadBridgedDeviceBasicProductName>(),             //
+        make_unique<ReportBridgedDeviceBasicProductName>(),           //
+        make_unique<ReadBridgedDeviceBasicNodeLabel>(),               //
+        make_unique<WriteBridgedDeviceBasicNodeLabel>(),              //
+        make_unique<ReportBridgedDeviceBasicNodeLabel>(),             //
+        make_unique<ReadBridgedDeviceBasicHardwareVersion>(),         //
+        make_unique<ReportBridgedDeviceBasicHardwareVersion>(),       //
+        make_unique<ReadBridgedDeviceBasicHardwareVersionString>(),   //
+        make_unique<ReportBridgedDeviceBasicHardwareVersionString>(), //
+        make_unique<ReadBridgedDeviceBasicSoftwareVersion>(),         //
+        make_unique<ReportBridgedDeviceBasicSoftwareVersion>(),       //
+        make_unique<ReadBridgedDeviceBasicSoftwareVersionString>(),   //
+        make_unique<ReportBridgedDeviceBasicSoftwareVersionString>(), //
+        make_unique<ReadBridgedDeviceBasicManufacturingDate>(),       //
+        make_unique<ReportBridgedDeviceBasicManufacturingDate>(),     //
+        make_unique<ReadBridgedDeviceBasicPartNumber>(),              //
+        make_unique<ReportBridgedDeviceBasicPartNumber>(),            //
+        make_unique<ReadBridgedDeviceBasicProductURL>(),              //
+        make_unique<ReportBridgedDeviceBasicProductURL>(),            //
+        make_unique<ReadBridgedDeviceBasicProductLabel>(),            //
+        make_unique<ReportBridgedDeviceBasicProductLabel>(),          //
+        make_unique<ReadBridgedDeviceBasicSerialNumber>(),            //
+        make_unique<ReportBridgedDeviceBasicSerialNumber>(),          //
+        make_unique<ReadBridgedDeviceBasicReachable>(),               //
+        make_unique<ReportBridgedDeviceBasicReachable>(),             //
+        make_unique<ReadBridgedDeviceBasicUniqueID>(),                //
+        make_unique<ReportBridgedDeviceBasicUniqueID>(),              //
+        make_unique<ReadBridgedDeviceBasicAttributeList>(),           //
+        make_unique<ReportBridgedDeviceBasicAttributeList>(),         //
+        make_unique<ReadBridgedDeviceBasicClusterRevision>(),         //
+        make_unique<ReportBridgedDeviceBasicClusterRevision>(),       //
     };
 
     commands.Register(clusterName, clusterCommands);

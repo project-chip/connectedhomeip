@@ -139,6 +139,23 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeBridgedActionsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBridgedDeviceBasicNodeLabelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo bridgedDeviceBasicnodeLabelCommandParameterInfo =
+        new CommandParameterInfo("value", String.class);
+    writeBridgedDeviceBasicNodeLabelCommandParams.put(
+        "value", bridgedDeviceBasicnodeLabelCommandParameterInfo);
+    InteractionInfo writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+                  .writeNodeLabelAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBridgedDeviceBasicNodeLabelCommandParams);
+    writeBridgedDeviceBasicInteractionInfo.put(
+        "writeNodeLabelAttribute", writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
     writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
     Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("channel", writeChannelInteractionInfo);
