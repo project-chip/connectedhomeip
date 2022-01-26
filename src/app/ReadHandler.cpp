@@ -85,6 +85,9 @@ ReadHandler::~ReadHandler()
     if (IsType(InteractionType::Subscribe))
     {
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+            OnUnblockHoldReportCallback, this);
+
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
             OnRefreshSubscribeTimerSyncCallback, this);
     }
 
