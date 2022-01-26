@@ -258,10 +258,10 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(
         gOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
-    params.ephemeralKeypair = &ephemeralKey;
-    params.controllerRCAC   = rcacSpan;
-    params.controllerICAC   = icacSpan;
-    params.controllerNOC    = nocSpan;
+    params.operationalKeypair = &ephemeralKey;
+    params.controllerRCAC     = rcacSpan;
+    params.controllerICAC     = icacSpan;
+    params.controllerNOC      = nocSpan;
 
     auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
