@@ -127,19 +127,22 @@ public:
 
     void SetFabricInfo(FabricInfo * fabricInfo) { mFabricInfo = fabricInfo; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
+    void SetOnConnecting(bool onConnecting) { mOnConnecting = onConnecting; }
     FabricInfo * GetFabricInfo(void) { return mFabricInfo; }
     NodeId GetNodeId(void) { return mNodeId; }
-
+    bool GetOnConnecting(void) { return mOnConnecting; }
 private:
     CASECommands() {}
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
     {
         streamer_printf(streamer_get(), "Establish CASESession Success!\r\n");
+        GetInstance().SetOnConnecting(false);
     }
 
     static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
     {
         streamer_printf(streamer_get(), "Establish CASESession Failure!\r\n");
+        GetInstance().SetOnConnecting(false);
     }
 
     static void ConnectToNode(intptr_t arg)
@@ -158,6 +161,10 @@ private:
 
     static CHIP_ERROR ConnectToNodeHandler(int argc, char ** argv)
     {
+        if (GetInstance().GetOnConnecting())
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
         const FabricIndex fabricIndex = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
         FabricInfo * fabricInfo       = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
 
@@ -170,6 +177,7 @@ private:
         GetInstance().SetNodeId(static_cast<NodeId>(strtoul(argv[1], nullptr, 10)));
         streamer_printf(streamer_get(), "Try to establish CaseSession to NodeId:0x" ChipLogFormatX64 " on fabric index %d\r\n",
                         ChipLogValueX64(GetInstance().GetNodeId()), fabricIndex);
+        GetInstance().SetOnConnecting(true);
         chip::DeviceLayer::PlatformMgr().ScheduleWork(ConnectToNode, reinterpret_cast<intptr_t>(&GetInstance()));
         return CHIP_NO_ERROR;
     }
@@ -194,6 +202,7 @@ private:
     static Shell::Engine sSubShell;
     FabricInfo * mFabricInfo = nullptr;
     NodeId mNodeId           = 0;
+    bool mOnConnecting       = false;
 };
 
 } // namespace Shell
