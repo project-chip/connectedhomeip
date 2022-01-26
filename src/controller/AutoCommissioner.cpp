@@ -264,7 +264,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // These don't need to be deep copied to local memory because they are used in this one step then never again.
             mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
                 .SetAttestationSignature(report.Get<AttestationResponse>().signature);
-            // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we woouldn't need to hold a
+            // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)
             {
