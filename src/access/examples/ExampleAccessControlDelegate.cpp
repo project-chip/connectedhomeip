@@ -586,7 +586,6 @@ public:
         }
         ReturnErrorOnFailure(reader.ExitContainer(innerContainer));
 
-        // mTargets
         ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Array, chip::TLV::ContextTag(kTagTargets)));
         ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
         for (size_t i = 0; i < kMaxTargets; ++i)
