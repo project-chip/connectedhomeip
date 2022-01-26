@@ -36,7 +36,7 @@ struct PrivilegeOverride
 {
     ClusterId mCluster;
     EndpointId mEndpoint;
-    Privilege mPrivilege;
+    Privilege mPrivilege; // NOTE: here so packing is tighter
     FieldId mField;
 
     PrivilegeOverride() : mCluster(kInvalidClusterId), mEndpoint(kInvalidEndpointId), mField(kInvalidFieldId) {}
@@ -50,22 +50,21 @@ struct PrivilegeOverride
     static_assert(sizeof(FieldId) >= sizeof(EventId), "FieldId must be able to hold EventId");
 };
 
-PrivilegeOverride
-    privilegeOverrideForReadAttribute[CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_ATTRIBUTE] = {
-        PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-    };
+const int kTableSize = 8;
 
-PrivilegeOverride
-    privilegeOverrideForWriteAttribute[CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_WRITE_ATTRIBUTE] = {
-        PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-    };
+PrivilegeOverride privilegeOverrideForReadAttribute[kTableSize] = {
+    PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
+};
 
-PrivilegeOverride
-    privilegeOverrideForInvokeCommand[CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_INVOKE_COMMAND] = {
-        PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
-    };
+PrivilegeOverride privilegeOverrideForWriteAttribute[kTableSize] = {
+    PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
+};
 
-PrivilegeOverride privilegeOverrideForReadEvent[CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_EVENT] = {
+PrivilegeOverride privilegeOverrideForInvokeCommand[kTableSize] = {
+    PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
+};
+
+PrivilegeOverride privilegeOverrideForReadEvent[kTableSize] = {
     PrivilegeOverride(0x0000'001f, kInvalidEndpointId, kInvalidFieldId, Privilege::kAdminister),
 };
 
@@ -143,7 +142,7 @@ CHIP_ERROR UnoverrideRequiredPrivilege(Operation operation, ClusterId cluster, E
 } // namespace
 
 namespace chip {
-namespace Access {
+namespace app {
 
 Privilege RequiredPrivilege::ForReadAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute)
 {
@@ -208,5 +207,5 @@ CHIP_ERROR RequiredPrivilege::UnoverrideForReadEvent(ClusterId cluster, Endpoint
     return UnoverrideRequiredPrivilege(Operation::kReadEvent, cluster, endpoint, event);
 }
 
-} // namespace Access
+} // namespace app
 } // namespace chip

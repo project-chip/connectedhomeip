@@ -2652,46 +2652,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_ATTRIBUTE
- *
- * Defines the maximum number of overrides for the read attribute operation in the
- * required privilege code.
- */
-#ifndef CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_ATTRIBUTE
-#define CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_ATTRIBUTE 8
-#endif
-
-/**
- * @def CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_WRITE_ATTRIBUTE
- *
- * Defines the maximum number of overrides for the write attribute operation in the
- * required privilege code.
- */
-#ifndef CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_WRITE_ATTRIBUTE
-#define CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_WRITE_ATTRIBUTE 8
-#endif
-
-/**
- * @def CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_INVOKE_COMMAND
- *
- * Defines the maximum number of overrides for the invoke command operation in the
- * required privilege code.
- */
-#ifndef CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_INVOKE_COMMAND
-#define CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_INVOKE_COMMAND 8
-#endif
-
-/**
- * @def CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_EVENT
- *
- * Defines the maximum number of overrides for the read event operation in the
- * required privilege code.
- */
-#ifndef CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_EVENT
-#define CHIP_CONFIG_ACCESS_CONTROL_MAX_REQUIRED_PRIVILEGE_OVERRIDES_FOR_READ_EVENT 8
-#endif
-
-/**
  * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
  *
  * Defines the number of access control entries supported per fabric in the

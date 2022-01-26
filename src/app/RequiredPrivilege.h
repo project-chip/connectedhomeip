@@ -18,18 +18,24 @@
 
 #pragma once
 
-#include "Privilege.h"
+#include "ConcreteAttributePath.h"
+#include "ConcreteCommandPath.h"
+#include "ConcreteEventPath.h"
+
+#include <access/Privilege.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
-namespace Access {
+namespace app {
 
 // This functionality is intended to come from Ember, but until Ember supports it,
 // this class will provide a workable alternative.
 class RequiredPrivilege
 {
+    using Privilege = Access::Privilege;
+
 public:
     static Privilege ForReadAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute);
     static Privilege ForWriteAttribute(ClusterId cluster, EndpointId endpoint, AttributeId attribute);
@@ -47,5 +53,5 @@ public:
     static CHIP_ERROR UnoverrideForReadEvent(ClusterId cluster, EndpointId endpoint, EventId event);
 };
 
-} // namespace Access
+} // namespace app
 } // namespace chip

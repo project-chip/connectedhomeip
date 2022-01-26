@@ -85,6 +85,8 @@ CHIP_ERROR AccessControl::Finish()
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
+    ChipLogDetail(DataManagement, "################################################## requestPrivilege %d", (int) requestPrivilege);
+
     // Don't check if using default delegate (e.g. test code that isn't testing access control)
     ReturnErrorCodeIf(&mDelegate == &mDefaultDelegate, CHIP_NO_ERROR);
 
