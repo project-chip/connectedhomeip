@@ -32,6 +32,7 @@ CHIP_ERROR TestCommand::RunCommand()
 
 CHIP_ERROR TestCommand::WaitForCommissionee()
 {
+    CurrentCommissioner().ReleaseOperationalDevice(mNodeId);
     return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
