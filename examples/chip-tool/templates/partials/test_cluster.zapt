@@ -98,6 +98,57 @@ class {{filename}}: public TestCommand
     {{/chip_tests_item_response_parameters}}
     {{/chip_tests_items}}
 
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+      bool isExpectedDnssdResult = false;
+      {{#chip_tests_items}}
+      {{#if (isStrEqual cluster "DiscoveryCommands")}}
+      if ((mTestIndex - 1) == {{index}})
+      {
+          isExpectedDnssdResult = true;
+          {{#chip_tests_item_response_parameters}}
+          {{#*inline "itemValue"}}nodeData.{{name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
+          {{~#if hasExpectedValue}}
+            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", nodeData.{{name}}));{{/if}}
+            VerifyOrReturn(CheckValue("{{name}}", {{>itemValue}},
+            {{#if (chip_tests_config_has expectedValue)}}
+            m{{asUpperCamelCase expectedValue}}.HasValue() ? m{{asUpperCamelCase expectedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expectedValue) (chip_tests_config_get_type expectedValue)}}
+            {{else}}
+            {{expectedValue}}
+            {{/if}}
+          ));
+          {{/if}}
+          {{#if hasExpectedConstraints}}
+            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", nodeData.{{name}}));{{/if}}
+            {{#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{name}}", {{>itemValue}}.size(), {{expectedConstraints.minLength}}));{{/if}}
+            {{#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{name}}", {{>itemValue}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
+            {{#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
+            {{#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
+            {{#if (hasProperty expectedConstraints "notValue")}}VerifyOrReturn(CheckConstraintNotValue("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
+          {{/if}}
+
+          {{#if saveAs}}
+          {{#if (isString type)}}
+          if ({{saveAs}}Buffer != nullptr)
+          {
+             chip::Platform::MemoryFree({{saveAs}}Buffer);
+          }
+          {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{>itemValue}}.size()));
+          memcpy({{saveAs}}Buffer, {{>itemValue}}.data(), {{>itemValue}}.size());
+          {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{>itemValue}}.size());
+          {{else}}
+          {{saveAs}} = {{>itemValue}};
+          {{/if}}
+          {{/if}}
+          {{/chip_tests_item_response_parameters}}
+      }
+      {{/if}}
+      {{/chip_tests_items}}
+
+      VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+      NextTest();
+    }
+
     {{! Helper around zapTypeToDecodableClusterObjectType that lets us set the
         array/nullable/etc context appropriately.}}
     {{~#*inline "subscribeResponseDataArgument"~}}
@@ -190,7 +241,13 @@ class {{filename}}: public TestCommand
     CHIP_ERROR {{>testCommand}}()
     {
         SetIdentity(kIdentity{{asUpperCamelCase identity}});
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if~}}
+          {{~#if (chip_tests_config_has definedValue)~}}
+          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}
+          {{else}}
+          {{definedValue}}
+          {{~/if~}}
+        {{~#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()
