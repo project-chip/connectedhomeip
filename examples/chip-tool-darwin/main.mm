@@ -16,7 +16,14 @@
  *
  */
 
-#import <CHIP/CHIP.h>
-#import <Foundation/Foundation.h>
+#include "commands/common/Commands.h"
 
-int main(int argc, const char * argv[]) { return EXIT_SUCCESS; }
+#include "commands/pairing/Commands.h"
+
+int main(int argc, const char * argv[])
+{
+    Commands commands;
+    registerCommandsPairing(commands);
+    return commands.Run(argc, (char **) argv);
+    ;
+}

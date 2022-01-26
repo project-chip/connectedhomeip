@@ -20,14 +20,24 @@ import("${chip_root}/build/chip/tools.gni")
 assert(chip_build_tools)
 
 executable("chip-tool-darwin") {
-  sources = [ "main.m" ]
+  sources = [
+    "commands/common/CHIPCommandBridge.mm",
+    "commands/pairing/Commands.h",
+    "commands/pairing/PairingCommandBridge.mm",
+    "commands/pairing/PairingDelegateBridge.mm",
+    "main.mm",
+  ]
+
+  include_dirs = [ "." ]
 
   deps = [
+    "${chip_root}/examples/chip-tool:chip-tool-utils",
     "${chip_root}/src/app/server",
     "${chip_root}/src/darwin/Framework/CHIP",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   cflags = [
@@ -36,4 +46,22 @@ executable("chip-tool-darwin") {
   ]
 
   output_dir = root_out_dir
+}
+
+action("codesign") {
+  script = "entitlements/codesign.py"
+  sources = [ "entitlements/chip-tool-darwin.entitlements" ]
+  public_deps = [ ":chip-tool-darwin" ]
+
+  args = [
+    "--target_path",
+    rebase_path("${root_build_dir}/chip-tool-darwin", root_build_dir),
+    "--entitlements_path",
+    rebase_path("entitlements/chip-tool-darwin.entitlements", root_build_dir),
+    "--log_path",
+    rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+  ]
+
+  output_name = "codesign_log.txt"
+  outputs = [ "${root_build_dir}/${output_name}" ]
 }
