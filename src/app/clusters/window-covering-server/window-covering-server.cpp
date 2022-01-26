@@ -158,12 +158,12 @@ bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
     return hasFeature;
 }
 
-static bool HasFeaturePaLift(chip::EndpointId endpoint)
+bool HasFeaturePaLift(chip::EndpointId endpoint)
 {
     return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
 }
 
-static bool HasFeaturePaTilt(chip::EndpointId endpoint)
+bool HasFeaturePaTilt(chip::EndpointId endpoint)
 {
     return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
@@ -422,6 +422,7 @@ void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
     Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
     emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
+
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
 {
