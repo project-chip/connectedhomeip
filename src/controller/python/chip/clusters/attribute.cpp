@@ -101,8 +101,6 @@ public:
             CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
-                app::StatusIB status;
-                status.mStatus = Protocols::InteractionModel::Status::Failure;
                 this->OnError(apReadClient, err);
                 return;
             }
@@ -359,6 +357,8 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;
+
+        VerifyOrExit(readClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         if (pyParams.isSubscription)
         {
