@@ -78,16 +78,24 @@ static WakeOnLanManager wakeOnLanManager;
 
 void ApplicationInit() {}
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class MyUserPrompter : public UserPrompter
 {
     // TODO: tv should override this with a dialog prompt
-    void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override {}
+    inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
 
     // TODO: tv should override this with a dialog prompt
-    void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override {}
+    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
 };
 
 MyUserPrompter gMyUserPrompter;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 class MyPincodeService : public PincodeService

@@ -31,6 +31,7 @@
 #include <iostream>
 #include <thread>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
