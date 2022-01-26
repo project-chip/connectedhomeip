@@ -135,31 +135,4 @@ void PendingNotificationMap::RemoveAllEntriesForNode(FabricIndex fabric, NodeId 
     mNumEntries     = newEntryCount;
 }
 
-void TestPendingNotificationMap()
-{
-    PendingNotificationMap map;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        EmberBindingTableEntry entry = EmberBindingTableEntry::ForNode(0, i % 5, i, i, i);
-        emberSetBinding(i, &entry);
-        map.AddPendingNotification(i, nullptr);
-    }
-    map.AddPendingNotification(0, nullptr);
-    PendingNotificationEntry entry = *map.begin();
-    assert(entry.mBindingEntryId == 1);
-    int16_t lruBindingEntryIndex = map.FindLRUBindingEntryIndex();
-    assert(lruBindingEntryIndex >= 0);
-    assert(lruBindingEntryIndex % 5 == 1);
-    map.RemoveAllEntriesForNode(0, 1);
-    entry = *map.begin();
-    assert(entry.mBindingEntryId == 2);
-    uint8_t count = 0;
-    for (const PendingNotificationEntry & pendingNotification : map)
-    {
-        assert(pendingNotification.mBindingEntryId % 5 != 1);
-        count++;
-    }
-    assert(count == 8);
-}
-
 } // namespace chip

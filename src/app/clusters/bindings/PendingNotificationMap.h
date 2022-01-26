@@ -84,6 +84,4 @@ private:
     uint8_t mNextToOverride = 0;
 };
 
-void TestPendingNotificationMap();
-
 } // namespace chip
