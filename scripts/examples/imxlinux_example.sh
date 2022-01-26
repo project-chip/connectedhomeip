@@ -34,20 +34,20 @@ then
         exit -1
     fi
 else
-    source $IMX_SDK_ROOT/environment-setup-cortexa53-crypto-poky-linux
+    source "$IMX_SDK_ROOT"/environment-setup-cortexa53-crypto-poky-linux
 fi
 env
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR} \
-PKG_CONFIG_LIBDIR=${PKG_CONFIG_PATH} \
+PKG_CONFIG_SYSROOT_DIR=$PKG_CONFIG_SYSROOT_DIR \
+PKG_CONFIG_LIBDIR="$PKG_CONFIG_PATH" \
 gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"arm64\" arm_arch=\"armv8-a\"
 import(\"//build_overrides/build.gni\")
-target_cflags=[ \"--sysroot=${SDKTARGETSYSROOT}\", \"${PLATFORM_CFLAGS}\" ]
-target_ldflags = [ \"--sysroot=${SDKTARGETSYSROOT}\" ]
+target_cflags=[ \"--sysroot=$SDKTARGETSYSROOT\", \"$PLATFORM_CFLAGS\" ]
+target_ldflags = [ \"--sysroot=$SDKTARGETSYSROOT\" ]
 custom_toolchain=\"\${build_root}/toolchain/custom\"
-target_cc=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
-target_cxx=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
-target_ar=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
+target_cc=\"$OECORE_NATIVE_SYSROOT/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
+target_cxx=\"$OECORE_NATIVE_SYSROOT/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
+target_ar=\"$OECORE_NATIVE_SYSROOT/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
 
 ninja -C "$2"
