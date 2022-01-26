@@ -40,6 +40,8 @@
 #include <stdint.h>
 #include <string>
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 namespace chip {
 namespace AppPlatform {
 
@@ -78,3 +80,5 @@ protected:
 
 } // namespace AppPlatform
 } // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

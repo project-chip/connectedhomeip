@@ -34,13 +34,13 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 using namespace chip;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
 using ApplicationStatusEnum   = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
-
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1

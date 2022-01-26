@@ -34,6 +34,8 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 using namespace chip;
 using namespace chip::AppPlatform;
 
@@ -64,3 +66,5 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId 
 
 } // namespace AppPlatform
 } // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
