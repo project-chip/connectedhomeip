@@ -39,7 +39,8 @@ using namespace chip::DeviceLayer;
 namespace {
 
 constexpr size_t kExpectedFixedLocationLength = 2;
-static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength, "Fixed location storage must be of size 2");
+static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
+              "Fixed location storage must be of size 2");
 
 class BasicAttrAccess : public AttributeAccessInterface
 {
