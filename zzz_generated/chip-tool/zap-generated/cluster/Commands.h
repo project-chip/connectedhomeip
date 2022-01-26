@@ -46326,7 +46326,7 @@ private:
 class ReportTestClusterGeneralErrorBoolean : public ModelCommand
 {
 public:
-    ReportTestClusterGeneralErrorBoolean() : ModelCommand("report")
+    ReportTestClusterGeneralErrorBoolean() : ModelCommand("subscribe")
     {
         AddArgument("attr-name", "general-error-boolean");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -46421,7 +46421,7 @@ private:
 class ReportTestClusterClusterErrorBoolean : public ModelCommand
 {
 public:
-    ReportTestClusterClusterErrorBoolean() : ModelCommand("report")
+    ReportTestClusterClusterErrorBoolean() : ModelCommand("subscribe")
     {
         AddArgument("attr-name", "cluster-error-boolean");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
