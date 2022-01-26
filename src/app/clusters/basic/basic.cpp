@@ -309,7 +309,7 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     ReturnErrorOnFailure(aDecoder.Decode(location));
 
     // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-    ChipLogError(Zcl, "WriteLocation received, size %zu, location '%.*s'", location.size(), (int)location.size(), location.data());
+    ChipLogError(Zcl, "WriteLocation received, size %zu, location '%.*s'", location.size(), (int) location.size(), location.data());
 
     bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
     VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::ConstraintError).ToChipError());
