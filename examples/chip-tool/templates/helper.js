@@ -17,8 +17,9 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../third_party/zap/repo/dist/src-electron/';
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const templateUtil = require(zapPath + 'generator/template-util.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
+const zclQuery     = require(zapPath + 'db/query-zcl.js');
 
 const ChipTypesHelper = require('../../../src/app/zap-templates/common/ChipTypesHelper.js');
 
@@ -108,10 +109,36 @@ function utf8StringLength(str)
   return new TextEncoder().encode(str).length
 }
 
+async function structs_with_cluster_name(options)
+{
+  const packageId = await templateUtil.ensureZclPackageId(this);
+
+  const structs = await zclQuery.selectAllStructsWithItems(this.global.db, packageId);
+
+  let blocks = [];
+  for (const s of structs) {
+    if (s.struct_cluster_count == 0) {
+      continue;
+    }
+
+    if (s.struct_cluster_count == 1) {
+      const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
+      blocks.push({ id : s.id, name : s.name, clusterName : clusters[0].name });
+    }
+
+    if (s.struct_cluster_count > 1) {
+      blocks.push({ id : s.id, name : s.name, clusterName : "detail" });
+    }
+  }
+
+  return templateUtil.collectBlocks(blocks, options, this);
+}
+
 //
 // Module exports
 //
-exports.asDelimitedCommand = asDelimitedCommand;
-exports.asTypeMinValue     = asTypeMinValue;
-exports.asTypeMaxValue     = asTypeMaxValue;
-exports.utf8StringLength   = utf8StringLength;
+exports.asDelimitedCommand        = asDelimitedCommand;
+exports.asTypeMinValue            = asTypeMinValue;
+exports.asTypeMaxValue            = asTypeMaxValue;
+exports.utf8StringLength          = utf8StringLength;
+exports.structs_with_cluster_name = structs_with_cluster_name;
