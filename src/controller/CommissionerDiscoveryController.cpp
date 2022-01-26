@@ -31,6 +31,8 @@
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
@@ -157,3 +159,4 @@ void CommissionerDiscoveryController::Cancel()
     mPendingConsent = false;
     return;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

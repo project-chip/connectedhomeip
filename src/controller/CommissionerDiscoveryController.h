@@ -35,6 +35,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
 using chip::Protocols::UserDirectedCommissioning::UDCClientState;
 using chip::Protocols::UserDirectedCommissioning::UserConfirmationProvider;
 using chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer;
@@ -180,3 +182,5 @@ protected:
     PincodeService * mPincodeService             = nullptr;
     CommissionerCallback * mCommissionerCallback = nullptr;
 };
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
