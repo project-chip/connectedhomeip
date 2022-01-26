@@ -120,7 +120,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
         // Only doing BDX transport for now
         MutableCharSpan uri(uriBuf, kUriMaxLen);
-        chip::bdx::MakeURI(nodeId, CharSpan(mOTAFilePath, strlen(mOTAFilePath)), uri);
+        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
         ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
     }
 
@@ -166,9 +166,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     QueryImageResponse::Type response;
     response.status = queryStatus;
     response.delayedActionTime.Emplace(mDelayedActionTimeSec);
-    response.imageURI.Emplace(chip::CharSpan(uriBuf, strlen(uriBuf)));
+    response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
     response.softwareVersion.Emplace(newSoftwareVersion);
-    response.softwareVersionString.Emplace(chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString)));
+    response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(kExampleSoftwareString));
     response.updateToken.Emplace(chip::ByteSpan(updateToken));
     response.userConsentNeeded.Emplace(userConsentNeeded);
     // Could also just not send metadataForRequestor at all.

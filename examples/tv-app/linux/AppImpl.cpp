@@ -200,7 +200,7 @@ ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApplication application, s
                     application.catalogVendorId, appId.c_str(), data.c_str());
 
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
+    response.data   = chip::CharSpan::fromCharString("data");
     response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
@@ -212,7 +212,7 @@ ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool auto
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
     chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
+    response.data   = chip::CharSpan::fromCharString("data");
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
