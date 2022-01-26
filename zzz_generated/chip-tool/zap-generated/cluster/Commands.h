@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
+#include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/DataModelLogger.h>
 #include <commands/clusters/ModelCommand.h>
 #include <commands/common/CommandInvoker.h>
@@ -1285,6 +1286,34 @@ public:
     }
 };
 
+class WriteAccessControlAcl : public ModelCommand
+{
+public:
+    WriteAccessControlAcl() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "acl");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteAccessControlAcl() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>>
+        mComplex;
+};
+
 class ReportAccessControlAcl : public ModelCommand
 {
 public:
@@ -1361,6 +1390,34 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "AccessControl.Extension response", value);
     }
+};
+
+class WriteAccessControlExtension : public ModelCommand
+{
+public:
+    WriteAccessControlExtension() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "extension");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteAccessControlExtension() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type>>
+        mComplex;
 };
 
 class ReportAccessControlExtension : public ModelCommand
@@ -2921,9 +2978,9 @@ private:
 class ApplicationLauncherHideAppRequest : public ModelCommand
 {
 public:
-    ApplicationLauncherHideAppRequest() : ModelCommand("hide-app-request")
+    ApplicationLauncherHideAppRequest() : ModelCommand("hide-app-request"), mComplex_Application(&mRequest.application)
     {
-        // application Struct parsing is not supported yet
+        AddArgument("Application", &mComplex_Application);
         ModelCommand::AddArguments();
     }
 
@@ -2937,6 +2994,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
+        mComplex_Application;
 };
 
 /*
@@ -2945,10 +3004,10 @@ private:
 class ApplicationLauncherLaunchAppRequest : public ModelCommand
 {
 public:
-    ApplicationLauncherLaunchAppRequest() : ModelCommand("launch-app-request")
+    ApplicationLauncherLaunchAppRequest() : ModelCommand("launch-app-request"), mComplex_Application(&mRequest.application)
     {
         AddArgument("Data", &mRequest.data);
-        // application Struct parsing is not supported yet
+        AddArgument("Application", &mComplex_Application);
         ModelCommand::AddArguments();
     }
 
@@ -2962,6 +3021,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
+        mComplex_Application;
 };
 
 /*
@@ -2970,9 +3031,9 @@ private:
 class ApplicationLauncherStopAppRequest : public ModelCommand
 {
 public:
-    ApplicationLauncherStopAppRequest() : ModelCommand("stop-app-request")
+    ApplicationLauncherStopAppRequest() : ModelCommand("stop-app-request"), mComplex_Application(&mRequest.application)
     {
-        // application Struct parsing is not supported yet
+        AddArgument("Application", &mComplex_Application);
         ModelCommand::AddArguments();
     }
 
@@ -2986,6 +3047,8 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
+        mComplex_Application;
 };
 
 /*
@@ -13104,11 +13167,11 @@ private:
 class ContentLauncherLaunchContentRequest : public ModelCommand
 {
 public:
-    ContentLauncherLaunchContentRequest() : ModelCommand("launch-content-request")
+    ContentLauncherLaunchContentRequest() : ModelCommand("launch-content-request"), mComplex_Search(&mRequest.search)
     {
         AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay);
         AddArgument("Data", &mRequest.data);
-        // search Array parsing is not supported yet
+        AddArgument("Search", &mComplex_Search);
         ModelCommand::AddArguments();
     }
 
@@ -13122,6 +13185,8 @@ public:
 
 private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>>
+        mComplex_Search;
 };
 
 /*
@@ -13130,11 +13195,12 @@ private:
 class ContentLauncherLaunchURLRequest : public ModelCommand
 {
 public:
-    ContentLauncherLaunchURLRequest() : ModelCommand("launch-urlrequest")
+    ContentLauncherLaunchURLRequest() :
+        ModelCommand("launch-urlrequest"), mComplex_BrandingInformation(&mRequest.brandingInformation)
     {
         AddArgument("ContentURL", &mRequest.contentURL);
         AddArgument("DisplayString", &mRequest.displayString);
-        // brandingInformation Struct parsing is not supported yet
+        AddArgument("BrandingInformation", &mComplex_BrandingInformation);
         ModelCommand::AddArguments();
     }
 
@@ -13148,6 +13214,7 @@ public:
 
 private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> mComplex_BrandingInformation;
 };
 
 /*
@@ -14075,9 +14142,9 @@ private:
 class DoorLockClearCredential : public ModelCommand
 {
 public:
-    DoorLockClearCredential() : ModelCommand("clear-credential")
+    DoorLockClearCredential() : ModelCommand("clear-credential"), mComplex_Credential(&mRequest.credential)
     {
-        // credential Struct parsing is not supported yet
+        AddArgument("Credential", &mComplex_Credential);
         ModelCommand::AddArguments();
     }
 
@@ -14091,6 +14158,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
 };
 
 /*
@@ -14123,9 +14191,9 @@ private:
 class DoorLockGetCredentialStatus : public ModelCommand
 {
 public:
-    DoorLockGetCredentialStatus() : ModelCommand("get-credential-status")
+    DoorLockGetCredentialStatus() : ModelCommand("get-credential-status"), mComplex_Credential(&mRequest.credential)
     {
-        // credential Struct parsing is not supported yet
+        AddArgument("Credential", &mComplex_Credential);
         ModelCommand::AddArguments();
     }
 
@@ -14139,6 +14207,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
 };
 
 /*
@@ -14195,11 +14264,11 @@ private:
 class DoorLockSetCredential : public ModelCommand
 {
 public:
-    DoorLockSetCredential() : ModelCommand("set-credential")
+    DoorLockSetCredential() : ModelCommand("set-credential"), mComplex_Credential(&mRequest.credential)
     {
         AddArgument("OperationType", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
-        // credential Struct parsing is not supported yet
+        AddArgument("Credential", &mComplex_Credential);
         AddArgument("CredentialData", &mRequest.credentialData);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserStatus", 0, UINT8_MAX,
@@ -14217,6 +14286,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::SetCredential::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
 };
 
 /*
@@ -20307,9 +20377,10 @@ private:
 class GroupKeyManagementKeySetReadAllIndices : public ModelCommand
 {
 public:
-    GroupKeyManagementKeySetReadAllIndices() : ModelCommand("key-set-read-all-indices")
+    GroupKeyManagementKeySetReadAllIndices() :
+        ModelCommand("key-set-read-all-indices"), mComplex_GroupKeySetIDs(&mRequest.groupKeySetIDs)
     {
-        // groupKeySetIDs Array parsing is not supported yet
+        AddArgument("GroupKeySetIDs", &mComplex_GroupKeySetIDs);
         ModelCommand::AddArguments();
     }
 
@@ -20323,6 +20394,7 @@ public:
 
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint16_t>> mComplex_GroupKeySetIDs;
 };
 
 /*
@@ -20355,9 +20427,9 @@ private:
 class GroupKeyManagementKeySetWrite : public ModelCommand
 {
 public:
-    GroupKeyManagementKeySetWrite() : ModelCommand("key-set-write")
+    GroupKeyManagementKeySetWrite() : ModelCommand("key-set-write"), mComplex_GroupKeySet(&mRequest.groupKeySet)
     {
-        // groupKeySet Struct parsing is not supported yet
+        AddArgument("GroupKeySet", &mComplex_GroupKeySet);
         ModelCommand::AddArguments();
     }
 
@@ -20371,6 +20443,7 @@ public:
 
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type> mComplex_GroupKeySet;
 };
 
 /*
@@ -20892,9 +20965,9 @@ private:
 class GroupsGetGroupMembership : public ModelCommand
 {
 public:
-    GroupsGetGroupMembership() : ModelCommand("get-group-membership")
+    GroupsGetGroupMembership() : ModelCommand("get-group-membership"), mComplex_GroupList(&mRequest.groupList)
     {
-        // groupList Array parsing is not supported yet
+        AddArgument("GroupList", &mComplex_GroupList);
         ModelCommand::AddArguments();
     }
 
@@ -20908,6 +20981,7 @@ public:
 
 private:
     chip::app::Clusters::Groups::Commands::GetGroupMembership::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint16_t>> mComplex_GroupList;
 };
 
 /*
@@ -27185,12 +27259,12 @@ private:
 class OtaSoftwareUpdateProviderQueryImage : public ModelCommand
 {
 public:
-    OtaSoftwareUpdateProviderQueryImage() : ModelCommand("query-image")
+    OtaSoftwareUpdateProviderQueryImage() : ModelCommand("query-image"), mComplex_ProtocolsSupported(&mRequest.protocolsSupported)
     {
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
-        // protocolsSupported Array parsing is not supported yet
+        AddArgument("ProtocolsSupported", &mComplex_ProtocolsSupported);
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
         AddArgument("Location", &mRequest.location);
         AddArgument("RequestorCanConsent", 0, 1, &mRequest.requestorCanConsent);
@@ -27208,6 +27282,8 @@ public:
 
 private:
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol>>
+        mComplex_ProtocolsSupported;
 };
 
 /*
@@ -27655,6 +27731,35 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProviders response", value);
     }
+};
+
+class WriteOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
+{
+public:
+    WriteOtaSoftwareUpdateRequestorDefaultOtaProviders() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "default-ota-providers");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> mValue;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>>
+        mComplex;
 };
 
 class ReportOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
@@ -35726,13 +35831,13 @@ private:
 class ScenesAddScene : public ModelCommand
 {
 public:
-    ScenesAddScene() : ModelCommand("add-scene")
+    ScenesAddScene() : ModelCommand("add-scene"), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
         AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
         AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
-        // extensionFieldSets Array parsing is not supported yet
+        AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
         ModelCommand::AddArguments();
     }
 
@@ -35746,6 +35851,8 @@ public:
 
 private:
     chip::app::Clusters::Scenes::Commands::AddScene::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>>
+        mComplex_ExtensionFieldSets;
 };
 
 /*
@@ -38852,9 +38959,9 @@ private:
 class TestClusterSimpleStructEchoRequest : public ModelCommand
 {
 public:
-    TestClusterSimpleStructEchoRequest() : ModelCommand("simple-struct-echo-request")
+    TestClusterSimpleStructEchoRequest() : ModelCommand("simple-struct-echo-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Struct parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -38868,6 +38975,7 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
 };
 
 /*
@@ -38972,9 +39080,9 @@ private:
 class TestClusterTestListInt8UArgumentRequest : public ModelCommand
 {
 public:
-    TestClusterTestListInt8UArgumentRequest() : ModelCommand("test-list-int8uargument-request")
+    TestClusterTestListInt8UArgumentRequest() : ModelCommand("test-list-int8uargument-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Array parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -38988,6 +39096,7 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
 };
 
 /*
@@ -38996,9 +39105,9 @@ private:
 class TestClusterTestListInt8UReverseRequest : public ModelCommand
 {
 public:
-    TestClusterTestListInt8UReverseRequest() : ModelCommand("test-list-int8ureverse-request")
+    TestClusterTestListInt8UReverseRequest() : ModelCommand("test-list-int8ureverse-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Array parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -39012,6 +39121,7 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
 };
 
 /*
@@ -39020,9 +39130,10 @@ private:
 class TestClusterTestListNestedStructListArgumentRequest : public ModelCommand
 {
 public:
-    TestClusterTestListNestedStructListArgumentRequest() : ModelCommand("test-list-nested-struct-list-argument-request")
+    TestClusterTestListNestedStructListArgumentRequest() :
+        ModelCommand("test-list-nested-struct-list-argument-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Array parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -39036,6 +39147,8 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
+        mComplex_Arg1;
 };
 
 /*
@@ -39044,9 +39157,9 @@ private:
 class TestClusterTestListStructArgumentRequest : public ModelCommand
 {
 public:
-    TestClusterTestListStructArgumentRequest() : ModelCommand("test-list-struct-argument-request")
+    TestClusterTestListStructArgumentRequest() : ModelCommand("test-list-struct-argument-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Array parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -39060,6 +39173,8 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
+        mComplex_Arg1;
 };
 
 /*
@@ -39068,9 +39183,10 @@ private:
 class TestClusterTestNestedStructArgumentRequest : public ModelCommand
 {
 public:
-    TestClusterTestNestedStructArgumentRequest() : ModelCommand("test-nested-struct-argument-request")
+    TestClusterTestNestedStructArgumentRequest() :
+        ModelCommand("test-nested-struct-argument-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Struct parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -39084,6 +39200,7 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStruct::Type> mComplex_Arg1;
 };
 
 /*
@@ -39092,9 +39209,10 @@ private:
 class TestClusterTestNestedStructListArgumentRequest : public ModelCommand
 {
 public:
-    TestClusterTestNestedStructListArgumentRequest() : ModelCommand("test-nested-struct-list-argument-request")
+    TestClusterTestNestedStructListArgumentRequest() :
+        ModelCommand("test-nested-struct-list-argument-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Struct parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -39108,6 +39226,7 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type> mComplex_Arg1;
 };
 
 /*
@@ -39204,9 +39323,9 @@ private:
 class TestClusterTestStructArgumentRequest : public ModelCommand
 {
 public:
-    TestClusterTestStructArgumentRequest() : ModelCommand("test-struct-argument-request")
+    TestClusterTestStructArgumentRequest() : ModelCommand("test-struct-argument-request"), mComplex_Arg1(&mRequest.arg1)
     {
-        // arg1 Struct parsing is not supported yet
+        AddArgument("Arg1", &mComplex_Arg1);
         ModelCommand::AddArguments();
     }
 
@@ -39220,6 +39339,7 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
 };
 
 /*
@@ -41852,6 +41972,33 @@ public:
     }
 };
 
+class WriteTestClusterListInt8u : public ModelCommand
+{
+public:
+    WriteTestClusterListInt8u() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-int8u");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListInt8u() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const uint8_t> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex;
+};
+
 class ReportTestClusterListInt8u : public ModelCommand
 {
 public:
@@ -41922,6 +42069,33 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "TestCluster.ListOctetString response", value);
     }
+};
+
+class WriteTestClusterListOctetString : public ModelCommand
+{
+public:
+    WriteTestClusterListOctetString() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-octet-string");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::ByteSpan> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
 };
 
 class ReportTestClusterListOctetString : public ModelCommand
@@ -41997,6 +42171,34 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "TestCluster.ListStructOctetString response", value);
     }
+};
+
+class WriteTestClusterListStructOctetString : public ModelCommand
+{
+public:
+    WriteTestClusterListStructOctetString() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-struct-octet-string");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListStructOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>>
+        mComplex;
 };
 
 class ReportTestClusterListStructOctetString : public ModelCommand
@@ -42657,6 +42859,35 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "TestCluster.ListNullablesAndOptionalsStruct response", value);
     }
+};
+
+class WriteTestClusterListNullablesAndOptionalsStruct : public ModelCommand
+{
+public:
+    WriteTestClusterListNullablesAndOptionalsStruct() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-nullables-and-optionals-struct");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListNullablesAndOptionalsStruct() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type> mValue;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>>
+        mComplex;
 };
 
 class ReportTestClusterListNullablesAndOptionalsStruct : public ModelCommand
@@ -47045,7 +47276,7 @@ private:
 class ThermostatSetWeeklySchedule : public ModelCommand
 {
 public:
-    ThermostatSetWeeklySchedule() : ModelCommand("set-weekly-schedule")
+    ThermostatSetWeeklySchedule() : ModelCommand("set-weekly-schedule"), mComplex_Payload(&mRequest.payload)
     {
         AddArgument("NumberOfTransitionsForSequence", 0, UINT8_MAX, &mRequest.numberOfTransitionsForSequence);
         AddArgument(
@@ -47054,7 +47285,7 @@ public:
         AddArgument("ModeForSequence", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(
                         &mRequest.modeForSequence));
-        // payload Array parsing is not supported yet
+        AddArgument("Payload", &mComplex_Payload);
         ModelCommand::AddArguments();
     }
 
@@ -47068,6 +47299,7 @@ public:
 
 private:
     chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Payload;
 };
 
 /*
@@ -54606,6 +54838,33 @@ public:
     }
 };
 
+class WriteUserLabelLabelList : public ModelCommand
+{
+public:
+    WriteUserLabelLabelList() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "label-list");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteUserLabelLabelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000041) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::UserLabel::Structs::LabelStruct::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>> mComplex;
+};
+
 class ReportUserLabelLabelList : public ModelCommand
 {
 public:
@@ -58116,8 +58375,10 @@ void registerClusterAccessControl(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadAccessControlAcl>(),                             //
+        make_unique<WriteAccessControlAcl>(),                            //
         make_unique<ReportAccessControlAcl>(),                           //
         make_unique<ReadAccessControlExtension>(),                       //
+        make_unique<WriteAccessControlExtension>(),                      //
         make_unique<ReportAccessControlExtension>(),                     //
         make_unique<ReadAccessControlAttributeList>(),                   //
         make_unique<ReportAccessControlAttributeList>(),                 //
@@ -59210,6 +59471,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
     commands_list clusterCommands = {
         make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),       //
         make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProviders>(),   //
+        make_unique<WriteOtaSoftwareUpdateRequestorDefaultOtaProviders>(),  //
         make_unique<ReportOtaSoftwareUpdateRequestorDefaultOtaProviders>(), //
         make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),        //
         make_unique<ReportOtaSoftwareUpdateRequestorUpdatePossible>(),      //
@@ -59757,10 +60019,13 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterOctetString>(),                        //
         make_unique<ReportTestClusterOctetString>(),                       //
         make_unique<ReadTestClusterListInt8u>(),                           //
+        make_unique<WriteTestClusterListInt8u>(),                          //
         make_unique<ReportTestClusterListInt8u>(),                         //
         make_unique<ReadTestClusterListOctetString>(),                     //
+        make_unique<WriteTestClusterListOctetString>(),                    //
         make_unique<ReportTestClusterListOctetString>(),                   //
         make_unique<ReadTestClusterListStructOctetString>(),               //
+        make_unique<WriteTestClusterListStructOctetString>(),              //
         make_unique<ReportTestClusterListStructOctetString>(),             //
         make_unique<ReadTestClusterLongOctetString>(),                     //
         make_unique<WriteTestClusterLongOctetString>(),                    //
@@ -59781,6 +60046,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterVendorId>(),                           //
         make_unique<ReportTestClusterVendorId>(),                          //
         make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(),     //
+        make_unique<WriteTestClusterListNullablesAndOptionalsStruct>(),    //
         make_unique<ReportTestClusterListNullablesAndOptionalsStruct>(),   //
         make_unique<ReadTestClusterEnumAttr>(),                            //
         make_unique<WriteTestClusterEnumAttr>(),                           //
@@ -60171,6 +60437,7 @@ void registerClusterUserLabel(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadUserLabelLabelList>(),         //
+        make_unique<WriteUserLabelLabelList>(),        //
         make_unique<ReportUserLabelLabelList>(),       //
         make_unique<ReadUserLabelClusterRevision>(),   //
         make_unique<ReportUserLabelClusterRevision>(), //
