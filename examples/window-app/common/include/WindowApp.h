@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
-#include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
+#include <app/clusters/window-covering-server/window-covering-server.h>
+
+using namespace chip::app::Clusters::WindowCovering;
 
 class WindowApp
 {
@@ -117,6 +118,12 @@ public:
         static void OnTiltTimeout(Timer & timer);
 
         chip::EndpointId mEndpoint = 0;
+
+        // Attribute: Id 10 OperationalStatus
+        OperationalStatus mOperationalStatus = { .global = OperationalState::Stall,
+                                                 .lift   = OperationalState::Stall,
+                                                 .tilt   = OperationalState::Stall };
+
         Timer * mLiftTimer         = nullptr;
         Timer * mTiltTimer         = nullptr;
         EventId mLiftAction        = EventId::None;
