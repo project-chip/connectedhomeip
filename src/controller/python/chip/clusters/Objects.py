@@ -9269,7 +9269,7 @@ class SoftwareDiagnostics(Cluster):
 
     class Structs:
         @dataclass
-        class SoftwareFault(ClusterObject):
+        class SoftwareFaultStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -9448,10 +9448,10 @@ class SoftwareDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="softwareFault", Tag=0, Type=SoftwareDiagnostics.Structs.SoftwareFault),
+                            ClusterObjectFieldDescriptor(Label="softwareFault", Tag=0, Type=SoftwareDiagnostics.Structs.SoftwareFaultStruct),
                     ])
 
-            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFault' = field(default_factory=lambda: SoftwareDiagnostics.Structs.SoftwareFault())
+            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFaultStruct' = field(default_factory=lambda: SoftwareDiagnostics.Structs.SoftwareFaultStruct())
 
 
 @dataclass
