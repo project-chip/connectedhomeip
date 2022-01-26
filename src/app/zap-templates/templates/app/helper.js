@@ -419,7 +419,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
   }
 
   let typeStr = await templateUtil.ensureZclPackageId(this).then(fn.bind(this));
-  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+  if ((this.isArray || this.entryType) && !options.hash.forceNotList) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app.
@@ -522,7 +522,7 @@ async function _zapTypeToPythonClusterObjectType(type, options)
   }
 
   let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
-  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+  if ((this.isArray || this.entryType) && !options.hash.forceNotList) {
     promise = promise.then(typeStr => `typing.List[${typeStr}]`);
   }
 
@@ -602,7 +602,7 @@ async function _getPythonFieldDefault(type, options)
   }
 
   let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
-  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+  if ((this.isArray || this.entryType) && !options.hash.forceNotList) {
     promise = promise.then(typeStr => `field(default_factory=lambda: [])`);
   }
 

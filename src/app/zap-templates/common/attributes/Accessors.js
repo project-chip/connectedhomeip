@@ -33,7 +33,7 @@ function isUnsupportedType(type)
 
 function canHaveSimpleAccessors(attr)
 {
-  if (attr.isArray || attr.isList) {
+  if (attr.isArray) {
     return false;
   }
 

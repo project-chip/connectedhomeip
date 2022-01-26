@@ -420,7 +420,7 @@ public:
 {{#if isWritableAttribute}}
 {{! No list support for writing yet.  Need to figure out how to represent the
     values. }}
-{{#unless isList}}
+{{#unless isArray}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -526,7 +526,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#if isWritableAttribute}}
         {{! No list support for writing yet.  Need to figure out how to
             represent the values. }}
-        {{#unless isList}}
+        {{#unless isArray}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/unless}}
         {{/if}}
