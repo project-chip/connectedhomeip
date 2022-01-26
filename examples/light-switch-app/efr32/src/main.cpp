@@ -74,7 +74,7 @@
 #include "matter_shell.h"
 #endif
 
-#define BLE_DEV_NAME "SiLabs-Light"
+#define BLE_DEV_NAME "SiLabs-Light-Switch"
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;

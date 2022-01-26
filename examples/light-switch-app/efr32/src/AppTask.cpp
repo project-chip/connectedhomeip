@@ -21,6 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "binding-handler.h"
 #include "lcd.h"
 #include "qrcodegen.h"
 #include "sl_simple_led_instances.h"
@@ -214,6 +215,14 @@ CHIP_ERROR AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+    // Configure Bindings - TODO ERROR PROCESSING
+    err = InitBindingHandler();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("InitBindingHandler() failed");
+        appError(err);
+    }
+
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
     std::string QRCode;
@@ -326,22 +335,10 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
-    // bool initiated = false;
-    // int32_t actor;
-    // CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // if (aEvent->Type == AppEvent::kEventType_Button)
-    // {
-    //     actor = AppEvent::kEventType_Button;
-    // }
-    // else
-    // {
-    //     err = APP_ERROR_UNHANDLED_EVENT;
-    // }
-
-    // if (err == CHIP_NO_ERROR)
-    // {
-    // }
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        SwitchToggleOnOff();
+    }
 }
 
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)

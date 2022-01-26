@@ -132,7 +132,7 @@ efr32_sdk("sdk") {
 }
 
 efr32_executable("lighting_app") {
-  output_name = "chip-efr32-lighting-example.out"
+  output_name = "chip-efr32-light-switch-example.out"
   include_dirs = [ "include" ]
   defines = []
 
@@ -144,6 +144,7 @@ efr32_executable("lighting_app") {
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
+    "src/binding-handler.cpp",
     "src/main.cpp",
   ]
 
