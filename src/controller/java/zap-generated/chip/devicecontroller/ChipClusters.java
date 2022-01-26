@@ -1136,20 +1136,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void mfgSpecificPing(DefaultClusterCallback callback) {
-      mfgSpecificPing(chipClusterPtr, callback, null);
-    }
-
-    public void mfgSpecificPing(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-
-      mfgSpecificPing(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    private native void mfgSpecificPing(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
     public interface VendorIDAttributeCallback {
       void onSuccess(Integer value);
 

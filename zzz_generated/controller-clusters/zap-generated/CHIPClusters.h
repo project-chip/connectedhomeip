@@ -118,9 +118,6 @@ class DLL_EXPORT BasicCluster : public ClusterBase
 public:
     BasicCluster() : ClusterBase(app::Clusters::Basic::Id) {}
     ~BasicCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
