@@ -2,32 +2,25 @@
   <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
 </p>
 
-<h1> Matter Arm Mbed OS Lighting Example Application </h1>
+<h1> Matter Arm Mbed OS Lock Example Application </h1>
 
-The Arm Mbed OS Lighting Example demonstrates how to remotely control a dimmable
-white light source. The example takes advantage of the IO available on board:
+The Arm Mbed OS OTA Requestor Example demonstrates how to remotely trigger
+update image downloading and apply it if needed. Full functionality of this
+examples can be obtained with the addition of a Mbed bootloader that allows
+launching the right application image form memory. The example takes advantage
+of the IO available on board:
 
--   A button press turns the light on or off.
--   Intensity can be displayed and changed depending on the target IO (PWM
-    output, slider).
+-   A buttons press confirm or reject firmware update steps.
+-   A LED shows the application state.
 
 You can use this example as a reference for creating your own application.
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Arm Mbed OS, and
-supports remote access and control of lighting over a WiFi network.
+supports remote access and control of lock over a WiFi network.
 
 The example behaves as a Matter accessory, in other words a device that can be
 paired into an existing Matter network and can be controlled by this network.
-
-Pigweed functionalities are also integrated into this application. The Remote
-Procedure Call (RPC) server is created. It allows sending commands through the
-serial port to the device. The following RPC protocols services are available:
-
--   **Device** - perform basic operations on device: reboot, factory reset,
-    software update or get basic device information
--   **Button** - trigger specific button event (push/release)
--   **Lighting** - set/get lighting state (on/off/brightness level)
 
 <hr>
 
@@ -43,17 +36,16 @@ serial port to the device. The following RPC protocols services are available:
     -   [Testing](#testing)
         -   [Serial port terminal](#serial-port-terminal)
         -   [CHIP Tools](#chip-tools)
-        -   [RPC console](#rpc-console)
+            -   [Notes](#notes)
     -   [Supported devices](#supported-devices)
-        -   [Notes](#notes)
--   [Device UI](#device-ui)
-    -   [Notes](#notes-1)
+        -   [Notes](#notes-1)
+    -   [Device UI](#device-ui)
 
 <hr>
 
 # Overview
 
-The Matter device that runs the lighting application is controlled by the Matter
+The Matter device that runs the lock application is controlled by the Matter
 controller device over WiFi. By default, the Matter device is disconnected , and
 it should be paired with Matter controller and get configuration from it.
 Actions required before establishing full communication are described below.
@@ -118,19 +110,19 @@ $ source ./scripts/activate.sh
 
 ## Building
 
-The Lighting application can be built in the same way as any other Matter
+The OTA Requestor application can be built in the same way as any other Matter
 example ported to the mbed-os platform.
 
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile) => (build type)
+Command Palette (F1) => Run Task... => Run Mbed Application => build => ota-requestor-app => (board name) => (build profile) => (build type)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=lighting-app -b=<board name> -p=<build profile> -T=<build type>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=ota-requestor-app -b=<board name> -p=<build profile> -T=<build type>
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
@@ -155,8 +147,8 @@ targets; this may be useful for rapid testing of a new mbed-targets.
 
 ## Flashing
 
-The Lighting application can be flashed in the same way as any other Matter
-example ported to mbed-os platform.
+The Lock application can be flashed in the same way as any other Matter example
+ported to mbed-os platform.
 
 The [Open On-Chip Debugger](http://openocd.org/) is used to upload a binary
 image and reset the device.
@@ -164,19 +156,19 @@ image and reset the device.
 -   **by using VSCode task**:
 
 ```
-Command Palette (F1) => Run Task... -> Run Mbed Application => flash => lighting-app => (board name) => (build profile)
+Command Palette (F1) => Run Task... -> Run Mbed Application => flash => ota-requestor-app => (board name) => (build profile)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=flash -a=lighting-app -b=<board name> -p=<build profile>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=flash -a=ota-requestor-app -b=<board name> -p=<build profile>
 ```
 
 -   **by using VSCode launch task**:
 
 ```
-Run and Debug (Ctrl+Shift+D) => Flash Mbed examples => Start Debugging (F5) => (board name) => lighting-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Flash Mbed examples => Start Debugging (F5) => (board name) => ota-requestor-app => (build profile)
 ```
 
 The last option uses the Open On-Chip Debugger to open and manage the gdb-server
@@ -196,13 +188,18 @@ the gdb-server session. Then gdb-client (arm-none-eabi-gdb) connect the server
 to upload binary image and control debugging.
 
 ```
-Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (board name) => lighting-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (board name) => ota-requestor-app => (build profile)
 ```
 
 It is possible to connect to an external gdb-server session by using specific
 **'Debug Mbed examples [remote]'** task.
 
 ## Testing
+
+The provider application is required to transfer image file to OTA requestor.
+Mbed example is compatible with Linux version of OTA provider example. Read the
+[OTAProvider](../../ota-provider-app/linux/README.md) to see how to build and
+run the OTA provider.
 
 ### Serial port terminal
 
@@ -215,12 +212,13 @@ use **mbed-tools** for this purpose
 
 After device reset these lines should be visible:
 
-    [INFO][CHIP]: [-]Mbed lighting-app example application start
+    [INFO][CHIP]: [-]Mbed ota-requestor-app example application start
     ...
-    [INFO][CHIP]: [-]Mbed lighting-app example application run
 
-The lighting-app application launched correctly and you can follow traces in the
-terminal.
+[INFO][chip]: [-]Mbed ota-requestor-app example application run
+
+The ota-requestor-app application launched correctly and you can follow traces
+in the terminal.
 
 ### CHIP Tools
 
@@ -228,61 +226,32 @@ Read the [MbedCommissioning](../../../docs/guides/mbedos_commissioning.md) to
 see how to use different CHIP tools to commission and control the application
 within a WiFi network.
 
-### RPC console
+After commissioning is successful, announce OTA provider's presence using
+`OtaSoftwareUpdateRequestor` cluster with `AnnounceOtaProvider` command. On
+receiving this command OTA requestor will query for OTA image:
 
-The RPC console is an interactive Python shell console, where the different RPC
-command can be invoked. It is a complete solution for interacting with hardware
-devices using pw_rpc over a pw_hdlc transport. For more details about Pigweed
-modules visit [Pigweed modules](https://pigweed.dev/module_guides.html).
+    chip-device-ctrl > zcl OtaSoftwareUpdateRequestor AnnounceOtaProvider 1234 0 0 providerNodeId=1235 vendorId=9020 announcementReason=0
 
-**<h3> Building and installing </h3>**
+The OTA requestor should communicate with provider, download update image and
+apply it.
 
-To build and install the RPC console check the guide
-[CHIP RPC console](../../common/pigweed/rpc_console/README.md).
+#### Notes
 
-**<h3> Run </h3>**
+-   You have to provision the OTA Provider in the same Matter network. Use the
+    `connect -ip` command of Python Device Controller:
 
-To start the RPC console run the following command and provide device connection
-parameters as arguments:
+        chip-device-ctrl > connect -ip 127.0.0.1 20202021 1235
 
--   --device/-d the serial port to use.
--   --baudrate/-b the baud rate to use.
--   --output/-o the file to which to write device output (HDLC channel 1),
-    provide - or omit for stdout.
--   --socket-addr/-s alternatively use socket to connect to server, type default
-    for localhost:33000, or manually input the server address:port.
-
-Example:
-
-    python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
-
-To control the lighting type the following command, where you define if 'on'
-state is true or false:
-
-    In [1]: rpcs.chip.rpc.Lighting.Set(on=True)
-
-The response from the device should be:
-
-    Out[1]: (Status.OK, pw.protobuf.Empty())
-
-To check the lighting state type the following command:
-
-    In [1]: rpcs.chip.rpc.Lighting.Get()
-
-The response from the device should contain the current lighting state:
-
-    Out[1]: Status.OK, chip.rpc.LightingState(on=True))
-
-For more details about RPC console and supported services visit
-[CHIP RPC console](../../common/pigweed/rpc_console/README.md).
+-   POSIX CLI CHIPTool can be also used for testing this example. Use the
+    correct `chip-tool` arguments to perform above-mentioned steps.
 
 ## Supported devices
 
 The example supports building and running on the following mbed-enabled devices:
 
-| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li><li>Lighting LED should be an external component connected to PB9_6 pin (active high).</li></ul></details> <details><summary>Buttons</summary><ul><li>SW2 push-button is not used in this example due to its interaction with WIFI module interrupt line.</li><li>Button 0 corresponds to BTN0 capacitive button.</li><li>Button 1 corresponds to BTN1 capacitive button.</li></ul></details> <details><summary>Slider</summary><ul><li>The board's touch slider corresponds to UI slider</li></ul></details> |
+| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li><li>Lock state LED should be an external component connected to PB9_6 pin (active high).</li></ul></details> <details><summary>Buttons</summary><ul><li>SW2 push-button is not used in this example due to its interaction with WIFI module interrupt line.</li><li>Button 0 corresponds to BTN0 capacitive button.</li><li>Button 1 corresponds to BTN1 capacitive button.</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</ul></details> |
 
 #### Notes
 
@@ -290,12 +259,12 @@ The example supports building and running on the following mbed-enabled devices:
     project with Mbed OS can be found in
     [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
-    `lighting-app/mbed/mbed_app.json`.  
+    `ota-requestor-app/mbed/mbed_app.json`.  
     Information about this file syntax and its meaning in mbed-os project can be
     found here:
     [Mbed-Os configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html))
 
-# Device UI
+## Device UI
 
 This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
@@ -318,15 +287,6 @@ following states are possible:
 -   _Solid On_ &mdash; The device is fully provisioned and has full network and
     service connectivity.
 
-**Lighting LED** simulates the light bulb and shows the state of the lighting.
-The following states are possible:
-
--   _Solid On_ &mdash; The light bulb is on.
-
--   _Off_ &mdash; The light bulb is off.
-
--   _PWM_ &mdash; The light bulb is dimmed according to PWM.
-
 **Button 0** can be used for the following purposes:
 
 -   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
@@ -337,15 +297,8 @@ The following states are possible:
 -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
     process. This feature is not currently supported.
 
-**Button 1** &mdash; Pressing the button once changes the lighting state to the
-opposite one.
-
-**Slider** &mdash; This touch control allows you to change PWM and therefore the
-dimming lighting state from the OFF state to maximum brightness corresponding to
-ON state. Currently the dimming resolution is set from 0-255 to satisfy ZCL 8
-bit commands argument for lighting cluster.
-
-### Notes
+**Button 1** &mdash; Pressing the button once delete all fabric IDs and start
+BLE advertising.
 
 Some of the supported boards may not have sufficient number PCB components to
 follow above description. In that case please refer to
