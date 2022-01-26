@@ -150,7 +150,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     InitDataModelHandler(stateParams.exchangeMgr);
 
     stateParams.imDelegate = params.imDelegate;
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.imDelegate));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));

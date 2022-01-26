@@ -127,7 +127,7 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
                               uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
                                   onSubscriptionEstablishedCb = nullptr,
-                              bool fabricFiltered             = true)
+                              bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -135,6 +135,7 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
     params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
+    params.mKeepSubscriptions           = keepPreviousSubscriptions;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
     params.mIsFabricFiltered            = fabricFiltered;
     return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, std::move(params));
@@ -153,11 +154,12 @@ CHIP_ERROR SubscribeAttribute(
     uint16_t aMinIntervalFloorSeconds, uint16_t aMaxIntervalCeilingSeconds,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSubscriptionEstablishedCallbackType
         onSubscriptionEstablishedCb = nullptr,
-    bool fabricFiltered             = true)
+    bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
 {
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
         exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
-        onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, fabricFiltered);
+        onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, fabricFiltered,
+        keepPreviousSubscriptions);
 }
 
 namespace detail {

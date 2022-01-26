@@ -388,8 +388,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)mfgSpecificPingWithCompletionHandler:(StatusCompletion)completionHandler;
-
 - (void)readAttributeInteractionModelVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInteractionModelVersionWithMinInterval:(uint16_t)minInterval
