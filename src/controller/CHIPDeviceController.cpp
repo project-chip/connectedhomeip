@@ -1584,6 +1584,28 @@ void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, E
     base.SetCommandTimeout(timeout);
 }
 
+void DescriptorClusterPartsCallback(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & data)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    EndpointParts parts;
+    auto iter = data.begin();
+    while (iter.Next() && parts.numEndpoints < parts.kMaxEndpoints)
+    {
+        parts.endpoints[parts.numEndpoints++] = iter.GetValue();
+    }
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<EndpointParts>(parts);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void DescriptorClusterFailure(void * context, EmberAfStatus status)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    // TODO: Do we have a function to convert from ember status to chip status?
+    commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+}
+
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
@@ -1602,11 +1624,17 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
     switch (step)
     {
+    case CommissioningStage::kGetPartsList: {
+        ChipLogProgress(Controller, "Reading descriptor cluster parts list");
+        DescriptorCluster desc;
+        SetupCluster(desc, proxy, endpoint, timeout);
+        desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(this, DescriptorClusterPartsCallback,
+                                                                                             DescriptorClusterFailure);
+    }
+    break;
     case CommissioningStage::kArmFailsafe: {
         ChipLogProgress(Controller, "Arming failsafe");
-        // TODO(cecille): Find a way to enumerate the clusters here.
         GeneralCommissioningCluster genCom;
-        // TODO: should get the endpoint information from the descriptor cluster.
         SetupCluster(genCom, proxy, endpoint, timeout);
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
     }

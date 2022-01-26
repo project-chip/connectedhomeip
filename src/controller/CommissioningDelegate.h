@@ -28,6 +28,7 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
+    kGetPartsList,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
@@ -232,12 +233,22 @@ struct OperationalNodeFoundData
     OperationalNodeFoundData(OperationalDeviceProxy * proxy) : operationalProxy(proxy) {}
     OperationalDeviceProxy * operationalProxy;
 };
+
+struct EndpointParts
+{
+    EndpointParts() : numEndpoints(0) {}
+    // TODO: I don't think this is specified anywhere in the spec
+    // Is 10 reasonable? This is just to find the network commissioning clusters
+    static constexpr size_t kMaxEndpoints = 10;
+    EndpointId endpoints[kMaxEndpoints];
+    size_t numEndpoints;
+};
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, EndpointParts>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

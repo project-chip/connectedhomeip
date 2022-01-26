@@ -105,6 +105,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
+        return CommissioningStage::kGetPartsList;
+    case CommissioningStage::kGetPartsList:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -254,6 +256,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         switch (report.stageCompleted)
         {
+        case CommissioningStage::kGetPartsList:
+            mAllEndpoints = report.Get<EndpointParts>();
+            break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
             break;
@@ -294,6 +299,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = nullptr;
             mParams                  = CommissioningParameters();
+            mAllEndpoints            = EndpointParts();
             return CHIP_NO_ERROR;
         default:
             break;
