@@ -1230,12 +1230,13 @@ public class ChipStructs {
     }
   }
 
-  public static class SoftwareDiagnosticsClusterSoftwareFault {
+  public static class SoftwareDiagnosticsClusterSoftwareFaultStruct {
     public Long id;
     public String name;
     public byte[] faultRecording;
 
-    public SoftwareDiagnosticsClusterSoftwareFault(Long id, String name, byte[] faultRecording) {
+    public SoftwareDiagnosticsClusterSoftwareFaultStruct(
+        Long id, String name, byte[] faultRecording) {
       this.id = id;
       this.name = name;
       this.faultRecording = faultRecording;
@@ -1244,7 +1245,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterSoftwareFault {\n");
+      output.append("SoftwareDiagnosticsClusterSoftwareFaultStruct {\n");
       output.append("\tid: ");
       output.append(id);
       output.append("\n");

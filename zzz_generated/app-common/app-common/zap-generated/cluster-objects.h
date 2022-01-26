@@ -11350,7 +11350,7 @@ public:
 namespace SoftwareDiagnostics {
 
 namespace Structs {
-namespace SoftwareFault {
+namespace SoftwareFaultStruct {
 enum class Fields
 {
     kId             = 0,
@@ -11371,7 +11371,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace SoftwareFault
+} // namespace SoftwareFaultStruct
 namespace ThreadMetrics {
 enum class Fields
 {
@@ -11564,7 +11564,7 @@ public:
     static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
-    Structs::SoftwareFault::Type softwareFault;
+    Structs::SoftwareFaultStruct::Type softwareFault;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11576,7 +11576,7 @@ public:
     static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
-    Structs::SoftwareFault::DecodableType softwareFault;
+    Structs::SoftwareFaultStruct::DecodableType softwareFault;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
