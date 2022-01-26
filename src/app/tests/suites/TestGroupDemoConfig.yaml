@@ -12,6 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# !!!!!!!!!! DO NOT RUN IN CI - ONLY USED IN MANUAL GROUP MESSAGING DEMONSTRATION !!!!!!!!!!
+
+# This test files is used in the group messaging demonstration to configure light-apps
+# Run this test on a commisionned device to add it to the group.
+# This file is used in tadem with TestGroupDemoCommand that sends the actual commands.
+#
+# To run this test file : chip-tool tests TestGroupDemoConfig <nodeid>
+#
+# Full test procedure :
+#   chip-tool tests TestGroupDemoConfig <nodeid>  - Run this command every light app nodeid that will be used for the demonstration
+#   chip-tool tests TestGroupDemoCommand <nodeid>
 name: Group Messaging Demo - Configuration
 
 config:
