@@ -198,7 +198,7 @@ void RegisterOtaCommands()
         { &ProgressHandler, "progress", "Gets progress of a current image update process. Usage: ota progress" }
     };
 
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands), "ota");
 
     // Register the root `ota` command in the top-level shell.
     static const shell_command_t otaCommand = { &OtaHandler, "ota", "OTA commands" };

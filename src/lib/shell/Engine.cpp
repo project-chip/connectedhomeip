@@ -171,8 +171,8 @@ CHIP_ERROR Engine::GetCommandCompletions(cmd_completion_context * context)
         // - there is no "incomplete command" so set it to empty
         prefix         = new char[buf_len + 1];
         incomplete_cmd = new char[1];
-        strlcpy(prefix, buf, buf_len + 1);
-        strlcpy(incomplete_cmd, "", 1);
+        strncpy(prefix, buf, buf_len + 1);
+        strncpy(incomplete_cmd, "", 1);
     }
     else
     {
@@ -182,8 +182,8 @@ CHIP_ERROR Engine::GetCommandCompletions(cmd_completion_context * context)
         bool no_space  = (last_space_idx == -1) ? true : false;
         prefix         = new char[last_space_idx + 1 + no_space];
         incomplete_cmd = new char[buf_len - last_space_idx];
-        strlcpy(prefix, buf, last_space_idx + 1 + no_space);
-        strlcpy(incomplete_cmd, &buf[last_space_idx + 1], buf_len - last_space_idx);
+        strncpy(prefix, buf, last_space_idx + 1 + no_space);
+        strncpy(incomplete_cmd, &buf[last_space_idx + 1], buf_len - last_space_idx);
     }
 
     // Array to pass arguments into the ForEachCommand call
