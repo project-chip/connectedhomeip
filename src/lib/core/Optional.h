@@ -68,7 +68,12 @@ public:
     {
         if (mHasValue)
         {
+#pragma GCC diagnostic push
+#if !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
             new (&mValue.mData) T(other.mValue.mData);
+#pragma GCC diagnostic pop
         }
     }
 
