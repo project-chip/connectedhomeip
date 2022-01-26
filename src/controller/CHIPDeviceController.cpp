@@ -1632,12 +1632,34 @@ void DescriptorClusterServerCallback(void * context, const chip::app::DataModel:
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
-void DescriptorClusterFailure(void * context, EmberAfStatus status)
+void BasicVendorCallback(void * context, VendorId vendorId)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<BasicVendor>(vendorId);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
 
-    // TODO: Do we have a function to convert from ember status to chip status?
-    commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+void BasicProductCallback(void * context, uint16_t productId)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<BasicProduct>(productId);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void BasicSoftwareCallback(void * context, uint32_t softwareVersion)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<BasicSoftware>(softwareVersion);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void AttributeReadFailure(void * context, CHIP_ERROR status)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(status);
 }
 
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
@@ -1658,12 +1680,37 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
     switch (step)
     {
+    case CommissioningStage::kReadVendorId: {
+        ChipLogProgress(Controller, "Reading vendor ID");
+        BasicCluster basic;
+        SetupCluster(basic, proxy, endpoint, timeout);
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, BasicVendorCallback,
+                                                                                        AttributeReadFailure);
+    }
+    break;
+    case CommissioningStage::kReadProductId: {
+        ChipLogProgress(Controller, "Reading product ID");
+        BasicCluster basic;
+        SetupCluster(basic, proxy, endpoint, timeout);
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(this, BasicProductCallback,
+                                                                                         AttributeReadFailure);
+    }
+    break;
+    case CommissioningStage::kReadSoftwareVersion: {
+        ChipLogProgress(Controller, "Reading software version");
+        BasicCluster basic;
+        SetupCluster(basic, proxy, endpoint, timeout);
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, BasicSoftwareCallback,
+                                                                                               AttributeReadFailure);
+    }
+    break;
+
     case CommissioningStage::kGetPartsList: {
         ChipLogProgress(Controller, "Reading descriptor cluster parts list");
         DescriptorCluster desc;
         SetupCluster(desc, proxy, endpoint, timeout);
         desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(this, DescriptorClusterPartsCallback,
-                                                                                             DescriptorClusterFailure);
+                                                                                             AttributeReadFailure);
     }
     break;
     case CommissioningStage::kCheckEndpointIsCommissionable: {
@@ -1671,7 +1718,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         DescriptorCluster desc;
         SetupCluster(desc, proxy, endpoint, timeout);
         desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(this, DescriptorClusterServerCallback,
-                                                                                              DescriptorClusterFailure);
+                                                                                              AttributeReadFailure);
     }
     break;
     case CommissioningStage::kArmFailsafe: {

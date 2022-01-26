@@ -28,6 +28,9 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
+    kReadVendorId,
+    kReadProductId,
+    kReadSoftwareVersion,
     kGetPartsList,
     kCheckEndpointIsCommissionable,
     kArmFailsafe,
@@ -251,12 +254,30 @@ struct EndpointCommissioningInfo
     bool hasNetworkCluster = false;
 };
 
+struct BasicVendor
+{
+    BasicVendor(VendorId id) : vendorId(id) {}
+    VendorId vendorId;
+};
+
+struct BasicProduct
+{
+    BasicProduct(uint16_t id) : productId(id) {}
+    uint16_t productId;
+};
+
+struct BasicSoftware
+{
+    BasicSoftware(uint32_t version) : softwareVersion(version) {}
+    uint32_t softwareVersion;
+};
+
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
-                                         EndpointParts, EndpointCommissioningInfo>
+                                         EndpointParts, EndpointCommissioningInfo, BasicVendor, BasicProduct, BasicSoftware>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

@@ -106,6 +106,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
+        return CommissioningStage::kReadVendorId;
+    case CommissioningStage::kReadVendorId:
+        return CommissioningStage::kReadProductId;
+    case CommissioningStage::kReadProductId:
+        return CommissioningStage::kReadSoftwareVersion;
+    case CommissioningStage::kReadSoftwareVersion:
         return CommissioningStage::kGetPartsList;
     case CommissioningStage::kGetPartsList:
         return CommissioningStage::kCheckEndpointIsCommissionable;
@@ -274,6 +280,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         switch (report.stageCompleted)
         {
+        case CommissioningStage::kReadVendorId:
+            mVendorId = report.Get<BasicVendor>().vendorId;
+            break;
+        case CommissioningStage::kReadProductId:
+            mProductId = report.Get<BasicProduct>().productId;
+            break;
+        case CommissioningStage::kReadSoftwareVersion:
+            mSoftwareVersion = report.Get<BasicSoftware>().softwareVersion;
+            break;
         case CommissioningStage::kGetPartsList:
             mAllEndpoints = report.Get<EndpointParts>();
             break;
