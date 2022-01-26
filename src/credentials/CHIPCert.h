@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -198,9 +198,10 @@ enum
  */
 struct ChipRDN
 {
-    CharSpan mString;         /**< Attribute value when encoded as a string. */
-    uint64_t mChipVal;        /**< CHIP specific DN attribute value. */
-    chip::ASN1::OID mAttrOID; /**< DN attribute CHIP OID. */
+    CharSpan mString;                                         /**< Attribute value when encoded as a string. */
+    uint64_t mChipVal;                                        /**< CHIP specific DN attribute value. */
+    chip::ASN1::OID mAttrOID = chip::ASN1::kOID_NotSpecified; /**< DN attribute CHIP OID. */
+    bool mAttrIsPrintableString;                              /**< Specifies if attribute is a printable string type. */
 
     bool IsEqual(const ChipRDN & other) const;
     bool IsEmpty() const { return mAttrOID == chip::ASN1::kOID_NotSpecified; }
@@ -235,10 +236,11 @@ public:
      * @param oid     String OID for DN attribute.
      * @param val     A CharSpan object containing a pointer and length of the DN string attribute
      *                buffer. The value in the buffer should remain valid while the object is in use.
+     * @param isPrintableString  Specifies if attribute ASN1 type is a printable string.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, CharSpan val);
+    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrintableString);
 
     /**
      * @brief Determine type of a CHIP certificate.
@@ -264,6 +266,18 @@ public:
      * @brief Retrieve the Fabric ID of a CHIP certificate.
      **/
     CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
+
+    /**
+     * @brief Decode ChipDN attributes from TLV encoded format.
+     *
+     * @param reader  A TLVReader positioned at the ChipDN TLV list.
+     **/
+    CHIP_ERROR DecodeFromTLV(chip::TLV::TLVReader & reader);
+
+    /**
+     * @brief Encode ChipDN attributes in ASN1 form.
+     **/
+    CHIP_ERROR EncodeToASN1(ASN1::ASN1Writer & writer) const;
 
     bool IsEqual(const ChipDN & other) const;
 
@@ -613,23 +627,13 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
  **/
 CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & x509Cert);
 
-// TODO: Add support for Authentication Tag Attribute
 struct X509CertRequestParams
 {
     int64_t SerialNumber;
-    uint64_t Issuer;
     uint32_t ValidityStart;
     uint32_t ValidityEnd;
-    bool HasFabricID;
-    uint64_t FabricID;
-    bool HasNodeID;
-    uint64_t NodeID;
-};
-
-enum CertificateIssuerLevel
-{
-    kIssuerIsRootCA,
-    kIssuerIsIntermediateCA,
+    ChipDN SubjectDN;
+    ChipDN IssuerDN;
 };
 
 /**
@@ -648,16 +652,14 @@ CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::
  * @brief Generate a new X.509 DER encoded Intermediate CA certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param subject         The requested subject ID
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, uint64_t subject,
-                          const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                          MutableByteSpan & x509Cert);
+CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
+                          Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
@@ -670,9 +672,8 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, uint64_t 
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel,
-                                      const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                                      MutableByteSpan & x509Cert);
+CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
+                                      Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief
