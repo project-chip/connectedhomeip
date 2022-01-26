@@ -24,7 +24,7 @@ using namespace chip::app::Clusters::TargetNavigator;
 CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & aEncoder)
 {
     // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         int maximumVectorSize = 2;
         for (int i = 0; i < maximumVectorSize; ++i)
         {
