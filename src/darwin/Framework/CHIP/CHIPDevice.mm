@@ -99,7 +99,7 @@ private:
     void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
         const StatusIB & aStatus) override;
 
-    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aStatus) override;
+    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override;
 
     void OnDone(ReadClient * apReadClient) override;
 
@@ -254,7 +254,7 @@ void SubscriptionCallback::OnAttributeData(
     [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value]];
 }
 
-void SubscriptionCallback::OnError(const ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aStatus)
+void SubscriptionCallback::OnError(const ReadClient * apReadClient, CHIP_ERROR aError)
 {
     ReportError([CHIPError errorForCHIPErrorCode:aError]);
 }
