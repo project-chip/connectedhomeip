@@ -201,10 +201,8 @@ public:
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
     {
-        // mCluster
         ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
         ReturnErrorOnFailure(reader.Get(mCluster));
-        // mFabricIndex
         ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
         return reader.Get(mDeviceType);
     }
@@ -570,20 +568,15 @@ public:
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        // mInUse
         ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagInUse)));
         ReturnErrorOnFailure(reader.Get(mInUse));
-        // mFabricIndex
         ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagFabricIndex)));
         ReturnErrorOnFailure(reader.Get(mFabricIndex));
-        // mAuthMode
         ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagAuthMode)));
         ReturnErrorOnFailure(reader.Get(mAuthMode));
-        // mPrivilege
         ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagPrivilege)));
         ReturnErrorOnFailure(reader.Get(mPrivilege));
 
-        // mSubjects
         chip::TLV::TLVType innerContainer;
         ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Array, chip::TLV::ContextTag(kTagSubjects)));
         ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
@@ -1266,13 +1259,11 @@ private:
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        // Version
         ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagVersion)));
         uint32_t version;
         ReturnErrorOnFailure(reader.Get(version));
         VerifyOrReturnError(version == kExampleAclStorageVersion, CHIP_ERROR_VERSION_MISMATCH);
 
-        // Entries
         for (size_t i = 0; i < EntryStorage::kNumberOfFabrics * EntryStorage::kEntriesPerFabric; ++i)
         {
             ReturnErrorOnFailure(EntryStorage::acl[i].Deserialize(mStorageDelegate, key.AccessControlEntry(i)));
