@@ -236,6 +236,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value);
 CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::TestCluster::Events::TestNullableFabricScopedEvent::DecodableType value);
 
 #if CHIP_PROGRESS_LOGGING
 std::string IndentStr(size_t indent)
@@ -3570,6 +3574,36 @@ CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::Test
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg6'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Arg1", indent + 1, value.arg1);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg1'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::TestCluster::Events::TestNullableFabricScopedEvent::DecodableType value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Arg1", indent + 1, value.arg1);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'Arg1'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -41793,6 +41827,8 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * TestEvent                                                         | 0x0001 |
+| * TestFabricScopedEvent                                             | 0x0002 |
+| * TestNullableFabricScopedEvent                                     | 0x0003 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -42275,6 +42311,151 @@ public:
     static void OnValueReport(void * context, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
     {
         LogValue("TestCluster.TestEvent report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+/*
+ * Event TestFabricScopedEvent
+ */
+class ReadTestClusterTestFabricScopedEvent : public ModelCommand
+{
+public:
+    ReadTestClusterTestFabricScopedEvent() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "test-fabric-scoped-event");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterTestFabricScopedEvent() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.TestFabricScopedEvent response", value);
+    }
+};
+
+class ReportTestClusterTestFabricScopedEvent : public ModelCommand
+{
+public:
+    ReportTestClusterTestFabricScopedEvent() : ModelCommand("report-event")
+    {
+        AddArgument("event-name", "test-fabric-scoped-event");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterTestFabricScopedEvent() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value)
+    {
+        LogValue("TestCluster.TestFabricScopedEvent report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+/*
+ * Event TestNullableFabricScopedEvent
+ */
+class ReadTestClusterTestNullableFabricScopedEvent : public ModelCommand
+{
+public:
+    ReadTestClusterTestNullableFabricScopedEvent() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "test-nullable-fabric-scoped-event");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterTestNullableFabricScopedEvent() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadEvent (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::TestCluster::Events::TestNullableFabricScopedEvent::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::TestCluster::Events::TestNullableFabricScopedEvent::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.TestNullableFabricScopedEvent response", value);
+    }
+};
+
+class ReportTestClusterTestNullableFabricScopedEvent : public ModelCommand
+{
+public:
+    ReportTestClusterTestNullableFabricScopedEvent() : ModelCommand("report-event")
+    {
+        AddArgument("event-name", "test-nullable-fabric-scoped-event");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterTestNullableFabricScopedEvent() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportEvent (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::TestCluster::Events::TestNullableFabricScopedEvent::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context,
+                              chip::app::Clusters::TestCluster::Events::TestNullableFabricScopedEvent::DecodableType value)
+    {
+        LogValue("TestCluster.TestNullableFabricScopedEvent report", 0, value);
     }
 
 private:
@@ -62670,6 +62851,10 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReportTestClusterClusterRevision>(),                   //
         make_unique<ReadTestClusterTestEvent>(),                           //
         make_unique<ReportTestClusterTestEvent>(),                         //
+        make_unique<ReadTestClusterTestFabricScopedEvent>(),               //
+        make_unique<ReportTestClusterTestFabricScopedEvent>(),             //
+        make_unique<ReadTestClusterTestNullableFabricScopedEvent>(),       //
+        make_unique<ReportTestClusterTestNullableFabricScopedEvent>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);
