@@ -159,6 +159,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/BindingManager.cpp",
           "${_app_root}/clusters/${cluster}/BindingManager.h",
+          "${_app_root}/clusters/${cluster}/PendingNotificationMap.cpp",
+          "${_app_root}/clusters/${cluster}/PendingNotificationMap.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

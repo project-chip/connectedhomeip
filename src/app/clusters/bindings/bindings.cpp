@@ -108,9 +108,10 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
         return true;
     }
 
+    emberSetBinding(bindingIndex, &bindingEntry);
     if (nodeId)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(fabricIndex, nodeId);
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(bindingIndex);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(
@@ -118,24 +119,9 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
                 ChipLogValueX64(nodeId), err.Format());
         }
     }
-    emberSetBinding(bindingIndex, &bindingEntry);
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
-}
-
-static uint8_t GetNumberOfUnicastBindingForNode(FabricIndex fabric, NodeId node)
-{
-    uint8_t numBinding = 0;
-    EmberBindingTableEntry entry;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type == EMBER_UNICAST_BINDING && entry.fabricIndex == fabric &&
-            entry.nodeId == node)
-        {
-            numBinding++;
-        }
-    }
-    return numBinding;
 }
 
 bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -173,17 +159,14 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
         return true;
     }
 
-    emberDeleteBinding(bindingIndex);
-    if (nodeId != 0 && GetNumberOfUnicastBindingForNode(fabricIndex, nodeId) == 0)
+    CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingRemoved(bindingIndex);
+    if (err != CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().LastUnicastBindingRemoved(fabricIndex, nodeId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Binding: Failed to disconnect device " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
-                         err.AsString());
-        }
+        ChipLogError(Zcl, "Binding: Failed to remove pending notification for unicast binding" ChipLogFormatX64 ": %s",
+                     ChipLogValueX64(nodeId), err.AsString());
     }
 
+    emberDeleteBinding(bindingIndex);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
