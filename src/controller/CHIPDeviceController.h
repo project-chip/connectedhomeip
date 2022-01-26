@@ -346,6 +346,11 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
+    /**
+     * @brief Get the Node ID of this instance.
+     */
+    NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
+
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
 protected:
@@ -415,7 +420,7 @@ private:
 
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
-    static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
+    static void OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR OpenCommissioningWindowInternal();
 
@@ -724,7 +729,8 @@ private:
     /* This function sends the operational credentials to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf,
+                                          AesCcm128KeySpan ipk, NodeId adminSubject);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a reference to the device object.
      */
@@ -772,7 +778,7 @@ private:
     static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                           const ByteSpan & rcac);
+                                           const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
 
     /**
      * @brief

@@ -30,7 +30,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
         {
             Structs::TargetInfo::Type outputInfo;
             outputInfo.identifier = static_cast<uint8_t>(i + 1);
-            outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
+            outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
         }
         return CHIP_NO_ERROR;
@@ -47,7 +47,7 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
 {
     // TODO: Insert code here
     Commands::NavigateTargetResponse::Type response;
-    response.data   = chip::CharSpan("data response", strlen("data response"));
+    response.data   = chip::CharSpan::fromCharString("data response");
     response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
     helper.Success(response);
 }

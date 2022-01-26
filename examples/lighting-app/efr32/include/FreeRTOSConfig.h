@@ -127,34 +127,14 @@ extern "C" {
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-/* Set configCREATE_LOW_POWER_DEMO as follows:
- *
- * 0: Build the full test and demo application.
- * 1: Build the simple blinky tickless low power demo, generating the tick
- *    interrupt from the RTCC.  EM2 will be entered.  The LXFO clock is used.
- *  See the comments at the top of main.c, main_full.c and main_low_power.c for
- *  more information.
- */
-
-#define configCREATE_LOW_POWER_DEMO (0)
-
-/* Some configuration is dependent on the demo being built. */
-#if (configCREATE_LOW_POWER_DEMO == 0)
-
-/* Tickless mode is not used. */
-
-/* Some of the standard demo test tasks assume a tick rate of 1KHz, even
-though that is faster than would normally be warranted by a real
-application. */
-#define configTICK_RATE_HZ (1000)
-
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
 #else
 #define configUSE_TICKLESS_IDLE 0
-#endif
+#endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
+#define configTICK_RATE_HZ (1000)
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
@@ -163,30 +143,6 @@ application. */
 #define configCHECK_FOR_STACK_OVERFLOW (2)
 #define configUSE_MALLOC_FAILED_HOOK (1)
 #define configUSE_IDLE_HOOK (1)
-
-#define configENERGY_MODE (sleepEM1)
-
-#else
-
-/* Tickless idle mode, generating RTOS tick interrupts from the RTC, fed
-by the LXFO clock. */
-
-/* The slow clock used to generate the tick interrupt in the low power demo
-runs at 32768/8=4096Hz.  Ensure the tick rate is a multiple of the clock. */
-#define configTICK_RATE_HZ (128)
-
-/* The low power demo uses the tickless idle feature. */
-#define configUSE_TICKLESS_IDLE (1)
-#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION (1)
-
-/* Hook function related definitions. */
-#define configUSE_TICK_HOOK (0)
-#define configCHECK_FOR_STACK_OVERFLOW (0)
-#define configUSE_MALLOC_FAILED_HOOK (0)
-#define configUSE_IDLE_HOOK (1)
-
-#define configENERGY_MODE (sleepEM3)
-#endif
 
 /* Main functions*/
 /* Run time stats gathering related definitions. */

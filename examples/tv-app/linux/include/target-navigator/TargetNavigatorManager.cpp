@@ -36,7 +36,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
         {
             Structs::TargetInfo::Type outputInfo;
             outputInfo.identifier = static_cast<uint8_t>(i + 1);
-            outputInfo.name       = CharSpan(entry.c_str(), entry.length());
+            outputInfo.name       = CharSpan::fromCharString(entry.c_str());
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
             i++;
         }
@@ -55,7 +55,7 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     NavigateTargetResponseType response;
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
-        response.data = CharSpan("error", strlen("error"));
+        response.data = CharSpan::fromCharString("error");
         // TODO: should be TARGET_NOT_FOUND
         response.status = StatusEnum::kAppNotAvailable;
         helper.Success(response);
@@ -63,7 +63,7 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
-    response.data   = CharSpan("data response", strlen("data response"));
+    response.data   = CharSpan::fromCharString("data response");
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }

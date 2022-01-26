@@ -86,7 +86,7 @@ public:
         mBdxDownloader      = downloader;
 
         uint32_t version;
-        VerifyOrDie(app::Clusters::Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &version) == EMBER_ZCL_STATUS_SUCCESS);
+        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
@@ -102,6 +102,12 @@ public:
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    // Get image update progress in percents unit
+    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
+
+    // Get requestor state
+    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
 
     /**
      * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
@@ -254,19 +260,19 @@ private:
      * QueryImage callbacks
      */
     static void OnQueryImageResponse(void * context, const QueryImageResponseDecodableType & response);
-    static void OnQueryImageFailure(void * context, EmberAfStatus status);
+    static void OnQueryImageFailure(void * context, CHIP_ERROR error);
 
     /**
      * ApplyUpdate callbacks
      */
     static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
-    static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+    static void OnApplyUpdateFailure(void * context, CHIP_ERROR error);
 
     /**
      * NotifyUpdateApplied callbacks
      */
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
-    static void OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus);
+    static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     NodeId mProviderNodeId                    = kUndefinedNodeId;

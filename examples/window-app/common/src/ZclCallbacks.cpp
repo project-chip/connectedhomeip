@@ -58,6 +58,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    OperationalState opState;
 
     switch (attributePath.mAttributeId)
     {
@@ -76,32 +77,28 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
     case Attributes::TargetPositionLiftPercent100ths::Id:
         Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
         Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-        if (!current.IsNull() && !target.IsNull())
+        opState = ComputeOperationalState(target, current);
+        if (OperationalState::MovingDownOrClose == opState)
         {
-            if (current.Value() > target.Value())
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
-            }
-            else if (current.Value() < target.Value())
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
-            }
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
+        }
+        else if (OperationalState::MovingUpOrOpen == opState)
+        {
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
         }
         break;
 
     case Attributes::TargetPositionTiltPercent100ths::Id:
         Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
         Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-        if (!current.IsNull() && !target.IsNull())
+        opState = ComputeOperationalState(target, current);
+        if (OperationalState::MovingDownOrClose == opState)
         {
-            if (current.Value() > target.Value())
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
-            }
-            else if (current.Value() < target.Value())
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
-            }
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
+        }
+        else if (OperationalState::MovingUpOrOpen == opState)
+        {
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
         }
         break;
 

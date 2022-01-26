@@ -2418,7 +2418,7 @@ server cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   readonly attribute ThreadMetrics threadMetrics[] = 0;
@@ -2607,6 +2607,8 @@ server cluster TestCluster = 1295 {
   readonly attribute LONG_OCTET_STRING listLongOctetString[] = 42;
   readonly attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
+  attribute boolean generalErrorBoolean = 49;
+  attribute boolean clusterErrorBoolean = 50;
   attribute nullable boolean nullableBoolean = 32768;
   attribute nullable bitmap8 nullableBitmap8 = 32769;
   attribute nullable bitmap16 nullableBitmap16 = 32770;

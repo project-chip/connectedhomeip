@@ -30,9 +30,9 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
         for (int i = 0; i < maximumVectorSize; ++i)
         {
             chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
-            channelInfo.affiliateCallSign = chip::CharSpan("exampleASign", strlen("exampleASign"));
-            channelInfo.callSign          = chip::CharSpan("exampleCSign", strlen("exampleCSign"));
-            channelInfo.name              = chip::CharSpan("exampleName", strlen("exampleName"));
+            channelInfo.affiliateCallSign = chip::CharSpan::fromCharString("exampleASign");
+            channelInfo.callSign          = chip::CharSpan::fromCharString("exampleCSign");
+            channelInfo.name              = chip::CharSpan::fromCharString("exampleName");
             channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
             channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
 
@@ -46,9 +46,9 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
 CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
     chip::app::Clusters::Channel::Structs::LineupInfo::Type lineup;
-    lineup.operatorName   = chip::CharSpan("operatorName", strlen("operatorName"));
-    lineup.lineupName     = chip::CharSpan("lineupName", strlen("lineupName"));
-    lineup.postalCode     = chip::CharSpan("postalCode", strlen("postalCode"));
+    lineup.operatorName   = chip::CharSpan::fromCharString("operatorName");
+    lineup.lineupName     = chip::CharSpan::fromCharString("lineupName");
+    lineup.postalCode     = chip::CharSpan::fromCharString("postalCode");
     lineup.lineupInfoType = chip::app::Clusters::Channel::LineupInfoTypeEnum::kMso;
 
     return aEncoder.Encode(lineup);
@@ -57,9 +57,9 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEncoder)
 {
     chip::app::Clusters::Channel::Structs::ChannelInfo::Type currentChannel;
-    currentChannel.affiliateCallSign = chip::CharSpan("exampleASign", strlen("exampleASign"));
-    currentChannel.callSign          = chip::CharSpan("exampleCSign", strlen("exampleCSign"));
-    currentChannel.name              = chip::CharSpan("exampleName", strlen("exampleName"));
+    currentChannel.affiliateCallSign = chip::CharSpan::fromCharString("exampleASign");
+    currentChannel.callSign          = chip::CharSpan::fromCharString("exampleCSign");
+    currentChannel.name              = chip::CharSpan::fromCharString("exampleName");
     currentChannel.majorNumber       = 1;
     currentChannel.minorNumber       = 0;
 
@@ -71,9 +71,9 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     ChangeChannelResponseType response;
     response.channelMatch.majorNumber       = 1;
     response.channelMatch.minorNumber       = 0;
-    response.channelMatch.name              = chip::CharSpan("name", strlen("name"));
-    response.channelMatch.callSign          = chip::CharSpan("callSign", strlen("callSign"));
-    response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
+    response.channelMatch.name              = chip::CharSpan::fromCharString("name");
+    response.channelMatch.callSign          = chip::CharSpan::fromCharString("callSign");
+    response.channelMatch.affiliateCallSign = chip::CharSpan::fromCharString("affiliateCallSign");
     response.errorType                      = chip::app::Clusters::Channel::ErrorTypeEnum::kMultipleMatches;
 
     helper.Success(response);

@@ -42,7 +42,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
 
     // TODO: Insert code here
     LauncherResponseType response;
-    response.data   = CharSpan("data", strlen("data"));
+    response.data   = CharSpan::fromCharString("data");
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -54,7 +54,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
 
     // TODO: Insert code here
     LauncherResponseType response;
-    response.data   = CharSpan("data", strlen("data"));
+    response.data   = CharSpan::fromCharString("data");
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -66,7 +66,7 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
 
     // TODO: Insert code here
     LauncherResponseType response;
-    response.data   = CharSpan("data", strlen("data"));
+    response.data   = CharSpan::fromCharString("data");
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }

@@ -170,7 +170,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         NetworkInterface * ifp = new NetworkInterface();
 
         interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
-        ifp->name            = CharSpan(ifp->Name, strlen(ifp->Name));
+        ifp->name            = CharSpan::fromCharString(ifp->Name);
         ifp->fabricConnected = true;
         Inet::InterfaceType interfaceType;
         if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)

@@ -67,6 +67,13 @@ public:
     // Send NotifyUpdateApplied command
     virtual void NotifyUpdateApplied(uint32_t version) = 0;
 
+    // Get image update progress in percents unit
+    virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
+
+    // Get requestor state
+    virtual CHIP_ERROR GetState(EndpointId endpointId,
+                                chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
+
     // Manually set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;
 };

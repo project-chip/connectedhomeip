@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::ApplicationBasic;
 
 CHIP_ERROR ApplicationBasicManager::HandleGetVendorName(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(CharSpan("exampleVendorName1", strlen("exampleVendorName1")));
+    return aEncoder.Encode(CharSpan::fromCharString("exampleVendorName1"));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
@@ -35,7 +35,7 @@ uint16_t ApplicationBasicManager::HandleGetVendorId()
 
 CHIP_ERROR ApplicationBasicManager::HandleGetApplicationName(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(CharSpan("exampleName1", strlen("exampleName1")));
+    return aEncoder.Encode(CharSpan::fromCharString("exampleName1"));
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
@@ -45,7 +45,7 @@ uint16_t ApplicationBasicManager::HandleGetProductId()
 
 CHIP_ERROR ApplicationBasicManager::HandleGetApplicationVersion(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(CharSpan("exampleVersion", strlen("exampleVersion")));
+    return aEncoder.Encode(CharSpan::fromCharString("exampleVersion"));
 }
 
 CHIP_ERROR ApplicationBasicManager::HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder)

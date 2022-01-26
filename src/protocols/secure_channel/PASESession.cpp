@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,10 +71,7 @@ using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;
 using PBKDF2_sha256_crypto = PBKDF2_sha256;
 #endif
 
-PASESession::PASESession()
-{
-    SetSecureSessionType(Transport::SecureSession::Type::kPASE);
-}
+PASESession::PASESession() : PairingSession(Transport::SecureSession::Type::kPASE) {}
 
 PASESession::~PASESession()
 {
@@ -240,7 +237,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t p
         ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
 
         // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
-        setupPIN = (setupPIN % 99999998) + 1;
+        setupPIN = (setupPIN % kSetupPINCodeMaximumValue) + 1;
     }
 
     return PASESession::ComputePASEVerifier(setupPIN, pbkdf2IterCount, salt, verifier);

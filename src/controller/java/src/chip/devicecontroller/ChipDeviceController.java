@@ -259,6 +259,16 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  /**
+   * Returns the {@link NetworkLocation} at which the given {@code deviceId} has been found.
+   *
+   * @param deviceId the 64-bit node ID of the device
+   * @throws ChipDeviceControllerException if the device location could not be resolved
+   */
+  public NetworkLocation getNetworkLocation(long deviceId) {
+    return getNetworkLocation(deviceControllerPtr, deviceId);
+  }
+
   public long getCompressedFabricId() {
     return getCompressedFabricId(deviceControllerPtr);
   }
@@ -345,6 +355,8 @@ public class ChipDeviceController {
   private native void deleteDeviceController(long deviceControllerPtr);
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
+
+  private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
 
   private native long getCompressedFabricId(long deviceControllerPtr);
 

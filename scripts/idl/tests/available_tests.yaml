@@ -12,10 +12,15 @@
 #     and the expected content for those output files.
 java:
     inputs/simple_attribute.matter:
-        jni/CHIPClustersRead.cpp: outputs/simple_attribute/jni/CHIPClustersRead.cpp
+        jni/MyClusterClient-ReadImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp
 
     inputs/global_struct_attribute.matter:
-        jni/CHIPClustersRead.cpp: outputs/global_struct_attribute/jni/CHIPClustersRead.cpp
+        jni/DemoClusterClient-ReadImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
 
     inputs/cluster_struct_attribute.matter:
-        jni/CHIPClustersRead.cpp: outputs/cluster_struct_attribute/jni/CHIPClustersRead.cpp
+        jni/DemoClusterClient-ReadImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
+
+    inputs/several_clusters.matter:
+        jni/FirstClient-ReadImpl.cpp: outputs/several_clusters/jni/FirstClient-ReadImpl.cpp
+        jni/SecondClient-ReadImpl.cpp: outputs/several_clusters/jni/SecondClient-ReadImpl.cpp
+        jni/ThirdClient-ReadImpl.cpp: outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp

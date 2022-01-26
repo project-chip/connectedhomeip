@@ -152,6 +152,16 @@ template("efr32_sdk") {
 
     defines += board_defines
 
+    if (defined(invoker.enable_sleepy_device)) {
+      if (invoker.enable_sleepy_device) {
+        defines += [
+          "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
+          "SL_CATALOG_POWER_MANAGER_PRESENT",
+          "SL_CATALOG_SLEEPTIMER_PRESENT",
+        ]
+      }
+    }
+
     if (chip_build_libshell) {
       defines += [
         "ENABLE_CHIP_SHELL",
@@ -431,6 +441,12 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
     ]
+
+    if (defined(invoker.enable_sleepy_device)) {
+      if (invoker.enable_sleepy_device) {
+        sources += [ "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c" ]
+      }
+    }
 
     if (defined(enable_fem)) {
       sources += [

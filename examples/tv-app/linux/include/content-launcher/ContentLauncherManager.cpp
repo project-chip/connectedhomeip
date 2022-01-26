@@ -37,7 +37,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
 
     LaunchResponseType response;
     // TODO: Insert code here
-    response.data   = CharSpan("exampleData", strlen("exampleData"));
+    response.data   = CharSpan::fromCharString("exampleData");
     response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -52,7 +52,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
 
     // TODO: Insert code here
     LaunchResponseType response;
-    response.data   = CharSpan("exampleData", strlen("exampleData"));
+    response.data   = CharSpan::fromCharString("exampleData");
     response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -63,7 +63,7 @@ CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncod
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (std::string & entry : mAcceptHeaderList)
         {
-            CharSpan data = CharSpan(entry.c_str(), entry.length());
+            CharSpan data = CharSpan::fromCharString(entry.c_str());
             ReturnErrorOnFailure(encoder.Encode(data));
         }
         return CHIP_NO_ERROR;

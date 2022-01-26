@@ -70,7 +70,7 @@ class TestCaseStorage(GeneratorStorage):
                     return golden.read()
 
         # This will attempt a new write, causing a unit test failure
-        logging.warning("Expected output %s not found" % relative_path)
+        self.checker.fail("Expected output %s not found" % relative_path)
         return None
 
     def write_new_data(self, relative_path: str, content: str):
@@ -100,6 +100,9 @@ class GeneratorTest:
     def _create_generator(self, storage: GeneratorStorage, idl: Idl):
         if self.generator_name.lower() == 'java':
             return JavaGenerator(storage, idl)
+        else:
+            raise Exception("Unknown generator for testing: %s",
+                            self.generator_name.lower())
 
     def run_test_cases(self, checker: unittest.TestCase):
         for test in self.test_cases:

@@ -189,8 +189,9 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
@@ -221,8 +222,9 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status aIMStatus,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
                                                                                kTestEndpointId, onSuccessCb, onFailureCb);
@@ -253,9 +255,8 @@ void TestReadInteraction::TestReadAttributeError(nlTestSuite * apSuite, void * a
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
-                                                      Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        NL_TEST_ASSERT(apSuite, (aError != CHIP_NO_ERROR) && (aIMStatus == Protocols::InteractionModel::Status::Busy));
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
         onFailureCbInvoked = true;
     };
 
@@ -288,8 +289,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
-                                                      Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, aError == CHIP_ERROR_TIMEOUT);
         onFailureCbInvoked = true;
     };
@@ -357,8 +357,9 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
@@ -413,8 +414,9 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);

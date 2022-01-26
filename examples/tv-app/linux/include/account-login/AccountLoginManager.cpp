@@ -61,6 +61,6 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
     GetSetupPINResponse response;
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
 
-    response.setupPIN = CharSpan(mSetupPin, strlen(mSetupPin));
+    response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
 }

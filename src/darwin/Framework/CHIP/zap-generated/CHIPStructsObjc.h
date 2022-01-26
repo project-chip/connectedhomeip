@@ -151,7 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPSoftwareDiagnosticsClusterSoftwareFault : NSObject
+@interface CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull id;
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSData * _Nonnull faultRecording;

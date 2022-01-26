@@ -26,9 +26,7 @@
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
-{%- for cluster in clusters | clientClustersOnly -%}
 {%-   for attr in cluster.attributes | attributesWithCallback(known_enums) %}
-
 JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -54,4 +52,3 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.na
 }
 
 {%   endfor %}
-{% endfor %}
