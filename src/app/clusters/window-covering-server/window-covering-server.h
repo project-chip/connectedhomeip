@@ -148,6 +148,8 @@ uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths);
 
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
