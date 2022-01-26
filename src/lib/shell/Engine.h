@@ -28,10 +28,8 @@
 #include <cstdio>
 #include <cstring>
 #include <lib/core/CHIPError.h>
-#include <map>
 #include <stdarg.h>
 #include <stddef.h>
-#include <vector>
 
 #ifndef CHIP_SHELL_PROMPT
 #define CHIP_SHELL_PROMPT "> "
@@ -48,6 +46,10 @@
 #ifndef CHIP_SHELL_MAX_TOKENS
 #define CHIP_SHELL_MAX_TOKENS 10
 #endif // CHIP_SHELL_MAX_TOKENS
+
+#ifndef CHIP_SHELL_MAX_CMD_COMPLETIONS
+#define CHIP_SHELL_MAX_CMD_COMPLETIONS 32
+#endif // CHIP_SHELL_MAX_CMD_COMPLETIONS
 
 namespace chip {
 namespace Shell {
@@ -96,45 +98,76 @@ typedef const struct shell_command shell_command_t;
  */
 typedef CHIP_ERROR shell_command_iterator_t(shell_command_t * command, void * arg);
 
-struct char_key_matcher
+class Engine;
+
+/**
+ * A map of the Engine instances and the command prefix that they correspond to.
+ * The struct itself is a linked list node.
+ *
+ *  prefix:     The command prefix (until n-1th token of full command) e.g. "device",
+ *              or "dns resolve".
+ *  enginev:    An array of the shells that have registered commands under the preifx.
+ *  enginec:    The number of shells that have registered commands under the preifx.
+ *  next:       The next shell in the list.
+ *
+ */
+typedef struct shell_map
 {
-    bool operator()(char const * a, char const * b) const { return strcmp(a, b) < 0; }
-};
+    const char * prefix;
+    Engine * enginev[CHIP_SHELL_MAX_MODULES];
+    size_t enginec = 0;
+    shell_map * next;
+} shell_map_t;
+
+/**
+ * A context object for passing request and receiving results with GetCmdCompletion.
+ *
+ *  line_buf:           The user input command to request for completion. If the applications prepends
+ *                      "matter " to all matter commands, please remove the "matter " prefix from the buffer.
+ *  ret_prefix:         The returned command prefix (up until the last space, not included).
+ *  cmdv:               The command completion candidates unter the prefix in "ret_prefix".
+ *  cmdc:               The number of command completion candidates in cmdv.
+ *
+ * Initialization:
+ *
+ *  cmd_completion_context context = cmd_completion_context("dns browse c");
+ *
+ */
+typedef struct cmd_completion_context
+{
+    const char * line_buf;
+    const char * ret_prefix;
+    shell_command_t * cmdv[CHIP_SHELL_MAX_CMD_COMPLETIONS];
+    size_t cmdc = 0;
+
+    cmd_completion_context(){};
+    cmd_completion_context(const char * _line_buf) { line_buf = _line_buf; };
+} cmd_completion_context;
 
 class Engine
 {
 protected:
     static Engine theEngineRoot;
-    static std::map<const char *, std::vector<Engine *>, char_key_matcher> theShellMap;
-    std::vector<shell_command_t *> _commandSet;
-    unsigned _commandSetSize[CHIP_SHELL_MAX_MODULES];
-    unsigned _commandSetCount;
+    static shell_map_t * theShellMapListHead;
+    shell_command_t * _commands[CHIP_SHELL_MAX_MODULES];
+    unsigned _commandCount;
 
-    static void AddToShellMap(char const * prefix, Engine * shell);
+    static void InsertShellMap(char const * prefix, Engine * shell);
 
 public:
-    Engine() {}
+    Engine(){};
 
     /** Return the root singleton for the Shell command hierarchy. */
-    static Engine & Root() { return theEngineRoot; }
-
-    /** Rturn the singleton shell map that stores all command prefixs and
-     *  Engine instances they correspond to.
-     */
-    static std::map<const char *, std::vector<Engine *>, char_key_matcher> & ShellMap() { return theShellMap; };
+    static Engine & Root() { return theEngineRoot; };
 
     /**
-     * Get command suggestions by command prefix.
+     * Get command completions by command prefix.
      *
-     * @param prefix                The command prefix. Use double quoted empty string `""`
-     *                              or nullptr for root commands.
+     * @param context               The command completion context to pass request and receive results.
      *
-     * @return                      All completion candidates under the prefix
+     * @return                      CHIP_ERROR error code.
      */
-    static std::vector<shell_command_t *> GetCommandSuggestions(const char * prefix);
-
-    /** Return vector of all the commands registered to the Engine instance. */
-    std::vector<shell_command_t *> & GetCommandSet() { return _commandSet; };
+    static CHIP_ERROR GetCommandCompletions(cmd_completion_context * context);
 
     /**
      * Registers a set of defaults commands (help) for all Shell and sub-Shell instances.
@@ -195,18 +228,6 @@ public:
 private:
     static void ProcessShellLineTask(intptr_t context);
 };
-
-/**
- * A map of the Engine instances and the command prefix that they correspond to.
- *
- * The key is the command prefix (until n-1th token of full command) e.g.
- * "device", or "dns resolve"
- *
- * The value is a vector of the pointers to Engine instances that register and
- * handle commands under that prefix, e.g. for key "dns", the map value should
- * include Engine instance(s) that handle {"resolve", "browse"}.
- */
-typedef std::map<const char *, std::vector<Engine *>, char_key_matcher> shell_map_t;
 
 } // namespace Shell
 } // namespace chip

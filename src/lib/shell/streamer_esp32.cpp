@@ -20,7 +20,6 @@
 
 #include "driver/uart.h"
 #include "esp_console.h"
-#include "esp_log.h"
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
 #include <fcntl.h>
@@ -43,82 +42,6 @@ static int chip_command_handler(int argc, char ** argv)
         err = CHIP_ERROR_INVALID_ARGUMENT;
     }
     return static_cast<int>(err.AsInteger());
-}
-
-void get_command_completion(const char * buf, linenoiseCompletions * lc)
-{
-    size_t len                 = strlen(buf);
-    const char * matter_prefix = "matter ";
-
-    if (len > 6 && strncmp(buf, matter_prefix, 6) == 0)
-    {
-        // remove "matter " prefix for suggestion lookup
-        buf = &buf[7];
-        len = len - 7;
-
-        int last_space_idx = -1;
-
-        for (int i = len - 1; i > -1; i--)
-        {
-            if (buf[i] == ' ')
-            {
-                last_space_idx = i;
-                break;
-            }
-        }
-
-        // Get the last token of user input which may be an incomplete command name
-        // for comparing with completion candidates
-        char * incomplete_cmd = new char[len - last_space_idx];
-
-        // In case of cursor at the last space, there is no incomplete command to match,
-        // len = 0, last_space_idx = -1 and strylcpy here will copy only 1 char from the
-        // cursor position, that is the null terminator.
-        strlcpy(incomplete_cmd, &buf[last_space_idx + 1], len - last_space_idx);
-
-        char * prefix = new char[last_space_idx + 2];
-
-        if (last_space_idx == -1)
-        {
-            // For root commands (when there is no space after the "matter " prefix
-            // e.g. "matter config", "matter device"), look up with empty string ""
-            strlcpy(prefix, "", 1);
-        }
-        else
-        {
-            // Get the user input until (not included) the last space in buf,
-            // this will be use to look up completion candidates
-            strlcpy(prefix, buf, last_space_idx + 1);
-        }
-
-        std::vector<shell_command_t *> cmdSuggestions = Engine::GetCommandSuggestions(prefix);
-
-        for (auto suggestion : cmdSuggestions)
-        {
-            // When there is an incomplete command to match, find the matched candidates and add them;
-            // When there isn't an incomplete command to match, compare size is zero so strncmp
-            // returns 0 for all candidates, thus add all candidates.
-            if (strncmp(incomplete_cmd, suggestion->cmd_name, strlen(incomplete_cmd)) == 0)
-            {
-                std::string cmd_completion = matter_prefix;
-                if (strcmp(prefix, "") != 0)
-                {
-                    cmd_completion += prefix;
-                    cmd_completion += " ";
-                }
-                cmd_completion += suggestion->cmd_name;
-                linenoiseAddCompletion(lc, cmd_completion.c_str());
-            }
-        }
-        delete incomplete_cmd;
-        delete prefix;
-    }
-    else
-    {
-        // When the command isn't prefixed with "matter ", call the default esp
-        // get completion function to get the non-matter registered commands
-        return esp_console_get_completion(buf, lc);
-    }
 }
 
 int streamer_esp32_init(streamer_t * streamer)
@@ -157,9 +80,8 @@ int streamer_esp32_init(streamer_t * streamer)
         linenoiseSetDumbMode(1);
     }
 
-    esp_console_cmd_t matter_command = { .command = "matter", .help = "Matter utilities", .func = chip_command_handler };
-    ESP_ERROR_CHECK(esp_console_cmd_register(&matter_command));
-    linenoiseSetCompletionCallback(&get_command_completion);
+    esp_console_cmd_t command = { .command = "matter", .help = "Matter utilities", .func = chip_command_handler };
+    ESP_ERROR_CHECK(esp_console_cmd_register(&command));
     return 0;
 }
 
