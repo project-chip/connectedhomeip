@@ -289,8 +289,12 @@ CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attri
 
     switch (aPath.mAttributeId)
     {
-    case Location::Id:
-        return WriteLocation(aDecoder);
+    case Location::Id: {
+        CHIP_ERROR err = WriteLocation(aDecoder);
+        // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
+        ChipLogError(Zcl, "WriteLocation status: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
     default:
         break;
     }
@@ -303,6 +307,9 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     chip::CharSpan location;
 
     ReturnErrorOnFailure(aDecoder.Decode(location));
+
+    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
+    ChipLogError(Zcl, "WriteLocation received, size %zu, location '%.*s'", location.size(), (int)location.size(), location.data());
 
     bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
     VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::ConstraintError).ToChipError());
