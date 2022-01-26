@@ -175,13 +175,21 @@ private:
 };
 
 extern "C" {
+
+struct __attribute__((packed)) PyReadAttributeParams
+{
+    uint32_t minInterval; // MinInterval in subscription request
+    uint32_t maxInterval; // MaxInterval in subscription request
+    bool isSubscription;
+    bool isFabricFiltered;
+};
+
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
 chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
                                                                 uint16_t timedWriteTimeoutMs, size_t n, ...);
 chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
                                                               ReadClientCallback ** pCallback, DeviceProxy * device,
-                                                              bool isSubscription, uint32_t minInterval, uint32_t maxInterval,
-                                                              size_t n, ...);
+                                                              uint8_t * readParamsBuf, size_t n, ...);
 }
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -205,7 +213,7 @@ public:
                                  to_underlying(aStatus.mStatus));
     }
 
-    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR aProtocolError) override
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override
     {
         gOnWriteErrorCallback(mAppContext, aProtocolError.AsInteger());
     }
@@ -313,10 +321,12 @@ void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apC
 
 chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
                                                               ReadClientCallback ** pCallback, DeviceProxy * device,
-                                                              bool isSubscription, uint32_t minInterval, uint32_t maxInterval,
-                                                              size_t n, ...)
+                                                              uint8_t * readParamsBuf, size_t n, ...)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    PyReadAttributeParams pyParams = {};
+    // The readParamsBuf might be not aligned, using a memcpy to avoid some unexpected behaviors.
+    memcpy(&pyParams, readParamsBuf, sizeof(pyParams));
 
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
@@ -343,18 +353,20 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
 
     readClient = std::make_unique<ReadClient>(
         InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback->GetBufferedReadCallback(),
-        isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read);
+        pyParams.isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read);
 
     {
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;
 
-        if (isSubscription)
+        if (pyParams.isSubscription)
         {
-            params.mMinIntervalFloorSeconds   = minInterval;
-            params.mMaxIntervalCeilingSeconds = maxInterval;
+            params.mMinIntervalFloorSeconds   = pyParams.minInterval;
+            params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
         }
+
+        params.mIsFabricFiltered = pyParams.isFabricFiltered;
 
         err = readClient->SendRequest(params);
         SuccessOrExit(err);
@@ -371,10 +383,12 @@ exit:
     return err.AsInteger();
 }
 
-chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, DeviceProxy * device, bool isSubscription,
-                                                          uint32_t minInterval, uint32_t maxInterval, size_t n, ...)
+chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, DeviceProxy * device, uint8_t * readParamsBuf,
+                                                          size_t n, ...)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    PyReadAttributeParams pyParams = {};
+    memcpy(&pyParams, readParamsBuf, sizeof(pyParams));
 
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
@@ -399,19 +413,19 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
     Optional<SessionHandle> session = device->GetSecureSession();
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NOT_CONNECTED);
 
-    readClient =
-        std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback.get(),
-                                     isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read);
+    readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback.get(),
+                                              pyParams.isSubscription ? ReadClient::InteractionType::Subscribe
+                                                                      : ReadClient::InteractionType::Read);
 
     {
         ReadPrepareParams params(session.Value());
         params.mpEventPathParamsList    = readPaths.get();
         params.mEventPathParamsListSize = n;
 
-        if (isSubscription)
+        if (pyParams.isSubscription)
         {
-            params.mMinIntervalFloorSeconds   = minInterval;
-            params.mMaxIntervalCeilingSeconds = maxInterval;
+            params.mMinIntervalFloorSeconds   = pyParams.minInterval;
+            params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
         }
 
         err = readClient->SendRequest(params);

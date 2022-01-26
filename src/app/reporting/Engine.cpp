@@ -48,13 +48,14 @@ void Engine::Shutdown()
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
+Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                            AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
+                            AttributeValueEncoder::AttributeEncodeState * aEncoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
     MatterPreAttributeReadCallback(aPath);
-    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aPath, aAttributeReportIBs, aEncoderState));
+    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
     MatterPostAttributeReadCallback(aPath);
     return CHIP_NO_ERROR;
 }
@@ -117,14 +118,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), attributeReportIBs, pathForRetrieval, &encodeState);
+            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
+                                      pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
                              "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                              ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
 
-                if (encodeState.AllowPartialData())
+                if (encodeState.AllowPartialData() && ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY)))
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     apReadHandler->SetAttributeEncodeState(encodeState);
@@ -135,6 +137,14 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     // attributeReportIB to avoid any partial data.
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+
+                    // Try to encode our error as a status response.
+                    err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        // OK, just roll back again and give up.
+                        attributeReportIBs.Rollback(attributeBackup);
+                    }
                 }
             }
             SuccessOrExit(err);

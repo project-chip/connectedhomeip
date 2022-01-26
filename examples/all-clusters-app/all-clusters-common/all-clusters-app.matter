@@ -212,8 +212,6 @@ server cluster Basic = 40 {
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster BinaryInputBasic = 15 {
@@ -961,10 +959,10 @@ server cluster DoorLock = 257 {
     nullable INT16U dataIndex = 6;
   }
 
-  readonly attribute DlLockState lockState = 0;
+  readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute DlDoorState doorState = 3;
+  readonly attribute nullable DlDoorState doorState = 3;
   attribute int32u doorOpenEvents = 4;
   attribute int32u doorClosedEvents = 5;
   attribute int16u openPeriod = 6;
@@ -1498,11 +1496,11 @@ server cluster IlluminanceMeasurement = 1024 {
     kCmos = 1;
   }
 
-  readonly attribute int16u measuredValue = 0;
-  readonly attribute int16u minMeasuredValue = 1;
-  readonly attribute int16u maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
-  readonly attribute enum8 lightSensorType = 4;
+  readonly attribute nullable enum8 lightSensorType = 4;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1625,11 +1623,11 @@ server cluster LevelControl = 8 {
   readonly attribute int16u maxFrequency = 6;
   attribute bitmap8 options = 15;
   attribute int16u onOffTransitionTime = 16;
-  attribute int8u onLevel = 17;
-  attribute int16u onTransitionTime = 18;
-  attribute int16u offTransitionTime = 19;
-  attribute int8u defaultMoveRate = 20;
-  attribute int8u startUpCurrentLevel = 16384;
+  attribute nullable int8u onLevel = 17;
+  attribute nullable int16u onTransitionTime = 18;
+  attribute nullable int16u offTransitionTime = 19;
+  attribute nullable int8u defaultMoveRate = 20;
+  attribute nullable int8u startUpCurrentLevel = 16384;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -1689,6 +1687,7 @@ server cluster LevelControl = 8 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster LowPower = 1288 {
@@ -2000,7 +1999,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   attribute ProviderLocation defaultOtaProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
-  readonly attribute int8u updateStateProgress = 3;
+  readonly attribute nullable int8u updateStateProgress = 3;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
@@ -2291,9 +2290,9 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute enum8 effectiveControlMode = 18;
   readonly attribute int16s capacity = 19;
   readonly attribute int16u speed = 20;
-  attribute int24u lifetimeRunningHours = 21;
+  attribute nullable int24u lifetimeRunningHours = 21;
   readonly attribute int24u power = 22;
-  attribute int32u lifetimeEnergyConsumed = 23;
+  attribute nullable int32u lifetimeEnergyConsumed = 23;
   attribute enum8 operationMode = 32;
   attribute enum8 controlMode = 33;
   readonly attribute bitmap16 alarmMask = 34;
@@ -2534,6 +2533,10 @@ server cluster TestCluster = 1295 {
     double h = 7;
   }
 
+  struct TestFabricScoped {
+    fabric_idx fabricIndex = 0;
+  }
+
   struct NestedStructList {
     INT8U a = 0;
     BOOLEAN b = 1;
@@ -2602,40 +2605,43 @@ server cluster TestCluster = 1295 {
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
   readonly attribute LONG_OCTET_STRING listLongOctetString[] = 42;
+  readonly attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
-  attribute boolean nullableBoolean = 32768;
-  attribute bitmap8 nullableBitmap8 = 32769;
-  attribute bitmap16 nullableBitmap16 = 32770;
-  attribute bitmap32 nullableBitmap32 = 32771;
-  attribute bitmap64 nullableBitmap64 = 32772;
-  attribute int8u nullableInt8u = 32773;
-  attribute int16u nullableInt16u = 32774;
-  attribute int24u nullableInt24u = 32775;
-  attribute int32u nullableInt32u = 32776;
-  attribute int40u nullableInt40u = 32777;
-  attribute int48u nullableInt48u = 32778;
-  attribute int56u nullableInt56u = 32779;
-  attribute int64u nullableInt64u = 32780;
-  attribute int8s nullableInt8s = 32781;
-  attribute int16s nullableInt16s = 32782;
-  attribute int24s nullableInt24s = 32783;
-  attribute int32s nullableInt32s = 32784;
-  attribute int40s nullableInt40s = 32785;
-  attribute int48s nullableInt48s = 32786;
-  attribute int56s nullableInt56s = 32787;
-  attribute int64s nullableInt64s = 32788;
-  attribute enum8 nullableEnum8 = 32789;
-  attribute enum16 nullableEnum16 = 32790;
-  attribute single nullableFloatSingle = 32791;
-  attribute double nullableFloatDouble = 32792;
-  attribute octet_string<10> nullableOctetString = 32793;
-  attribute char_string<10> nullableCharString = 32798;
-  attribute SimpleEnum nullableEnumAttr = 32804;
-  attribute SimpleStruct nullableStruct = 32805;
-  attribute int8u nullableRangeRestrictedInt8u = 32806;
-  attribute int8s nullableRangeRestrictedInt8s = 32807;
-  attribute int16u nullableRangeRestrictedInt16u = 32808;
-  attribute int16s nullableRangeRestrictedInt16s = 32809;
+  attribute boolean generalErrorBoolean = 49;
+  attribute boolean clusterErrorBoolean = 50;
+  attribute nullable boolean nullableBoolean = 32768;
+  attribute nullable bitmap8 nullableBitmap8 = 32769;
+  attribute nullable bitmap16 nullableBitmap16 = 32770;
+  attribute nullable bitmap32 nullableBitmap32 = 32771;
+  attribute nullable bitmap64 nullableBitmap64 = 32772;
+  attribute nullable int8u nullableInt8u = 32773;
+  attribute nullable int16u nullableInt16u = 32774;
+  attribute nullable int24u nullableInt24u = 32775;
+  attribute nullable int32u nullableInt32u = 32776;
+  attribute nullable int40u nullableInt40u = 32777;
+  attribute nullable int48u nullableInt48u = 32778;
+  attribute nullable int56u nullableInt56u = 32779;
+  attribute nullable int64u nullableInt64u = 32780;
+  attribute nullable int8s nullableInt8s = 32781;
+  attribute nullable int16s nullableInt16s = 32782;
+  attribute nullable int24s nullableInt24s = 32783;
+  attribute nullable int32s nullableInt32s = 32784;
+  attribute nullable int40s nullableInt40s = 32785;
+  attribute nullable int48s nullableInt48s = 32786;
+  attribute nullable int56s nullableInt56s = 32787;
+  attribute nullable int64s nullableInt64s = 32788;
+  attribute nullable enum8 nullableEnum8 = 32789;
+  attribute nullable enum16 nullableEnum16 = 32790;
+  attribute nullable single nullableFloatSingle = 32791;
+  attribute nullable double nullableFloatDouble = 32792;
+  attribute nullable octet_string<10> nullableOctetString = 32793;
+  attribute nullable char_string<10> nullableCharString = 32798;
+  attribute nullable SimpleEnum nullableEnumAttr = 32804;
+  attribute nullable SimpleStruct nullableStruct = 32805;
+  attribute nullable int8u nullableRangeRestrictedInt8u = 32806;
+  attribute nullable int8s nullableRangeRestrictedInt8s = 32807;
+  attribute nullable int16u nullableRangeRestrictedInt16u = 32808;
+  attribute nullable int16s nullableRangeRestrictedInt16s = 32809;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct SimpleStructEchoRequestRequest {
@@ -3028,17 +3034,17 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 server cluster WindowCovering = 258 {
   readonly attribute enum8 type = 0;
-  readonly attribute int16u currentPositionLift = 3;
-  readonly attribute int16u currentPositionTilt = 4;
+  readonly attribute nullable int16u currentPositionLift = 3;
+  readonly attribute nullable int16u currentPositionTilt = 4;
   readonly attribute bitmap8 configStatus = 7;
-  readonly attribute Percent currentPositionLiftPercentage = 8;
-  readonly attribute Percent currentPositionTiltPercentage = 9;
+  readonly attribute nullable Percent currentPositionLiftPercentage = 8;
+  readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
-  readonly attribute Percent100ths targetPositionLiftPercent100ths = 11;
-  readonly attribute Percent100ths targetPositionTiltPercent100ths = 12;
+  readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
+  readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute enum8 endProductType = 13;
-  readonly attribute Percent100ths currentPositionLiftPercent100ths = 14;
-  readonly attribute Percent100ths currentPositionTiltPercent100ths = 15;
+  readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
+  readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
   readonly attribute int16u installedOpenLimitLift = 16;
   readonly attribute int16u installedClosedLimitLift = 17;
   readonly attribute int16u installedOpenLimitTilt = 18;
@@ -3107,7 +3113,6 @@ endpoint 1 {
   server  cluster IlluminanceMeasurement;
   server  cluster KeypadInput;
   server  cluster LevelControl;
-  server  cluster LocalizationConfiguration;
   server  cluster LowPower;
   server  cluster MediaInput;
   server  cluster MediaPlayback;

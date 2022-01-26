@@ -144,8 +144,10 @@ private:
     static ConnectivityManagerImpl sInstance;
     static void RefreshMessageLayer(void);
     static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
+    static void RtkWiFiScanCompletedHandler(void);
     void DHCPProcess(void);
     static void DHCPProcessThread(void * param);
+    static int conn_callback_dispatcher(void * object);
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

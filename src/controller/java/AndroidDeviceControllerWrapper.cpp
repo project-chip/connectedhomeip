@@ -157,7 +157,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
 
     ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
 
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, ByteSpan(), rcacSpan);
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, ByteSpan(), rcacSpan, Optional<AesCcm128KeySpan>(),
+                        Optional<NodeId>());
 
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();

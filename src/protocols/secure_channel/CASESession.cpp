@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,9 +89,8 @@ using HKDF_sha_crypto = HKDF_sha;
 // The session establishment fails if the response is not received within timeout window.
 static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Clock::Seconds16(30);
 
-CASESession::CASESession()
+CASESession::CASESession() : PairingSession(Transport::SecureSession::Type::kCASE)
 {
-    SetSecureSessionType(Transport::SecureSession::Type::kCASE);
     mTrustedRootId = CertificateKeyId();
 }
 

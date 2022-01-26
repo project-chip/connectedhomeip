@@ -65,7 +65,6 @@ const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.

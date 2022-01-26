@@ -77,8 +77,6 @@ server cluster Basic = 40 {
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster Binding = 30 {
@@ -484,6 +482,7 @@ server cluster Identify = 3 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {

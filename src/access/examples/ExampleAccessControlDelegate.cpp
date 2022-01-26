@@ -1095,8 +1095,6 @@ public:
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    bool IsTransitional() const override { return false; }
-
 private:
     CHIP_ERROR LoadFromFlash() { return CHIP_NO_ERROR; }
 

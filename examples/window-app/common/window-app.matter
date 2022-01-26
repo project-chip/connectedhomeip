@@ -75,6 +75,7 @@ server cluster Basic = 40 {
   readonly attribute char_string<32> serialNumber = 15;
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -318,6 +319,7 @@ server cluster Identify = 3 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -822,17 +824,17 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 server cluster WindowCovering = 258 {
   readonly attribute enum8 type = 0;
-  readonly attribute int16u currentPositionLift = 3;
-  readonly attribute int16u currentPositionTilt = 4;
+  readonly attribute nullable int16u currentPositionLift = 3;
+  readonly attribute nullable int16u currentPositionTilt = 4;
   readonly attribute bitmap8 configStatus = 7;
-  readonly attribute Percent currentPositionLiftPercentage = 8;
-  readonly attribute Percent currentPositionTiltPercentage = 9;
+  readonly attribute nullable Percent currentPositionLiftPercentage = 8;
+  readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
-  readonly attribute Percent100ths targetPositionLiftPercent100ths = 11;
-  readonly attribute Percent100ths targetPositionTiltPercent100ths = 12;
+  readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
+  readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute enum8 endProductType = 13;
-  readonly attribute Percent100ths currentPositionLiftPercent100ths = 14;
-  readonly attribute Percent100ths currentPositionTiltPercent100ths = 15;
+  readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
+  readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
   readonly attribute int16u installedOpenLimitLift = 16;
   readonly attribute int16u installedClosedLimitLift = 17;
   readonly attribute int16u installedOpenLimitTilt = 18;

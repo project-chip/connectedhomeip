@@ -296,9 +296,9 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
     {
 #ifdef EMBER_AF_PLUGIN_SCENES
         GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
-        if (emberAfCurrentCommand()->type == EMBER_INCOMING_MULTICAST)
+        if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
         {
-            groupId = emberAfCurrentCommand()->source->GetSessionHandle()->AsGroupSession()->GetGroupId();
+            groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
         }
 
         emberAfScenesClusterStoreCurrentSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
@@ -351,9 +351,9 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
 
 #ifdef EMBER_AF_PLUGIN_SCENES
     GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
-    if (emberAfCurrentCommand()->type == EMBER_INCOMING_MULTICAST)
+    if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
     {
-        groupId = emberAfCurrentCommand()->source->GetSessionHandle()->AsGroupSession()->GetGroupId();
+        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
     }
 
     emberAfScenesClusterRecallSavedSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);

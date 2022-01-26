@@ -22,11 +22,11 @@
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPListUtils_internal.h"
 
 #import "zap-generated/CHIPTestClustersObjc.h"
 #import "zap-generated/tests/CHIPClustersTest.h"
 
+#include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -5416,6 +5416,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

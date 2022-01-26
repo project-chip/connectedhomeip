@@ -58,7 +58,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'OTA_BOOTLOAD_CLUSTER': [],
     'OTA_PROVIDER_CLUSTER': ['ota-provider'],
     'OTA_REQUESTOR_CLUSTER': ['ota-requestor'],
-    'POWER_SOURCE_CLUSTER': [],
+    'POWER_SOURCE_CLUSTER': ['power-source-server'],
     'POWER_SOURCE_CONFIGURATION_CLUSTER': ['power-source-configuration-server'],
     'POLL_CONTROL_CLUSTER': [],
     'POWER_CONFIG_CLUSTER': [],

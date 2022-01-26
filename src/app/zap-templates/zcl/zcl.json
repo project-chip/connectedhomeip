@@ -88,5 +88,5 @@
             "commandDiscovery": true
         }
     },
-    "defaultReportable": true
+    "defaultReportingPolicy": "mandatory"
 }

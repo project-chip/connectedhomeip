@@ -4045,6 +4045,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
             break;
@@ -7111,6 +7122,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
         }
         case Attributes::TimedWriteBoolean::Id: {
             using TypeInfo = Attributes::TimedWriteBoolean::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::GeneralErrorBoolean::Id: {
+            using TypeInfo = Attributes::GeneralErrorBoolean::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::ClusterErrorBoolean::Id: {
+            using TypeInfo = Attributes::ClusterErrorBoolean::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

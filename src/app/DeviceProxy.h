@@ -53,7 +53,7 @@ public:
 
     virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj);
+    virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj, chip::Optional<System::Clock::Timeout> timeout = NullOptional);
 
     // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
     virtual void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
@@ -68,6 +68,8 @@ public:
     virtual chip::Optional<SessionHandle> GetSecureSession() const = 0;
 
     virtual bool IsActive() const { return true; }
+
+    virtual CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 

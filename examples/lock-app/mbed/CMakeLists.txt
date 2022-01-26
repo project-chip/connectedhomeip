@@ -92,6 +92,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/power-source-configuration-server/power-source-configuration-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/power-source-server/power-source-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp
 )
 
@@ -99,11 +100,6 @@ target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-e
 
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
     target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)
-endif()
-
-if("capsense" IN_LIST MBED_TARGET_LABELS)
-    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ./capsense_build)
-    target_link_libraries(${APP_TARGET} capsense)
 endif()
 
 mbed_set_post_build(${APP_TARGET})

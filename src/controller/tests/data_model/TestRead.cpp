@@ -58,38 +58,61 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
 
     if (responseDirective == kSendDataResponse)
     {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
-        ReturnErrorOnFailure(attributeReport.GetError());
-        TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-        TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
-
-        value = valueBuf;
-
-        uint8_t i = 0;
-        for (auto & item : valueBuf)
+        if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
+            aPath.mAttributeId == app::Clusters::TestCluster::Attributes::ListFabricScoped::Id)
         {
-            item.fabricIndex = i;
-            i++;
+            AttributeValueEncoder::AttributeEncodeState state =
+                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath, 0 /* data version */,
+                                               aIsFabricFiltered, state);
+
+            return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
+                chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
+                val.fabricIndex = aSubjectDescriptor.fabricIndex;
+                ReturnErrorOnFailure(encoder.Encode(val));
+                val.fabricIndex = (val.fabricIndex == 1) ? 2 : 1;
+                ReturnErrorOnFailure(encoder.Encode(val));
+                return CHIP_NO_ERROR;
+            });
         }
+        else
+        {
+            AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+            ReturnErrorOnFailure(aAttributeReports.GetError());
+            AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
+            ReturnErrorOnFailure(attributeReport.GetError());
+            TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+            TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
-        attributeData.DataVersion(0);
-        AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePath.GetError());
+            value = valueBuf;
 
-        ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
-                                               chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
-        ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
-        return attributeReport.EndOfAttributeReportIB().GetError();
+            uint8_t i = 0;
+            for (auto & item : valueBuf)
+            {
+                item.fabricIndex = i;
+                i++;
+            }
+
+            attributeData.DataVersion(0);
+            AttributePathIB::Builder & attributePath = attributeData.CreatePath();
+            attributePath.Endpoint(aPath.mEndpointId)
+                .Cluster(aPath.mClusterId)
+                .Attribute(aPath.mAttributeId)
+                .EndOfAttributePathIB();
+            ReturnErrorOnFailure(attributePath.GetError());
+
+            ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
+                                                   chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
+            ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
+            return attributeReport.EndOfAttributeReportIB().GetError();
+        }
     }
     else
     {
@@ -131,6 +154,8 @@ public:
     static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext);
+    static void TestReadFabricScopedWithFabricFilter(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -164,8 +189,9 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
@@ -196,8 +222,9 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status aIMStatus,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
                                                                                kTestEndpointId, onSuccessCb, onFailureCb);
@@ -228,9 +255,8 @@ void TestReadInteraction::TestReadAttributeError(nlTestSuite * apSuite, void * a
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
-                                                      Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        NL_TEST_ASSERT(apSuite, (aError != CHIP_NO_ERROR) && (aIMStatus == Protocols::InteractionModel::Status::Busy));
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
         onFailureCbInvoked = true;
     };
 
@@ -263,8 +289,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
-                                                      Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, aError == CHIP_ERROR_TIMEOUT);
         onFailureCbInvoked = true;
     };
@@ -301,12 +326,119 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext)
+{
+    /**
+     *  TODO: we cannot implement the e2e read tests w/ fabric filter since the test session has only one session, and the
+     * ReadSingleClusterData is not the one in real applications. We should be able to move some logic out of the ember library and
+     * make it possible to have more fabrics in test setup so we can have a better test coverage.
+     *
+     *  NOTE: Based on the TODO above, the test is testing two separate logics:
+     *   - When a fabric filtered read request is received, the server is able to pass the required fabric index to the response
+     * encoder.
+     *   - When a fabric filtered read request is received, the response encoder is able to encode the attribute correctly.
+     */
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        size_t len = 0;
+
+        NL_TEST_ASSERT(apSuite, dataResponse.ComputeSize(&len) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, len > 1);
+
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
+
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apSuite, void * apContext)
+{
+    /**
+     *  TODO: we cannot implement the e2e read tests w/ fabric filter since the test session has only one session, and the
+     * ReadSingleClusterData is not the one in real applications. We should be able to move some logic out of the ember library and
+     * make it possible to have more fabrics in test setup so we can have a better test coverage.
+     *
+     *  NOTE: Based on the TODO above, the test is testing two separate logics:
+     *   - When a fabric filtered read request is received, the server is able to pass the required fabric index to the response
+     * encoder.
+     *   - When a fabric filtered read request is received, the response encoder is able to encode the attribute correctly.
+     */
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        size_t len = 0;
+
+        NL_TEST_ASSERT(apSuite, dataResponse.ComputeSize(&len) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, len == 1);
+
+        // TODO: Uncomment the following code after we have fabric support in unit tests.
+        /*
+        auto iter = dataResponse.begin();
+        if (iter.Next())
+        {
+            auto & item = iter.GetValue();
+            NL_TEST_ASSERT(apSuite, item.fabricIndex == 1);
+        }
+        */
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
+
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestReadAttributeResponse", TestReadInteraction::TestReadAttributeResponse),
     NL_TEST_DEF("TestReadEventResponse", TestReadInteraction::TestReadEventResponse),
     NL_TEST_DEF("TestReadAttributeError", TestReadInteraction::TestReadAttributeError),
+    NL_TEST_DEF("TestReadFabricScopedWithoutFabricFilter", TestReadInteraction::TestReadFabricScopedWithoutFabricFilter),
+    NL_TEST_DEF("TestReadFabricScopedWithFabricFilter", TestReadInteraction::TestReadFabricScopedWithFabricFilter),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_SENTINEL()
 };

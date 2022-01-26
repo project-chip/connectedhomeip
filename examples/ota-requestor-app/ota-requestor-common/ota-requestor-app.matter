@@ -32,9 +32,15 @@ server cluster Basic = 40 {
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
   readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
+  attribute boolean localConfigDisabled = 16;
+  readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -103,6 +109,7 @@ server cluster GeneralCommissioning = 48 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -344,7 +351,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   attribute ProviderLocation defaultOtaProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
-  readonly attribute int8u updateStateProgress = 3;
+  readonly attribute nullable int8u updateStateProgress = 3;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {

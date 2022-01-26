@@ -106,12 +106,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ActiveLocale))
-    {
-        err = WriteConfigValueStr(PosixConfig::kConfigKey_ActiveLocale, "en-US", strlen("en-US"));
-        SuccessOrExit(err);
-    }
-
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
