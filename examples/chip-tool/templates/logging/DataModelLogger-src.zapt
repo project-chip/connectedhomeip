@@ -1,0 +1,39 @@
+{{> header}}
+
+#include <commands/clusters/DataModelLogger.h>
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> log_struct_value ns="detail"}}
+{{/if}}
+{{/zcl_structs}}
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+{{> log_struct_value ns=parent.name}}
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_events}}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value)
+{
+  DataModelLogger::LogString(label, indent, "{");
+{{#zcl_event_fields}}
+  {
+      CHIP_ERROR err = DataModelLogger::LogValue("{{asUpperCamelCase name}}", indent + 1, value.{{asLowerCamelCase name}});
+      if (err != CHIP_NO_ERROR)
+      {
+          DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for '{{asUpperCamelCase name}}'");
+          return err;
+      }
+  }
+{{/zcl_event_fields}}
+  DataModelLogger::LogString(indent, "}");
+
+  return CHIP_NO_ERROR;
+}
+{{/zcl_events}}
+{{/zcl_clusters}}

@@ -9,6 +9,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
+#include <commands/clusters/DataModelLogger.h>
 #include <commands/clusters/ModelCommand.h>
 #include <commands/common/CommandInvoker.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -17,178 +18,6 @@
 #include <lib/support/TypeTraits.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
-
-// Value logging functions.  The non-generated ones depend on the
-// generated ones, so are placed here.
-namespace {
-
-{{#zcl_structs}}
-{{#if has_more_than_one_cluster}}
-CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns="detail" isArgument=true}} value);
-{{/if}}
-{{/zcl_structs}}
-
-{{#zcl_clusters}}
-{{#zcl_structs}}
-{{#unless has_more_than_one_cluster}}
-CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true}} value);
-{{/unless}}
-{{/zcl_structs}}
-{{/zcl_clusters}}
-
-{{#zcl_clusters}}
-{{#zcl_events}}
-{{#unless has_more_than_one_cluster}}
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value);
-{{/unless}}
-{{/zcl_events}}
-{{/zcl_clusters}}
-
-#if CHIP_PROGRESS_LOGGING
-std::string IndentStr(size_t indent)
-{
-  std::string str;
-  for (size_t i = 0; i < indent; ++i) {
-    str.append("  ");
-  }
-  return str;
-}
-#endif // CHIP_PROGRESS_LOGGING
-
-template <typename X, typename std::enable_if_t<std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
-CHIP_ERROR LogValue(const char * label, size_t indent, X value)
-{
-    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
-    return CHIP_NO_ERROR;
-}
-
-template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
-CHIP_ERROR LogValue(const char * label, size_t indent, X value)
-{
-    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
-{
-    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, value ? "TRUE" : "FALSE");
-    return CHIP_NO_ERROR;
-}
-
-template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
-CHIP_ERROR LogValue(const char * label, size_t indent, X value)
-{
-    return LogValue(label, indent, chip::to_underlying(value));
-}
-
-
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::CharSpan value)
-{
-    ChipLogProgress(chipTool, "%s%s: %.*s", IndentStr(indent).c_str(), label, static_cast<int>(value.size()), value.data());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::ByteSpan value)
-{
-    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    if (CHIP_NO_ERROR == chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
-    {
-        ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, buffer);
-    }
-    else
-    {
-      ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
-    }
-    return CHIP_NO_ERROR;
-}
-
-template <typename X>
-CHIP_ERROR LogValue(const char * label, size_t indent, chip::BitFlags<X> value)
-{
-    return LogValue(label, indent, value.Raw());
-}
-
-template <typename T>
-CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::DecodableList<T> & value)
-{
-    size_t count = 0;
-    CHIP_ERROR err = value.ComputeSize(&count);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    ChipLogProgress(chipTool, "%s%s: %zu entries", IndentStr(indent).c_str(), label, count);
-
-    auto iter = value.begin();
-    size_t i = 0;
-    while (iter.Next())
-    {
-      ++i;
-      std::string itemLabel = std::string("[") + std::to_string(i) + "]";
-      ReturnErrorOnFailure(LogValue(itemLabel.c_str(), indent + 1, iter.GetValue()));
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-      ChipLogProgress(chipTool, "%sList truncated due to invalid value", IndentStr(indent+1).c_str());
-    }
-    return iter.GetStatus();
-}
-
-
-template <typename T>
-CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::Nullable<T> & value)
-{
-    if (!value.IsNull())
-    {
-        return LogValue(label, indent, value.Value());
-    }
-    ChipLogProgress(chipTool, "%s%s: null", IndentStr(indent).c_str(), label);
-    return CHIP_NO_ERROR;
-}
-
-template <typename T>
-CHIP_ERROR LogValue(const char * label, size_t indent, const chip::Optional<T> & value)
-{
-    if (value.HasValue())
-    {
-        return LogValue(label, indent, value.Value());
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-// We output helpers for all structs here, including ones we might not actually
-// be logging.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-{{#zcl_structs}}
-{{#if has_more_than_one_cluster}}
-{{> log_struct_value ns="detail"}}
-{{/if}}
-{{/zcl_structs}}
-
-{{#zcl_clusters}}
-{{#zcl_structs}}
-{{#unless has_more_than_one_cluster}}
-{{> log_struct_value ns=parent.name}}
-{{/unless}}
-{{/zcl_structs}}
-{{/zcl_clusters}}
-#pragma GCC diagnostic pop
-
-// We output helpers for all events here, including ones we might not actually
-// be logging.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-{{#zcl_clusters}}
-{{#zcl_events}}
-{{#unless has_more_than_one_cluster}}
-{{> log_event_value ns=parent.name}}
-{{/unless}}
-{{/zcl_events}}
-{{/zcl_clusters}}
-#pragma GCC diagnostic pop
-} // anonymous namespace
 
 static void OnDefaultSuccessResponseWithoutExit(void * context)
 {
@@ -219,7 +48,7 @@ static void OnDefaultSuccess(void * context, const chip::app::DataModel::NullObj
 template <typename T>
 static void OnGeneralAttributeEventResponse(void * context, const char * label, T value)
 {
-    CHIP_ERROR err = LogValue(label, 0, value);
+    CHIP_ERROR err = DataModelLogger::LogValue(label, 0, value);
 
     auto * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
@@ -232,8 +61,9 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Success(v
     ChipLogProgress(Zcl, "Received {{asUpperCamelCase name}}:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{#chip_cluster_response_arguments}}
-    if (err == CHIP_NO_ERROR) {
-       err = LogValue("{{asLowerCamelCase label}}", 1, data.{{asLowerCamelCase label}});
+    if (err == CHIP_NO_ERROR)
+    {
+       err = DataModelLogger::LogValue("{{asLowerCamelCase label}}", 1, data.{{asLowerCamelCase label}});
     }
     {{/chip_cluster_response_arguments}}
 
@@ -371,7 +201,7 @@ public:
 
     static void OnValueReport(void * context, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
     {
-       LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
+       DataModelLogger::LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
     }
 
 private:
@@ -493,7 +323,7 @@ public:
 
     static void OnValueReport(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
     {
-       LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
+       DataModelLogger::LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
     }
 
 private:
