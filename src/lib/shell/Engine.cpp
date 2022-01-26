@@ -55,9 +55,9 @@ int Engine::Init()
 
 void Engine::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
 {
-    for (unsigned i = 0; i < this->_commandCount; i++)
+    for (unsigned i = 0; i < _commandCount; i++)
     {
-        if (on_command(this->_commands[i], arg) != CHIP_NO_ERROR)
+        if (on_command(_commands[i], arg) != CHIP_NO_ERROR)
         {
             return;
         }
