@@ -297,7 +297,8 @@ exit:
 
 // ApplicationLauncher Cluster Commands
 CHIP_ERROR ApplicationLauncherCluster::HideAppRequest(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -319,6 +320,12 @@ CHIP_ERROR ApplicationLauncherCluster::HideAppRequest(Callback::Cancelable * onS
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -334,7 +341,8 @@ exit:
 }
 
 CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan data)
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan data,
+                                                        uint16_t catalogVendorId, chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -360,6 +368,10 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * o
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // data: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -376,7 +388,8 @@ exit:
 }
 
 CHIP_ERROR ApplicationLauncherCluster::StopAppRequest(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -397,6 +410,12 @@ CHIP_ERROR ApplicationLauncherCluster::StopAppRequest(Callback::Cancelable * onS
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -2332,7 +2351,7 @@ exit:
 
 CHIP_ERROR ContentLauncherCluster::LaunchURLRequest(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, chip::CharSpan contentURL,
-                                                    chip::CharSpan displayString)
+                                                    chip::CharSpan displayString, chip::CharSpan providerName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2359,6 +2378,8 @@ CHIP_ERROR ContentLauncherCluster::LaunchURLRequest(Callback::Cancelable * onSuc
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), contentURL));
     // displayString: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), displayString));
+    // providerName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), providerName));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -2422,7 +2443,8 @@ exit:
 }
 
 // DoorLock Cluster Commands
-CHIP_ERROR DoorLockCluster::ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint8_t credentialType, uint16_t credentialIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2443,6 +2465,12 @@ CHIP_ERROR DoorLockCluster::ClearCredential(Callback::Cancelable * onSuccessCall
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // credentialType: dlCredentialType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialType));
+    // credentialIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -2499,7 +2527,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t credentialType, uint16_t credentialIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2520,6 +2549,12 @@ CHIP_ERROR DoorLockCluster::GetCredentialStatus(Callback::Cancelable * onSuccess
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // credentialType: dlCredentialType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialType));
+    // credentialIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -2618,8 +2653,8 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t operationType, chip::ByteSpan credentialData, uint16_t userIndex,
-                                          uint8_t userStatus)
+                                          uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex,
+                                          chip::ByteSpan credentialData, uint16_t userIndex, uint8_t userStatus)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2644,6 +2679,10 @@ CHIP_ERROR DoorLockCluster::SetCredential(Callback::Cancelable * onSuccessCallba
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // operationType: dlDataOperationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationType));
+    // credentialType: dlCredentialType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialType));
+    // credentialIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialIndex));
     // credentialData: longOctetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialData));
     // userIndex: int16u
@@ -2982,8 +3021,7 @@ exit:
 }
 
 CHIP_ERROR GroupKeyManagementCluster::KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback,
-                                                           /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs)
+                                                           Callback::Cancelable * onFailureCallback, uint16_t groupKeySetIDs)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3066,7 +3104,10 @@ exit:
 }
 
 CHIP_ERROR GroupKeyManagementCluster::KeySetWrite(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+                                                  Callback::Cancelable * onFailureCallback, uint16_t groupKeySetID,
+                                                  uint8_t securityPolicy, chip::ByteSpan epochKey0, uint64_t epochStartTime0,
+                                                  chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2,
+                                                  uint64_t epochStartTime2)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3087,6 +3128,24 @@ CHIP_ERROR GroupKeyManagementCluster::KeySetWrite(Callback::Cancelable * onSucce
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+    // securityPolicy: groupKeySecurityPolicy
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), securityPolicy));
+    // epochKey0: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey0));
+    // epochStartTime0: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime0));
+    // epochKey1: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey1));
+    // epochStartTime1: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime1));
+    // epochKey2: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey2));
+    // epochStartTime2: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime2));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3190,7 +3249,7 @@ exit:
 }
 
 CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+                                             uint16_t groupList)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4913,8 +4972,7 @@ exit:
 
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::VendorId vendorId,
-                                                        uint16_t productId, uint32_t softwareVersion,
-                                                        /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported,
+                                                        uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
                                                         uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
                                                         chip::ByteSpan metadataForProvider)
 {
@@ -5660,7 +5718,8 @@ exit:
 
 // Scenes Cluster Commands
 CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName)
+                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName,
+                                   chip::ClusterId clusterId, uint8_t length, uint8_t value)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5691,6 +5750,12 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // sceneName: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), sceneName));
+    // clusterId: clusterId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
+    // length: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), length));
+    // value: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), value));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6051,7 +6116,8 @@ exit:
 
 // TestCluster Cluster Commands
 CHIP_ERROR TestClusterCluster::SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+                                                       Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
+                                                       chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g, double h)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6073,6 +6139,24 @@ CHIP_ERROR TestClusterCluster::SimpleStructEchoRequest(Callback::Cancelable * on
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // c: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), c));
+    // d: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
+    // e: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e));
+    // f: simpleBitmap
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: single
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+    // h: double
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), h));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6260,8 +6344,7 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
+                                                            Callback::Cancelable * onFailureCallback, uint8_t arg1)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6303,8 +6386,7 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestListInt8UReverseRequest(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback,
-                                                           /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
+                                                           Callback::Cancelable * onFailureCallback, uint8_t arg1)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6346,7 +6428,8 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestListNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
+                                                                       Callback::Cancelable * onFailureCallback, uint8_t a, bool b,
+                                                                       uint32_t e, chip::ByteSpan f, uint8_t g)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6369,6 +6452,18 @@ CHIP_ERROR TestClusterCluster::TestListNestedStructListArgumentRequest(Callback:
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // e: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), e));
+    // f: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -6384,7 +6479,8 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+                                                             Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
+                                                             chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g, double h)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6407,6 +6503,24 @@ CHIP_ERROR TestClusterCluster::TestListStructArgumentRequest(Callback::Cancelabl
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // c: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), c));
+    // d: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
+    // e: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e));
+    // f: simpleBitmap
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: single
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+    // h: double
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), h));
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -6422,7 +6536,7 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestNestedStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+                                                               Callback::Cancelable * onFailureCallback, uint8_t a, bool b)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6445,6 +6559,12 @@ CHIP_ERROR TestClusterCluster::TestNestedStructArgumentRequest(Callback::Cancela
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -6460,7 +6580,8 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+                                                                   Callback::Cancelable * onFailureCallback, uint8_t a, bool b,
+                                                                   uint32_t e, chip::ByteSpan f, uint8_t g)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6482,6 +6603,18 @@ CHIP_ERROR TestClusterCluster::TestNestedStructListArgumentRequest(Callback::Can
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // e: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), e));
+    // f: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6658,7 +6791,8 @@ exit:
 }
 
 CHIP_ERROR TestClusterCluster::TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+                                                         Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
+                                                         chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g, double h)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6680,6 +6814,24 @@ CHIP_ERROR TestClusterCluster::TestStructArgumentRequest(Callback::Cancelable * 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // c: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), c));
+    // d: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
+    // e: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e));
+    // f: simpleBitmap
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: single
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+    // h: double
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), h));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6896,8 +7048,7 @@ exit:
 
 CHIP_ERROR ThermostatCluster::SetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
-                                                uint8_t modeForSequence,
-                                                /* TYPE WARNING: array array defaults to */ uint8_t * payload)
+                                                uint8_t modeForSequence, uint8_t payload)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;

@@ -126,8 +126,7 @@ exit:
 
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::VendorId vendorId,
-                                                        uint16_t productId, uint32_t softwareVersion,
-                                                        /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported,
+                                                        uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
                                                         uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
                                                         chip::ByteSpan metadataForProvider)
 {

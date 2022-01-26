@@ -44,10 +44,16 @@ public:
     CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    chip::ByteSpan updateToken, uint32_t softwareVersion);
     CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+<<<<<<< HEAD
                           chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion,
                           /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint16_t hardwareVersion,
                           chip::CharSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+=======
+                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                          chip::ByteSpan metadataForProvider);
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase

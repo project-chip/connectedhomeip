@@ -46,11 +46,18 @@ public:
 =======
 
     // Cluster Commands
-    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint16_t catalogVendorId, chip::CharSpan applicationId);
     CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+<<<<<<< HEAD
                                 chip::CharSpan data);
     CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+=======
+                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint16_t catalogVendorId, chip::CharSpan applicationId);
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
@@ -79,7 +86,7 @@ public:
     CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                     bool autoPlay, chip::CharSpan data);
     CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan contentURL, chip::CharSpan displayString);
+                                chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
 };
 
 <<<<<<< HEAD
