@@ -1,0 +1,7 @@
+{{> header}}
+
+{{#structs_with_cluster_name}}
+static CHIP_ERROR Setup(const char * label, {{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request, Json::Value & value);
+
+static void Finalize({{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request);
+{{/structs_with_cluster_name}}
