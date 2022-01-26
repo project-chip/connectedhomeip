@@ -277,10 +277,12 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     if ((err != CHIP_NO_ERROR) || (codeLen == 0))
     {
         strncpy(&location[0], "XX", kMaxLen + 1);
-        err = CHIP_NO_ERROR;
+        codeLen = strnlen(location, kMaxLen);
+        err     = CHIP_NO_ERROR;
     }
 
-    return EncodeStringOnSuccess(err, aEncoder, location, kMaxLen);
+    ReturnErrorOnFailure(err);
+    return encoder.Encode(chip::CharSpan(buf, codeLen));
 }
 
 CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
