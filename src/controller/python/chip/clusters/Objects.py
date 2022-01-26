@@ -30604,6 +30604,21 @@ class TestCluster(Cluster):
             arg1: 'TestCluster.Structs.NestedStructList' = field(default_factory=lambda: TestCluster.Structs.NestedStructList())
 
         @dataclass
+        class TestEmitTestFabricScopedEventResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x000B
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="value", Tag=0, Type=uint),
+                    ])
+
+            value: 'uint' = 0
+
+        @dataclass
         class TestListNestedStructListArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x000C
@@ -30767,6 +30782,21 @@ class TestCluster(Cluster):
             arg1: 'uint' = 0
             arg2: 'TestCluster.Enums.SimpleEnum' = 0
             arg3: 'bool' = False
+
+        @dataclass
+        class TestEmitTestFabricScopedEventRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0015
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="arg1", Tag=0, Type=uint),
+                    ])
+
+            arg1: 'uint' = 0
 
 
     class Attributes:
@@ -32148,6 +32178,25 @@ class TestCluster(Cluster):
             arg4: 'TestCluster.Structs.SimpleStruct' = field(default_factory=lambda: TestCluster.Structs.SimpleStruct())
             arg5: 'typing.List[TestCluster.Structs.SimpleStruct]' = field(default_factory=lambda: [])
             arg6: 'typing.List[TestCluster.Enums.SimpleEnum]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class TestFabricScopedEvent(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="arg1", Tag=1, Type=uint),
+                    ])
+
+            arg1: 'uint' = 0
 
 
 @dataclass
