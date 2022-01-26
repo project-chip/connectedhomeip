@@ -71,7 +71,7 @@ void RegisterMetaCommands()
 
     std::atexit(AtExitShell);
 
-    Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds), "");
+    Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds), nullptr);
 }
 
 } // namespace Shell
