@@ -55,17 +55,16 @@ public:
     static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
     typedef struct DeviceSoftwareVersionModel
     {
-        uint16_t vendorId;
+        chip::VendorId vendorId;
         uint16_t productId;
         uint32_t softwareVersion;
         char softwareVersionString[SW_VER_STR_MAX_LEN];
-        uint16_t CDVersionNumber;
+        uint16_t cDVersionNumber;
         bool softwareVersionValid;
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
         char otaURL[OTA_URL_MAX_LEN];
     } DeviceSoftwareVersionModel;
-    void SetOTACandidates(OTAProviderExample::DeviceSoftwareVersionModel entry);
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }

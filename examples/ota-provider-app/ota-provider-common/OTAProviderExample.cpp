@@ -98,12 +98,7 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
     mCandidates = std::move(candidates);
 }
 
-void OTAProviderExample::SetOTACandidates(OTAProviderExample::DeviceSoftwareVersionModel entry)
-{
-    mCandidates.push_back(entry);
-}
-
-static bool compareSoftwareVersions(const OTAProviderExample::DeviceSoftwareVersionModel & a,
+static bool CompareSoftwareVersions(const OTAProviderExample::DeviceSoftwareVersionModel & a,
                                     const OTAProviderExample::DeviceSoftwareVersionModel & b)
 {
     return (a.softwareVersion < b.softwareVersion);
@@ -114,7 +109,7 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
                                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate)
 {
     bool candidateFound = false;
-    std::sort(mCandidates.begin(), mCandidates.end(), compareSoftwareVersions);
+    std::sort(mCandidates.begin(), mCandidates.end(), CompareSoftwareVersions);
     for (auto candidate : mCandidates)
     {
         // VendorID and ProductID will be the primary key when querying

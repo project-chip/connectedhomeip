@@ -62,7 +62,7 @@ static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
-static bool parse_json_file_and_populate_candidates(const char * filepath,
+static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
                                                     std::vector<OTAProviderExample::DeviceSoftwareVersionModel> & candidates)
 {
     bool ret = false;
@@ -74,37 +74,42 @@ static bool parse_json_file_and_populate_candidates(const char * filepath,
     builder["collectComments"] = true; // allow C/C++ type comments in JSON file
     ifs.open(filepath);
 
+    if (!ifs.good())
+    {
+        ChipLogError(SoftwareUpdate, "Error opening ifstream with file: \"%s\"", filepath);
+        return ret;
+    }
+
     if (!parseFromStream(builder, ifs, &root, &errs))
     {
-        ChipLogDetail(SoftwareUpdate, "Error parsing JSON from file: \"%s\"", filepath);
+        ChipLogError(SoftwareUpdate, "Error parsing JSON from file: \"%s\"", filepath);
+        return ret;
+    }
+
+    const Json::Value devSofVerModValue = root["deviceSoftwareVersionModel"];
+    if (!devSofVerModValue || !devSofVerModValue.isArray())
+    {
+        ChipLogError(SoftwareUpdate, "Error: Key deviceSoftwareVersionModel not found or its value is not of type Array");
     }
     else
     {
-        const Json::Value devSofVerModValue = root["deviceSoftwareVersionModel"];
-        if (!devSofVerModValue || !devSofVerModValue.isArray())
+        for (auto iter : devSofVerModValue)
         {
-            ChipLogDetail(SoftwareUpdate, "Error: Key deviceSoftwareVersionModel not found or its value is not of type Array");
-        }
-        else
-        {
-            for (auto iter : devSofVerModValue)
-            {
-                OTAProviderExample::DeviceSoftwareVersionModel candidate;
-                candidate.vendorId        = static_cast<uint16_t>(iter.get("vendorId", 1).asUInt());
-                candidate.productId       = static_cast<uint16_t>(iter.get("productId", 1).asUInt());
-                candidate.softwareVersion = static_cast<uint32_t>(iter.get("softwareVersion", 10).asUInt64());
-                strncpy(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString(),
-                        OTAProviderExample::SW_VER_STR_MAX_LEN);
-                candidate.CDVersionNumber      = static_cast<uint16_t>(iter.get("CDVersionNumber", 0).asUInt());
-                candidate.softwareVersionValid = iter.get("softwareVersionValid", true).asBool() ? true : false;
-                candidate.minApplicableSoftwareVersion =
-                    static_cast<uint32_t>(iter.get("minApplicableSoftwareVersion", 0).asUInt64());
-                candidate.maxApplicableSoftwareVersion =
-                    static_cast<uint32_t>(iter.get("maxApplicableSoftwareVersion", 1000).asUInt64());
-                strncpy(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString(), OTAProviderExample::OTA_URL_MAX_LEN);
-                candidates.push_back(candidate);
-                ret = true;
-            }
+            OTAProviderExample::DeviceSoftwareVersionModel candidate;
+            candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
+            candidate.productId       = static_cast<uint16_t>(iter.get("productId", 1).asUInt());
+            candidate.softwareVersion = static_cast<uint32_t>(iter.get("softwareVersion", 10).asUInt64());
+            strncpy(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString(),
+                    OTAProviderExample::SW_VER_STR_MAX_LEN);
+            candidate.cDVersionNumber      = static_cast<uint16_t>(iter.get("cDVersionNumber", 0).asUInt());
+            candidate.softwareVersionValid = iter.get("softwareVersionValid", true).asBool() ? true : false;
+            candidate.minApplicableSoftwareVersion =
+                static_cast<uint32_t>(iter.get("minApplicableSoftwareVersion", 0).asUInt64());
+            candidate.maxApplicableSoftwareVersion =
+                static_cast<uint32_t>(iter.get("maxApplicableSoftwareVersion", 1000).asUInt64());
+            strncpy(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString(), OTAProviderExample::OTA_URL_MAX_LEN);
+            candidates.push_back(candidate);
+            ret = true;
         }
     }
     return ret;
@@ -259,13 +264,13 @@ int main(int argc, char * argv[])
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
 
-    ChipLogDetail(SoftwareUpdate, "using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
+    ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
 
     if (gOtaImageListFilepath != nullptr)
     {
         // Parse JSON file and load the ota candidates
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
-        parse_json_file_and_populate_candidates(gOtaImageListFilepath, candidates);
+        ParseJsonFileAndPopulateCandidates(gOtaImageListFilepath, candidates);
         otaProvider.SetOTACandidates(candidates);
     }
 
