@@ -119,21 +119,6 @@ void Engine::InsertShellMap(char const * prefix, Engine * shell)
     Engine::theShellMapListHead = new_map;
 }
 
-// CHIP_ERROR process_completion(shell_command_t * cmd, void * arg)
-// {
-//     cmd_completion_context * ctx = (cmd_completion_context *) ((void **) arg)[0];
-//     char * _incomplete_cmd       = (char *) ((void **) arg)[1];
-//     // For end nodes like "ble adv", need to avoid duplicate returns.
-//     // Return for prefix="ble adv" cmd=""; reject for prefix="ble" cmd="adv"
-//     if ((strcmp(cmd->cmd_name, _incomplete_cmd) != 0 && strncmp(cmd->cmd_name, _incomplete_cmd, strlen(_incomplete_cmd)) == 0) ||
-//         strcmp(_incomplete_cmd, "") == 0)
-//     {
-//         ctx->cmdc++;
-//         ctx->cmdv[ctx->cmdc - 1] = cmd;
-//     }
-//     return CHIP_NO_ERROR;
-// };
-
 CHIP_ERROR Engine::GetCommandCompletions(cmd_completion_context * context)
 {
 
