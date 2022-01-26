@@ -66,7 +66,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static void ScheduleNextTest(intptr_t context){
+    static void ScheduleNextTest(intptr_t context)
+    {
         TestCommand * command = reinterpret_cast<TestCommand *>(context);
         command->isRunning    = true;
         command->NextTest();
