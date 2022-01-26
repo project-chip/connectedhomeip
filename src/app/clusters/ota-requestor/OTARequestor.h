@@ -146,10 +146,6 @@ private:
             VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
             chip::Messaging::SendFlags sendFlags;
-            if (event.msgTypeData.HasMessageType(chip::bdx::MessageType::ReceiveInit))
-            {
-                sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
-            }
             if (!event.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF) &&
                 !event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
