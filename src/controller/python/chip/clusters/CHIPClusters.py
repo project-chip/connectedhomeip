@@ -395,12 +395,6 @@ class ChipClusters:
             "clusterName": "Basic",
             "clusterId": 0x00000028,
             "commands": {
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "MfgSpecificPing",
-                    "args": {
-                    },
-                },
             },
             "attributes": {
                 0x00000000: {

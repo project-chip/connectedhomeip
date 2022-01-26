@@ -1471,23 +1471,6 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)mfgSpecificPingWithCompletionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    Basic::Commands::MfgSpecificPing::Type request;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
 - (void)readAttributeInteractionModelVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler
 {
