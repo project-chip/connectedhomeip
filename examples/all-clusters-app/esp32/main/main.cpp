@@ -18,7 +18,6 @@
 #include "BluetoothWidget.h"
 #include "Button.h"
 #include "CHIPDeviceManager.h"
-#include "CaseCommands.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
 #include "Globals.h"
@@ -27,6 +26,7 @@
 #include "OpenThreadLaunch.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#include "ShellCommands.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -82,8 +82,6 @@
 #if CONFIG_OPENTHREAD_ENABLED
 #include <platform/ThreadStackManager.h>
 #endif
-
-#include <OnOffCommands.h>
 
 using namespace ::chip;
 using namespace ::chip::Shell;
@@ -597,9 +595,8 @@ extern "C" void app_main()
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
-    OnOffCommands & onOffCommands = OnOffCommands::GetInstance();
-    onOffCommands.Register();
-    chip::Shell::RegisterCaseCommands();
+    OnOffCommands::GetInstance().Register();
+    CASECommands::GetInstance().Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
 #if CONFIG_OPENTHREAD_ENABLED
