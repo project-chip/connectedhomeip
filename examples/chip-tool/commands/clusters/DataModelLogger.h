@@ -20,11 +20,11 @@
 
 #include <string>
 
-#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventHeader.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
 #include <lib/support/BytesToHex.h>
 
 class DataModelLogger
