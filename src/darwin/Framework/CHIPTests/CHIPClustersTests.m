@@ -13577,6 +13577,11 @@ uint8_t currentTarget;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
+        {
+            id actualValue = value;
+            currentTarget = [actualValue unsignedCharValue];
+        }
+
         [expectation fulfill];
     }];
 
@@ -37123,6 +37128,9 @@ uint8_t TestAddArgumentDefaultValue;
                           {
                               id actualValue = values.returnValue;
                               XCTAssertEqual([actualValue unsignedCharValue], 20);
+                          }
+                          {
+                              id actualValue = values.returnValue;
                               TestAddArgumentDefaultValue = [actualValue unsignedCharValue];
                           }
 
@@ -37209,6 +37217,9 @@ bool readAttributeBooleanDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue boolValue], 0);
+        }
+        {
+            id actualValue = value;
             readAttributeBooleanDefaultValue = [actualValue boolValue];
         }
 
@@ -37329,6 +37340,9 @@ uint8_t readAttributeBitmap8DefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+        {
+            id actualValue = value;
             readAttributeBitmap8DefaultValue = [actualValue unsignedCharValue];
         }
 
@@ -37449,6 +37463,9 @@ uint16_t readAttributeBitmap16DefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
+        {
+            id actualValue = value;
             readAttributeBitmap16DefaultValue = [actualValue unsignedShortValue];
         }
 
@@ -37569,6 +37586,9 @@ uint32_t readAttributeBitmap32DefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
+        {
+            id actualValue = value;
             readAttributeBitmap32DefaultValue = [actualValue unsignedIntValue];
         }
 
@@ -37689,6 +37709,9 @@ uint64_t readAttributeBitmap64DefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
+        {
+            id actualValue = value;
             readAttributeBitmap64DefaultValue = [actualValue unsignedLongLongValue];
         }
 
@@ -37809,6 +37832,9 @@ uint8_t readAttributeInt8uDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+        {
+            id actualValue = value;
             readAttributeInt8uDefaultValue = [actualValue unsignedCharValue];
         }
 
@@ -37929,6 +37955,9 @@ uint16_t readAttributeInt16uDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
+        {
+            id actualValue = value;
             readAttributeInt16uDefaultValue = [actualValue unsignedShortValue];
         }
 
@@ -38049,6 +38078,9 @@ uint32_t readAttributeInt32uDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
+        {
+            id actualValue = value;
             readAttributeInt32uDefaultValue = [actualValue unsignedIntValue];
         }
 
@@ -38169,6 +38201,9 @@ uint64_t readAttributeInt64uDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
+        {
+            id actualValue = value;
             readAttributeInt64uDefaultValue = [actualValue unsignedLongLongValue];
         }
 
@@ -38289,6 +38324,9 @@ int8_t readAttributeInt8sDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue charValue], 0);
+        }
+        {
+            id actualValue = value;
             readAttributeInt8sDefaultValue = [actualValue charValue];
         }
 
@@ -38409,6 +38447,9 @@ int16_t readAttributeInt16sDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue shortValue], 0);
+        }
+        {
+            id actualValue = value;
             readAttributeInt16sDefaultValue = [actualValue shortValue];
         }
 
@@ -38529,6 +38570,9 @@ int32_t readAttributeInt32sDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue intValue], 0L);
+        }
+        {
+            id actualValue = value;
             readAttributeInt32sDefaultValue = [actualValue intValue];
         }
 
@@ -38649,6 +38693,9 @@ int64_t readAttributeInt64sDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue longLongValue], 0LL);
+        }
+        {
+            id actualValue = value;
             readAttributeInt64sDefaultValue = [actualValue longLongValue];
         }
 
@@ -38769,6 +38816,9 @@ uint8_t readAttributeEnum8DefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+        {
+            id actualValue = value;
             readAttributeEnum8DefaultValue = [actualValue unsignedCharValue];
         }
 
@@ -38889,6 +38939,9 @@ uint16_t readAttributeEnum16DefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
+        {
+            id actualValue = value;
             readAttributeEnum16DefaultValue = [actualValue unsignedShortValue];
         }
 
@@ -39009,6 +39062,9 @@ uint64_t readAttributeEpochUSDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
+        {
+            id actualValue = value;
             readAttributeEpochUSDefaultValue = [actualValue unsignedLongLongValue];
         }
 
@@ -39129,6 +39185,9 @@ uint32_t readAttributeEpochSDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
+        {
+            id actualValue = value;
             readAttributeEpochSDefaultValue = [actualValue unsignedIntValue];
         }
 
@@ -39249,6 +39308,9 @@ uint16_t readAttributeVendorIdDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
+        {
+            id actualValue = value;
             readAttributeVendorIdDefaultValue = [actualValue unsignedShortValue];
         }
 
@@ -39369,6 +39431,9 @@ NSMutableString * readAttributeCharStringDefaultValue;
         {
             id actualValue = value;
             XCTAssertTrue([actualValue isEqualToString:@""]);
+        }
+        {
+            id actualValue = value;
             readAttributeCharStringDefaultValue = [NSMutableString stringWithString:actualValue];
         }
 
@@ -39442,13 +39507,16 @@ NSMutableString * readAttributeCharStringNotDefaultValue;
         {
             id actualValue = value;
             XCTAssertTrue([actualValue isEqualToString:@"NotDefault"]);
-            readAttributeCharStringNotDefaultValue = [NSMutableString stringWithString:actualValue];
         }
         {
             id actualValue = value;
             if (actualValue != nil) {
                 XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
             }
+        }
+        {
+            id actualValue = value;
+            readAttributeCharStringNotDefaultValue = [NSMutableString stringWithString:actualValue];
         }
 
         [expectation fulfill];
@@ -39575,6 +39643,9 @@ NSMutableData * readAttributeOctetStringDefaultValue;
         {
             id actualValue = value;
             XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"" length:0]]);
+        }
+        {
+            id actualValue = value;
             readAttributeOctetStringDefaultValue = [NSMutableData dataWithData:actualValue];
         }
 
@@ -39648,13 +39719,16 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
         {
             id actualValue = value;
             XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"NotDefault" length:10]]);
-            readAttributeOctetStringNotDefaultValue = [NSMutableData dataWithData:actualValue];
         }
         {
             id actualValue = value;
             if (actualValue != nil) {
                 XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
             }
+        }
+        {
+            id actualValue = value;
+            readAttributeOctetStringNotDefaultValue = [NSMutableData dataWithData:actualValue];
         }
 
         [expectation fulfill];
