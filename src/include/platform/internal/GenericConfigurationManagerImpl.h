@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -75,6 +75,12 @@ public:
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
+    CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
+    CHIP_ERROR StoreSpake2pIterationCount(uint32_t iterationCount) override;
+    CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen) override;
+    CHIP_ERROR StoreSpake2pSalt(const uint8_t * salt, size_t saltLen) override;
+    CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen) override;
+    CHIP_ERROR StoreSpake2pVerifier(const uint8_t * verifier, size_t verifierLen) override;
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
