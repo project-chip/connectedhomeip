@@ -747,7 +747,8 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     OperationalKey * GetCurrentKey()
     {
         // An epoch key update SHALL order the keys from oldest to newest,
-        // the current epoch key having the second newest time
+        // the current epoch key having the second newest time if time
+        // synchronization is not achieved or guaranteed.
         switch (this->keys_count)
         {
         case 1:
@@ -1781,14 +1782,18 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
     for (uint16_t i = 0; i < fabric.map_count; ++i, mapping.id = mapping.next)
     {
         VerifyOrReturnError(CHIP_NO_ERROR == mapping.Load(mStorage), nullptr);
-        // Group found, get the keyset
-        KeySetData keyset;
-        VerifyOrReturnError(keyset.Find(mStorage, fabric, mapping.keyset_id), nullptr);
-        OperationalKey * key = keyset.GetCurrentKey();
-        if (nullptr != key)
+        // GroupKeySetID of 0 is reserved for the Identity Protection Key (IPK)
+        if (mapping.keyset_id > 0 && mapping.group_id == group_id)
         {
-            return mKeyContexPool.CreateObject(*this, ByteSpan(key->value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES),
-                                               key->hash);
+            // Group found, get the keyset
+            KeySetData keyset;
+            VerifyOrReturnError(keyset.Find(mStorage, fabric, mapping.keyset_id), nullptr);
+            OperationalKey * key = keyset.GetCurrentKey();
+            if (nullptr != key)
+            {
+                return mKeyContexPool.CreateObject(*this, ByteSpan(key->value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES),
+                                                   key->hash);
+            }
         }
     }
     return nullptr;
