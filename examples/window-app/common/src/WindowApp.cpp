@@ -411,11 +411,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
                                   .tiltIsEncoderControlled = 1 };
     ConfigStatusSet(endpoint, configStatus);
 
-    // Attribute: Id 10 OperationalStatus
-    OperationalStatus operationalStatus = { .global = OperationalState::Stall,
-                                            .lift   = OperationalState::Stall,
-                                            .tilt   = OperationalState::Stall };
-    OperationalStatusSet(endpoint, operationalStatus);
+    OperationalStatusSetWithGlobalUpdated(endpoint, mOperationalStatus);
 
     // Attribute: Id 13 EndProductType
     EndProductTypeSet(endpoint, EMBER_ZCL_WC_END_PRODUCT_TYPE_INTERIOR_BLIND);
