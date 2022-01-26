@@ -38,6 +38,9 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
+constexpr size_t kExpectedFixedLocationLength = 2;
+static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength, "Fixed location storage must be of size 2");
+
 class BasicAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -273,9 +276,10 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     if ((err != CHIP_NO_ERROR) || (codeLen == 0))
     {
         strncpy(&location[0], "XX", kMaxLen + 1);
+        err = CHIP_NO_ERROR;
     }
 
-    return aEncoder.Encode(chip::CharSpan(location, strnlen(location, kMaxLen)));
+    return EncodeStringOnSuccess(err, aEncoder, location, kMaxLen);
 }
 
 CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
@@ -298,8 +302,9 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     chip::CharSpan location;
 
     ReturnErrorOnFailure(aDecoder.Decode(location));
-    VerifyOrReturnError(location.size() <= DeviceLayer::ConfigurationManager::kMaxLocationLength,
-                        CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
+    VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::ConstraintError).ToChipError());
 
     return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
 }
