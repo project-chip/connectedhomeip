@@ -36,13 +36,13 @@ struct PrivilegeOverride
 {
     ClusterId mCluster;
     EndpointId mEndpoint;
-    FieldId mField;
     Privilege mPrivilege;
+    FieldId mField;
 
     PrivilegeOverride() : mCluster(kInvalidClusterId), mEndpoint(kInvalidEndpointId), mField(kInvalidFieldId) {}
 
     PrivilegeOverride(ClusterId cluster, EndpointId endpoint, FieldId field, Privilege privilege) :
-        mCluster(cluster), mEndpoint(endpoint), mField(field), mPrivilege(privilege)
+        mCluster(cluster), mEndpoint(endpoint), mPrivilege(privilege), mField(field)
     {}
 
     static_assert(sizeof(FieldId) >= sizeof(AttributeId), "FieldId must be able to hold AttributeId");
@@ -80,10 +80,8 @@ enum class Operation
 PrivilegeOverride * const privilegeOverride[] = { privilegeOverrideForReadAttribute, privilegeOverrideForWriteAttribute,
                                                   privilegeOverrideForInvokeCommand, privilegeOverrideForReadEvent };
 
-const size_t maxPrivilegeOverride[] = { sizeof(privilegeOverrideForReadAttribute) / sizeof(privilegeOverrideForReadAttribute[0]),
-                                        sizeof(privilegeOverrideForWriteAttribute) / sizeof(privilegeOverrideForWriteAttribute[0]),
-                                        sizeof(privilegeOverrideForInvokeCommand) / sizeof(privilegeOverrideForInvokeCommand[0]),
-                                        sizeof(privilegeOverrideForReadEvent) / sizeof(privilegeOverrideForReadEvent[0]) };
+const size_t maxPrivilegeOverride[] = { ArraySize(privilegeOverrideForReadAttribute), ArraySize(privilegeOverrideForWriteAttribute),
+                                        ArraySize(privilegeOverrideForInvokeCommand), ArraySize(privilegeOverrideForReadEvent) };
 
 Privilege GetRequiredPrivilege(Operation operation, ClusterId cluster, EndpointId endpoint, FieldId field,
                                Privilege defaultPrivilege)
@@ -94,7 +92,7 @@ Privilege GetRequiredPrivilege(Operation operation, ClusterId cluster, EndpointI
     const auto * const pEnd   = pStart + maxPrivilegeOverride[static_cast<int>(operation)];
 
     // TODO: note that the sorted nature of the table can be taken advantage of to skip around
-    // (e.g. binary search), but if so, ensure to look for specific (non-wilcard) entries before
+    // (e.g. binary search), but if so, ensure to look for specific (non-wildcard) entries before
     // using a wildcard entry.
 
     for (const auto * p = pStart; p < pEnd; ++p)
