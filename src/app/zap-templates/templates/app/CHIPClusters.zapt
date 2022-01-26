@@ -1,7 +1,6 @@
 {{> header}}
 
-{{#all_user_clusters_with_outgoing_commands}}
-{{#first}}
+{{#if (chip_has_client_clusters)}}
 // Prevent multiple inclusion
 #pragma once
 
@@ -15,7 +14,7 @@
 namespace chip {
 namespace Controller {
 
-{{/first}}
+{{#all_user_clusters_with_outgoing_commands}}
 {{#if (is_client clusterSide)}}
 class DLL_EXPORT {{asUpperCamelCase clusterName}}Cluster : public ClusterBase
 {
@@ -25,8 +24,7 @@ public:
 };
 
 {{/if}}
-{{#last}}
+{{/all_user_clusters_with_outgoing_commands}}
 } // namespace Controller
 } // namespace chip
-{{/last}}
-{{/all_user_clusters_with_outgoing_commands}}
+{{/if}}

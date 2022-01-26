@@ -33,6 +33,7 @@ namespace Controller {
 // TODO(#4502): onCompletion is not used by IM for now.
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
+
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue,
