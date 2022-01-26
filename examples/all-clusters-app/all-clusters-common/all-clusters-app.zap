@@ -15788,6 +15788,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
+            },
+            {
+              "name": "TestEmitTestFabricScopedEventRequest",
+              "code": 21,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -15867,6 +15875,14 @@
             {
               "name": "TestEmitTestEventResponse",
               "code": 10,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "TestEmitTestFabricScopedEventResponse",
+              "code": 11,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
