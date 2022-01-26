@@ -180,6 +180,36 @@ function chip_endpoint_generated_functions()
   return ret.concat('\n');
 }
 
+function chip_endpoint_generated_commands_list()
+{
+  let ret = '{';
+  this.clusterList.forEach((c) => {
+    clientGeneratedCommands = [];
+    serverGeneratedCommands = [];
+
+    c.commands.forEach((cmd) => {
+      console.log(cmd);
+      if (cmd.mask.includes('incoming_server')) {
+        clientGeneratedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
+      }
+      if (cmd.mask.includes('incoming_client')) {
+        serverGeneratedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
+      }
+    });
+
+    if (clientGeneratedCommands > 0) {
+      clientGeneratedCommands.push("0xFFFF'FFFF /* end of list */");
+    }
+
+    if (serverGeneratedCommands > 0) {
+      serverGeneratedCommands.push("0xFFFF'FFFF /* end of list */");
+    }
+
+    ret = ret.concat(`/* ${c.comment} */ ${clientGeneratedCommands.join(' , ')}, ${serverGeneratedCommands.join(' , ')}, `)
+  })
+  return ret.concat('}\n');
+}
+
 /**
  * Return endpoint config GENERATED_CLUSTER MACRO
  * To be used as a replacement of endpoint_cluster_list since this one
@@ -187,11 +217,14 @@ function chip_endpoint_generated_functions()
  */
 function chip_endpoint_cluster_list()
 {
-  let ret = '{ \\\n';
+  let ret           = '{ \\\n';
+  let totalCommands = 0;
   this.clusterList.forEach((c) => {
     let mask          = '';
     let functionArray = c.functions;
     let clusterName   = c.clusterName;
+
+    console.log(c);
 
     if (c.comment.includes('server')) {
       let hasFunctionArray = false;
@@ -225,8 +258,35 @@ function chip_endpoint_cluster_list()
     } else {
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
-    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${
-        mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
+
+    clientGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
+    serverGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
+
+    clientGeneratedCommandsListVal = "nullptr";
+    serverGeneratedCommandsListVal = "nullptr";
+
+    if (clientGeneratedCommands > 0) {
+      clientGeneratedCommands++;
+      clientGeneratedCommandsListVal += `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands} )`;
+    }
+
+    if (serverGeneratedCommands > 0) {
+      serverGeneratedCommands++;
+      serverGeneratedCommandsListVal += `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands + clientGeneratedCommands} )`;
+    }
+
+    ret = ret.concat(`  { \\
+      .clusterId = ${c.clusterId},  \\
+        .attributes = ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), \\
+        .attributeCount = ${c.attributeCount}, \\
+        .clusterSize = ${c.attributeSize}, \\
+        .mask = ${mask}, \\
+        .functions = ${functionArray}, \\
+        .clientGeneratedCommandList = ${clientGeneratedCommandsListVal} ,\\
+        .serverGeneratedCommandList = ${serverGeneratedCommandsListVal} ,\\
+    }, /* ${c.comment} */ \\\n`)
+
+    totalCommands = totalCommands + clientGeneratedCommands + serverGeneratedCommands;
   })
   return ret.concat('}\n');
 }
@@ -728,21 +788,22 @@ async function zcl_events_fields_by_event_name(name, options)
 //
 // Module exports
 //
-exports.asPrintFormat                       = asPrintFormat;
-exports.asReadType                          = asReadType;
-exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
-exports.asTypedLiteral                      = asTypedLiteral;
-exports.asLowerCamelCase                    = asLowerCamelCase;
-exports.asUpperCamelCase                    = asUpperCamelCase;
-exports.hasProperty                         = hasProperty;
-exports.hasSpecificAttributes               = hasSpecificAttributes;
-exports.asMEI                               = asMEI;
-exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
-exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
-exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
-exports.getResponseCommandName              = getResponseCommandName;
-exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
-exports.getPythonFieldDefault               = getPythonFieldDefault;
-exports.incrementDepth                      = incrementDepth;
-exports.zcl_events_fields_by_event_name     = zcl_events_fields_by_event_name;
+exports.asPrintFormat                         = asPrintFormat;
+exports.asReadType                            = asReadType;
+exports.chip_endpoint_generated_functions     = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list            = chip_endpoint_cluster_list
+exports.chip_endpoint_generated_commands_list = chip_endpoint_generated_commands_list
+exports.asTypedLiteral                        = asTypedLiteral;
+exports.asLowerCamelCase                      = asLowerCamelCase;
+exports.asUpperCamelCase                      = asUpperCamelCase;
+exports.hasProperty                           = hasProperty;
+exports.hasSpecificAttributes                 = hasSpecificAttributes;
+exports.asMEI                                 = asMEI;
+exports.zapTypeToEncodableClusterObjectType   = zapTypeToEncodableClusterObjectType;
+exports.zapTypeToDecodableClusterObjectType   = zapTypeToDecodableClusterObjectType;
+exports.zapTypeToPythonClusterObjectType      = zapTypeToPythonClusterObjectType;
+exports.getResponseCommandName                = getResponseCommandName;
+exports.isWeaklyTypedEnum                     = isWeaklyTypedEnum;
+exports.getPythonFieldDefault                 = getPythonFieldDefault;
+exports.incrementDepth                        = incrementDepth;
+exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;

@@ -117,6 +117,18 @@ typedef struct
      * if this cluster has no functions.
      */
     const EmberAfGenericClusterFunction * functions;
+
+    /**
+     * A list of client generated commands. A client generated command
+     * is a client to server command. Terminated by 0xFFFF_FFFF.
+     */
+    const chip::CommandId * clientGeneratedCommandList;
+
+    /**
+     * A list of server generated commands. A server generated command
+     * is a response to client command request. Terminated by 0xFFFF_FFFF.
+     */
+    const chip::CommandId * serverGeneratedCommandList;
 } EmberAfCluster;
 
 /**

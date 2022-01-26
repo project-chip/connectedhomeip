@@ -285,39 +285,62 @@ protected:
     const EmberAfCluster * mCluster;
 };
 
-class AttributeListReader : public MandatoryGlobalAttributeReader
+class GlobalListAttributeReader : public MandatoryGlobalAttributeReader
 {
 public:
-    AttributeListReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
+    GlobalListAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-CHIP_ERROR AttributeListReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GlobalListAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    // The id of AttributeList is not in the attribute metadata.
+    using namespace Clusters::Globals::Attributes;
+    // The id of the attributes below is not in the attribute metadata.
     // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
     // put it in the metadata, or fix wildcard expansion to add it.
-    return aEncoder.EncodeList([this](const auto & encoder) {
-        constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
-        const size_t count          = mCluster->attributeCount;
-        bool addedOurId             = false;
-        for (size_t i = 0; i < count; ++i)
-        {
-            AttributeId id = mCluster->attributes[i].attributeId;
-            if (!addedOurId && id > ourId)
+    switch (aPath.mAttributeId)
+    {
+    case AttributeList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
+            const size_t count          = mCluster->attributeCount;
+            bool addedOurId             = false;
+            for (size_t i = 0; i < count; ++i)
+            {
+                AttributeId id = mCluster->attributes[i].attributeId;
+                if (!addedOurId && id > ourId)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(ourId));
+                    addedOurId = true;
+                }
+                ReturnErrorOnFailure(encoder.Encode(id));
+            }
+            if (!addedOurId)
             {
                 ReturnErrorOnFailure(encoder.Encode(ourId));
-                addedOurId = true;
             }
-            ReturnErrorOnFailure(encoder.Encode(id));
-        }
-        if (!addedOurId)
-        {
-            ReturnErrorOnFailure(encoder.Encode(ourId));
-        }
+            return CHIP_NO_ERROR;
+        });
+    case ClientGeneratedCommandList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            for (size_t i = 0; mCluster->clientGeneratedCommandList && mCluster->clientGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
+            {
+                ReturnErrorOnFailure(encoder.Encode(mCluster->clientGeneratedCommandList[i]));
+            }
+            return CHIP_NO_ERROR;
+        });
+    case ServerGeneratedCommandList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            for (size_t i = 0; mCluster->serverGeneratedCommandList && mCluster->serverGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
+            {
+                ReturnErrorOnFailure(encoder.Encode(mCluster->serverGeneratedCommandList[i]));
+            }
+            return CHIP_NO_ERROR;
+        });
+    default:
         return CHIP_NO_ERROR;
-    });
+    }
 }
 
 // Helper function for trying to read an attribute value via an
@@ -366,12 +389,16 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     EmberAfCluster * attributeCluster            = nullptr;
     EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
-    if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
+    switch (aPath.mAttributeId)
     {
+    case Clusters::Globals::Attributes::AttributeList::Id:
+        FALLTHROUGH;
+    case Clusters::Globals::Attributes::ClientGeneratedCommandList::Id:
+        FALLTHROUGH;
+    case Clusters::Globals::Attributes::ServerGeneratedCommandList::Id:
         attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-    }
-    else
-    {
+        break;
+    default:
         attributeMetadata =
             emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
     }
@@ -406,7 +433,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     {
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
         // reader (which can be lightweight constructed even from nullptr).
-        AttributeListReader reader(attributeCluster);
+        GlobalListAttributeReader reader(attributeCluster);
         AttributeAccessInterface * attributeOverride =
             (attributeCluster != nullptr) ? &reader : findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)

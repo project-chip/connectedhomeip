@@ -36,8 +36,12 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
 
+#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::Command *)(&generatedCommands[index]))
+
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS   {{chip_endpoint_generated_functions}}
+
+#define GENERATED_COMMANDS {{chip_endpoint_generated_commands_list}}
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
 #define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
