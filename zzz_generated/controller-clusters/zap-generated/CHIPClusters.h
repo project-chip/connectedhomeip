@@ -53,11 +53,18 @@ public:
 =======
 
     // Cluster Commands
-    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint16_t catalogVendorId, chip::CharSpan applicationId);
     CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+<<<<<<< HEAD
                                 chip::CharSpan data);
     CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+=======
+                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint16_t catalogVendorId, chip::CharSpan applicationId);
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
@@ -135,8 +142,12 @@ public:
     CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                     bool autoPlay, chip::CharSpan data);
     CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+<<<<<<< HEAD
                                 chip::CharSpan contentURL, chip::CharSpan displayString);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+=======
+                                chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
 class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
@@ -155,13 +166,16 @@ public:
 =======
 
     // Cluster Commands
-    CHIP_ERROR ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                               uint8_t credentialType, uint16_t credentialIndex);
     CHIP_ERROR ClearUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
-    CHIP_ERROR GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t credentialType, uint16_t credentialIndex);
     CHIP_ERROR GetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
     CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
     CHIP_ERROR SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint8_t operationType, chip::ByteSpan credentialData, uint16_t userIndex, uint8_t userStatus);
+                             uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex, chip::ByteSpan credentialData,
+                             uint16_t userIndex, uint8_t userStatus);
     CHIP_ERROR SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t operationType,
                        uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
                        uint8_t credentialRule);
@@ -196,11 +210,17 @@ public:
     CHIP_ERROR KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                           uint16_t groupKeySetID);
     CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
+                                    uint16_t groupKeySetIDs);
     CHIP_ERROR KeySetRemove(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             uint16_t groupKeySetID);
+<<<<<<< HEAD
     CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+=======
+    CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                           uint16_t groupKeySetID, uint8_t securityPolicy, chip::ByteSpan epochKey0, uint64_t epochStartTime0,
+                           chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2, uint64_t epochStartTime2);
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase
@@ -217,7 +237,7 @@ public:
     CHIP_ERROR AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t groupId, chip::CharSpan groupName);
     CHIP_ERROR GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+                                  uint16_t groupList);
     CHIP_ERROR RemoveAllGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId);
     CHIP_ERROR ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId);
@@ -294,10 +314,16 @@ public:
     CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    chip::ByteSpan updateToken, uint32_t softwareVersion);
     CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+<<<<<<< HEAD
                           chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion,
                           /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint16_t hardwareVersion,
                           chip::CharSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+=======
+                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                          chip::ByteSpan metadataForProvider);
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
 class DLL_EXPORT OtaSoftwareUpdateRequestorCluster : public ClusterBase
@@ -331,7 +357,8 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                        uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName);
+                        uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName, chip::ClusterId clusterId,
+                        uint8_t length, uint8_t value);
     CHIP_ERROR GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint16_t groupId);
     CHIP_ERROR RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
@@ -370,7 +397,9 @@ public:
 =======
 
     // Cluster Commands
-    CHIP_ERROR SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
+                                       double h);
     CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestAddArguments(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t arg1,
                                 uint8_t arg2);
@@ -379,22 +408,29 @@ public:
     CHIP_ERROR TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                 chip::VendorId arg1, uint8_t arg2);
     CHIP_ERROR TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+                                            uint8_t arg1);
     CHIP_ERROR TestListInt8UReverseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+                                           uint8_t arg1);
     CHIP_ERROR TestListNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TestNestedStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+                                                       Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint32_t e,
+                                                       chip::ByteSpan f, uint8_t g);
+    CHIP_ERROR TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
+                                             double h);
+    CHIP_ERROR TestNestedStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint8_t a, bool b);
     CHIP_ERROR TestNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback);
+                                                   Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint32_t e,
+                                                   chip::ByteSpan f, uint8_t g);
     CHIP_ERROR TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestNullableOptionalRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint8_t arg1);
     CHIP_ERROR TestSimpleOptionalArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  bool arg1);
     CHIP_ERROR TestSpecific(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
+                                         double h);
     CHIP_ERROR TestUnknownCommand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TimedInvokeRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
@@ -415,7 +451,7 @@ public:
                                  uint8_t daysToReturn, uint8_t modeToReturn);
     CHIP_ERROR SetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                  uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
-                                 /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+                                 uint8_t payload);
     CHIP_ERROR SetpointRaiseLower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t mode,
                                   int8_t amount);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates

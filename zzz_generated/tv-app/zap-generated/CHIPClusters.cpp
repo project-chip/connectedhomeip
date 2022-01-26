@@ -154,6 +154,7 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/tv-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // expiryLengthSeconds: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), expiryLengthSeconds));
@@ -161,6 +162,8 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+=======
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -176,8 +179,60 @@ exit:
     return err;
 }
 
+// ApplicationLauncher Cluster Commands
+CHIP_ERROR ApplicationLauncherCluster::HideAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::HideAppRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+<<<<<<< HEAD:zzz_generated/tv-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
+=======
+CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan data,
+                                                        uint16_t catalogVendorId, chip::CharSpan applicationId)
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -200,7 +255,61 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD:zzz_generated/tv-app/zap-generated/CHIPClusters.cpp
     // Command takes no arguments.
+=======
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // data: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR ApplicationLauncherCluster::StopAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::StopAppRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -494,9 +603,15 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD:zzz_generated/tv-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
                                                      uint64_t breadcrumb)
+=======
+CHIP_ERROR ContentLauncherCluster::LaunchURLRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan contentURL,
+                                                    chip::CharSpan displayString, chip::CharSpan providerName)
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -519,10 +634,19 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD:zzz_generated/tv-app/zap-generated/CHIPClusters.cpp
     // ssid: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+=======
+    // contentURL: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), contentURL));
+    // displayString: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), displayString));
+    // providerName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), providerName));
+>>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
     SuccessOrExit(err = sender->FinishCommand());
 
