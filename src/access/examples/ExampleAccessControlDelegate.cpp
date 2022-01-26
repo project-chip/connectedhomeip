@@ -517,6 +517,7 @@ public:
     static constexpr uint8_t kTagPrivilege   = 4;
     static constexpr uint8_t kTagSubjects    = 5;
     static constexpr uint8_t kTagTargets     = 6;
+    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
     static const size_t kStorageBufferSize   = 192;
 
     CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const char * key)
@@ -1238,6 +1239,7 @@ private:
 
     // The version of the storage data format. Increment this key when the format of the data model changes.
     static const uint32_t kExampleAclStorageVersion = 1;
+    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
     static const size_t kStorageBufferSize          = 32;
     static constexpr uint8_t kTagVersion            = 1;
 
