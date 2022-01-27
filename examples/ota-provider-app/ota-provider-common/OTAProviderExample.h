@@ -21,8 +21,8 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
-#include <vector>
 #include <ota-provider-common/UserConsentDelegate.h>
+#include <vector>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.

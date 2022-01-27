@@ -138,7 +138,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
 {
-    OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
+    OTAQueryStatus queryStatus = OTAQueryStatus::kNotAvailable;
     OTAProviderExample::DeviceSoftwareVersionModel candidate;
     uint32_t newSoftwareVersion           = 0;
     const char * newSoftwareVersionString = nullptr;
@@ -175,7 +175,6 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             }
         }
 
-
         if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
         {
             UserConsentState state = mUserConsentDelegate->GetUserConsentState(commandObj->SourceNodeId(), commandPath.mEndpointId,
@@ -187,12 +186,12 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                 break;
 
             case chip::ota::UserConsentState::kObtaining:
-                queryStatus = OTAQueryStatus::kBusy;
+                queryStatus          = OTAQueryStatus::kBusy;
                 delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
                 break;
 
             case chip::ota::UserConsentState::kDenied:
-                queryStatus = OTAQueryStatus::kNotAvailable;
+                queryStatus          = OTAQueryStatus::kNotAvailable;
                 delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
                 break;
             }
@@ -204,17 +203,17 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         break;
 
     case kRespondWithBusy:
-        queryStatus = OTAQueryStatus::kBusy;
+        queryStatus          = OTAQueryStatus::kBusy;
         delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
         break;
 
     case kRespondWithNotAvailable:
-        queryStatus = OTAQueryStatus::kNotAvailable;
+        queryStatus          = OTAQueryStatus::kNotAvailable;
         delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
         break;
 
     default:
-        queryStatus = OTAQueryStatus::kNotAvailable;
+        queryStatus          = OTAQueryStatus::kNotAvailable;
         delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
         break;
     }
