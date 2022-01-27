@@ -76,7 +76,7 @@ def CallbackName(attr: Attribute, cluster: Cluster, known_enum_types: List[matte
     )
 
 def CommandCallbackName(command: Command, cluster: Cluster):
-  if command.output_param.lower() == 'DefaultSuccess':
+  if command.output_param.lower() == 'defaultsuccess':
     return 'DefaultSuccess'
   return '{}Cluster{}'.format(cluster.name, command.output_param)
 

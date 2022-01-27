@@ -34,7 +34,7 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
     }
 }
 
-{%- for cluster in clusters | clientClustersOnly %}
+{% for cluster in clusters | clientClustersOnly -%}
 
 JNI_METHOD(jlong, {{cluster.name | capitalcase}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
@@ -45,14 +45,14 @@ JNI_METHOD(jlong, {{cluster.name | capitalcase}}Cluster, initWithDevice)(JNIEnv 
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-{%- for command in cluster.commands %}
+{% for command in cluster.commands -%}
 
 JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, 
   {{command.name | lowercaseFirst}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback,
   {%- if command.input_param -%}
-  {%    for field in (cluster.structs | named(command.input_param)).fields %}
+  {%-    for field in (cluster.structs | named(command.input_param)).fields -%}
     {{ field | toBoxedJavaType }} {{field.name}},
-  {%    endfor  %}
+  {%-    endfor  -%}
   {%- endif -%}
     jobject timedInvokeTimeoutMs)
 {
@@ -102,12 +102,12 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
 }
 {% endfor %}
 
-{%-  for attr in cluster.attributes if attr.is_subscribable %}
+{%-  for attr in cluster.attributes if attr.is_subscribable -%}
 
 JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    
+
     {%- set callbackName = attr | callbackName(cluster, known_enums) -%}
 
     std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(Platform::New<{{callbackName}}>(callback, true), chip::Platform::Delete<{{callbackName}}>);
