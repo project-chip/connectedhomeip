@@ -24,8 +24,8 @@ else:
 
 root_out_dir = sys.argv[2]
 project_name = sys.argv[3]
-pem_file     = sys.argv[4]
-hex_file     = root_out_dir + '/' + project_name + '.hex'
+pem_file = sys.argv[4]
+hex_file = root_out_dir + '/' + project_name + '.hex'
 oad_bin_file = root_out_dir + '/' + project_name + '.bin'
 combined_hex = root_out_dir + '/' + project_name + '-bim.hex'
 bim_hex_file = sys.argv[5]
@@ -53,4 +53,3 @@ bim_hex.fromfile(bim_hex_file, format='hex')
 ota_image.merge(bim_hex)
 
 ota_image.tofile(combined_hex, format='hex')
-
