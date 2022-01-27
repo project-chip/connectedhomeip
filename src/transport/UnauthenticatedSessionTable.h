@@ -241,7 +241,7 @@ private:
         return false;
     }
 
-    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
+    ObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport

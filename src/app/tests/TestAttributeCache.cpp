@@ -549,9 +549,13 @@ nlTestSuite theSuite =
 
 int TestAttributeCache()
 {
-    TestContext gContext;
-    gSuite = &theSuite;
-    nlTestRunner(&theSuite, &gContext);
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    {
+        TestContext gContext;
+        gSuite = &theSuite;
+        nlTestRunner(&theSuite, &gContext);
+    }
+    chip::Platform::MemoryShutdown();
     return (nlTestRunnerStats(&theSuite));
 }
 
