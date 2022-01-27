@@ -291,8 +291,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending ReadEvent to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
-        return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mEventId,
-                                              chip::app::ReadClient::InteractionType::Read);
+        return ReportCommand::ReportEvent(device, endpointId, mClusterId, mEventId, chip::app::ReadClient::InteractionType::Read);
     }
 
 private:
