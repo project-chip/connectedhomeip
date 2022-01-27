@@ -48,12 +48,6 @@ public:
         Iterator operator++()
         {
             mIndex++;
-            if (mIndex == mMap->mNumEntries)
-            {
-                // end of iteration
-                mIndex = -1;
-            }
-            mIndex = static_cast<int16_t>(mIndex % kMaxPendingNotifications);
             return *this;
         }
 
@@ -64,11 +58,11 @@ public:
         int16_t mIndex;
     };
 
-    Iterator begin() { return Iterator(this, mNumEntries > 0 ? mNextToOverride : -1); }
+    Iterator begin() { return Iterator(this, 0); }
 
-    Iterator end() { return Iterator(this, -1); }
+    Iterator end() { return Iterator(this, mNumEntries); }
 
-    int16_t FindLRUBindingEntryIndex();
+    CHIP_ERROR FindLRUConnectPeer(FabricIndex * fabric, NodeId * node);
 
     void AddPendingNotification(uint8_t bindingEntryId, void * context);
 
@@ -80,8 +74,7 @@ private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];
     void * mPendingContexts[kMaxPendingNotifications];
 
-    uint8_t mNumEntries     = 0;
-    uint8_t mNextToOverride = 0;
+    uint8_t mNumEntries = 0;
 };
 
 } // namespace chip

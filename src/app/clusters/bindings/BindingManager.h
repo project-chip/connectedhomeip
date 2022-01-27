@@ -67,10 +67,10 @@ public:
      * Notifies the BindingManager that a new unicast binding is created.
      *
      */
-    CHIP_ERROR UnicastBindingCreated(uint8_t bindingEntryId);
+    CHIP_ERROR UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry);
 
     /*
-     * Notifies the BindingManager that a new unicast binding is removed.
+     * Notifies the BindingManager that a unicast binding is about to be removed from the given index.
      *
      */
     CHIP_ERROR UnicastBindingRemoved(uint8_t bindingEntryId);

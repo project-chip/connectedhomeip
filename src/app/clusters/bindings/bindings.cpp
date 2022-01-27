@@ -111,7 +111,7 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
     emberSetBinding(bindingIndex, &bindingEntry);
     if (nodeId)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(bindingIndex);
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(bindingEntry);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(

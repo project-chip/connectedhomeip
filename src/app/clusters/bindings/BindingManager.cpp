@@ -36,15 +36,9 @@ namespace chip {
 
 BindingManager BindingManager::sBindingManager;
 
-CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t bindingEntryId)
+CHIP_ERROR BindingManager::UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry)
 {
-    EmberBindingTableEntry entry{};
-    emberGetBinding(bindingEntryId, &entry);
-    if (entry.type != EMBER_UNICAST_BINDING)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return EstablishConnection(entry.fabricIndex, entry.nodeId);
+    return EstablishConnection(bindingEntry.fabricIndex, bindingEntry.nodeId);
 }
 
 CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
@@ -72,13 +66,12 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
         // Release the least recently used entry
         // TODO: Some reference counting mechanism shall be added the CASESessionManager
         // so that other session clients don't get accidentally closed.
-        int16_t lruBindingEntryIndex = mPendingNotificationMap.FindLRUBindingEntryIndex();
-        if (lruBindingEntryIndex >= 0)
+        FabricIndex fabricToRemove;
+        NodeId nodeToRemove;
+        if (mPendingNotificationMap.FindLRUConnectPeer(&fabricToRemove, &nodeToRemove) == CHIP_NO_ERROR)
         {
-            EmberBindingTableEntry entry;
-            emberGetBinding(static_cast<uint8_t>(lruBindingEntryIndex), &entry);
-            mPendingNotificationMap.RemoveAllEntriesForNode(entry.fabricIndex, entry.nodeId);
-            PeerId lruPeer = PeerIdForNode(mAppServer->GetFabricTable(), entry.fabricIndex, entry.nodeId);
+            mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
+            PeerId lruPeer = PeerIdForNode(mAppServer->GetFabricTable(), fabricToRemove, nodeToRemove);
             mAppServer->GetCASESessionManager()->ReleaseSession(lruPeer);
             // Now retry
             error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback,
@@ -96,6 +89,9 @@ void BindingManager::HandleDeviceConnected(void * context, OperationalDeviceProx
 
 void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
 {
+    FabricIndex fabricToRemove = kUndefinedFabricIndex;
+    NodeId nodeToRemove        = kUndefinedNodeId;
+
     for (const PendingNotificationEntry & pendingNotification : mPendingNotificationMap)
     {
         EmberBindingTableEntry entry;
@@ -104,9 +100,12 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
         PeerId peer = PeerIdForNode(mAppServer->GetFabricTable(), entry.fabricIndex, entry.nodeId);
         if (device->GetPeerId() == peer)
         {
+            fabricToRemove = entry.fabricIndex;
+            nodeToRemove   = entry.nodeId;
             mBoundDeviceChangedHandler(&entry, device, pendingNotification.mContext);
         }
     }
+    mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
 }
 
 void BindingManager::HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)

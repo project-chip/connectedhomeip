@@ -22,7 +22,7 @@
 
 namespace chip {
 
-int16_t PendingNotificationMap::FindLRUBindingEntryIndex()
+CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, NodeId * node)
 {
     uint8_t bindingWithSamePeer[EMBER_BINDING_TABLE_SIZE];
 
@@ -64,8 +64,8 @@ int16_t PendingNotificationMap::FindLRUBindingEntryIndex()
         lastAppear[bindingWithSamePeer[pendingNotification.mBindingEntryId]] = appearIndex;
         appearIndex++;
     }
-    int16_t lruBindingEntryIndex = -1;
-    uint16_t minApperValue       = UINT16_MAX;
+    uint8_t lruBindingEntryIndex;
+    uint16_t minApperValue = UINT16_MAX;
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
         if (lastAppear[i] < minApperValue)
@@ -74,65 +74,56 @@ int16_t PendingNotificationMap::FindLRUBindingEntryIndex()
             minApperValue        = lastAppear[i];
         }
     }
-    return lruBindingEntryIndex;
+    if (minApperValue < UINT16_MAX)
+    {
+        EmberBindingTableEntry entry;
+        emberGetBinding(lruBindingEntryIndex, &entry);
+        *fabric = entry.fabricIndex;
+        *node   = entry.nodeId;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 void PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, void * context)
 {
     RemoveEntry(bindingEntryId);
-    uint8_t addIndex                 = mNumEntries < kMaxPendingNotifications ? mNumEntries : mNextToOverride;
-    mPendingBindingEntries[addIndex] = bindingEntryId;
-    mPendingContexts[addIndex]       = context;
-    if (mNumEntries < kMaxPendingNotifications)
-    {
-        mNumEntries++;
-    }
-    else
-    {
-        mNextToOverride++;
-    }
+    mPendingBindingEntries[mNumEntries] = bindingEntryId;
+    mPendingContexts[mNumEntries]       = context;
+    mNumEntries++;
 }
 
 void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
 {
-    uint8_t newBindingEntries[kMaxPendingNotifications];
-    void * newContexts[kMaxPendingNotifications];
     uint8_t newEntryCount = 0;
-    for (const PendingNotificationEntry & pendingNotification : *this)
+    for (int i = 0; i < mNumEntries; i++)
     {
-        if (pendingNotification.mBindingEntryId != bindingEntryId)
+        if (mPendingBindingEntries[i] != bindingEntryId)
         {
-            newBindingEntries[newEntryCount] = pendingNotification.mBindingEntryId;
-            newContexts[newEntryCount]       = pendingNotification.mContext;
+            mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
+            mPendingContexts[newEntryCount]       = mPendingContexts[i];
             newEntryCount++;
         }
     }
-    memcpy(mPendingBindingEntries, newBindingEntries, sizeof(newBindingEntries));
-    memcpy(mPendingContexts, newContexts, sizeof(newContexts));
-    mNextToOverride = 0;
-    mNumEntries     = newEntryCount;
+    mNumEntries = newEntryCount;
 }
 
 void PendingNotificationMap::RemoveAllEntriesForNode(FabricIndex fabric, NodeId node)
 {
-    uint8_t newBindingEntries[kMaxPendingNotifications];
-    void * newContexts[kMaxPendingNotifications];
     uint8_t newEntryCount = 0;
-    for (const PendingNotificationEntry & pendingNotification : *this)
+    for (int i = 0; i < mNumEntries; i++)
     {
         EmberBindingTableEntry entry;
-        emberGetBinding(pendingNotification.mBindingEntryId, &entry);
+        emberGetBinding(mPendingBindingEntries[i], &entry);
+
         if (entry.fabricIndex != fabric || entry.nodeId != node)
         {
-            newBindingEntries[newEntryCount] = pendingNotification.mBindingEntryId;
-            newContexts[newEntryCount]       = pendingNotification.mContext;
+            mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
+            mPendingContexts[newEntryCount]       = mPendingContexts[i];
             newEntryCount++;
         }
     }
-    memcpy(mPendingBindingEntries, newBindingEntries, sizeof(newBindingEntries));
-    memcpy(mPendingContexts, newContexts, sizeof(newContexts));
-    mNextToOverride = 0;
-    mNumEntries     = newEntryCount;
+    mNumEntries = newEntryCount;
 }
 
 } // namespace chip
