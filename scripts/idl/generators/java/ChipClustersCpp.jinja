@@ -100,13 +100,15 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
     onSuccess.release();
     onFailure.release();
 }
+{% endfor %}
 
 {%-  for attr in cluster.attributes if attr.is_subscribable %}
 
-JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    {%- set callbackName = attr | callbackName(cluster, known_enums) %}
+    
+    {%- set callbackName = attr | callbackName(cluster, known_enums) -%}
 
     std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(Platform::New<{{callbackName}}>(callback, true), chip::Platform::Delete<{{callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -118,8 +120,8 @@ JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.name | capitalcase}}At
     {{cluster.name}}Cluster * cppCluster = reinterpret_cast<{{cluster.name}}Cluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    using TypeInfo = chip::app::Clusters::{{cluster.name}}::Attributes::{{attr.name}}::TypeInfo;
-    auto successFn = chip::Callback::Callback<CHIP{{cluster.name}}Cluster{{attr.name}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    using TypeInfo = chip::app::Clusters::{{cluster.name}}::Attributes::{{attr.definition.name | capitalcase}}::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIP{{cluster.name}}Cluster{{attr.definition.name | capitalcase}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval), {{callbackName}}::OnSubscriptionEstablished);
@@ -128,6 +130,5 @@ JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.name | capitalcase}}At
     onSuccess.release();
     onFailure.release();
 }
-{%  endfor %}
 {% endfor %}
 {%endfor%}
