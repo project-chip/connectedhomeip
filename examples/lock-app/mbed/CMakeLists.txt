@@ -79,6 +79,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
                ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/unit-localization-server/unit-localization-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
