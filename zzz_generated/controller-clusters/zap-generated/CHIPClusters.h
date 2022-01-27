@@ -210,18 +210,6 @@ class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
 public:
     GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
     ~GroupKeyManagementCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                          uint16_t groupKeySetID);
-    CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t groupKeySetIDs);
-    CHIP_ERROR KeySetRemove(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            uint16_t groupKeySetID);
-    CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                           uint16_t groupKeySetID, uint8_t groupKeySecurityPolicy, chip::ByteSpan epochKey0,
-                           uint64_t epochStartTime0, chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2,
-                           uint64_t epochStartTime2);
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase

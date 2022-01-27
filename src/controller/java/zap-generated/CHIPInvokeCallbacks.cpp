@@ -1247,8 +1247,19 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject GroupKeySetIDs;
+    chip::JniReferences::GetInstance().CreateArrayList(GroupKeySetIDs);
 
-    GroupKeySetIDs = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_GroupKeySetIDs_0 = dataResponse.groupKeySetIDs.begin();
+    while (iter_GroupKeySetIDs_0.Next())
+    {
+        auto & entry_0 = iter_GroupKeySetIDs_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(GroupKeySetIDs, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetIDs);
 }
@@ -1302,14 +1313,122 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Lchip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeySet;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess", "(Lchip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeySetStruct;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject GroupKeySet;
+    jobject GroupKeySet_groupKeySetID;
+    std::string GroupKeySet_groupKeySetIDClassName     = "java/lang/Integer";
+    std::string GroupKeySet_groupKeySetIDCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+        GroupKeySet_groupKeySetIDClassName.c_str(), GroupKeySet_groupKeySetIDCtorSignature.c_str(),
+        dataResponse.groupKeySet.groupKeySetID, GroupKeySet_groupKeySetID);
+    jobject GroupKeySet_groupKeySecurityPolicy;
+    std::string GroupKeySet_groupKeySecurityPolicyClassName     = "java/lang/Integer";
+    std::string GroupKeySet_groupKeySecurityPolicyCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        GroupKeySet_groupKeySecurityPolicyClassName.c_str(), GroupKeySet_groupKeySecurityPolicyCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.groupKeySet.groupKeySecurityPolicy), GroupKeySet_groupKeySecurityPolicy);
+    jobject GroupKeySet_epochKey0;
+    if (dataResponse.groupKeySet.epochKey0.IsNull())
+    {
+        GroupKeySet_epochKey0 = nullptr;
+    }
+    else
+    {
+        jbyteArray GroupKeySet_epochKey0ByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey0.Value().size()));
+        env->SetByteArrayRegion(GroupKeySet_epochKey0ByteArray, 0,
+                                static_cast<jsize>(dataResponse.groupKeySet.epochKey0.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey0.Value().data()));
+        GroupKeySet_epochKey0 = GroupKeySet_epochKey0ByteArray;
+    }
+    jobject GroupKeySet_epochStartTime0;
+    if (dataResponse.groupKeySet.epochStartTime0.IsNull())
+    {
+        GroupKeySet_epochStartTime0 = nullptr;
+    }
+    else
+    {
+        std::string GroupKeySet_epochStartTime0ClassName     = "java/lang/Long";
+        std::string GroupKeySet_epochStartTime0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            GroupKeySet_epochStartTime0ClassName.c_str(), GroupKeySet_epochStartTime0CtorSignature.c_str(),
+            dataResponse.groupKeySet.epochStartTime0.Value(), GroupKeySet_epochStartTime0);
+    }
+    jobject GroupKeySet_epochKey1;
+    if (dataResponse.groupKeySet.epochKey1.IsNull())
+    {
+        GroupKeySet_epochKey1 = nullptr;
+    }
+    else
+    {
+        jbyteArray GroupKeySet_epochKey1ByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey1.Value().size()));
+        env->SetByteArrayRegion(GroupKeySet_epochKey1ByteArray, 0,
+                                static_cast<jsize>(dataResponse.groupKeySet.epochKey1.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey1.Value().data()));
+        GroupKeySet_epochKey1 = GroupKeySet_epochKey1ByteArray;
+    }
+    jobject GroupKeySet_epochStartTime1;
+    if (dataResponse.groupKeySet.epochStartTime1.IsNull())
+    {
+        GroupKeySet_epochStartTime1 = nullptr;
+    }
+    else
+    {
+        std::string GroupKeySet_epochStartTime1ClassName     = "java/lang/Long";
+        std::string GroupKeySet_epochStartTime1CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            GroupKeySet_epochStartTime1ClassName.c_str(), GroupKeySet_epochStartTime1CtorSignature.c_str(),
+            dataResponse.groupKeySet.epochStartTime1.Value(), GroupKeySet_epochStartTime1);
+    }
+    jobject GroupKeySet_epochKey2;
+    if (dataResponse.groupKeySet.epochKey2.IsNull())
+    {
+        GroupKeySet_epochKey2 = nullptr;
+    }
+    else
+    {
+        jbyteArray GroupKeySet_epochKey2ByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey2.Value().size()));
+        env->SetByteArrayRegion(GroupKeySet_epochKey2ByteArray, 0,
+                                static_cast<jsize>(dataResponse.groupKeySet.epochKey2.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey2.Value().data()));
+        GroupKeySet_epochKey2 = GroupKeySet_epochKey2ByteArray;
+    }
+    jobject GroupKeySet_epochStartTime2;
+    if (dataResponse.groupKeySet.epochStartTime2.IsNull())
+    {
+        GroupKeySet_epochStartTime2 = nullptr;
+    }
+    else
+    {
+        std::string GroupKeySet_epochStartTime2ClassName     = "java/lang/Long";
+        std::string GroupKeySet_epochStartTime2CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            GroupKeySet_epochStartTime2ClassName.c_str(), GroupKeySet_epochStartTime2CtorSignature.c_str(),
+            dataResponse.groupKeySet.epochStartTime2.Value(), GroupKeySet_epochStartTime2);
+    }
 
-    GroupKeySet = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    jclass groupKeySetStructStructClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeySetStruct", groupKeySetStructStructClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeySetStruct"));
+    chip::JniClass structJniClass(groupKeySetStructStructClass);
+    jmethodID groupKeySetStructStructCtor =
+        env->GetMethodID(groupKeySetStructStructClass, "<init>",
+                         "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;)V");
+    VerifyOrReturn(groupKeySetStructStructCtor != nullptr,
+                   ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKeySetStruct constructor"));
+
+    GroupKeySet =
+        env->NewObject(groupKeySetStructStructClass, groupKeySetStructStructCtor, GroupKeySet_groupKeySetID,
+                       GroupKeySet_groupKeySecurityPolicy, GroupKeySet_epochKey0, GroupKeySet_epochStartTime0,
+                       GroupKeySet_epochKey1, GroupKeySet_epochStartTime1, GroupKeySet_epochKey2, GroupKeySet_epochStartTime2);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySet);
 }
