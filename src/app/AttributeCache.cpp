@@ -66,14 +66,14 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
     return CHIP_NO_ERROR;
 }
 
-void AttributeCache::OnReportBegin(const ReadClient * apReadClient)
+void AttributeCache::OnReportBegin()
 {
     mChangedAttributeSet.clear();
     mAddedEndpoints.clear();
-    mCallback.OnReportBegin(apReadClient);
+    mCallback.OnReportBegin();
 }
 
-void AttributeCache::OnReportEnd(const ReadClient * apReadClient)
+void AttributeCache::OnReportEnd()
 {
     std::set<std::tuple<EndpointId, ClusterId>> changedClusters;
 
@@ -97,11 +97,10 @@ void AttributeCache::OnReportEnd(const ReadClient * apReadClient)
         mCallback.OnEndpointAdded(this, endpoint);
     }
 
-    mCallback.OnReportEnd(apReadClient);
+    mCallback.OnReportEnd();
 }
 
-void AttributeCache::OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
-                                     TLV::TLVReader * apData, const StatusIB & aStatus)
+void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     //
     // Since the cache itself is a ReadClient::Callback, it may be incorrectly passed in directly when registering with the
@@ -121,7 +120,7 @@ void AttributeCache::OnAttributeData(const ReadClient * apReadClient, const Conc
     //
     // Forward the call through.
     //
-    mCallback.OnAttributeData(apReadClient, aPath, apData, aStatus);
+    mCallback.OnAttributeData(aPath, apData, aStatus);
 }
 
 CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)
