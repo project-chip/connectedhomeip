@@ -192,7 +192,7 @@ void RegisterAppPlatformCommands()
     static const shell_command_t sDeviceComand = { &AppPlatformHandler, "app", "App commands. Usage: app [command_name]" };
 
     // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&sDeviceComand, 1, nullptr);
     return;
 }
 

@@ -138,8 +138,8 @@ void RegisterWiFiCommands()
     };
     static const shell_command_t sWiFiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
 
-    sShellWiFiSubCommands.RegisterCommands(sWiFiSubCommands, ArraySize(sWiFiSubCommands));
-    Engine::Root().RegisterCommands(&sWiFiCommand, 1);
+    sShellWiFiSubCommands.RegisterCommands(sWiFiSubCommands, ArraySize(sWiFiSubCommands), "wifi");
+    Engine::Root().RegisterCommands(&sWiFiCommand, 1, nullptr);
 }
 
 } // namespace Shell

@@ -191,7 +191,6 @@ static CHIP_ERROR ConfigHandler(int argc, char ** argv)
 
 void RegisterConfigCommands()
 {
-
     static const shell_command_t sConfigComand = { &ConfigHandler, "config",
                                                    "Manage device configuration. Usage to dump value: config [param_name] and "
                                                    "to set some values (discriminator): config [param_name] [param_value]." };
@@ -206,10 +205,9 @@ void RegisterConfigCommands()
     };
 
     // Register `config` subcommands with the local shell dispatcher.
-    sShellConfigSubcommands.RegisterCommands(sConfigSubCommands, ArraySize(sConfigSubCommands));
-
+    sShellConfigSubcommands.RegisterCommands(sConfigSubCommands, ArraySize(sConfigSubCommands), "config");
     // Register the root `config` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sConfigComand, 1);
+    Engine::Root().RegisterCommands(&sConfigComand, 1, nullptr);
     return;
 }
 

@@ -90,12 +90,12 @@ void OnOffCommands::Register()
     static const shell_command_t subCommands[] = { { &OnLightHandler, "on", "Usage: OnOff on endpoint-id" },
                                                    { &OffLightHandler, "off", "Usage: OnOff off endpoint-id" },
                                                    { &ToggleLightHandler, "toggle", "Usage: OnOff toggle endpoint-id" } };
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands), "OnOff");
 
     // Register the root `OnOff` command in the top-level shell.
     static const shell_command_t onOffCommand = { &OnOffHandler, "OnOff", "OnOff commands" };
 
-    Engine::Root().RegisterCommands(&onOffCommand, 1);
+    Engine::Root().RegisterCommands(&onOffCommand, 1, nullptr);
 }
 
 } // namespace Shell
