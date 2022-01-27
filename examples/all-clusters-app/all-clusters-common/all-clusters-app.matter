@@ -2819,7 +2819,7 @@ server cluster TestCluster = 1295 {
   command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
   command TestSpecific(): TestSpecificResponse = 2;
   command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
-  command TimedInvokeRequest(): DefaultSuccess = 18;
+  timed command TimedInvokeRequest(): DefaultSuccess = 18;
 }
 
 server cluster Thermostat = 513 {
