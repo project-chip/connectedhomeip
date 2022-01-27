@@ -22,7 +22,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <access/RequiredPrivilege.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
