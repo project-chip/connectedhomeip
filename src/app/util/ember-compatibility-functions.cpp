@@ -836,7 +836,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
     {
-        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
+        AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
