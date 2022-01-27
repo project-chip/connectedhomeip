@@ -249,56 +249,62 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
-        return err;
     }
-    switch (report.stageCompleted)
+    else
     {
-    case CommissioningStage::kSendPAICertificateRequest:
-        SetPAI(report.Get<RequestedCertificate>().certificate);
-        break;
-    case CommissioningStage::kSendDACCertificateRequest:
-        SetDAC(report.Get<RequestedCertificate>().certificate);
-        break;
-    case CommissioningStage::kSendAttestationRequest:
-        // These don't need to be deep copied to local memory because they are used in this one step then never again.
-        mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
-            .SetAttestationSignature(report.Get<AttestationResponse>().signature);
-        // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we woouldn't need to hold a
-        // reference to the operational credential delegate here
-        if (mOperationalCredentialsDelegate != nullptr)
+        switch (report.stageCompleted)
         {
-            MutableByteSpan nonce(mCSRNonce);
-            ReturnErrorOnFailure(mOperationalCredentialsDelegate->ObtainCsrNonce(nonce));
-            mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+        case CommissioningStage::kSendPAICertificateRequest:
+            SetPAI(report.Get<RequestedCertificate>().certificate);
+            break;
+        case CommissioningStage::kSendDACCertificateRequest:
+            SetDAC(report.Get<RequestedCertificate>().certificate);
+            break;
+        case CommissioningStage::kSendAttestationRequest:
+            // These don't need to be deep copied to local memory because they are used in this one step then never again.
+            mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
+                .SetAttestationSignature(report.Get<AttestationResponse>().signature);
+            // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
+            // reference to the operational credential delegate here
+            if (mOperationalCredentialsDelegate != nullptr)
+            {
+                MutableByteSpan nonce(mCSRNonce);
+                ReturnErrorOnFailure(mOperationalCredentialsDelegate->ObtainCsrNonce(nonce));
+                mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+            }
+            break;
+        case CommissioningStage::kSendOpCertSigningRequest: {
+            NOCChainGenerationParameters nocParams;
+            nocParams.nocsrElements = report.Get<AttestationResponse>().attestationElements;
+            nocParams.signature     = report.Get<AttestationResponse>().signature;
+            mParams.SetNOCChainGenerationParameters(nocParams);
         }
         break;
-    case CommissioningStage::kSendOpCertSigningRequest: {
-        NOCChainGenerationParameters nocParams;
-        nocParams.nocsrElements = report.Get<AttestationResponse>().attestationElements;
-        nocParams.signature     = report.Get<AttestationResponse>().signature;
-        mParams.SetNOCChainGenerationParameters(nocParams);
-    }
-    break;
-    case CommissioningStage::kGenerateNOCChain:
-        // For NOC chain generation, we re-use the buffers. NOCChainGenerated triggers the next stage before
-        // storing the returned certs, so just return here without triggering the next stage.
-        return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
-                                 report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
-    case CommissioningStage::kFindOperational:
-        mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
-        break;
-    case CommissioningStage::kCleanup:
-        ReleasePAI();
-        ReleaseDAC();
-        mCommissioneeDeviceProxy = nullptr;
-        mOperationalDeviceProxy  = nullptr;
-        mParams                  = CommissioningParameters();
-        return CHIP_NO_ERROR;
-    default:
-        break;
+        case CommissioningStage::kGenerateNOCChain:
+            // For NOC chain generation, we re-use the buffers. NOCChainGenerated triggers the next stage before
+            // storing the returned certs, so just return here without triggering the next stage.
+            return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
+                                     report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
+        case CommissioningStage::kFindOperational:
+            mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
+            break;
+        case CommissioningStage::kCleanup:
+            ReleasePAI();
+            ReleaseDAC();
+            mCommissioneeDeviceProxy = nullptr;
+            mOperationalDeviceProxy  = nullptr;
+            mParams                  = CommissioningParameters();
+            return CHIP_NO_ERROR;
+        default:
+            break;
+        }
     }
 
     CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted, err);
+    if (nextStage == CommissioningStage::kError)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     DeviceProxy * proxy = mCommissioneeDeviceProxy;
     if (nextStage == CommissioningStage::kSendComplete ||
