@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include <DFUManager.h>
 #include <LEDWidget.h>
 
 #include <app/server/Dnssd.h>
@@ -33,18 +34,6 @@
 
 #ifdef CAPSENSE_ENABLED
 #include "capsense.h"
-#endif
-
-#ifdef CHIP_OTA_REQUESTOR
-#include "GenericOTARequestorDriver.h"
-#include <BDXDownloader.h>
-#include <OTAImageProcessorImpl.h>
-#include <OTARequestor.h>
-#endif // CHIP_OTA_REQUESTOR
-
-#ifdef BOOT_ENABLED
-#include "blockdevice/SlicingBlockDevice.h"
-#include <bootutil/bootutil.h>
 #endif
 
 static bool sIsWiFiStationProvisioned = false;
@@ -126,45 +115,12 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-#ifdef CHIP_OTA_REQUESTOR
-    // Initialize the instance of the main Requestor Class
-    OTARequestor * requestor = new OTARequestor();
-    if (requestor == nullptr)
+    error = GetDFUManager().Init();
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Create OTA Requestor core failed");
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
         return EXIT_FAILURE;
     }
-    SetRequestorInstance(requestor);
-
-    // Initialize an instance of the Requestor Driver
-    GenericOTARequestorDriver * requestorDriver = new GenericOTARequestorDriver;
-    if (requestorDriver == nullptr)
-    {
-        ChipLogError(NotSpecified, "Create OTA Requestor driver failed");
-        return EXIT_FAILURE;
-    }
-
-    // Initialize  the Downloader object
-    BDXDownloader * downloader = new BDXDownloader();
-    if (downloader == nullptr)
-    {
-        ChipLogError(NotSpecified, "Create OTA Downloader failed");
-        return EXIT_FAILURE;
-    }
-
-    // Initialize the Image Processor object
-    OTAImageProcessorImpl * imageProcessor = new OTAImageProcessorImpl;
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(NotSpecified, "Create OTA Image Processor failed");
-        return EXIT_FAILURE;
-    }
-
-    requestor->Init(&(chip::Server::GetInstance()), requestorDriver, downloader);
-    imageProcessor->SetOTADownloader(downloader);
-    downloader->SetImageProcessorDelegate(imageProcessor);
-    requestorDriver->Init(requestor, imageProcessor);
-#endif // CHIP_OTA_REQUESTOR
 
     return 0;
 }
