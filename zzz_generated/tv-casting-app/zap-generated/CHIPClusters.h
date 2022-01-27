@@ -37,6 +37,13 @@ public:
     ~AccountLoginCluster() {}
 };
 
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
+    ~ApplicationBasicCluster() {}
+};
+
 class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
 {
 public:

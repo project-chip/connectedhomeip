@@ -101,5 +101,12 @@ public:
     ~OperationalCredentialsCluster() {}
 };
 
+class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+{
+public:
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
+    ~TemperatureMeasurementCluster() {}
+};
+
 } // namespace Controller
 } // namespace chip

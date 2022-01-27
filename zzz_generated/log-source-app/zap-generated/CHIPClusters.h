@@ -30,5 +30,12 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
+{
+public:
+    DiagnosticLogsCluster() : ClusterBase(app::Clusters::DiagnosticLogs::Id) {}
+    ~DiagnosticLogsCluster() {}
+};
+
 } // namespace Controller
 } // namespace chip
