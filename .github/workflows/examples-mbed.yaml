@@ -26,7 +26,7 @@ concurrency:
 jobs:
     mbedos:
         name: Mbed OS examples building
-        timeout-minutes: 80
+        timeout-minutes: 200
 
         env:
             BUILD_TYPE: mbedos
@@ -67,7 +67,7 @@ jobs:
                    .environment/pigweed-venv/*.log
 
             - name: Build lock-app example
-              timeout-minutes: 12
+              timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=lock-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -76,7 +76,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build lighting-app example
-              timeout-minutes: 12
+              timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=lighting-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -85,7 +85,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build pigweed-app example
-              timeout-minutes: 15
+              timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -94,7 +94,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build all-clusters-app example
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=all-clusters-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -103,7 +103,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build shell example
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=shell -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -112,7 +112,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build ota-requestor-app example
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=ota-requestor-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -121,7 +121,7 @@ jobs:
                     /tmp/bloat_reports/
             
             - name: Build unit tests
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 
             - name: Uploading Size Reports

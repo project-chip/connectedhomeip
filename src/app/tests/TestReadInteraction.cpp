@@ -136,15 +136,15 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = fa
 class MockInteractionModelApp : public chip::app::ReadClient::Callback
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
-                     chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
+    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+                     const chip::app::StatusIB * apStatus) override
     {
         ++mNumDataElementIndex;
         mGotEventResponse = true;
     }
 
-    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteDataAttributePath & aPath,
-                         chip::TLV::TLVReader * apData, const chip::app::StatusIB & status) override
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
+                         const chip::app::StatusIB & status) override
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
@@ -153,9 +153,9 @@ public:
         }
     }
 
-    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override { mReadError = true; }
+    void OnError(CHIP_ERROR aError) override { mReadError = true; }
 
-    void OnDone(chip::app::ReadClient * apReadClient) override {}
+    void OnDone() override {}
 
     int mNumDataElementIndex               = 0;
     bool mGotEventResponse                 = false;

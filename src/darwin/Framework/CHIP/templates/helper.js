@@ -50,6 +50,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':
   case 'PowerSourceConfiguration':
+  case 'UnitLocalization':
     return 0;
   }
   return 1;

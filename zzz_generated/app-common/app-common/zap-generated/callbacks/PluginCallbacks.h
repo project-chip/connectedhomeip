@@ -67,6 +67,8 @@ void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallba
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterTimeFormatLocalizationPluginClientInitCallback() {}
 void MatterTimeFormatLocalizationPluginServerInitCallback();
+void __attribute__((weak)) MatterUnitLocalizationPluginClientInitCallback() {}
+void MatterUnitLocalizationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
 void MatterPowerSourceConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}

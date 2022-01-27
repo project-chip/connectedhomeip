@@ -1590,6 +1590,10 @@ namespace TestNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace TestNestedStructListArgumentRequest
 
+namespace TestEmitTestFabricScopedEventResponse {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace TestEmitTestFabricScopedEventResponse
+
 namespace TestListNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000C;
 } // namespace TestListNestedStructListArgumentRequest
@@ -1625,6 +1629,10 @@ static constexpr CommandId Id = 0x00000013;
 namespace TestEmitTestEventRequest {
 static constexpr CommandId Id = 0x00000014;
 } // namespace TestEmitTestEventRequest
+
+namespace TestEmitTestFabricScopedEventRequest {
+static constexpr CommandId Id = 0x00000015;
+} // namespace TestEmitTestFabricScopedEventRequest
 
 } // namespace Commands
 } // namespace TestCluster
