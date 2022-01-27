@@ -93,6 +93,16 @@ tests:
 
     ######## UpOrOpen Command #######
     ### Step 2x -> Check UpOrOpen Fast effects
+
+    - label: "2: Subscribe to DUT reports on OperationalStatus attribute"
+      command: "subscribeAttribute"
+      attribute: "OperationalStatus"
+      minInterval: 4
+      maxInterval: 5
+      response:
+          constraints:
+              type: map8
+
     ### MANDATORY Command
     - label: "2a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
@@ -127,28 +137,26 @@ tests:
       response:
             value: 0
 
-    - label: "2e: TH leave the device moving for 5 seconds"
+    - label: "2e: TH leave the device moving for 2 seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: 2000
 
     ######## UpOrOpen Reports #######
     ### Step 3x -> Check UpOrOpen Mid term effects
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
-    # Only 3 possibilities are possible here : 11h = 17, 14h = 20 or 15h = 21 then check a range for simplicity [17 - 21]
+    # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
     - label: "3a: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"
-      command: "subscribeAttribute"
+      command: "waitForReport"
       attribute: "OperationalStatus"
-      minInterval: 1
-      maxInterval: 2
       response:
           constraints:
               type: map8
-              minValue: 17
+              minValue: 5
               maxValue: 21
 
     ### Mandatory Depends on the FeatureMap
@@ -266,5 +274,4 @@ tests:
       attribute: "OperationalStatus"
       response:
           value: 0
-
 

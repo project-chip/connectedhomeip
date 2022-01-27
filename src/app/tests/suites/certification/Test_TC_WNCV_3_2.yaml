@@ -93,6 +93,16 @@ tests:
 
     ######## DownOrClose Command #######
     ### Step 2x -> Check DownOrClose Fast effects
+
+    - label: "2: Subscribe to DUT reports on OperationalStatus attribute"
+      command: "subscribeAttribute"
+      attribute: "OperationalStatus"
+      minInterval: 4
+      maxInterval: 5
+      response:
+          constraints:
+              type: map8
+
     ### MANDATORY Command
     - label: "2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
@@ -127,28 +137,26 @@ tests:
       response:
             value: 0
 
-    - label: "2e: TH leave the device moving for 5 seconds"
+    - label: "2e: TH leave the device moving for 2 seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: 2000
 
     ######## DownOrClose Reports #######
     ### Step 3x -> Check DownOrClose Mid term effects
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 10b & if (LF) value of bit 2..3 must be 10b else 00b & if (TL) value of bit 4..5 must be 10b else 00b
-    # Only 3 possibilities are possible here : 22h = 34, 28h = 40 or 2Ah = 242 then check a range for simplicity [34 - 42]
+    # Only 3 possibilities are possible here : 0Ah = 10, 22h = 34 or 2Ah = 42 then check a range for simplicity [10 - 42]
     - label: "3a: Verify DUT reports OperationalStatus attribute to TH after a DownOrClose"
-      command: "subscribeAttribute"
+      command: "waitForReport"
       attribute: "OperationalStatus"
-      minInterval: 1
-      maxInterval: 2
       response:
           constraints:
               type: map8
-              minValue: 34
+              minValue: 10
               maxValue: 42
 
     ### Mandatory Depends on the FeatureMap
