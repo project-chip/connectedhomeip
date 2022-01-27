@@ -19,6 +19,8 @@
 
 #include <commands/clusters/DataModelLogger.h>
 
+using namespace chip::app::Clusters;
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType & value)
 {
@@ -2316,58 +2318,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminFabricIndex'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AdminNodeID", indent + 1, value.adminNodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminNodeID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminPasscodeID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ChangeType", indent + 1, value.changeType);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ChangeType'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("LatestValue", indent + 1, value.latestValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'LatestValue'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AccessControl::Events::AccessControlEntryChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2415,7 +2367,55 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType & value)
+                                     const AccessControl::Events::AccessControlExtensionChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminFabricIndex'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AdminNodeID", indent + 1, value.adminNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminNodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminPasscodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ChangeType", indent + 1, value.changeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ChangeType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("LatestValue", indent + 1, value.latestValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'LatestValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const BridgedActions::Events::StateChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2447,7 +2447,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType & value)
+                                     const BridgedActions::Events::ActionFailed::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2486,8 +2486,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Basic::Events::StartUp::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::StartUp::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2502,8 +2501,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Basic::Events::ShutDown::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::ShutDown::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::Leave::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -2511,15 +2516,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Basic::Events::Leave::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType & value)
+                                     const Basic::Events::ReachableChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2534,9 +2531,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2575,9 +2571,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2600,9 +2595,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2641,9 +2635,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralDiagnostics::Events::HardwareFaultChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2667,32 +2660,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType & value)
+                                     const GeneralDiagnostics::Events::RadioFaultChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2716,7 +2684,31 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType & value)
+                                     const GeneralDiagnostics::Events::NetworkFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralDiagnostics::Events::BootReason::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2732,7 +2724,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType & value)
+                                     const SoftwareDiagnostics::Events::SoftwareFault::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2747,9 +2739,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2764,9 +2755,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WiFiNetworkDiagnostics::Events::Disconnection::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2781,9 +2771,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2806,9 +2795,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2823,8 +2811,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::SwitchLatched::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2839,8 +2826,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::InitialPress::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::InitialPress::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2855,8 +2841,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::LongPress::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::LongPress::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2871,8 +2856,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::ShortRelease::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::ShortRelease::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousPosition", indent + 1, value.previousPosition);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousPosition'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::LongRelease::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2888,23 +2887,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::LongRelease::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("PreviousPosition", indent + 1, value.previousPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousPosition'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType & value)
+                                     const Switch::Events::MultiPressOngoing::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2929,7 +2912,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType & value)
+                                     const Switch::Events::MultiPressComplete::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2953,7 +2936,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::BooleanState::Events::StateChange::DecodableType & value)
+                                     const BooleanState::Events::StateChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2969,7 +2952,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType & value)
+                                     const DoorLock::Events::DoorLockAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2985,7 +2968,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType & value)
+                                     const DoorLock::Events::DoorStateChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3001,7 +2984,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType & value)
+                                     const DoorLock::Events::LockOperation::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3057,7 +3040,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType & value)
+                                     const DoorLock::Events::LockOperationError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3121,7 +3104,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType & value)
+                                     const DoorLock::Events::LockUserChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3184,126 +3167,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -3311,25 +3176,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value)
+                                     const PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -3337,7 +3184,126 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType & value)
+                                     const PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::DryRunning::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::PumpBlocked::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::SensorFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::GeneralFault::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::Leakage::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::AirDetection::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const TestCluster::Events::TestEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3393,7 +3359,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType & value)
+                                     const TestCluster::Events::TestFabricScopedEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3407,4 +3373,4588 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AccountLogin::Commands::GetSetupPINResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("setupPIN", indent + 1, value.setupPIN));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ApplicationLauncher::Commands::LauncherResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("data", indent + 1, value.data));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Channel::Commands::ChangeChannelResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("channelMatch", indent + 1, value.channelMatch));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorType", indent + 1, value.errorType));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ContentLauncher::Commands::LaunchResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("data", indent + 1, value.data));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("content", indent + 1, value.content));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeStamp", indent + 1, value.timeStamp));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeSinceBoot", indent + 1, value.timeSinceBoot));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetCredentialStatusResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("credentialExists", indent + 1, value.credentialExists));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nextCredentialIndex", indent + 1, value.nextCredentialIndex));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetUserResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userName", indent + 1, value.userName));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userUniqueId", indent + 1, value.userUniqueId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userStatus", indent + 1, value.userStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userType", indent + 1, value.userType));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("credentialRule", indent + 1, value.credentialRule));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("credentials", indent + 1, value.credentials));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("creatorFabricIndex", indent + 1, value.creatorFabricIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("lastModifiedFabricIndex", indent + 1, value.lastModifiedFabricIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nextUserIndex", indent + 1, value.nextUserIndex));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::SetCredentialResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nextCredentialIndex", indent + 1, value.nextCredentialIndex));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupKeySetIDs", indent + 1, value.groupKeySetIDs));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupKeySet", indent + 1, value.groupKeySet));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Groups::Commands::AddGroupResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Groups::Commands::GetGroupMembershipResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("capacity", indent + 1, value.capacity));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupList", indent + 1, value.groupList));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Groups::Commands::RemoveGroupResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Groups::Commands::ViewGroupResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupName", indent + 1, value.groupName));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Identify::Commands::IdentifyQueryResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeout", indent + 1, value.timeout));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const KeypadInput::Commands::SendKeyResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const MediaPlayback::Commands::PlaybackResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorValue", indent + 1, value.errorValue));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("wiFiScanResults", indent + 1, value.wiFiScanResults));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("threadScanResults", indent + 1, value.threadScanResults));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("action", indent + 1, value.action));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("delayedActionTime", indent + 1, value.delayedActionTime));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("delayedActionTime", indent + 1, value.delayedActionTime));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("imageURI", indent + 1, value.imageURI));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("softwareVersion", indent + 1, value.softwareVersion));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("softwareVersionString", indent + 1, value.softwareVersionString));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("updateToken", indent + 1, value.updateToken));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userConsentNeeded", indent + 1, value.userConsentNeeded));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("metadataForRequestor", indent + 1, value.metadataForRequestor));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OperationalCredentials::Commands::AttestationResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("attestationElements", indent + 1, value.attestationElements));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("signature", indent + 1, value.signature));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OperationalCredentials::Commands::CertificateChainResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("certificate", indent + 1, value.certificate));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OperationalCredentials::Commands::NOCResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusCode", indent + 1, value.statusCode));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("fabricIndex", indent + 1, value.fabricIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OperationalCredentials::Commands::OpCSRResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("NOCSRElements", indent + 1, value.NOCSRElements));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("attestationSignature", indent + 1, value.attestationSignature));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Scenes::Commands::AddSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneId", indent + 1, value.sceneId));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Scenes::Commands::GetSceneMembershipResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("capacity", indent + 1, value.capacity));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneCount", indent + 1, value.sceneCount));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneList", indent + 1, value.sceneList));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Scenes::Commands::RemoveAllScenesResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Scenes::Commands::RemoveSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneId", indent + 1, value.sceneId));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Scenes::Commands::StoreSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneId", indent + 1, value.sceneId));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Scenes::Commands::ViewSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneId", indent + 1, value.sceneId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("transitionTime", indent + 1, value.transitionTime));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneName", indent + 1, value.sceneName));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("extensionFieldSets", indent + 1, value.extensionFieldSets));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TargetNavigator::Commands::NavigateTargetResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("data", indent + 1, value.data));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::BooleanResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::SimpleStructResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::TestAddArgumentsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::TestEmitTestEventResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::TestEnumsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("arg2", indent + 1, value.arg2));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::TestNullableOptionalResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("wasPresent", indent + 1, value.wasPresent));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("wasNull", indent + 1, value.wasNull));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("originalValue", indent + 1, value.originalValue));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const TestCluster::Commands::TestSpecificResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeOfDay", indent + 1, value.timeOfDay));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("relayStatus", indent + 1, value.relayStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("localTemperature", indent + 1, value.localTemperature));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("humidityInPercentage", indent + 1, value.humidityInPercentage));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("setpoint", indent + 1, value.setpoint));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("unreadEntries", indent + 1, value.unreadEntries));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(
+        DataModelLogger::LogValue("numberOfTransitionsForSequence", indent + 1, value.numberOfTransitionsForSequence));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("modeForSequence", indent + 1, value.modeForSequence));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("payload", indent + 1, value.payload));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI, path.mEndpointId,
+                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+
+    switch (path.mClusterId)
+    {
+    case AccessControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case AccessControl::Attributes::Acl::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ACL", 1, value);
+        }
+        case AccessControl::Attributes::Extension::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Extension", 1, value);
+        }
+        case AccessControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case AccessControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case AccountLogin::Id: {
+        switch (path.mAttributeId)
+        {
+        case AccountLogin::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case AccountLogin::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case AdministratorCommissioning::Id: {
+        switch (path.mAttributeId)
+        {
+        case AdministratorCommissioning::Attributes::WindowStatus::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("WindowStatus", 1, value);
+        }
+        case AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
+            chip::FabricIndex value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AdminFabricIndex", 1, value);
+        }
+        case AdministratorCommissioning::Attributes::AdminVendorId::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AdminVendorId", 1, value);
+        }
+        case AdministratorCommissioning::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case AdministratorCommissioning::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ApplicationBasic::Id: {
+        switch (path.mAttributeId)
+        {
+        case ApplicationBasic::Attributes::VendorName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("vendor name", 1, value);
+        }
+        case ApplicationBasic::Attributes::VendorId::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("vendor id", 1, value);
+        }
+        case ApplicationBasic::Attributes::ApplicationName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("application name", 1, value);
+        }
+        case ApplicationBasic::Attributes::ProductId::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("product id", 1, value);
+        }
+        case ApplicationBasic::Attributes::ApplicationApp::Id: {
+            chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("application app", 1, value);
+        }
+        case ApplicationBasic::Attributes::ApplicationStatus::Id: {
+            chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("application status", 1, value);
+        }
+        case ApplicationBasic::Attributes::ApplicationVersion::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("application version", 1, value);
+        }
+        case ApplicationBasic::Attributes::AllowedVendorList::Id: {
+            chip::app::DataModel::DecodableList<chip::VendorId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("allowed vendor list", 1, value);
+        }
+        case ApplicationBasic::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ApplicationBasic::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ApplicationLauncher::Id: {
+        switch (path.mAttributeId)
+        {
+        case ApplicationLauncher::Attributes::ApplicationLauncherList::Id: {
+            chip::app::DataModel::DecodableList<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("application launcher list", 1, value);
+        }
+        case ApplicationLauncher::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ApplicationLauncher::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case AudioOutput::Id: {
+        switch (path.mAttributeId)
+        {
+        case AudioOutput::Attributes::AudioOutputList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("audio output list", 1, value);
+        }
+        case AudioOutput::Attributes::CurrentAudioOutput::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current audio output", 1, value);
+        }
+        case AudioOutput::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case AudioOutput::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case BarrierControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case BarrierControl::Attributes::BarrierMovingState::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("barrier moving state", 1, value);
+        }
+        case BarrierControl::Attributes::BarrierSafetyStatus::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("barrier safety status", 1, value);
+        }
+        case BarrierControl::Attributes::BarrierCapabilities::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("barrier capabilities", 1, value);
+        }
+        case BarrierControl::Attributes::BarrierPosition::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("barrier position", 1, value);
+        }
+        case BarrierControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case BarrierControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Basic::Id: {
+        switch (path.mAttributeId)
+        {
+        case Basic::Attributes::InteractionModelVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InteractionModelVersion", 1, value);
+        }
+        case Basic::Attributes::VendorName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VendorName", 1, value);
+        }
+        case Basic::Attributes::VendorID::Id: {
+            chip::VendorId value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VendorID", 1, value);
+        }
+        case Basic::Attributes::ProductName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductName", 1, value);
+        }
+        case Basic::Attributes::ProductID::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductID", 1, value);
+        }
+        case Basic::Attributes::NodeLabel::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeLabel", 1, value);
+        }
+        case Basic::Attributes::Location::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Location", 1, value);
+        }
+        case Basic::Attributes::HardwareVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareVersion", 1, value);
+        }
+        case Basic::Attributes::HardwareVersionString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareVersionString", 1, value);
+        }
+        case Basic::Attributes::SoftwareVersion::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareVersion", 1, value);
+        }
+        case Basic::Attributes::SoftwareVersionString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareVersionString", 1, value);
+        }
+        case Basic::Attributes::ManufacturingDate::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ManufacturingDate", 1, value);
+        }
+        case Basic::Attributes::PartNumber::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PartNumber", 1, value);
+        }
+        case Basic::Attributes::ProductURL::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductURL", 1, value);
+        }
+        case Basic::Attributes::ProductLabel::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductLabel", 1, value);
+        }
+        case Basic::Attributes::SerialNumber::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SerialNumber", 1, value);
+        }
+        case Basic::Attributes::LocalConfigDisabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LocalConfigDisabled", 1, value);
+        }
+        case Basic::Attributes::Reachable::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Reachable", 1, value);
+        }
+        case Basic::Attributes::UniqueID::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UniqueID", 1, value);
+        }
+        case Basic::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Basic::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case BinaryInputBasic::Id: {
+        switch (path.mAttributeId)
+        {
+        case BinaryInputBasic::Attributes::OutOfService::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("out of service", 1, value);
+        }
+        case BinaryInputBasic::Attributes::PresentValue::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("present value", 1, value);
+        }
+        case BinaryInputBasic::Attributes::StatusFlags::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("status flags", 1, value);
+        }
+        case BinaryInputBasic::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case BinaryInputBasic::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Binding::Id: {
+        switch (path.mAttributeId)
+        {
+        case Binding::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Binding::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case BooleanState::Id: {
+        switch (path.mAttributeId)
+        {
+        case BooleanState::Attributes::StateValue::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StateValue", 1, value);
+        }
+        case BooleanState::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case BooleanState::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case BridgedActions::Id: {
+        switch (path.mAttributeId)
+        {
+        case BridgedActions::Attributes::ActionList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("action list", 1, value);
+        }
+        case BridgedActions::Attributes::EndpointList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("endpoint list", 1, value);
+        }
+        case BridgedActions::Attributes::SetupUrl::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("setup url", 1, value);
+        }
+        case BridgedActions::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case BridgedActions::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case BridgedDeviceBasic::Id: {
+        switch (path.mAttributeId)
+        {
+        case BridgedDeviceBasic::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Channel::Id: {
+        switch (path.mAttributeId)
+        {
+        case Channel::Attributes::ChannelList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("channel list", 1, value);
+        }
+        case Channel::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Channel::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ColorControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case ColorControl::Attributes::CurrentHue::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current hue", 1, value);
+        }
+        case ColorControl::Attributes::CurrentSaturation::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current saturation", 1, value);
+        }
+        case ColorControl::Attributes::RemainingTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("remaining time", 1, value);
+        }
+        case ColorControl::Attributes::CurrentX::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current x", 1, value);
+        }
+        case ColorControl::Attributes::CurrentY::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current y", 1, value);
+        }
+        case ColorControl::Attributes::DriftCompensation::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("drift compensation", 1, value);
+        }
+        case ColorControl::Attributes::CompensationText::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("compensation text", 1, value);
+        }
+        case ColorControl::Attributes::ColorTemperature::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color temperature", 1, value);
+        }
+        case ColorControl::Attributes::ColorMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color mode", 1, value);
+        }
+        case ColorControl::Attributes::ColorControlOptions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color control options", 1, value);
+        }
+        case ColorControl::Attributes::NumberOfPrimaries::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("number of primaries", 1, value);
+        }
+        case ColorControl::Attributes::Primary1X::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 1 x", 1, value);
+        }
+        case ColorControl::Attributes::Primary1Y::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 1 y", 1, value);
+        }
+        case ColorControl::Attributes::Primary1Intensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 1 intensity", 1, value);
+        }
+        case ColorControl::Attributes::Primary2X::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 2 x", 1, value);
+        }
+        case ColorControl::Attributes::Primary2Y::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 2 y", 1, value);
+        }
+        case ColorControl::Attributes::Primary2Intensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 2 intensity", 1, value);
+        }
+        case ColorControl::Attributes::Primary3X::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 3 x", 1, value);
+        }
+        case ColorControl::Attributes::Primary3Y::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 3 y", 1, value);
+        }
+        case ColorControl::Attributes::Primary3Intensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 3 intensity", 1, value);
+        }
+        case ColorControl::Attributes::Primary4X::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 4 x", 1, value);
+        }
+        case ColorControl::Attributes::Primary4Y::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 4 y", 1, value);
+        }
+        case ColorControl::Attributes::Primary4Intensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 4 intensity", 1, value);
+        }
+        case ColorControl::Attributes::Primary5X::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 5 x", 1, value);
+        }
+        case ColorControl::Attributes::Primary5Y::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 5 y", 1, value);
+        }
+        case ColorControl::Attributes::Primary5Intensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 5 intensity", 1, value);
+        }
+        case ColorControl::Attributes::Primary6X::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 6 x", 1, value);
+        }
+        case ColorControl::Attributes::Primary6Y::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 6 y", 1, value);
+        }
+        case ColorControl::Attributes::Primary6Intensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("primary 6 intensity", 1, value);
+        }
+        case ColorControl::Attributes::WhitePointX::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("white point x", 1, value);
+        }
+        case ColorControl::Attributes::WhitePointY::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("white point y", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointRX::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point r x", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointRY::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point r y", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointRIntensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point r intensity", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointGX::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point g x", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointGY::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point g y", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointGIntensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point g intensity", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointBX::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point b x", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointBY::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point b y", 1, value);
+        }
+        case ColorControl::Attributes::ColorPointBIntensity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color point b intensity", 1, value);
+        }
+        case ColorControl::Attributes::EnhancedCurrentHue::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("enhanced current hue", 1, value);
+        }
+        case ColorControl::Attributes::EnhancedColorMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("enhanced color mode", 1, value);
+        }
+        case ColorControl::Attributes::ColorLoopActive::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color loop active", 1, value);
+        }
+        case ColorControl::Attributes::ColorLoopDirection::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color loop direction", 1, value);
+        }
+        case ColorControl::Attributes::ColorLoopTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color loop time", 1, value);
+        }
+        case ColorControl::Attributes::ColorLoopStartEnhancedHue::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color loop start enhanced hue", 1, value);
+        }
+        case ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color loop stored enhanced hue", 1, value);
+        }
+        case ColorControl::Attributes::ColorCapabilities::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color capabilities", 1, value);
+        }
+        case ColorControl::Attributes::ColorTempPhysicalMin::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color temp physical min", 1, value);
+        }
+        case ColorControl::Attributes::ColorTempPhysicalMax::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("color temp physical max", 1, value);
+        }
+        case ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("couple color temp to level min-mireds", 1, value);
+        }
+        case ColorControl::Attributes::StartUpColorTemperatureMireds::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("start up color temperature mireds", 1, value);
+        }
+        case ColorControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ColorControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ContentLauncher::Id: {
+        switch (path.mAttributeId)
+        {
+        case ContentLauncher::Attributes::AcceptHeaderList::Id: {
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("accept header list", 1, value);
+        }
+        case ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("supported streaming protocols", 1, value);
+        }
+        case ContentLauncher::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ContentLauncher::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Descriptor::Id: {
+        switch (path.mAttributeId)
+        {
+        case Descriptor::Attributes::DeviceList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("device list", 1, value);
+        }
+        case Descriptor::Attributes::ServerList::Id: {
+            chip::app::DataModel::DecodableList<chip::ClusterId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("server list", 1, value);
+        }
+        case Descriptor::Attributes::ClientList::Id: {
+            chip::app::DataModel::DecodableList<chip::ClusterId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("client list", 1, value);
+        }
+        case Descriptor::Attributes::PartsList::Id: {
+            chip::app::DataModel::DecodableList<chip::EndpointId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("parts list", 1, value);
+        }
+        case Descriptor::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Descriptor::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case DiagnosticLogs::Id: {
+        switch (path.mAttributeId)
+        {
+        case DiagnosticLogs::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        }
+    }
+    case DoorLock::Id: {
+        switch (path.mAttributeId)
+        {
+        case DoorLock::Attributes::LockState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LockState", 1, value);
+        }
+        case DoorLock::Attributes::LockType::Id: {
+            chip::app::Clusters::DoorLock::DlLockType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LockType", 1, value);
+        }
+        case DoorLock::Attributes::ActuatorEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActuatorEnabled", 1, value);
+        }
+        case DoorLock::Attributes::DoorState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DoorState", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfTotalUsersSupported::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfTotalUsersSupported", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfPINUsersSupported::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfPINUsersSupported", 1, value);
+        }
+        case DoorLock::Attributes::MaxPINCodeLength::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxPINCodeLength", 1, value);
+        }
+        case DoorLock::Attributes::MinPINCodeLength::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinPINCodeLength", 1, value);
+        }
+        case DoorLock::Attributes::Language::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Language", 1, value);
+        }
+        case DoorLock::Attributes::AutoRelockTime::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AutoRelockTime", 1, value);
+        }
+        case DoorLock::Attributes::SoundVolume::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoundVolume", 1, value);
+        }
+        case DoorLock::Attributes::OperatingMode::Id: {
+            chip::app::Clusters::DoorLock::DlOperatingMode value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperatingMode", 1, value);
+        }
+        case DoorLock::Attributes::SupportedOperatingModes::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedOperatingModes", 1, value);
+        }
+        case DoorLock::Attributes::EnableOneTouchLocking::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EnableOneTouchLocking", 1, value);
+        }
+        case DoorLock::Attributes::EnablePrivacyModeButton::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EnablePrivacyModeButton", 1, value);
+        }
+        case DoorLock::Attributes::WrongCodeEntryLimit::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("WrongCodeEntryLimit", 1, value);
+        }
+        case DoorLock::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case DoorLock::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ElectricalMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case ElectricalMeasurement::Attributes::MeasurementType::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("measurement type", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::TotalActivePower::Id: {
+            int32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("total active power", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::RmsVoltage::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rms voltage", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::RmsVoltageMin::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rms voltage min", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::RmsVoltageMax::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rms voltage max", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::RmsCurrent::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rms current", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::RmsCurrentMin::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rms current min", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::RmsCurrentMax::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rms current max", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::ActivePower::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("active power", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::ActivePowerMin::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("active power min", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::ActivePowerMax::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("active power max", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ElectricalMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case EthernetNetworkDiagnostics::Id: {
+        switch (path.mAttributeId)
+        {
+        case EthernetNetworkDiagnostics::Attributes::PHYRate::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PHYRate", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::FullDuplex::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FullDuplex", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PacketRxCount", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PacketTxCount", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::TxErrCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxErrCount", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::CollisionCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CollisionCount", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::OverrunCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverrunCount", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CarrierDetect", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TimeSinceReset", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case EthernetNetworkDiagnostics::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case FixedLabel::Id: {
+        switch (path.mAttributeId)
+        {
+        case FixedLabel::Attributes::LabelList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("label list", 1, value);
+        }
+        case FixedLabel::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case FixedLabel::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case FlowMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case FlowMeasurement::Attributes::MeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MeasuredValue", 1, value);
+        }
+        case FlowMeasurement::Attributes::MinMeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
+        }
+        case FlowMeasurement::Attributes::MaxMeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
+        }
+        case FlowMeasurement::Attributes::Tolerance::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Tolerance", 1, value);
+        }
+        case FlowMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case FlowMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case GeneralCommissioning::Id: {
+        switch (path.mAttributeId)
+        {
+        case GeneralCommissioning::Attributes::Breadcrumb::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Breadcrumb", 1, value);
+        }
+        case GeneralCommissioning::Attributes::BasicCommissioningInfoList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BasicCommissioningInfoList", 1, value);
+        }
+        case GeneralCommissioning::Attributes::RegulatoryConfig::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RegulatoryConfig", 1, value);
+        }
+        case GeneralCommissioning::Attributes::LocationCapability::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LocationCapability", 1, value);
+        }
+        case GeneralCommissioning::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case GeneralCommissioning::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case GeneralDiagnostics::Id: {
+        switch (path.mAttributeId)
+        {
+        case GeneralDiagnostics::Attributes::NetworkInterfaces::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkInterfaces", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::RebootCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RebootCount", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::UpTime::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UpTime", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::TotalOperationalHours::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TotalOperationalHours", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::BootReasons::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BootReasons", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveHardwareFaults", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::ActiveRadioFaults::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveRadioFaults", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveNetworkFaults", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case GroupKeyManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case GroupKeyManagement::Attributes::GroupKeyMap::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("groupKeyMap", 1, value);
+        }
+        case GroupKeyManagement::Attributes::GroupTable::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("groupTable", 1, value);
+        }
+        case GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("maxGroupsPerFabric", 1, value);
+        }
+        case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("maxGroupKeysPerFabric", 1, value);
+        }
+        case GroupKeyManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case GroupKeyManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Groups::Id: {
+        switch (path.mAttributeId)
+        {
+        case Groups::Attributes::NameSupport::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("name support", 1, value);
+        }
+        case Groups::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Groups::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Identify::Id: {
+        switch (path.mAttributeId)
+        {
+        case Identify::Attributes::IdentifyTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("identify time", 1, value);
+        }
+        case Identify::Attributes::IdentifyType::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("identify type", 1, value);
+        }
+        case Identify::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Identify::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case IlluminanceMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case IlluminanceMeasurement::Attributes::MeasuredValue::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MeasuredValue", 1, value);
+        }
+        case IlluminanceMeasurement::Attributes::MinMeasuredValue::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
+        }
+        case IlluminanceMeasurement::Attributes::MaxMeasuredValue::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
+        }
+        case IlluminanceMeasurement::Attributes::Tolerance::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Tolerance", 1, value);
+        }
+        case IlluminanceMeasurement::Attributes::LightSensorType::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LightSensorType", 1, value);
+        }
+        case IlluminanceMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case IlluminanceMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case KeypadInput::Id: {
+        switch (path.mAttributeId)
+        {
+        case KeypadInput::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case KeypadInput::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case LevelControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case LevelControl::Attributes::CurrentLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current level", 1, value);
+        }
+        case LevelControl::Attributes::RemainingTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("remaining time", 1, value);
+        }
+        case LevelControl::Attributes::MinLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("min level", 1, value);
+        }
+        case LevelControl::Attributes::MaxLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("max level", 1, value);
+        }
+        case LevelControl::Attributes::CurrentFrequency::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current frequency", 1, value);
+        }
+        case LevelControl::Attributes::MinFrequency::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("min frequency", 1, value);
+        }
+        case LevelControl::Attributes::MaxFrequency::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("max frequency", 1, value);
+        }
+        case LevelControl::Attributes::Options::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("options", 1, value);
+        }
+        case LevelControl::Attributes::OnOffTransitionTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("on off transition time", 1, value);
+        }
+        case LevelControl::Attributes::OnLevel::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("on level", 1, value);
+        }
+        case LevelControl::Attributes::OnTransitionTime::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("on transition time", 1, value);
+        }
+        case LevelControl::Attributes::OffTransitionTime::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("off transition time", 1, value);
+        }
+        case LevelControl::Attributes::DefaultMoveRate::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("default move rate", 1, value);
+        }
+        case LevelControl::Attributes::StartUpCurrentLevel::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("start up current level", 1, value);
+        }
+        case LevelControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case LevelControl::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case LevelControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case LocalizationConfiguration::Id: {
+        switch (path.mAttributeId)
+        {
+        case LocalizationConfiguration::Attributes::ActiveLocale::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveLocale", 1, value);
+        }
+        case LocalizationConfiguration::Attributes::SupportedLocales::Id: {
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedLocales", 1, value);
+        }
+        case LocalizationConfiguration::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case LowPower::Id: {
+        switch (path.mAttributeId)
+        {
+        case LowPower::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case LowPower::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case MediaInput::Id: {
+        switch (path.mAttributeId)
+        {
+        case MediaInput::Attributes::MediaInputList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("media input list", 1, value);
+        }
+        case MediaInput::Attributes::CurrentMediaInput::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current media input", 1, value);
+        }
+        case MediaInput::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case MediaInput::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case MediaPlayback::Id: {
+        switch (path.mAttributeId)
+        {
+        case MediaPlayback::Attributes::PlaybackState::Id: {
+            chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("playback state", 1, value);
+        }
+        case MediaPlayback::Attributes::StartTime::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("start time", 1, value);
+        }
+        case MediaPlayback::Attributes::Duration::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("duration", 1, value);
+        }
+        case MediaPlayback::Attributes::PlaybackSpeed::Id: {
+            float value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("playback speed", 1, value);
+        }
+        case MediaPlayback::Attributes::SeekRangeEnd::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("seek range end", 1, value);
+        }
+        case MediaPlayback::Attributes::SeekRangeStart::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("seek range start", 1, value);
+        }
+        case MediaPlayback::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case MediaPlayback::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ModeSelect::Id: {
+        switch (path.mAttributeId)
+        {
+        case ModeSelect::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case ModeSelect::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
+        case ModeSelect::Attributes::OnMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case ModeSelect::Attributes::StartUpMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case ModeSelect::Attributes::Description::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Description", 1, value);
+        }
+        case ModeSelect::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ModeSelect::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case NetworkCommissioning::Id: {
+        switch (path.mAttributeId)
+        {
+        case NetworkCommissioning::Attributes::MaxNetworks::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxNetworks", 1, value);
+        }
+        case NetworkCommissioning::Attributes::Networks::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Networks", 1, value);
+        }
+        case NetworkCommissioning::Attributes::ScanMaxTimeSeconds::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ScanMaxTimeSeconds", 1, value);
+        }
+        case NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ConnectMaxTimeSeconds", 1, value);
+        }
+        case NetworkCommissioning::Attributes::InterfaceEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterfaceEnabled", 1, value);
+        }
+        case NetworkCommissioning::Attributes::LastNetworkingStatus::Id: {
+            chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastNetworkingStatus", 1, value);
+        }
+        case NetworkCommissioning::Attributes::LastNetworkID::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastNetworkID", 1, value);
+        }
+        case NetworkCommissioning::Attributes::LastConnectErrorValue::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastConnectErrorValue", 1, value);
+        }
+        case NetworkCommissioning::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case NetworkCommissioning::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case OtaSoftwareUpdateProvider::Id: {
+        switch (path.mAttributeId)
+        {
+        case OtaSoftwareUpdateProvider::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case OtaSoftwareUpdateProvider::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case OtaSoftwareUpdateRequestor::Id: {
+        switch (path.mAttributeId)
+        {
+        case OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultOtaProviders", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UpdatePossible", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id: {
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UpdateState", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UpdateStateProgress", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case OccupancySensing::Id: {
+        switch (path.mAttributeId)
+        {
+        case OccupancySensing::Attributes::Occupancy::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("occupancy", 1, value);
+        }
+        case OccupancySensing::Attributes::OccupancySensorType::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("occupancy sensor type", 1, value);
+        }
+        case OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("occupancy sensor type bitmap", 1, value);
+        }
+        case OccupancySensing::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case OccupancySensing::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case OnOff::Id: {
+        switch (path.mAttributeId)
+        {
+        case OnOff::Attributes::OnOff::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnOff", 1, value);
+        }
+        case OnOff::Attributes::GlobalSceneControl::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GlobalSceneControl", 1, value);
+        }
+        case OnOff::Attributes::OnTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnTime", 1, value);
+        }
+        case OnOff::Attributes::OffWaitTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OffWaitTime", 1, value);
+        }
+        case OnOff::Attributes::StartUpOnOff::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpOnOff", 1, value);
+        }
+        case OnOff::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case OnOff::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case OnOff::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case OnOffSwitchConfiguration::Id: {
+        switch (path.mAttributeId)
+        {
+        case OnOffSwitchConfiguration::Attributes::SwitchType::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("switch type", 1, value);
+        }
+        case OnOffSwitchConfiguration::Attributes::SwitchActions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("switch actions", 1, value);
+        }
+        case OnOffSwitchConfiguration::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case OnOffSwitchConfiguration::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case OperationalCredentials::Id: {
+        switch (path.mAttributeId)
+        {
+        case OperationalCredentials::Attributes::NOCs::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NOCs", 1, value);
+        }
+        case OperationalCredentials::Attributes::FabricsList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("fabrics list", 1, value);
+        }
+        case OperationalCredentials::Attributes::SupportedFabrics::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedFabrics", 1, value);
+        }
+        case OperationalCredentials::Attributes::CommissionedFabrics::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CommissionedFabrics", 1, value);
+        }
+        case OperationalCredentials::Attributes::TrustedRootCertificates::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TrustedRootCertificates", 1, value);
+        }
+        case OperationalCredentials::Attributes::CurrentFabricIndex::Id: {
+            chip::FabricIndex value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentFabricIndex", 1, value);
+        }
+        case OperationalCredentials::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case OperationalCredentials::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case PowerSource::Id: {
+        switch (path.mAttributeId)
+        {
+        case PowerSource::Attributes::Status::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Status", 1, value);
+        }
+        case PowerSource::Attributes::Order::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Order", 1, value);
+        }
+        case PowerSource::Attributes::Description::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Description", 1, value);
+        }
+        case PowerSource::Attributes::BatteryVoltage::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatteryVoltage", 1, value);
+        }
+        case PowerSource::Attributes::BatteryPercentRemaining::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatteryPercentRemaining", 1, value);
+        }
+        case PowerSource::Attributes::BatteryTimeRemaining::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatteryTimeRemaining", 1, value);
+        }
+        case PowerSource::Attributes::BatteryChargeLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatteryChargeLevel", 1, value);
+        }
+        case PowerSource::Attributes::ActiveBatteryFaults::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveBatteryFaults", 1, value);
+        }
+        case PowerSource::Attributes::BatteryChargeState::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatteryChargeState", 1, value);
+        }
+        case PowerSource::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case PowerSource::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case PowerSource::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case PowerSourceConfiguration::Id: {
+        switch (path.mAttributeId)
+        {
+        case PowerSourceConfiguration::Attributes::Sources::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Sources", 1, value);
+        }
+        case PowerSourceConfiguration::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case PowerSourceConfiguration::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case PressureMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case PressureMeasurement::Attributes::MeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MeasuredValue", 1, value);
+        }
+        case PressureMeasurement::Attributes::MinMeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
+        }
+        case PressureMeasurement::Attributes::MaxMeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
+        }
+        case PressureMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case PressureMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case PumpConfigurationAndControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case PumpConfigurationAndControl::Attributes::MaxPressure::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxPressure", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxSpeed::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxSpeed", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxFlow::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxFlow", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MinConstPressure::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinConstPressure", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxConstPressure::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxConstPressure", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MinCompPressure::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinCompPressure", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxCompPressure::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxCompPressure", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MinConstSpeed::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinConstSpeed", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxConstSpeed", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MinConstFlow::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinConstFlow", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxConstFlow::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxConstFlow", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MinConstTemp::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinConstTemp", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::MaxConstTemp::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxConstTemp", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::PumpStatus::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PumpStatus", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EffectiveOperationMode", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EffectiveControlMode", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::Capacity::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Capacity", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::Speed::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Speed", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LifetimeRunningHours", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::Power::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Power", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LifetimeEnergyConsumed", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::OperationMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationMode", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::ControlMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ControlMode", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::AlarmMask::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AlarmMask", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case PumpConfigurationAndControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case RelativeHumidityMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("measured value", 1, value);
+        }
+        case RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("min measured value", 1, value);
+        }
+        case RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("max measured value", 1, value);
+        }
+        case RelativeHumidityMeasurement::Attributes::Tolerance::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("tolerance", 1, value);
+        }
+        case RelativeHumidityMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case RelativeHumidityMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Scenes::Id: {
+        switch (path.mAttributeId)
+        {
+        case Scenes::Attributes::SceneCount::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("scene count", 1, value);
+        }
+        case Scenes::Attributes::CurrentScene::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current scene", 1, value);
+        }
+        case Scenes::Attributes::CurrentGroup::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current group", 1, value);
+        }
+        case Scenes::Attributes::SceneValid::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("scene valid", 1, value);
+        }
+        case Scenes::Attributes::NameSupport::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("name support", 1, value);
+        }
+        case Scenes::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Scenes::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case SoftwareDiagnostics::Id: {
+        switch (path.mAttributeId)
+        {
+        case SoftwareDiagnostics::Attributes::ThreadMetrics::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadMetrics", 1, value);
+        }
+        case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentHeapFree", 1, value);
+        }
+        case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentHeapUsed", 1, value);
+        }
+        case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentHeapHighWatermark", 1, value);
+        }
+        case SoftwareDiagnostics::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case SoftwareDiagnostics::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case SoftwareDiagnostics::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Switch::Id: {
+        switch (path.mAttributeId)
+        {
+        case Switch::Attributes::NumberOfPositions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("number of positions", 1, value);
+        }
+        case Switch::Attributes::CurrentPosition::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current position", 1, value);
+        }
+        case Switch::Attributes::MultiPressMax::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("multi press max", 1, value);
+        }
+        case Switch::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Switch::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case Switch::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case TargetNavigator::Id: {
+        switch (path.mAttributeId)
+        {
+        case TargetNavigator::Attributes::TargetNavigatorList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("target navigator list", 1, value);
+        }
+        case TargetNavigator::Attributes::CurrentNavigatorTarget::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current navigator target", 1, value);
+        }
+        case TargetNavigator::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case TargetNavigator::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case TemperatureMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case TemperatureMeasurement::Attributes::MeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MeasuredValue", 1, value);
+        }
+        case TemperatureMeasurement::Attributes::MinMeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
+        }
+        case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
+        }
+        case TemperatureMeasurement::Attributes::Tolerance::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Tolerance", 1, value);
+        }
+        case TemperatureMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case TemperatureMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case TestCluster::Id: {
+        switch (path.mAttributeId)
+        {
+        case TestCluster::Attributes::Boolean::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("boolean", 1, value);
+        }
+        case TestCluster::Attributes::Bitmap8::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("bitmap8", 1, value);
+        }
+        case TestCluster::Attributes::Bitmap16::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("bitmap16", 1, value);
+        }
+        case TestCluster::Attributes::Bitmap32::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("bitmap32", 1, value);
+        }
+        case TestCluster::Attributes::Bitmap64::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("bitmap64", 1, value);
+        }
+        case TestCluster::Attributes::Int8u::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int8u", 1, value);
+        }
+        case TestCluster::Attributes::Int16u::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int16u", 1, value);
+        }
+        case TestCluster::Attributes::Int24u::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int24u", 1, value);
+        }
+        case TestCluster::Attributes::Int32u::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int32u", 1, value);
+        }
+        case TestCluster::Attributes::Int40u::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int40u", 1, value);
+        }
+        case TestCluster::Attributes::Int48u::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int48u", 1, value);
+        }
+        case TestCluster::Attributes::Int56u::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int56u", 1, value);
+        }
+        case TestCluster::Attributes::Int64u::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int64u", 1, value);
+        }
+        case TestCluster::Attributes::Int8s::Id: {
+            int8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int8s", 1, value);
+        }
+        case TestCluster::Attributes::Int16s::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int16s", 1, value);
+        }
+        case TestCluster::Attributes::Int24s::Id: {
+            int32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int24s", 1, value);
+        }
+        case TestCluster::Attributes::Int32s::Id: {
+            int32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int32s", 1, value);
+        }
+        case TestCluster::Attributes::Int40s::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int40s", 1, value);
+        }
+        case TestCluster::Attributes::Int48s::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int48s", 1, value);
+        }
+        case TestCluster::Attributes::Int56s::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int56s", 1, value);
+        }
+        case TestCluster::Attributes::Int64s::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("int64s", 1, value);
+        }
+        case TestCluster::Attributes::Enum8::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("enum8", 1, value);
+        }
+        case TestCluster::Attributes::Enum16::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("enum16", 1, value);
+        }
+        case TestCluster::Attributes::FloatSingle::Id: {
+            float value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("float_single", 1, value);
+        }
+        case TestCluster::Attributes::FloatDouble::Id: {
+            double value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("float_double", 1, value);
+        }
+        case TestCluster::Attributes::OctetString::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("octet_string", 1, value);
+        }
+        case TestCluster::Attributes::ListInt8u::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("list_int8u", 1, value);
+        }
+        case TestCluster::Attributes::ListOctetString::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("list_octet_string", 1, value);
+        }
+        case TestCluster::Attributes::ListStructOctetString::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("list_struct_octet_string", 1, value);
+        }
+        case TestCluster::Attributes::LongOctetString::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("long_octet_string", 1, value);
+        }
+        case TestCluster::Attributes::CharString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("char_string", 1, value);
+        }
+        case TestCluster::Attributes::LongCharString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("long_char_string", 1, value);
+        }
+        case TestCluster::Attributes::EpochUs::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("epoch_us", 1, value);
+        }
+        case TestCluster::Attributes::EpochS::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("epoch_s", 1, value);
+        }
+        case TestCluster::Attributes::VendorId::Id: {
+            chip::VendorId value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("vendor_id", 1, value);
+        }
+        case TestCluster::Attributes::ListNullablesAndOptionalsStruct::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("list_nullables_and_optionals_struct", 1, value);
+        }
+        case TestCluster::Attributes::EnumAttr::Id: {
+            chip::app::Clusters::TestCluster::SimpleEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("enum_attr", 1, value);
+        }
+        case TestCluster::Attributes::StructAttr::Id: {
+            chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("struct_attr", 1, value);
+        }
+        case TestCluster::Attributes::RangeRestrictedInt8u::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("range_restricted_int8u", 1, value);
+        }
+        case TestCluster::Attributes::RangeRestrictedInt8s::Id: {
+            int8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("range_restricted_int8s", 1, value);
+        }
+        case TestCluster::Attributes::RangeRestrictedInt16u::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("range_restricted_int16u", 1, value);
+        }
+        case TestCluster::Attributes::RangeRestrictedInt16s::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("range_restricted_int16s", 1, value);
+        }
+        case TestCluster::Attributes::ListLongOctetString::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("list_long_octet_string", 1, value);
+        }
+        case TestCluster::Attributes::TimedWriteBoolean::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("timed_write_boolean", 1, value);
+        }
+        case TestCluster::Attributes::GeneralErrorBoolean::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("general_error_boolean", 1, value);
+        }
+        case TestCluster::Attributes::ClusterErrorBoolean::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("cluster_error_boolean", 1, value);
+        }
+        case TestCluster::Attributes::Unsupported::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("unsupported", 1, value);
+        }
+        case TestCluster::Attributes::NullableBoolean::Id: {
+            chip::app::DataModel::Nullable<bool> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_boolean", 1, value);
+        }
+        case TestCluster::Attributes::NullableBitmap8::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_bitmap8", 1, value);
+        }
+        case TestCluster::Attributes::NullableBitmap16::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_bitmap16", 1, value);
+        }
+        case TestCluster::Attributes::NullableBitmap32::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_bitmap32", 1, value);
+        }
+        case TestCluster::Attributes::NullableBitmap64::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_bitmap64", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt8u::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int8u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt16u::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int16u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt24u::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int24u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt32u::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int32u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt40u::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int40u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt48u::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int48u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt56u::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int56u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt64u::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int64u", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt8s::Id: {
+            chip::app::DataModel::Nullable<int8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int8s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt16s::Id: {
+            chip::app::DataModel::Nullable<int16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int16s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt24s::Id: {
+            chip::app::DataModel::Nullable<int32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int24s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt32s::Id: {
+            chip::app::DataModel::Nullable<int32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int32s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt40s::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int40s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt48s::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int48s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt56s::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int56s", 1, value);
+        }
+        case TestCluster::Attributes::NullableInt64s::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_int64s", 1, value);
+        }
+        case TestCluster::Attributes::NullableEnum8::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_enum8", 1, value);
+        }
+        case TestCluster::Attributes::NullableEnum16::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_enum16", 1, value);
+        }
+        case TestCluster::Attributes::NullableFloatSingle::Id: {
+            chip::app::DataModel::Nullable<float> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_float_single", 1, value);
+        }
+        case TestCluster::Attributes::NullableFloatDouble::Id: {
+            chip::app::DataModel::Nullable<double> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_float_double", 1, value);
+        }
+        case TestCluster::Attributes::NullableOctetString::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_octet_string", 1, value);
+        }
+        case TestCluster::Attributes::NullableCharString::Id: {
+            chip::app::DataModel::Nullable<chip::CharSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_char_string", 1, value);
+        }
+        case TestCluster::Attributes::NullableEnumAttr::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_enum_attr", 1, value);
+        }
+        case TestCluster::Attributes::NullableStruct::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_struct", 1, value);
+        }
+        case TestCluster::Attributes::NullableRangeRestrictedInt8u::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_range_restricted_int8u", 1, value);
+        }
+        case TestCluster::Attributes::NullableRangeRestrictedInt8s::Id: {
+            chip::app::DataModel::Nullable<int8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_range_restricted_int8s", 1, value);
+        }
+        case TestCluster::Attributes::NullableRangeRestrictedInt16u::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_range_restricted_int16u", 1, value);
+        }
+        case TestCluster::Attributes::NullableRangeRestrictedInt16s::Id: {
+            chip::app::DataModel::Nullable<int16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_range_restricted_int16s", 1, value);
+        }
+        case TestCluster::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case TestCluster::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case Thermostat::Id: {
+        switch (path.mAttributeId)
+        {
+        case Thermostat::Attributes::LocalTemperature::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("local temperature", 1, value);
+        }
+        case Thermostat::Attributes::AbsMinHeatSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("abs min heat setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("abs max heat setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::AbsMinCoolSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("abs min cool setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("abs max cool setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::OccupiedCoolingSetpoint::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("occupied cooling setpoint", 1, value);
+        }
+        case Thermostat::Attributes::OccupiedHeatingSetpoint::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("occupied heating setpoint", 1, value);
+        }
+        case Thermostat::Attributes::MinHeatSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("min heat setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::MaxHeatSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("max heat setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::MinCoolSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("min cool setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::MaxCoolSetpointLimit::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("max cool setpoint limit", 1, value);
+        }
+        case Thermostat::Attributes::MinSetpointDeadBand::Id: {
+            int8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("min setpoint dead band", 1, value);
+        }
+        case Thermostat::Attributes::ControlSequenceOfOperation::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("control sequence of operation", 1, value);
+        }
+        case Thermostat::Attributes::SystemMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("system mode", 1, value);
+        }
+        case Thermostat::Attributes::StartOfWeek::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("start of week", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfWeeklyTransitions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("number of weekly transitions", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfDailyTransitions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("number of daily transitions", 1, value);
+        }
+        case Thermostat::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Thermostat::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case Thermostat::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ThermostatUserInterfaceConfiguration::Id: {
+        switch (path.mAttributeId)
+        {
+        case ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("temperature display mode", 1, value);
+        }
+        case ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("keypad lockout", 1, value);
+        }
+        case ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("schedule programming visibility", 1, value);
+        }
+        case ThermostatUserInterfaceConfiguration::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case ThreadNetworkDiagnostics::Id: {
+        switch (path.mAttributeId)
+        {
+        case ThreadNetworkDiagnostics::Attributes::Channel::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("channel", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RoutingRole", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkName", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::PanId::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PanId", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ExtendedPanId", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MeshLocalPrefix", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverrunCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NeighborTableList", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RouteTableList", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::PartitionId::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PartitionId", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("weighting", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DataVersion", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StableDataVersion", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LeaderRouterId", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DetachedRoleCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChildRoleCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RouterRoleCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LeaderRoleCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttachAttemptCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PartitionIdChangeCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BetterPartitionAttachAttemptCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ParentChangeCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxTotalCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxUnicastCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxBroadcastCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxAckRequestedCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxAckedCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxNoAckRequestedCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxDataCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxDataCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxDataPollCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxBeaconCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxBeaconRequestCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxOtherCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxRetryCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxDirectMaxRetryExpiryCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxIndirectMaxRetryExpiryCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxErrCcaCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxErrAbortCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TxErrBusyChannelCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxTotalCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxUnicastCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxBroadcastCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxDataCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxDataCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxDataPollCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxBeaconCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxBeaconRequestCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxOtherCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxAddressFilteredCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxDestAddrFilteredCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxDuplicatedCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxErrNoFrameCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxErrUnknownNeighborCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxErrInvalidSrcAddrCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxErrSecCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxErrFcsCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RxErrOtherCount", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveTimestamp", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PendingTimestamp", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::Delay::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("delay", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SecurityPolicy", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChannelMask", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalDatasetComponents", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveNetworkFaultsList", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case TimeFormatLocalization::Id: {
+        switch (path.mAttributeId)
+        {
+        case TimeFormatLocalization::Attributes::HourFormat::Id: {
+            chip::app::Clusters::TimeFormatLocalization::HourFormat value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HourFormat", 1, value);
+        }
+        case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
+            chip::app::Clusters::TimeFormatLocalization::CalendarType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveCalendarType", 1, value);
+        }
+        case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedCalendarTypes", 1, value);
+        }
+        case TimeFormatLocalization::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case UnitLocalization::Id: {
+        switch (path.mAttributeId)
+        {
+        case UnitLocalization::Attributes::TemperatureUnit::Id: {
+            chip::app::Clusters::UnitLocalization::TempUnit value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TemperatureUnit", 1, value);
+        }
+        case UnitLocalization::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case UnitLocalization::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case UserLabel::Id: {
+        switch (path.mAttributeId)
+        {
+        case UserLabel::Attributes::LabelList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("label list", 1, value);
+        }
+        case UserLabel::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case WakeOnLan::Id: {
+        switch (path.mAttributeId)
+        {
+        case WakeOnLan::Attributes::WakeOnLanMacAddress::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("wake on lan mac address", 1, value);
+        }
+        case WakeOnLan::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case WakeOnLan::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case WiFiNetworkDiagnostics::Id: {
+        switch (path.mAttributeId)
+        {
+        case WiFiNetworkDiagnostics::Attributes::Bssid::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("bssid", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::SecurityType::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SecurityType", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("WiFiVersion", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChannelNumber", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::Rssi::Id: {
+            int8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Rssi", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BeaconLostCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BeaconRxCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PacketMulticastRxCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PacketMulticastTxCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PacketUnicastRxCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PacketUnicastTxCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMaxRate", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::OverrunCount::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverrunCount", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    case WindowCovering::Id: {
+        switch (path.mAttributeId)
+        {
+        case WindowCovering::Attributes::Type::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Type", 1, value);
+        }
+        case WindowCovering::Attributes::CurrentPositionLift::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPositionLift", 1, value);
+        }
+        case WindowCovering::Attributes::CurrentPositionTilt::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPositionTilt", 1, value);
+        }
+        case WindowCovering::Attributes::ConfigStatus::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ConfigStatus", 1, value);
+        }
+        case WindowCovering::Attributes::CurrentPositionLiftPercentage::Id: {
+            chip::app::DataModel::Nullable<chip::Percent> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPositionLiftPercentage", 1, value);
+        }
+        case WindowCovering::Attributes::CurrentPositionTiltPercentage::Id: {
+            chip::app::DataModel::Nullable<chip::Percent> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPositionTiltPercentage", 1, value);
+        }
+        case WindowCovering::Attributes::OperationalStatus::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperationalStatus", 1, value);
+        }
+        case WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id: {
+            chip::app::DataModel::Nullable<chip::Percent100ths> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TargetPositionLiftPercent100ths", 1, value);
+        }
+        case WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id: {
+            chip::app::DataModel::Nullable<chip::Percent100ths> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TargetPositionTiltPercent100ths", 1, value);
+        }
+        case WindowCovering::Attributes::EndProductType::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndProductType", 1, value);
+        }
+        case WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id: {
+            chip::app::DataModel::Nullable<chip::Percent100ths> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPositionLiftPercent100ths", 1, value);
+        }
+        case WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id: {
+            chip::app::DataModel::Nullable<chip::Percent100ths> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentPositionTiltPercent100ths", 1, value);
+        }
+        case WindowCovering::Attributes::InstalledOpenLimitLift::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InstalledOpenLimitLift", 1, value);
+        }
+        case WindowCovering::Attributes::InstalledClosedLimitLift::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InstalledClosedLimitLift", 1, value);
+        }
+        case WindowCovering::Attributes::InstalledOpenLimitTilt::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InstalledOpenLimitTilt", 1, value);
+        }
+        case WindowCovering::Attributes::InstalledClosedLimitTilt::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InstalledClosedLimitTilt", 1, value);
+        }
+        case WindowCovering::Attributes::Mode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Mode", 1, value);
+        }
+        case WindowCovering::Attributes::SafetyStatus::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SafetyStatus", 1, value);
+        }
+        case WindowCovering::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case WindowCovering::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case WindowCovering::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+    }
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+
+CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Command " ChipLogFormatMEI, path.mEndpointId,
+                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId));
+
+    switch (path.mClusterId)
+    {
+    case AccountLogin::Id: {
+        switch (path.mCommandId)
+        {
+        case AccountLogin::Commands::GetSetupPINResponse::Id: {
+            AccountLogin::Commands::GetSetupPINResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetSetupPINResponse", 1, value);
+        }
+        }
+    }
+    case ApplicationLauncher::Id: {
+        switch (path.mCommandId)
+        {
+        case ApplicationLauncher::Commands::LauncherResponse::Id: {
+            ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LauncherResponse", 1, value);
+        }
+        }
+    }
+    case Channel::Id: {
+        switch (path.mCommandId)
+        {
+        case Channel::Commands::ChangeChannelResponse::Id: {
+            Channel::Commands::ChangeChannelResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeChannelResponse", 1, value);
+        }
+        }
+    }
+    case ContentLauncher::Id: {
+        switch (path.mCommandId)
+        {
+        case ContentLauncher::Commands::LaunchResponse::Id: {
+            ContentLauncher::Commands::LaunchResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LaunchResponse", 1, value);
+        }
+        }
+    }
+    case DiagnosticLogs::Id: {
+        switch (path.mCommandId)
+        {
+        case DiagnosticLogs::Commands::RetrieveLogsResponse::Id: {
+            DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RetrieveLogsResponse", 1, value);
+        }
+        }
+    }
+    case DoorLock::Id: {
+        switch (path.mCommandId)
+        {
+        case DoorLock::Commands::GetCredentialStatusResponse::Id: {
+            DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetCredentialStatusResponse", 1, value);
+        }
+        case DoorLock::Commands::GetUserResponse::Id: {
+            DoorLock::Commands::GetUserResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetUserResponse", 1, value);
+        }
+        case DoorLock::Commands::SetCredentialResponse::Id: {
+            DoorLock::Commands::SetCredentialResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetCredentialResponse", 1, value);
+        }
+        }
+    }
+    case GeneralCommissioning::Id: {
+        switch (path.mCommandId)
+        {
+        case GeneralCommissioning::Commands::ArmFailSafeResponse::Id: {
+            GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ArmFailSafeResponse", 1, value);
+        }
+        case GeneralCommissioning::Commands::CommissioningCompleteResponse::Id: {
+            GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CommissioningCompleteResponse", 1, value);
+        }
+        case GeneralCommissioning::Commands::SetRegulatoryConfigResponse::Id: {
+            GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetRegulatoryConfigResponse", 1, value);
+        }
+        }
+    }
+    case GroupKeyManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id: {
+            GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("KeySetReadAllIndicesResponse", 1, value);
+        }
+        case GroupKeyManagement::Commands::KeySetReadResponse::Id: {
+            GroupKeyManagement::Commands::KeySetReadResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("KeySetReadResponse", 1, value);
+        }
+        }
+    }
+    case Groups::Id: {
+        switch (path.mCommandId)
+        {
+        case Groups::Commands::AddGroupResponse::Id: {
+            Groups::Commands::AddGroupResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AddGroupResponse", 1, value);
+        }
+        case Groups::Commands::GetGroupMembershipResponse::Id: {
+            Groups::Commands::GetGroupMembershipResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetGroupMembershipResponse", 1, value);
+        }
+        case Groups::Commands::RemoveGroupResponse::Id: {
+            Groups::Commands::RemoveGroupResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RemoveGroupResponse", 1, value);
+        }
+        case Groups::Commands::ViewGroupResponse::Id: {
+            Groups::Commands::ViewGroupResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ViewGroupResponse", 1, value);
+        }
+        }
+    }
+    case Identify::Id: {
+        switch (path.mCommandId)
+        {
+        case Identify::Commands::IdentifyQueryResponse::Id: {
+            Identify::Commands::IdentifyQueryResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IdentifyQueryResponse", 1, value);
+        }
+        }
+    }
+    case KeypadInput::Id: {
+        switch (path.mCommandId)
+        {
+        case KeypadInput::Commands::SendKeyResponse::Id: {
+            KeypadInput::Commands::SendKeyResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SendKeyResponse", 1, value);
+        }
+        }
+    }
+    case MediaPlayback::Id: {
+        switch (path.mCommandId)
+        {
+        case MediaPlayback::Commands::PlaybackResponse::Id: {
+            MediaPlayback::Commands::PlaybackResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PlaybackResponse", 1, value);
+        }
+        }
+    }
+    case NetworkCommissioning::Id: {
+        switch (path.mCommandId)
+        {
+        case NetworkCommissioning::Commands::ConnectNetworkResponse::Id: {
+            NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ConnectNetworkResponse", 1, value);
+        }
+        case NetworkCommissioning::Commands::NetworkConfigResponse::Id: {
+            NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkConfigResponse", 1, value);
+        }
+        case NetworkCommissioning::Commands::ScanNetworksResponse::Id: {
+            NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ScanNetworksResponse", 1, value);
+        }
+        }
+    }
+    case OtaSoftwareUpdateProvider::Id: {
+        switch (path.mCommandId)
+        {
+        case OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id: {
+            OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ApplyUpdateResponse", 1, value);
+        }
+        case OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id: {
+            OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("QueryImageResponse", 1, value);
+        }
+        }
+    }
+    case OperationalCredentials::Id: {
+        switch (path.mCommandId)
+        {
+        case OperationalCredentials::Commands::AttestationResponse::Id: {
+            OperationalCredentials::Commands::AttestationResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttestationResponse", 1, value);
+        }
+        case OperationalCredentials::Commands::CertificateChainResponse::Id: {
+            OperationalCredentials::Commands::CertificateChainResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CertificateChainResponse", 1, value);
+        }
+        case OperationalCredentials::Commands::NOCResponse::Id: {
+            OperationalCredentials::Commands::NOCResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NOCResponse", 1, value);
+        }
+        case OperationalCredentials::Commands::OpCSRResponse::Id: {
+            OperationalCredentials::Commands::OpCSRResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OpCSRResponse", 1, value);
+        }
+        }
+    }
+    case Scenes::Id: {
+        switch (path.mCommandId)
+        {
+        case Scenes::Commands::AddSceneResponse::Id: {
+            Scenes::Commands::AddSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AddSceneResponse", 1, value);
+        }
+        case Scenes::Commands::GetSceneMembershipResponse::Id: {
+            Scenes::Commands::GetSceneMembershipResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetSceneMembershipResponse", 1, value);
+        }
+        case Scenes::Commands::RemoveAllScenesResponse::Id: {
+            Scenes::Commands::RemoveAllScenesResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RemoveAllScenesResponse", 1, value);
+        }
+        case Scenes::Commands::RemoveSceneResponse::Id: {
+            Scenes::Commands::RemoveSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RemoveSceneResponse", 1, value);
+        }
+        case Scenes::Commands::StoreSceneResponse::Id: {
+            Scenes::Commands::StoreSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StoreSceneResponse", 1, value);
+        }
+        case Scenes::Commands::ViewSceneResponse::Id: {
+            Scenes::Commands::ViewSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ViewSceneResponse", 1, value);
+        }
+        }
+    }
+    case TargetNavigator::Id: {
+        switch (path.mCommandId)
+        {
+        case TargetNavigator::Commands::NavigateTargetResponse::Id: {
+            TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NavigateTargetResponse", 1, value);
+        }
+        }
+    }
+    case TestCluster::Id: {
+        switch (path.mCommandId)
+        {
+        case TestCluster::Commands::BooleanResponse::Id: {
+            TestCluster::Commands::BooleanResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BooleanResponse", 1, value);
+        }
+        case TestCluster::Commands::SimpleStructResponse::Id: {
+            TestCluster::Commands::SimpleStructResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SimpleStructResponse", 1, value);
+        }
+        case TestCluster::Commands::TestAddArgumentsResponse::Id: {
+            TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestAddArgumentsResponse", 1, value);
+        }
+        case TestCluster::Commands::TestEmitTestEventResponse::Id: {
+            TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestEmitTestEventResponse", 1, value);
+        }
+        case TestCluster::Commands::TestEnumsResponse::Id: {
+            TestCluster::Commands::TestEnumsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestEnumsResponse", 1, value);
+        }
+        case TestCluster::Commands::TestListInt8UReverseResponse::Id: {
+            TestCluster::Commands::TestListInt8UReverseResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestListInt8UReverseResponse", 1, value);
+        }
+        case TestCluster::Commands::TestNullableOptionalResponse::Id: {
+            TestCluster::Commands::TestNullableOptionalResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestNullableOptionalResponse", 1, value);
+        }
+        case TestCluster::Commands::TestSpecificResponse::Id: {
+            TestCluster::Commands::TestSpecificResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestSpecificResponse", 1, value);
+        }
+        }
+    }
+    case Thermostat::Id: {
+        switch (path.mCommandId)
+        {
+        case Thermostat::Commands::GetRelayStatusLogResponse::Id: {
+            Thermostat::Commands::GetRelayStatusLogResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetRelayStatusLogResponse", 1, value);
+        }
+        case Thermostat::Commands::GetWeeklyScheduleResponse::Id: {
+            Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
+        }
+        }
+    }
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+
+CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI,
+                    header.mPath.mEndpointId, ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
+
+    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, header.mEventNumber);
+
+    if (header.mPriorityLevel == chip::app::PriorityLevel::Info)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Info");
+    }
+    else if (header.mPriorityLevel == chip::app::PriorityLevel::Critical)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Critical");
+    }
+    else if (header.mPriorityLevel == chip::app::PriorityLevel::Debug)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Debug");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "\t Priority: Unknown");
+    }
+
+    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, header.mTimestamp.mValue);
+
+    switch (header.mPath.mClusterId)
+    {
+    case AccessControl::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case AccessControl::Events::AccessControlEntryChanged::Id: {
+            chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AccessControlEntryChanged", 1, value);
+        }
+        case AccessControl::Events::AccessControlExtensionChanged::Id: {
+            chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AccessControlExtensionChanged", 1, value);
+        }
+        }
+    }
+    case Basic::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case Basic::Events::StartUp::Id: {
+            chip::app::Clusters::Basic::Events::StartUp::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUp", 1, value);
+        }
+        case Basic::Events::ShutDown::Id: {
+            chip::app::Clusters::Basic::Events::ShutDown::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ShutDown", 1, value);
+        }
+        case Basic::Events::Leave::Id: {
+            chip::app::Clusters::Basic::Events::Leave::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Leave", 1, value);
+        }
+        case Basic::Events::ReachableChanged::Id: {
+            chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReachableChanged", 1, value);
+        }
+        }
+    }
+    case BooleanState::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case BooleanState::Events::StateChange::Id: {
+            chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StateChange", 1, value);
+        }
+        }
+    }
+    case BridgedActions::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case BridgedActions::Events::StateChanged::Id: {
+            chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StateChanged", 1, value);
+        }
+        case BridgedActions::Events::ActionFailed::Id: {
+            chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActionFailed", 1, value);
+        }
+        }
+    }
+    case DoorLock::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case DoorLock::Events::DoorLockAlarm::Id: {
+            chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DoorLockAlarm", 1, value);
+        }
+        case DoorLock::Events::DoorStateChange::Id: {
+            chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DoorStateChange", 1, value);
+        }
+        case DoorLock::Events::LockOperation::Id: {
+            chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LockOperation", 1, value);
+        }
+        case DoorLock::Events::LockOperationError::Id: {
+            chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LockOperationError", 1, value);
+        }
+        case DoorLock::Events::LockUserChange::Id: {
+            chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LockUserChange", 1, value);
+        }
+        }
+    }
+    case GeneralDiagnostics::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case GeneralDiagnostics::Events::HardwareFaultChange::Id: {
+            chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareFaultChange", 1, value);
+        }
+        case GeneralDiagnostics::Events::RadioFaultChange::Id: {
+            chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RadioFaultChange", 1, value);
+        }
+        case GeneralDiagnostics::Events::NetworkFaultChange::Id: {
+            chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkFaultChange", 1, value);
+        }
+        case GeneralDiagnostics::Events::BootReason::Id: {
+            chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BootReason", 1, value);
+        }
+        }
+    }
+    case OtaSoftwareUpdateRequestor::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case OtaSoftwareUpdateRequestor::Events::StateTransition::Id: {
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StateTransition", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Events::VersionApplied::Id: {
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VersionApplied", 1, value);
+        }
+        case OtaSoftwareUpdateRequestor::Events::DownloadError::Id: {
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DownloadError", 1, value);
+        }
+        }
+    }
+    case PumpConfigurationAndControl::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case PumpConfigurationAndControl::Events::SupplyVoltageLow::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupplyVoltageLow", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::SupplyVoltageHigh::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupplyVoltageHigh", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::PowerMissingPhase::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PowerMissingPhase", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::SystemPressureLow::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SystemPressureLow", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::SystemPressureHigh::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SystemPressureHigh", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::DryRunning::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DryRunning", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::MotorTemperatureHigh::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MotorTemperatureHigh", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::PumpMotorFatalFailure::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PumpMotorFatalFailure", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ElectronicTemperatureHigh", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::PumpBlocked::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PumpBlocked", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::SensorFailure::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensorFailure", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ElectronicNonFatalFailure", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::ElectronicFatalFailure::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ElectronicFatalFailure", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::GeneralFault::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneralFault", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::Leakage::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Leakage", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::AirDetection::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AirDetection", 1, value);
+        }
+        case PumpConfigurationAndControl::Events::TurbineOperation::Id: {
+            chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TurbineOperation", 1, value);
+        }
+        }
+    }
+    case SoftwareDiagnostics::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case SoftwareDiagnostics::Events::SoftwareFault::Id: {
+            chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareFault", 1, value);
+        }
+        }
+    }
+    case Switch::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case Switch::Events::SwitchLatched::Id: {
+            chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SwitchLatched", 1, value);
+        }
+        case Switch::Events::InitialPress::Id: {
+            chip::app::Clusters::Switch::Events::InitialPress::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InitialPress", 1, value);
+        }
+        case Switch::Events::LongPress::Id: {
+            chip::app::Clusters::Switch::Events::LongPress::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LongPress", 1, value);
+        }
+        case Switch::Events::ShortRelease::Id: {
+            chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ShortRelease", 1, value);
+        }
+        case Switch::Events::LongRelease::Id: {
+            chip::app::Clusters::Switch::Events::LongRelease::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LongRelease", 1, value);
+        }
+        case Switch::Events::MultiPressOngoing::Id: {
+            chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MultiPressOngoing", 1, value);
+        }
+        case Switch::Events::MultiPressComplete::Id: {
+            chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MultiPressComplete", 1, value);
+        }
+        }
+    }
+    case TestCluster::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case TestCluster::Events::TestEvent::Id: {
+            chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestEvent", 1, value);
+        }
+        case TestCluster::Events::TestFabricScopedEvent::Id: {
+            chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestFabricScopedEvent", 1, value);
+        }
+        }
+    }
+    case ThreadNetworkDiagnostics::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case ThreadNetworkDiagnostics::Events::ConnectionStatus::Id: {
+            chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ConnectionStatus", 1, value);
+        }
+        }
+    }
+    case WiFiNetworkDiagnostics::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case WiFiNetworkDiagnostics::Events::Disconnection::Id: {
+            chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Disconnection", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Events::AssociationFailure::Id: {
+            chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AssociationFailure", 1, value);
+        }
+        case WiFiNetworkDiagnostics::Events::ConnectionStatus::Id: {
+            chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ConnectionStatus", 1, value);
+        }
+        }
+    }
+    default:
+        return CHIP_NO_ERROR;
+    }
 }
