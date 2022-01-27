@@ -284,10 +284,10 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     keyset.num_keys_used++;
 
     // Epoch Key 1
-    if (!commandData.groupKeySet.epochKey1.IsNull() && !commandData.groupKeySet.epochStartTime1.IsNull() &&
-        !commandData.groupKeySet.epochKey1.Value().empty())
+    if (!commandData.groupKeySet.epochKey1.IsNull())
     {
-        if (commandData.groupKeySet.epochStartTime1.Value() <= commandData.groupKeySet.epochStartTime0.Value())
+        if (commandData.groupKeySet.epochStartTime1.IsNull() ||
+            commandData.groupKeySet.epochStartTime1.Value() <= commandData.groupKeySet.epochStartTime0.Value())
         {
             // If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL contain
             // a later epoch start time than the epoch start time found in the EpochStartTime0 field.
@@ -301,11 +301,10 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     // Epoch Key 2
-    if (!commandData.groupKeySet.epochKey2.IsNull() && !commandData.groupKeySet.epochStartTime2.IsNull() &&
-        !commandData.groupKeySet.epochKey2.Value().empty())
+    if (!commandData.groupKeySet.epochKey2.IsNull())
     {
-        keyset.num_keys_used++;
-        if (commandData.groupKeySet.epochStartTime2.Value() <= commandData.groupKeySet.epochStartTime1.Value())
+        if (commandData.groupKeySet.epochKey1.IsNull() || commandData.groupKeySet.epochStartTime2.IsNull() ||
+            commandData.groupKeySet.epochStartTime2.Value() <= commandData.groupKeySet.epochStartTime1.Value())
         {
             // If the EpochKey2 field is not null then:
             // * The EpochKey1 field SHALL NOT be null
@@ -362,8 +361,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
         return true;
     }
 
-    // In KeySetReadResponse EpochKey0, EpochKey1 and EpochKey2 fields shall be null.
-
+    // In KeySetReadResponse, EpochKey0, EpochKey1 and EpochKey2 key contents shall be null
     GroupKeyManagement::Commands::KeySetReadResponse::Type response;
     response.groupKeySet.groupKeySetID          = keyset.keyset_id;
     response.groupKeySet.groupKeySecurityPolicy = keyset.policy;

@@ -134,14 +134,11 @@ static TestListener sListener;
 
 bool CompareKeySets(const KeySet & keyset1, const KeySet & keyset2)
 {
-    VerifyOrReturnError(keyset1.policy == keyset2.policy, false);
-    VerifyOrReturnError(keyset1.num_keys_used == keyset2.num_keys_used, false);
-    VerifyOrReturnError(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time, false);
-    VerifyOrReturnError(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time, false);
-    VerifyOrReturnError(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time, false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[0].key, EpochKey::kLengthBytes), false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[1].key, EpochKey::kLengthBytes), false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[2].key, EpochKey::kLengthBytes), false);
+    ReturnErrorOnFailure(keyset1.policy == keyset2.policy);
+    ReturnErrorOnFailure(keyset1.num_keys_used == keyset2.num_keys_used);
+    ReturnErrorOnFailure(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time);
+    ReturnErrorOnFailure(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time);
+    ReturnErrorOnFailure(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time);
     return true;
 }
 
@@ -829,11 +826,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(keyset) && count < expected_f1.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f1.count(keyset.keyset_id) > 0);
-            NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f1[keyset.keyset_id].keyset_id);
-            NL_TEST_ASSERT(apSuite, keyset.policy == expected_f1[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, expected_f1[keyset.keyset_id]));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f1.size());
@@ -854,11 +847,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(keyset) && count < expected_f2.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f2.count(keyset.keyset_id) > 0);
-            NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f2[keyset.keyset_id].keyset_id);
-            NL_TEST_ASSERT(apSuite, keyset.policy == expected_f2[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, expected_f2[keyset.keyset_id]));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f2.size());

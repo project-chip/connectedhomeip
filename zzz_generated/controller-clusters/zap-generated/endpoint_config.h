@@ -97,7 +97,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Access Control (client) */                                                                    \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                  \
-              ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
+              ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */                                                                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Actions (client) */                                                                   \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */          \
