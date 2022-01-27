@@ -48990,6 +48990,8 @@ private:
 | * NullableRangeRestrictedInt8s                                      | 0x8027 |
 | * NullableRangeRestrictedInt16u                                     | 0x8028 |
 | * NullableRangeRestrictedInt16s                                     | 0x8029 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -56884,6 +56886,150 @@ public:
     static void OnValueReport(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
     {
         LogValue("TestCluster.NullableRangeRestrictedInt16s report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ServerGeneratedCommandList
+ */
+class ReadTestClusterServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadTestClusterServerGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.ServerGeneratedCommandList response", value);
+    }
+};
+
+class ReportTestClusterServerGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportTestClusterServerGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("TestCluster.ServerGeneratedCommandList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClientGeneratedCommandList
+ */
+class ReadTestClusterClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReadTestClusterClientGeneratedCommandList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.ClientGeneratedCommandList response", value);
+    }
+};
+
+class ReportTestClusterClientGeneratedCommandList : public ModelCommand
+{
+public:
+    ReportTestClusterClientGeneratedCommandList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+    {
+        LogValue("TestCluster.ClientGeneratedCommandList report", 0, value);
     }
 
 private:
@@ -71096,6 +71242,10 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableRangeRestrictedInt16s>(),       //
         make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(),      //
         make_unique<ReportTestClusterNullableRangeRestrictedInt16s>(),     //
+        make_unique<ReadTestClusterServerGeneratedCommandList>(),          //
+        make_unique<ReportTestClusterServerGeneratedCommandList>(),        //
+        make_unique<ReadTestClusterClientGeneratedCommandList>(),          //
+        make_unique<ReportTestClusterClientGeneratedCommandList>(),        //
         make_unique<ReadTestClusterAttributeList>(),                       //
         make_unique<ReportTestClusterAttributeList>(),                     //
         make_unique<ReadTestClusterClusterRevision>(),                     //

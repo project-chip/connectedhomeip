@@ -8208,6 +8208,40 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readNullableRangeRestrictedInt16sAttribute",
         readTestClusterNullableRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterServerGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterServerGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readServerGeneratedCommandListAttribute(
+                      (ChipClusters.TestClusterCluster.ServerGeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTestClusterClusterServerGeneratedCommandListAttributeCallback(),
+            readTestClusterServerGeneratedCommandListCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readServerGeneratedCommandListAttribute",
+        readTestClusterServerGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterClientGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterClientGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readClientGeneratedCommandListAttribute(
+                      (ChipClusters.TestClusterCluster.ClientGeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTestClusterClusterClientGeneratedCommandListAttributeCallback(),
+            readTestClusterClientGeneratedCommandListCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readClientGeneratedCommandListAttribute",
+        readTestClusterClientGeneratedCommandListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterAttributeListAttributeInteractionInfo =

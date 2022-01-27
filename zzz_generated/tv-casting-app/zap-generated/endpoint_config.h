@@ -1501,7 +1501,7 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
 
-#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::Command *) (&generatedCommands[index]))
+#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
@@ -1555,100 +1555,100 @@
 #define GENERATED_COMMANDS { \
 /* Endpoint: 0, Cluster: Descriptor (server) */\
 /* Endpoint: 0, Cluster: Binding (server) */\
-/*   incoming_server */ 0x00000000 /* Bind */ , 0x00000001 /* Unbind */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Bind */ , 0x00000001 /* Unbind */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Basic (server) */\
 /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */\
-/*   incoming_server */ 0x00000000 /* QueryImage */ , 0x00000002 /* ApplyUpdateRequest */ , 0x00000004 /* NotifyUpdateApplied */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* QueryImageResponse */ , 0x00000003 /* ApplyUpdateResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* QueryImage */ , 0x00000002 /* ApplyUpdateRequest */ , 0x00000004 /* NotifyUpdateApplied */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* QueryImageResponse */ , 0x00000003 /* ApplyUpdateResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Localization Configuration (server) */\
 /* Endpoint: 0, Cluster: Time Format Localization (server) */\
 /* Endpoint: 0, Cluster: General Commissioning (server) */\
-/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000003 /* SetRegulatoryConfigResponse */ , 0x00000004 /* CommissioningComplete */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000003 /* SetRegulatoryConfigResponse */ , 0x00000004 /* CommissioningComplete */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Network Commissioning (server) */\
-/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Diagnostic Logs (server) */\
-/*   incoming_server */ 0x00000000 /* RetrieveLogsRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* RetrieveLogsRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: General Diagnostics (server) */\
 /* Endpoint: 0, Cluster: Software Diagnostics (server) */\
-/*   incoming_server */ 0x00000000 /* ResetWatermarks */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ResetWatermarks */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */\
 /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */\
 /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */\
-/*   incoming_server */ 0x00000000 /* ResetCounts */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ResetCounts */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */\
-/*   incoming_server */ 0x00000000 /* OpenCommissioningWindow */ , 0x00000001 /* OpenBasicCommissioningWindow */ , 0x00000002 /* RevokeCommissioning */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* OpenCommissioningWindow */ , 0x00000001 /* OpenBasicCommissioningWindow */ , 0x00000002 /* RevokeCommissioning */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Operational Credentials (server) */\
-/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000007 /* UpdateNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , 0x0000000C /* RemoveTrustedRootCertificate */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000007 /* UpdateNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , 0x0000000C /* RemoveTrustedRootCertificate */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Group Key Management (server) */\
 /* Endpoint: 0, Cluster: Fixed Label (server) */\
 /* Endpoint: 0, Cluster: User Label (server) */\
 /* Endpoint: 0, Cluster: Relative Humidity Measurement (server) */\
 /* Endpoint: 1, Cluster: Identify (server) */\
-/*   incoming_server */ 0x00000000 /* Identify */ , 0x00000001 /* IdentifyQuery */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* IdentifyQueryResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Identify */ , 0x00000001 /* IdentifyQuery */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* IdentifyQueryResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Groups (server) */\
-/*   incoming_server */ 0x00000000 /* AddGroup */ , 0x00000001 /* ViewGroup */ , 0x00000002 /* GetGroupMembership */ , 0x00000003 /* RemoveGroup */ , 0x00000004 /* RemoveAllGroups */ , 0x00000005 /* AddGroupIfIdentifying */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* AddGroupResponse */ , 0x00000001 /* ViewGroupResponse */ , 0x00000002 /* GetGroupMembershipResponse */ , 0x00000003 /* RemoveGroupResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AddGroup */ , 0x00000001 /* ViewGroup */ , 0x00000002 /* GetGroupMembership */ , 0x00000003 /* RemoveGroup */ , 0x00000004 /* RemoveAllGroups */ , 0x00000005 /* AddGroupIfIdentifying */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* AddGroupResponse */ , 0x00000001 /* ViewGroupResponse */ , 0x00000002 /* GetGroupMembershipResponse */ , 0x00000003 /* RemoveGroupResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Scenes (server) */\
-/*   incoming_server */ 0x00000000 /* AddScene */ , 0x00000001 /* ViewScene */ , 0x00000002 /* RemoveScene */ , 0x00000003 /* RemoveAllScenes */ , 0x00000004 /* StoreScene */ , 0x00000005 /* RecallScene */ , 0x00000006 /* GetSceneMembership */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* AddSceneResponse */ , 0x00000001 /* ViewSceneResponse */ , 0x00000002 /* RemoveSceneResponse */ , 0x00000003 /* RemoveAllScenesResponse */ , 0x00000004 /* StoreSceneResponse */ , 0x00000006 /* GetSceneMembershipResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AddScene */ , 0x00000001 /* ViewScene */ , 0x00000002 /* RemoveScene */ , 0x00000003 /* RemoveAllScenes */ , 0x00000004 /* StoreScene */ , 0x00000005 /* RecallScene */ , 0x00000006 /* GetSceneMembership */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* AddSceneResponse */ , 0x00000001 /* ViewSceneResponse */ , 0x00000002 /* RemoveSceneResponse */ , 0x00000003 /* RemoveAllScenesResponse */ , 0x00000004 /* StoreSceneResponse */ , 0x00000006 /* GetSceneMembershipResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: On/Off (server) */\
-/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Level Control (server) */\
-/*   incoming_server */ 0x00000000 /* MoveToLevel */ , 0x00000001 /* Move */ , 0x00000002 /* Step */ , 0x00000003 /* Stop */ , 0x00000004 /* MoveToLevelWithOnOff */ , 0x00000005 /* MoveWithOnOff */ , 0x00000006 /* StepWithOnOff */ , 0x00000007 /* StopWithOnOff */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* MoveToLevel */ , 0x00000001 /* Move */ , 0x00000002 /* Step */ , 0x00000003 /* Stop */ , 0x00000004 /* MoveToLevelWithOnOff */ , 0x00000005 /* MoveWithOnOff */ , 0x00000006 /* StepWithOnOff */ , 0x00000007 /* StopWithOnOff */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Binary Input (Basic) (server) */\
 /* Endpoint: 1, Cluster: Descriptor (server) */\
 /* Endpoint: 1, Cluster: Binding (server) */\
-/*   incoming_server */ 0x00000000 /* Bind */ , 0x00000001 /* Unbind */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Bind */ , 0x00000001 /* Unbind */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Bridged Device Basic (server) */\
-/*   incoming_client */ 0x00000003 /* ReachableChanged */ , 0xffffffff /* end of list */, \
+/*   incoming_client */ 0x00000003 /* ReachableChanged */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Switch (server) */\
 /* Endpoint: 1, Cluster: Fixed Label (server) */\
 /* Endpoint: 1, Cluster: Door Lock (server) */\
-/*   incoming_server */ 0x00000000 /* LockDoor */ , 0x00000001 /* UnlockDoor */ , 0x0000001A /* SetUser */ , 0x0000001B /* GetUser */ , 0x0000001D /* ClearUser */ , 0x00000022 /* SetCredential */ , 0x00000024 /* GetCredentialStatus */ , 0x00000026 /* ClearCredential */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* LockDoor */ , 0x00000001 /* UnlockDoor */ , 0x0000001A /* SetUser */ , 0x0000001B /* GetUser */ , 0x0000001D /* ClearUser */ , 0x00000022 /* SetCredential */ , 0x00000024 /* GetCredentialStatus */ , 0x00000026 /* ClearCredential */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Window Covering (server) */\
-/*   incoming_server */ 0x00000000 /* UpOrOpen */ , 0x00000001 /* DownOrClose */ , 0x00000002 /* StopMotion */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* UpOrOpen */ , 0x00000001 /* DownOrClose */ , 0x00000002 /* StopMotion */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Barrier Control (server) */\
-/*   incoming_server */ 0x00000000 /* BarrierControlGoToPercent */ , 0x00000001 /* BarrierControlStop */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* BarrierControlGoToPercent */ , 0x00000001 /* BarrierControlStop */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Thermostat (server) */\
-/*   incoming_server */ 0x00000000 /* SetpointRaiseLower */ , 0x00000000 /* GetWeeklyScheduleResponse */ , 0x00000001 /* GetRelayStatusLogResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* SetpointRaiseLower */ , 0x00000000 /* GetWeeklyScheduleResponse */ , 0x00000001 /* GetRelayStatusLogResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Color Control (server) */\
-/*   incoming_server */ 0x00000000 /* MoveToHue */ , 0x00000001 /* MoveHue */ , 0x00000002 /* StepHue */ , 0x00000003 /* MoveToSaturation */ , 0x00000004 /* MoveSaturation */ , 0x00000005 /* StepSaturation */ , 0x00000006 /* MoveToHueAndSaturation */ , 0x00000007 /* MoveToColor */ , 0x00000008 /* MoveColor */ , 0x00000009 /* StepColor */ , 0x0000000A /* MoveToColorTemperature */ , 0x00000047 /* StopMoveStep */ , 0x0000004B /* MoveColorTemperature */ , 0x0000004C /* StepColorTemperature */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* MoveToHue */ , 0x00000001 /* MoveHue */ , 0x00000002 /* StepHue */ , 0x00000003 /* MoveToSaturation */ , 0x00000004 /* MoveSaturation */ , 0x00000005 /* StepSaturation */ , 0x00000006 /* MoveToHueAndSaturation */ , 0x00000007 /* MoveToColor */ , 0x00000008 /* MoveColor */ , 0x00000009 /* StepColor */ , 0x0000000A /* MoveToColorTemperature */ , 0x00000047 /* StopMoveStep */ , 0x0000004B /* MoveColorTemperature */ , 0x0000004C /* StepColorTemperature */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Temperature Measurement (server) */\
 /* Endpoint: 1, Cluster: Pressure Measurement (server) */\
 /* Endpoint: 1, Cluster: Flow Measurement (server) */\
 /* Endpoint: 1, Cluster: Relative Humidity Measurement (server) */\
 /* Endpoint: 1, Cluster: IAS Zone (server) */\
-/*   incoming_server */ 0x00000000 /* ZoneEnrollResponse */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* ZoneStatusChangeNotification */ , 0x00000001 /* ZoneEnrollRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ZoneEnrollResponse */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* ZoneStatusChangeNotification */ , 0x00000001 /* ZoneEnrollRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Wake on LAN (server) */\
 /* Endpoint: 1, Cluster: Channel (client) */\
-/*   incoming_server */ 0x00000000 /* ChangeChannelRequest */ , 0x00000002 /* ChangeChannelByNumberRequest */ , 0x00000003 /* SkipChannelRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ChangeChannelRequest */ , 0x00000002 /* ChangeChannelByNumberRequest */ , 0x00000003 /* SkipChannelRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Target Navigator (client) */\
-/*   incoming_server */ 0x00000000 /* NavigateTargetRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* NavigateTargetRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Media Playback (client) */\
-/*   incoming_server */ 0x00000000 /* PlayRequest */ , 0x00000001 /* PauseRequest */ , 0x00000002 /* StopRequest */ , 0x00000003 /* StartOverRequest */ , 0x00000004 /* PreviousRequest */ , 0x00000005 /* NextRequest */ , 0x00000006 /* RewindRequest */ , 0x00000007 /* FastForwardRequest */ , 0x00000008 /* SkipForwardRequest */ , 0x00000009 /* SkipBackwardRequest */ , 0x0000000B /* SeekRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* PlayRequest */ , 0x00000001 /* PauseRequest */ , 0x00000002 /* StopRequest */ , 0x00000003 /* StartOverRequest */ , 0x00000004 /* PreviousRequest */ , 0x00000005 /* NextRequest */ , 0x00000006 /* RewindRequest */ , 0x00000007 /* FastForwardRequest */ , 0x00000008 /* SkipForwardRequest */ , 0x00000009 /* SkipBackwardRequest */ , 0x0000000B /* SeekRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Media Input (client) */\
-/*   incoming_server */ 0x00000000 /* SelectInputRequest */ , 0x00000001 /* ShowInputStatusRequest */ , 0x00000002 /* HideInputStatusRequest */ , 0x00000003 /* RenameInputRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* SelectInputRequest */ , 0x00000001 /* ShowInputStatusRequest */ , 0x00000002 /* HideInputStatusRequest */ , 0x00000003 /* RenameInputRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Keypad Input (client) */\
-/*   incoming_server */ 0x00000000 /* SendKeyRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* SendKeyRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Content Launcher (client) */\
-/*   incoming_server */ 0x00000000 /* LaunchContentRequest */ , 0x00000001 /* LaunchURLRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* LaunchContentRequest */ , 0x00000001 /* LaunchURLRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Audio Output (client) */\
-/*   incoming_server */ 0x00000000 /* SelectOutputRequest */ , 0x00000001 /* RenameOutputRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* SelectOutputRequest */ , 0x00000001 /* RenameOutputRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Application Launcher (client) */\
-/*   incoming_server */ 0x00000000 /* LaunchAppRequest */ , 0x00000001 /* StopAppRequest */ , 0x00000002 /* HideAppRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* LaunchAppRequest */ , 0x00000001 /* StopAppRequest */ , 0x00000002 /* HideAppRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Application Basic (client) */\
 /* Endpoint: 1, Cluster: Account Login (client) */\
-/*   incoming_server */ 0x00000000 /* GetSetupPINRequest */ , 0x00000002 /* LoginRequest */ , 0x00000003 /* LogoutRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* GetSetupPINRequest */ , 0x00000002 /* LoginRequest */ , 0x00000003 /* LogoutRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Test Cluster (server) */\
-/*   incoming_server */ 0x00000000 /* Test */ , 0x00000001 /* TestNotHandled */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* TestSpecificResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Test */ , 0x00000001 /* TestNotHandled */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* TestSpecificResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 2, Cluster: On/Off (server) */\
-/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 2, Cluster: Descriptor (server) */\
 /* Endpoint: 2, Cluster: Occupancy Sensing (server) */\
 }

@@ -37091,6 +37091,78 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestCluster_000476_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read ClientGeneratedCommandList attribure"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"read ClientGeneratedCommandList attribure Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 17);
+            XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
+            XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
+            XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
+            XCTAssertEqual([actualValue[3] unsignedIntValue], 4UL);
+            XCTAssertEqual([actualValue[4] unsignedIntValue], 7UL);
+            XCTAssertEqual([actualValue[5] unsignedIntValue], 8UL);
+            XCTAssertEqual([actualValue[6] unsignedIntValue], 9UL);
+            XCTAssertEqual([actualValue[7] unsignedIntValue], 10UL);
+            XCTAssertEqual([actualValue[8] unsignedIntValue], 11UL);
+            XCTAssertEqual([actualValue[9] unsignedIntValue], 12UL);
+            XCTAssertEqual([actualValue[10] unsignedIntValue], 13UL);
+            XCTAssertEqual([actualValue[11] unsignedIntValue], 14UL);
+            XCTAssertEqual([actualValue[12] unsignedIntValue], 15UL);
+            XCTAssertEqual([actualValue[13] unsignedIntValue], 17UL);
+            XCTAssertEqual([actualValue[14] unsignedIntValue], 18UL);
+            XCTAssertEqual([actualValue[15] unsignedIntValue], 19UL);
+            XCTAssertEqual([actualValue[16] unsignedIntValue], 20UL);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000477_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read ServerGeneratedCommandList attribure"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"read ServerGeneratedCommandList attribure Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 7);
+            XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
+            XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
+            XCTAssertEqual([actualValue[2] unsignedIntValue], 4UL);
+            XCTAssertEqual([actualValue[3] unsignedIntValue], 5UL);
+            XCTAssertEqual([actualValue[4] unsignedIntValue], 6UL);
+            XCTAssertEqual([actualValue[5] unsignedIntValue], 9UL);
+            XCTAssertEqual([actualValue[6] unsignedIntValue], 10UL);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestSaveAs_000000_WaitForCommissionee
 {

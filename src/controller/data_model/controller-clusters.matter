@@ -2981,6 +2981,8 @@ client cluster TestCluster = 1295 {
   attribute nullable int8s nullableRangeRestrictedInt8s = 32807;
   attribute nullable int16u nullableRangeRestrictedInt16u = 32808;
   attribute nullable int16s nullableRangeRestrictedInt16s = 32809;
+  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
+  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 

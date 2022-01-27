@@ -4186,6 +4186,50 @@ void TestClusterClusterListLongOctetStringListAttributeFilter(TLV::TLVReader * t
     cb->mCall(cb->mContext, list);
 }
 
+void TestClusterClusterServerGeneratedCommandListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                     Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::CommandId> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<TestClusterServerGeneratedCommandListListAttributeCallback> * cb =
+        Callback::Callback<TestClusterServerGeneratedCommandListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void TestClusterClusterClientGeneratedCommandListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                     Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::CommandId> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<TestClusterClientGeneratedCommandListListAttributeCallback> * cb =
+        Callback::Callback<TestClusterClientGeneratedCommandListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void TestClusterClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {

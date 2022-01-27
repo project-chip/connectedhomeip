@@ -1324,6 +1324,10 @@ typedef void (*CHIPTestClusterClusterNullableRangeRestrictedInt16uAttributeCallb
     void *, chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableRangeRestrictedInt16sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterServerGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPTestClusterClusterClientGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(

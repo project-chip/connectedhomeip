@@ -6639,6 +6639,64 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPTestClusterServerGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TestClusterServerGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPTestClusterServerGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterServerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPTestClusterServerGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPTestClusterServerGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPTestClusterServerGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTestClusterServerGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTestClusterClientGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TestClusterClientGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPTestClusterClientGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClientGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPTestClusterClientGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPTestClusterClientGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPTestClusterClientGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTestClusterClientGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPTestClusterAttributeListListAttributeCallbackBridge
     : public CHIPCallbackBridge<TestClusterAttributeListListAttributeCallback>
 {

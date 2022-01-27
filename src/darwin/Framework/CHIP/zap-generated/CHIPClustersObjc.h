@@ -5547,6 +5547,24 @@ NS_ASSUME_NONNULL_BEGIN
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval

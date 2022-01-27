@@ -215,7 +215,7 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
 
-#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::Command *) (&generatedCommands[index]))
+#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
@@ -231,19 +231,19 @@
 // clang-format off
 #define GENERATED_COMMANDS { \
 /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */\
-/*   incoming_server */ 0x00000000 /* QueryImage */ , 0x00000002 /* ApplyUpdateRequest */ , 0x00000004 /* NotifyUpdateApplied */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* QueryImageResponse */ , 0x00000003 /* ApplyUpdateResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* QueryImage */ , 0x00000002 /* ApplyUpdateRequest */ , 0x00000004 /* NotifyUpdateApplied */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* QueryImageResponse */ , 0x00000003 /* ApplyUpdateResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Localization Configuration (server) */\
 /* Endpoint: 0, Cluster: Time Format Localization (server) */\
 /* Endpoint: 0, Cluster: General Commissioning (server) */\
-/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000004 /* CommissioningComplete */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000004 /* CommissioningComplete */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Network Commissioning (server) */\
-/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Operational Credentials (server) */\
-/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Fixed Label (server) */\
 /* Endpoint: 0, Cluster: User Label (server) */\
 }

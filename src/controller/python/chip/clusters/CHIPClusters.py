@@ -5342,6 +5342,18 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000FFF8: {
+                    "attributeName": "ServerGeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "ClientGeneratedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,

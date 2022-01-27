@@ -23920,6 +23920,70 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler
+{
+    new CHIPTestClusterServerGeneratedCommandListListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo;
+            auto successFn = Callback<TestClusterServerGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler
+{
+    new CHIPTestClusterServerGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo;
+            auto successFn = Callback<TestClusterServerGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval,
+                CHIPTestClusterServerGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler
+{
+    new CHIPTestClusterClientGeneratedCommandListListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo;
+            auto successFn = Callback<TestClusterClientGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler
+{
+    new CHIPTestClusterClientGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo;
+            auto successFn = Callback<TestClusterClientGeneratedCommandListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval,
+                CHIPTestClusterClientGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {

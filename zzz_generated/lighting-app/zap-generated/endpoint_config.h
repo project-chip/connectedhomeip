@@ -948,7 +948,7 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
 
-#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::Command *) (&generatedCommands[index]))
+#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
@@ -986,58 +986,58 @@
 // clang-format off
 #define GENERATED_COMMANDS { \
 /* Endpoint: 0, Cluster: Groups (server) */\
-/*   incoming_server */ 0x00000000 /* AddGroup */ , 0x00000001 /* ViewGroup */ , 0x00000002 /* GetGroupMembership */ , 0x00000003 /* RemoveGroup */ , 0x00000004 /* RemoveAllGroups */ , 0x00000005 /* AddGroupIfIdentifying */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* AddGroupResponse */ , 0x00000001 /* ViewGroupResponse */ , 0x00000002 /* GetGroupMembershipResponse */ , 0x00000003 /* RemoveGroupResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AddGroup */ , 0x00000001 /* ViewGroup */ , 0x00000002 /* GetGroupMembership */ , 0x00000003 /* RemoveGroup */ , 0x00000004 /* RemoveAllGroups */ , 0x00000005 /* AddGroupIfIdentifying */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* AddGroupResponse */ , 0x00000001 /* ViewGroupResponse */ , 0x00000002 /* GetGroupMembershipResponse */ , 0x00000003 /* RemoveGroupResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Descriptor (server) */\
 /* Endpoint: 0, Cluster: Basic (server) */\
 /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */\
-/*   incoming_server */ 0x00000000 /* QueryImage */ , 0x00000002 /* ApplyUpdateRequest */ , 0x00000004 /* NotifyUpdateApplied */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* QueryImageResponse */ , 0x00000003 /* ApplyUpdateResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* QueryImage */ , 0x00000002 /* ApplyUpdateRequest */ , 0x00000004 /* NotifyUpdateApplied */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* QueryImageResponse */ , 0x00000003 /* ApplyUpdateResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */\
-/*   incoming_server */ 0x00000000 /* AnnounceOtaProvider */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AnnounceOtaProvider */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Localization Configuration (server) */\
 /* Endpoint: 0, Cluster: Time Format Localization (server) */\
 /* Endpoint: 0, Cluster: General Commissioning (server) */\
-/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000004 /* CommissioningComplete */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000004 /* CommissioningComplete */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Network Commissioning (server) */\
-/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Diagnostic Logs (server) */\
-/*   incoming_server */ 0x00000000 /* RetrieveLogsRequest */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* RetrieveLogsRequest */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: General Diagnostics (server) */\
 /* Endpoint: 0, Cluster: Software Diagnostics (server) */\
-/*   incoming_server */ 0x00000000 /* ResetWatermarks */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ResetWatermarks */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */\
-/*   incoming_server */ 0x00000000 /* ResetCounts */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ResetCounts */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */\
-/*   incoming_server */ 0x00000000 /* ResetCounts */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ResetCounts */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */\
-/*   incoming_server */ 0x00000000 /* ResetCounts */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* ResetCounts */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Switch (server) */\
 /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */\
-/*   incoming_server */ 0x00000000 /* OpenCommissioningWindow */ , 0x00000001 /* OpenBasicCommissioningWindow */ , 0x00000002 /* RevokeCommissioning */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* OpenCommissioningWindow */ , 0x00000001 /* OpenBasicCommissioningWindow */ , 0x00000002 /* RevokeCommissioning */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Operational Credentials (server) */\
-/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000007 /* UpdateNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , 0x0000000C /* RemoveTrustedRootCertificate */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000007 /* UpdateNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , 0x0000000C /* RemoveTrustedRootCertificate */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 0, Cluster: Fixed Label (server) */\
 /* Endpoint: 0, Cluster: User Label (server) */\
 /* Endpoint: 1, Cluster: Identify (server) */\
-/*   incoming_server */ 0x00000000 /* Identify */ , 0x00000001 /* IdentifyQuery */ , 0x00000040 /* TriggerEffect */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* IdentifyQueryResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Identify */ , 0x00000001 /* IdentifyQuery */ , 0x00000040 /* TriggerEffect */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* IdentifyQueryResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Groups (server) */\
-/*   incoming_server */ 0x00000000 /* AddGroup */ , 0x00000001 /* ViewGroup */ , 0x00000002 /* GetGroupMembership */ , 0x00000003 /* RemoveGroup */ , 0x00000004 /* RemoveAllGroups */ , 0x00000005 /* AddGroupIfIdentifying */ , 0xffffffff /* end of list */, \
-/*   incoming_client */ 0x00000000 /* AddGroupResponse */ , 0x00000001 /* ViewGroupResponse */ , 0x00000002 /* GetGroupMembershipResponse */ , 0x00000003 /* RemoveGroupResponse */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* AddGroup */ , 0x00000001 /* ViewGroup */ , 0x00000002 /* GetGroupMembership */ , 0x00000003 /* RemoveGroup */ , 0x00000004 /* RemoveAllGroups */ , 0x00000005 /* AddGroupIfIdentifying */ , chip::kInvalidCommandId /* end of list */, \
+/*   incoming_client */ 0x00000000 /* AddGroupResponse */ , 0x00000001 /* ViewGroupResponse */ , 0x00000002 /* GetGroupMembershipResponse */ , 0x00000003 /* RemoveGroupResponse */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: On/Off (server) */\
-/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , 0x00000040 /* OffWithEffect */ , 0x00000041 /* OnWithRecallGlobalScene */ , 0x00000042 /* OnWithTimedOff */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , 0x00000040 /* OffWithEffect */ , 0x00000041 /* OnWithRecallGlobalScene */ , 0x00000042 /* OnWithTimedOff */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Level Control (server) */\
-/*   incoming_server */ 0x00000000 /* MoveToLevel */ , 0x00000001 /* Move */ , 0x00000002 /* Step */ , 0x00000003 /* Stop */ , 0x00000004 /* MoveToLevelWithOnOff */ , 0x00000005 /* MoveWithOnOff */ , 0x00000006 /* StepWithOnOff */ , 0x00000007 /* StopWithOnOff */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* MoveToLevel */ , 0x00000001 /* Move */ , 0x00000002 /* Step */ , 0x00000003 /* Stop */ , 0x00000004 /* MoveToLevelWithOnOff */ , 0x00000005 /* MoveWithOnOff */ , 0x00000006 /* StepWithOnOff */ , 0x00000007 /* StopWithOnOff */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Descriptor (server) */\
 /* Endpoint: 1, Cluster: Color Control (server) */\
-/*   incoming_server */ 0x00000000 /* MoveToHue */ , 0x00000001 /* MoveHue */ , 0x00000002 /* StepHue */ , 0x00000003 /* MoveToSaturation */ , 0x00000004 /* MoveSaturation */ , 0x00000005 /* StepSaturation */ , 0x00000006 /* MoveToHueAndSaturation */ , 0x00000007 /* MoveToColor */ , 0x00000008 /* MoveColor */ , 0x00000009 /* StepColor */ , 0x0000000A /* MoveToColorTemperature */ , 0x00000040 /* EnhancedMoveToHue */ , 0x00000041 /* EnhancedMoveHue */ , 0x00000042 /* EnhancedStepHue */ , 0x00000043 /* EnhancedMoveToHueAndSaturation */ , 0x00000044 /* ColorLoopSet */ , 0x00000047 /* StopMoveStep */ , 0x0000004B /* MoveColorTemperature */ , 0x0000004C /* StepColorTemperature */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* MoveToHue */ , 0x00000001 /* MoveHue */ , 0x00000002 /* StepHue */ , 0x00000003 /* MoveToSaturation */ , 0x00000004 /* MoveSaturation */ , 0x00000005 /* StepSaturation */ , 0x00000006 /* MoveToHueAndSaturation */ , 0x00000007 /* MoveToColor */ , 0x00000008 /* MoveColor */ , 0x00000009 /* StepColor */ , 0x0000000A /* MoveToColorTemperature */ , 0x00000040 /* EnhancedMoveToHue */ , 0x00000041 /* EnhancedMoveHue */ , 0x00000042 /* EnhancedStepHue */ , 0x00000043 /* EnhancedMoveToHueAndSaturation */ , 0x00000044 /* ColorLoopSet */ , 0x00000047 /* StopMoveStep */ , 0x0000004B /* MoveColorTemperature */ , 0x0000004C /* StepColorTemperature */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 1, Cluster: Occupancy Sensing (server) */\
 /* Endpoint: 2, Cluster: On/Off (client) */\
-/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , 0xffffffff /* end of list */, \
+/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , chip::kInvalidCommandId /* end of list */, \
 /* Endpoint: 2, Cluster: On/off Switch Configuration (server) */\
 }
 

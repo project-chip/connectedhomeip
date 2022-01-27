@@ -1051,6 +1051,16 @@ void TestClusterClusterListLongOctetStringListAttributeFilter(chip::TLV::TLVRead
                                                               chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TestClusterListLongOctetStringListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+void TestClusterClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                     chip::Callback::Cancelable * onSuccessCallback,
+                                                                     chip::Callback::Cancelable * onFailureCallback);
+typedef void (*TestClusterServerGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+void TestClusterClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                     chip::Callback::Cancelable * onSuccessCallback,
+                                                                     chip::Callback::Cancelable * onFailureCallback);
+typedef void (*TestClusterClientGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void TestClusterClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                         chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
