@@ -770,6 +770,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
  */
 void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
+    emberAfWindowCoveringClusterPrint("Window Covering ServerAttributeChanged A");
     PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }
 
