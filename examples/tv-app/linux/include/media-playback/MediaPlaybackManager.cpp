@@ -35,12 +35,13 @@ uint64_t MediaPlaybackManager::HandleGetDuration()
     return 0;
 }
 
-Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
+CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
     Structs::PlaybackPosition::Type sampledPosition;
     sampledPosition.updatedAt = 0;
     sampledPosition.position  = 0;
-    return sampledPosition;
+
+    return aEncoder.Encode(sampledPosition);
 }
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
@@ -58,90 +59,93 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
     return 0;
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
+void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePause()
+void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStop()
+void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleFastForward()
+void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePrevious()
+void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleRewind()
+void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipBackward(const uint64_t & deltaPositionMilliseconds)
+void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                              const uint64_t & deltaPositionMilliseconds)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipForward(const uint64_t & deltaPositionMilliseconds)
+void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const uint64_t & deltaPositionMilliseconds)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSeekRequest(const uint64_t & positionMilliseconds)
+void MediaPlaybackManager::HandleSeekRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const uint64_t & positionMilliseconds)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleNext()
+void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStartOverRequest()
+void MediaPlaybackManager::HandleStartOverRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }

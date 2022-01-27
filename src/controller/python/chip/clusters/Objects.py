@@ -12671,12 +12671,12 @@ class OperationalCredentials(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="noc", Tag=1, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="icac", Tag=2, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="icac", Tag=2, Type=typing.Union[Nullable, bytes]),
                     ])
 
             fabricIndex: 'uint' = 0
             noc: 'bytes' = b""
-            icac: 'bytes' = b""
+            icac: 'typing.Union[Nullable, bytes]' = NullValue
 
 
 

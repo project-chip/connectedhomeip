@@ -55,9 +55,6 @@ struct SetupParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    FabricIndex fabricIndex = kMinValidFabricIndex;
-    FabricId fabricId       = kUndefinedFabricId;
-
     uint16_t controllerVendorId;
 
     // The Device Pairing Delegated used to initialize a Commissioner
