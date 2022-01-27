@@ -835,14 +835,20 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), device->GetMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
-    exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
-    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
-
     err = mIDAllocator.Allocate(keyID);
     SuccessOrExit(err);
 
     // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
     device->SetActive(true);
+
+    // Allocate the exchange immediately before calling PASESession::Pair.
+    //
+    // PASESession::Pair takes ownership of the exchange and will free it on
+    // error, but can only do this if it is actually called.  Allocating the
+    // exchange context right before calling Pair ensures that if allocation
+    // succeeds, PASESession has taken ownership.
+    exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
+    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID,
                                     Optional<ReliableMessageProtocolConfig>::Value(mMRPConfig), exchangeCtxt, this);
