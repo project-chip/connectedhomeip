@@ -153,7 +153,7 @@ protected:
         void SetKey(const ByteSpan & key, uint16_t hash)
         {
             mKeyHash = hash;
-            memcpy(mKeyValue, key.data(), std::min(key.size(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
+            memcpy(mKeyValue, key.data(), std::min(key.size(), sizeof(mKeyValue)));
         }
 
         uint16_t GetKeyHash() override { return mKeyHash; }

@@ -1601,9 +1601,10 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        MutableByteSpan key(keyset.operational_keys[i].value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key));
-        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key, keyset.operational_keys[i].hash));
+        uint8_t key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+        MutableByteSpan key_span(key, sizeof(key));
+        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key_span));
+        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(ByteSpan(key, sizeof(key)), keyset.operational_keys[i].hash));
     }
 
     if (found)
