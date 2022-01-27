@@ -50,9 +50,9 @@ void RegisterAppShellCommands(void)
         .cmd_help = "App commands",
     };
 
-    sAppSubcommands.RegisterCommands(sAppSubCommands, ArraySize(sAppSubCommands), "app");
+    sAppSubcommands.RegisterCommands(sAppSubCommands, ArraySize(sAppSubCommands));
 
-    Engine::Root().RegisterCommands(&sAppCommand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sAppCommand, 1);
 }
 
 CHIP_ERROR AppCommandHelpHandler(int argc, char * argv[])

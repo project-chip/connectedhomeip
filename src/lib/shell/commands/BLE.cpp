@@ -111,10 +111,10 @@ void RegisterBLECommands()
     static const shell_command_t sBLECommand = { &BLEDispatch, "ble", "BLE transport commands" };
 
     // Register `device` subcommands with the local shell dispatcher.
-    sShellDeviceSubcommands.RegisterCommands(sBLESubCommands, ArraySize(sBLESubCommands), "ble");
+    sShellDeviceSubcommands.RegisterCommands(sBLESubCommands, ArraySize(sBLESubCommands));
 
     // Register the root `btp` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sBLECommand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sBLECommand, 1);
 }
 
 } // namespace Shell
