@@ -9,6 +9,10 @@ class FieldAttribute(enum.Enum):
     NULLABLE = enum.auto()
 
 
+class CommandAttribute(enum.Enum):
+    TIMED_INVOKE = enum.auto()
+
+
 class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
@@ -57,7 +61,7 @@ class Field:
 @dataclass
 class Attribute:
     definition: Field
-    tags: Set[AttributeTag] = field(default_factory=set())
+    tags: Set[AttributeTag] = field(default_factory=set)
 
     @property
     def is_readable(self):
@@ -106,6 +110,11 @@ class Command:
     code: int
     input_param: str
     output_param: str
+    attributes: Set[CommandAttribute] = field(default_factory=set)
+
+    @property
+    def is_timed_invoke(self):
+        return CommandAttribute.TIMED_INVOKE in self.attributes
 
 
 @dataclass

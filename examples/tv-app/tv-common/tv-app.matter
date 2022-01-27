@@ -22,9 +22,9 @@ server cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 0;
   }
 
-  command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
+  timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
   command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
-  command LogoutRequest(): DefaultSuccess = 3;
+  timed command LogoutRequest(): DefaultSuccess = 3;
 }
 
 server cluster AdministratorCommissioning = 60 {
