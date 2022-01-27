@@ -648,6 +648,7 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(ctx.Init());
     ctx.EnableAsyncDispatch();
 
@@ -682,6 +683,10 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
     gCommissionerFabrics.Reset();
     gDeviceFabrics.Reset();
     static_cast<TestContext *>(inContext)->Shutdown();
+
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    ctx.~TestContext();
+    chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 

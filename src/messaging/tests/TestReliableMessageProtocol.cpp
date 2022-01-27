@@ -583,6 +583,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.ShutdownAndRestoreExisting(inctx);
+    ctx.~MessagingContext();
 }
 
 void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
@@ -1395,12 +1396,33 @@ const nlTest sTests[] =
     NL_TEST_SENTINEL()
 };
 
+int Test_Setup(void * inContext)
+{
+    CHIP_ERROR status = chip::Platform::MemoryInit();
+    if (status != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+    return TestContext::InitializeAsync(inContext);
+}
+
+int Test_Teardown(void * inContext)
+{
+    int result = TestContext::Finalize(inContext);
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    ctx.~TestContext();
+
+    chip::Platform::MemoryShutdown();
+    return result;
+}
+
+
 nlTestSuite sSuite =
 {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    TestContext::InitializeAsync,
-    TestContext::Finalize,
+    Test_Setup,
+    Test_Teardown,
     InitializeTestCase,
 };
 // clang-format on

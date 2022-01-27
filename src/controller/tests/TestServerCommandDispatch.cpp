@@ -265,8 +265,13 @@ nlTestSuite sSuite =
 
 int TestCommandInteractionTest()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    {
+        TestContext gContext;
+        nlTestRunner(&sSuite, &gContext);
+    }
+    chip::Platform::MemoryShutdown();
+
     return (nlTestRunnerStats(&sSuite));
 }
 

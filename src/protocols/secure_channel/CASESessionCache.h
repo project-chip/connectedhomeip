@@ -37,7 +37,8 @@ public:
     CHIP_ERROR Get(const PeerId & peer, CASESessionCachable & outCachableSession);
 
 private:
-    BitMapObjectPool<CASESessionCachable, CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE> mCachePool;
+    static constexpr size_t kCacheSize = CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE;
+    ObjectPool<CASESessionCachable, kCacheSize> mCachePool;
     CASESessionCachable * GetLRUSession();
 };
 

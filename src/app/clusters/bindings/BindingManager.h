@@ -167,7 +167,7 @@ private:
         }
 
     private:
-        BitMapObjectPool<PendingNotificationEntry, EMBER_BINDING_TABLE_SIZE> mPendingNotificationMap;
+        ObjectPool<PendingNotificationEntry, EMBER_BINDING_TABLE_SIZE> mPendingNotificationMap;
     };
 
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
