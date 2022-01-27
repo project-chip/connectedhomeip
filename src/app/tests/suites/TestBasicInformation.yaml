@@ -33,13 +33,13 @@ tests:
       command: "writeAttribute"
       attribute: "location"
       arguments:
-          value: "us"
+          value: "US"
 
     - label: "Read back location"
       command: "readAttribute"
       attribute: "location"
       response:
-          value: "us"
+          value: "US"
 
     - label: "Restore initial location value"
       command: "writeAttribute"
