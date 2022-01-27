@@ -234,7 +234,8 @@ class ClusterObjectTests:
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
         # Events may take some time to flush, so wait for about 10s or so to get some events.
         for i in range(0, 10):
             print("Reading out events..")

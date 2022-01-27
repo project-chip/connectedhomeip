@@ -277,8 +277,6 @@ client cluster Basic = 40 {
   readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 client cluster BinaryInputBasic = 15 {
@@ -2861,6 +2859,10 @@ client cluster TestCluster = 1295 {
     SimpleEnum arg6[] = 6;
   }
 
+  info event TestFabricScopedEvent = 2 {
+    fabric_idx arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute bitmap8 bitmap8 = 1;
   attribute bitmap16 bitmap16 = 2;
@@ -3306,6 +3308,18 @@ client cluster TimeFormatLocalization = 44 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+client cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 client cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -3491,6 +3505,7 @@ endpoint 1 {
   binding cluster ThermostatUserInterfaceConfiguration;
   binding cluster ThreadNetworkDiagnostics;
   binding cluster TimeFormatLocalization;
+  binding cluster UnitLocalization;
   binding cluster UserLabel;
   binding cluster WakeOnLan;
   binding cluster WiFiNetworkDiagnostics;

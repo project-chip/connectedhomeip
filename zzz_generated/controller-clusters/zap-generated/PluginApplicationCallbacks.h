@@ -80,6 +80,7 @@
     MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
     MatterThreadNetworkDiagnosticsPluginClientInitCallback();                                                                      \
     MatterTimeFormatLocalizationPluginClientInitCallback();                                                                        \
+    MatterUnitLocalizationPluginClientInitCallback();                                                                              \
     MatterUserLabelPluginClientInitCallback();                                                                                     \
     MatterWakeOnLanPluginClientInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginClientInitCallback();                                                                        \

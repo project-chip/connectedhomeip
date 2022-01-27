@@ -1136,20 +1136,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void mfgSpecificPing(DefaultClusterCallback callback) {
-      mfgSpecificPing(chipClusterPtr, callback, null);
-    }
-
-    public void mfgSpecificPing(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-
-      mfgSpecificPing(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    private native void mfgSpecificPing(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
     public interface VendorIDAttributeCallback {
       void onSuccess(Integer value);
 
@@ -17180,6 +17166,77 @@ public class ChipClusters {
         SupportedCalendarTypesAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class UnitLocalizationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 45L;
+
+    public UnitLocalizationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readTemperatureUnitAttribute(IntegerAttributeCallback callback) {
+      readTemperatureUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeTemperatureUnitAttribute(DefaultClusterCallback callback, Integer value) {
+      writeTemperatureUnitAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeTemperatureUnitAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeTemperatureUnitAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeTemperatureUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTemperatureUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readTemperatureUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeTemperatureUnitAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeTemperatureUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
