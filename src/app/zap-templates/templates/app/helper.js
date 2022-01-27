@@ -198,11 +198,11 @@ function chip_endpoint_generated_commands_list()
 
     ret = ret.concat(`/* ${c.comment} */\\\n`);
     if (clientGeneratedCommands.length > 0) {
-      clientGeneratedCommands.push('0xffffffff /* end of list */')
+      clientGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
       ret = ret.concat(`/*   incoming_server */ ${clientGeneratedCommands.join(' , ')}, \\\n`);
     }
     if (serverGeneratedCommands.length > 0) {
-      serverGeneratedCommands.push('0xffffffff /* end of list */')
+      serverGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
       ret = ret.concat(`/*   incoming_client */ ${serverGeneratedCommands.join(' , ')}, \\\n`);
     }
   })

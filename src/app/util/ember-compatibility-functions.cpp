@@ -324,19 +324,17 @@ CHIP_ERROR GlobalListAttributeReader::Read(const ConcreteReadAttributePath & aPa
         });
     case ClientGeneratedCommandList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            for (size_t i = 0;
-                 mCluster->clientGeneratedCommandList != nullptr && mCluster->clientGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
+            for (const CommandId * cmd = mCluster->clientGeneratedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
             {
-                ReturnErrorOnFailure(encoder.Encode(mCluster->clientGeneratedCommandList[i]));
+                ReturnErrorOnFailure(encoder.Encode(*cmd));
             }
             return CHIP_NO_ERROR;
         });
     case ServerGeneratedCommandList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            for (size_t i = 0;
-                 mCluster->serverGeneratedCommandList != nullptr && mCluster->serverGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
+            for (const CommandId * cmd = mCluster->serverGeneratedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
             {
-                ReturnErrorOnFailure(encoder.Encode(mCluster->serverGeneratedCommandList[i]));
+                ReturnErrorOnFailure(encoder.Encode(*cmd));
             }
             return CHIP_NO_ERROR;
         });
