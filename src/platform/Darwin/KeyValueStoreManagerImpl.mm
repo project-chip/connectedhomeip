@@ -117,7 +117,16 @@ namespace DeviceLayer {
                 }
                 request.predicate = [NSPredicate predicateWithFormat:@"key = %@", key];
 
-                NSArray * result = [gContext executeFetchRequest:request error:error];
+                __block NSError * fetchError = nil;
+                __block NSArray * result;
+                [gContext performBlockAndWait:^{
+                  result = [gContext executeFetchRequest:request error:&fetchError];
+                }];
+
+                if (error != nil) {
+                    *error = fetchError;
+                }
+
                 if (result == nil) {
                     return nullptr;
                 }
