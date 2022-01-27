@@ -223,6 +223,18 @@ class EncodableValue:
         result.attrs.remove(EncodableValueAttr.LIST)   
         return result
 
+    def get_struct(self):
+        for s in self.context.all_structs():
+            if s.name == self.data_type.name:
+                return s
+        raise Exception("Struct %s not found" % self.data_type.name)
+
+    def get_enum(self):
+        for e in self.context.all_enums():
+            if e.name == self.data_type.name:
+                return e
+        raise Exception("Struct %s not found" % self.data_type.name)
+
     @property
     def java_type(self):
         t = ParseDataType(self.data_type, self.context.all_enums())
@@ -279,7 +291,7 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
-        self.jinja_env.filters['encodable'] = EncodableValueFrom
+        self.jinja_env.filters['asEncodable'] = EncodableValueFrom
         self.jinja_env.filters['lookupContext'] = CreateContext
 
 
