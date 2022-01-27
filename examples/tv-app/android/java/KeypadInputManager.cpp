@@ -39,7 +39,7 @@ void KeypadInputManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::KeypadInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keyCode)
+void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCode & keyCode)
 {
     Commands::SendKeyResponse::Type response;
 
@@ -65,7 +65,7 @@ exit:
     {
         response.status = static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
     }
-    return response;
+    helper.Success(response);
 }
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)

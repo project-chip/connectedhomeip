@@ -82,7 +82,12 @@ public:
     void SetProductId(uint16_t value) { mProductId = value; }
 
     const uint8_t * GetRotatingId() const { return mRotatingId; }
-    void SetRotatingId(const uint8_t * rotatingId) { memcpy(mRotatingId, rotatingId, sizeof(mRotatingId)); }
+    size_t GetRotatingIdLength() const { return mRotatingIdLen; }
+    void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
+    {
+        memcpy(mRotatingId, rotatingId, rotatingIdLen);
+        mRotatingIdLen = rotatingIdLen;
+    }
 
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
     void SetUDCClientProcessingState(UDCClientProcessingState state) { mUDCClientProcessingState = state; }
@@ -114,6 +119,7 @@ private:
     uint16_t mVendorId;
     uint16_t mProductId;
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
+    size_t mRotatingIdLen = 0;
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
 };
