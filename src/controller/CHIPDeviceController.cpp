@@ -746,7 +746,7 @@ CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Cal
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
 {
-    ReturnErrorOnFailure(mAutoCommissioner.AddCommissioningParameters(params));
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode);
 }
 
@@ -757,8 +757,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-    CommissioningParameters commissioningParams;
-    return PairDevice(remoteDeviceId, params, commissioningParams);
+    ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, params));
+    return Commission(remoteDeviceId);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
@@ -882,6 +882,12 @@ exit:
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    return Commission(remoteDeviceId);
+}
+
+CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
+{
     // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
     // commissioning stage in the device.
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
@@ -902,7 +908,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
                                             OnSessionEstablishmentTimeoutCallback, this);
 
     mAutoCommissioner.SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
-    ReturnErrorOnFailure(mAutoCommissioner.AddCommissioningParameters(params));
     if (device->IsSecureConnected())
     {
         mAutoCommissioner.StartCommissioning(device);
@@ -1609,9 +1614,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         SetupCluster(genCom, proxy, endpoint, timeout);
-        constexpr uint16_t kDefaultFailsafeSeconds = 60;
-        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeSeconds),
-                           breadcrumb, kCommandTimeoutMs);
+        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {

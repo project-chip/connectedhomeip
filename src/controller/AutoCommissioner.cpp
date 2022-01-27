@@ -25,16 +25,6 @@
 namespace chip {
 namespace Controller {
 
-AutoCommissioner::AutoCommissioner(DeviceCommissioner * commissioner) : mCommissioner(commissioner)
-{
-    ChipLogProgress(Controller, "Setting attestation nonce to random value");
-    Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
-    mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
-    ChipLogProgress(Controller, "Setting CSR nonce to random value");
-    Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
-    mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
-}
-
 AutoCommissioner::~AutoCommissioner()
 {
     ReleaseDAC();
@@ -49,62 +39,6 @@ void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsD
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
-    // Call AddCommissioningParameters to swap bytespans to internal memory.
-    return AddCommissioningParameters(params);
-}
-
-CHIP_ERROR AutoCommissioner::AddCommissioningParameters(const CommissioningParameters & params)
-{
-    if (params.GetFailsafeTimerSeconds().HasValue())
-    {
-        mParams.SetFailsafeTimerSeconds(params.GetFailsafeTimerSeconds().Value());
-    }
-    if (params.GetNOCChainGenerationParameters().HasValue())
-    {
-        mParams.SetNOCChainGenerationParameters(params.GetNOCChainGenerationParameters().Value());
-    }
-    if (params.GetRootCert().HasValue())
-    {
-        mParams.SetRootCert(params.GetRootCert().Value());
-    }
-    if (params.GetNoc().HasValue())
-    {
-        mParams.SetNoc(params.GetNoc().Value());
-    }
-    if (params.GetIcac().HasValue())
-    {
-        mParams.SetIcac(params.GetIcac().Value());
-    }
-    if (params.GetIpk().HasValue())
-    {
-        mParams.SetIpk(params.GetIpk().Value());
-    }
-    if (params.GetAdminSubject().HasValue())
-    {
-        mParams.SetAdminSubject(params.GetAdminSubject().Value());
-    }
-    if (params.GetAdminSubject().HasValue())
-    {
-        mParams.SetAdminSubject(params.GetAdminSubject().Value());
-    }
-    if (params.GetAttestationElements().HasValue())
-    {
-        mParams.SetAttestationElements(params.GetAttestationElements().Value());
-    }
-    if (params.GetAttestationSignature().HasValue())
-    {
-        mParams.SetAttestationSignature(params.GetAttestationSignature().Value());
-    }
-    if (params.GetPAI().HasValue())
-    {
-        ReleasePAI();
-        SetPAI(params.GetPAI().Value());
-    }
-    if (params.GetDAC().HasValue())
-    {
-        ReleaseDAC();
-        SetDAC(params.GetDAC().Value());
-    }
     if (params.GetThreadOperationalDataset().HasValue())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
@@ -132,20 +66,32 @@ CHIP_ERROR AutoCommissioner::AddCommissioningParameters(const CommissioningParam
         mParams.SetWiFiCredentials(
             WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
+    // If the AttestationNonce is passed in, using that else using a random one..
     if (params.GetAttestationNonce().HasValue())
     {
         ChipLogProgress(Controller, "Setting attestation nonce from parameters");
         VerifyOrReturnError(params.GetAttestationNonce().Value().size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
         memcpy(mAttestationNonce, params.GetAttestationNonce().Value().data(), params.GetAttestationNonce().Value().size());
-        mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
     }
+    else
+    {
+        ChipLogProgress(Controller, "Setting attestation nonce to random value");
+        Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+    }
+    mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
+
     if (params.GetCSRNonce().HasValue())
     {
         ChipLogProgress(Controller, "Setting CSR nonce from parameters");
         VerifyOrReturnError(params.GetCSRNonce().Value().size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
         memcpy(mCSRNonce, params.GetCSRNonce().Value().data(), params.GetCSRNonce().Value().size());
-        mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
     }
+    else
+    {
+        ChipLogProgress(Controller, "Setting CSR nonce to random value");
+        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+    }
+    mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
     return CHIP_NO_ERROR;
 }

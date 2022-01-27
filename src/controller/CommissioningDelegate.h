@@ -73,7 +73,7 @@ public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
-    const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
@@ -95,7 +95,7 @@ public:
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
-        mFailsafeTimerSeconds.SetValue(seconds);
+        mFailsafeTimerSeconds = seconds;
         return *this;
     }
 
@@ -182,7 +182,7 @@ public:
     void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
 
 private:
-    Optional<uint16_t> mFailsafeTimerSeconds;
+    uint16_t mFailsafeTimerSeconds = 60;
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WiFiCredentials> mWiFiCreds;

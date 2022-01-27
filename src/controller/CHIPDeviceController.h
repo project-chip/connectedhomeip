@@ -533,6 +533,7 @@ public:
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The commissioning parameters
      */
+    CHIP_ERROR Commission(NodeId remoteDeviceId);
     CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);

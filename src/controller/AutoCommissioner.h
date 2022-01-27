@@ -28,14 +28,9 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
-    AutoCommissioner(DeviceCommissioner * commissioner);
+    AutoCommissioner(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     ~AutoCommissioner();
-
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params);
-
-    // Overwrites only the given commissioning parameters.
-    CHIP_ERROR AddCommissioningParameters(const CommissioningParameters & params);
-
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate);
 
     void StartCommissioning(CommissioneeDeviceProxy * proxy);
