@@ -1084,6 +1084,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | ThermostatUserInterfaceConfiguration                                | 0x0204 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
 | TimeFormatLocalization                                              | 0x002C |
+| UnitLocalization                                                    | 0x002D |
 | UserLabel                                                           | 0x0041 |
 | WakeOnLan                                                           | 0x0503 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
@@ -54774,6 +54775,261 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster UnitLocalization                                            | 0x002D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TemperatureUnit                                                   | 0x0000 |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute TemperatureUnit
+ */
+class ReadUnitLocalizationTemperatureUnit : public ModelCommand
+{
+public:
+    ReadUnitLocalizationTemperatureUnit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "temperature-unit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUnitLocalizationTemperatureUnit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
+    {
+        OnGeneralAttributeEventResponse(context, "UnitLocalization.TemperatureUnit response", value);
+    }
+};
+
+class WriteUnitLocalizationTemperatureUnit : public ModelCommand
+{
+public:
+    WriteUnitLocalizationTemperatureUnit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "temperature-unit");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteUnitLocalizationTemperatureUnit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::UnitLocalization::TempUnit mValue;
+};
+
+class ReportUnitLocalizationTemperatureUnit : public ModelCommand
+{
+public:
+    ReportUnitLocalizationTemperatureUnit() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "temperature-unit");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportUnitLocalizationTemperatureUnit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
+    {
+        DataModelLogger::LogValue("UnitLocalization.TemperatureUnit report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadUnitLocalizationFeatureMap : public ModelCommand
+{
+public:
+    ReadUnitLocalizationFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUnitLocalizationFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UnitLocalization::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "UnitLocalization.FeatureMap response", value);
+    }
+};
+
+class ReportUnitLocalizationFeatureMap : public ModelCommand
+{
+public:
+    ReportUnitLocalizationFeatureMap() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportUnitLocalizationFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::UnitLocalization::Attributes::FeatureMap::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        DataModelLogger::LogValue("UnitLocalization.FeatureMap report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadUnitLocalizationClusterRevision : public ModelCommand
+{
+public:
+    ReadUnitLocalizationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUnitLocalizationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UnitLocalization::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeEventResponse(context, "UnitLocalization.ClusterRevision response", value);
+    }
+};
+
+class ReportUnitLocalizationClusterRevision : public ModelCommand
+{
+public:
+    ReportUnitLocalizationClusterRevision() : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportUnitLocalizationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002D) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::UnitLocalizationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::UnitLocalization::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        DataModelLogger::LogValue("UnitLocalization.ClusterRevision report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster UserLabel                                                   | 0x0041 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -60409,6 +60665,22 @@ void registerClusterTimeFormatLocalization(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterUnitLocalization(Commands & commands)
+{
+    const char * clusterName = "UnitLocalization";
+
+    commands_list clusterCommands = {
+        make_unique<ReadUnitLocalizationTemperatureUnit>(),   //
+        make_unique<WriteUnitLocalizationTemperatureUnit>(),  //
+        make_unique<ReportUnitLocalizationTemperatureUnit>(), //
+        make_unique<ReadUnitLocalizationFeatureMap>(),        //
+        make_unique<ReportUnitLocalizationFeatureMap>(),      //
+        make_unique<ReadUnitLocalizationClusterRevision>(),   //
+        make_unique<ReportUnitLocalizationClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterUserLabel(Commands & commands)
 {
     const char * clusterName = "UserLabel";
@@ -60606,6 +60878,7 @@ void registerClusters(Commands & commands)
     registerClusterThermostatUserInterfaceConfiguration(commands);
     registerClusterThreadNetworkDiagnostics(commands);
     registerClusterTimeFormatLocalization(commands);
+    registerClusterUnitLocalization(commands);
     registerClusterUserLabel(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWiFiNetworkDiagnostics(commands);

@@ -430,6 +430,13 @@ public:
     ~TimeFormatLocalizationClusterTest() {}
 };
 
+class DLL_EXPORT UnitLocalizationClusterTest : public UnitLocalizationCluster
+{
+public:
+    UnitLocalizationClusterTest() : UnitLocalizationCluster() {}
+    ~UnitLocalizationClusterTest() {}
+};
+
 class DLL_EXPORT UserLabelClusterTest : public UserLabelCluster
 {
 public:

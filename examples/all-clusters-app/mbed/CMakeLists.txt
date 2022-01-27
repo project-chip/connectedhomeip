@@ -110,6 +110,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/low-power-server/low-power-server.cpp
                ${APP_CLUSTERS}/localization-configuration-server/localization-configuration-server.cpp
                ${APP_CLUSTERS}/time-format-localization-server/time-format-localization-server.cpp
+               ${APP_CLUSTERS}/unit-localization-server/unit-localization-server.cpp
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp

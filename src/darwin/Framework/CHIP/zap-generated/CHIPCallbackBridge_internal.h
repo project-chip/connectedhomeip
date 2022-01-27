@@ -215,6 +215,9 @@ typedef void (*TimeFormatLocalizationClusterHourFormatAttributeCallback)(void *,
                                                                          chip::app::Clusters::TimeFormatLocalization::HourFormat);
 typedef void (*NullableTimeFormatLocalizationClusterHourFormatAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> &);
+typedef void (*UnitLocalizationClusterTempUnitAttributeCallback)(void *, chip::app::Clusters::UnitLocalization::TempUnit);
+typedef void (*NullableUnitLocalizationClusterTempUnitAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> &);
 typedef void (*PowerSourceClusterBatChargeFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeFaultType);
 typedef void (*NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> &);
@@ -6327,6 +6330,64 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge
+    : public CHIPCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>
+{
+public:
+    CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::UnitLocalization::TempUnit value);
+};
+
+class CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
+    : public CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge
+{
+public:
+    CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>
+{
+public:
+    CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value);
+};
+
+class CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
+    : public CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
+{
+public:
+    CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

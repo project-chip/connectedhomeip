@@ -253,6 +253,10 @@
 @property (readonly) chip::Controller::TimeFormatLocalizationCluster cppCluster;
 @end
 
+@interface CHIPUnitLocalization ()
+@property (readonly) chip::Controller::UnitLocalizationCluster cppCluster;
+@end
+
 @interface CHIPUserLabel ()
 @property (readonly) chip::Controller::UserLabelCluster cppCluster;
 @end

@@ -1025,6 +1025,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Unit Localization
+ *
+ */
+@interface CHIPTestUnitLocalization : CHIPUnitLocalization
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster User Label
  *
  */

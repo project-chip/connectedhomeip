@@ -1326,6 +1326,13 @@ typedef void (*CHIPTimeFormatLocalizationClusterSupportedCalendarTypesAttributeC
 typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
+typedef void (*CHIPUnitLocalizationClusterTemperatureUnitAttributeCallbackType)(
+    void *, chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo::DecodableArgType);
+typedef void (*CHIPUnitLocalizationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::UnitLocalization::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPUnitLocalizationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::UnitLocalization::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
 typedef void (*CHIPUserLabelClusterLabelListAttributeCallbackType)(
     void *, const chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo::DecodableType &);
 typedef void (*CHIPUserLabelClusterClusterRevisionAttributeCallbackType)(

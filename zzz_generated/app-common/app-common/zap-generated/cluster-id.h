@@ -94,6 +94,9 @@ static constexpr chip::ClusterId ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID = 0x0
 // Definitions for cluster: Time Format Localization
 static constexpr chip::ClusterId ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID = 0x002C;
 
+// Definitions for cluster: Unit Localization
+static constexpr chip::ClusterId ZCL_UNIT_LOCALIZATION_CLUSTER_ID = 0x002D;
+
 // Definitions for cluster: Power Source Configuration
 static constexpr chip::ClusterId ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID = 0x002E;
 

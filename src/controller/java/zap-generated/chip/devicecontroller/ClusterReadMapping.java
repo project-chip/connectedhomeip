@@ -7799,6 +7799,46 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute",
         readTimeFormatLocalizationClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("timeFormatLocalization", readTimeFormatLocalizationInteractionInfo);
+    Map<String, InteractionInfo> readUnitLocalizationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readUnitLocalizationTemperatureUnitCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUnitLocalizationTemperatureUnitAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .readTemperatureUnitAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUnitLocalizationTemperatureUnitCommandParams);
+    readUnitLocalizationInteractionInfo.put(
+        "readTemperatureUnitAttribute",
+        readUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUnitLocalizationFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUnitLocalizationFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readUnitLocalizationFeatureMapCommandParams);
+    readUnitLocalizationInteractionInfo.put(
+        "readFeatureMapAttribute", readUnitLocalizationFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUnitLocalizationClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUnitLocalizationClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUnitLocalizationClusterRevisionCommandParams);
+    readUnitLocalizationInteractionInfo.put(
+        "readClusterRevisionAttribute",
+        readUnitLocalizationClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("unitLocalization", readUnitLocalizationInteractionInfo);
     Map<String, InteractionInfo> readUserLabelInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readUserLabelLabelListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
