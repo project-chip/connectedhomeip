@@ -17453,6 +17453,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query MaxNetworks\n");
+            err = TestQueryMaxNetworks_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Networks\n");
+            err = TestQueryNetworks_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -17464,10 +17472,33 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t maxNetworks)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnSuccessResponse_1(maxNetworks);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            networks)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnSuccessResponse_2(networks);
+    }
 
     //
     // Tests methods
@@ -17477,6 +17508,54 @@ private:
     {
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestQueryMaxNetworks_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::NetworkCommissioningClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t maxNetworks)
+    {
+        VerifyOrReturn(CheckConstraintType("maxNetworks", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryNetworks_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::NetworkCommissioningClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            networks)
+    {
+        VerifyOrReturn(CheckConstraintType("networks", "", "list"));
+        NextTest();
     }
 };
 
