@@ -2557,20 +2557,16 @@ void CHIPBridgedDeviceBasicServerGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
-        value)
+void CHIPBridgedDeviceBasicClientGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
-        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
-        newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2601,42 +2597,16 @@ void CHIPBridgedDeviceBasicClientGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
-        value)
+void CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
-        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
-        auto * array_2 = [NSMutableArray new];
-        auto iter_2 = entry_0.endpoints.begin();
-        while (iter_2.Next()) {
-            auto & entry_2 = iter_2.GetValue();
-            NSNumber * newElement_2;
-            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
-            [array_2 addObject:newElement_2];
-        }
-        { // Scope for the error so we will know what it's named
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-        }
-        newElement_0.endpoints = array_2;
-        if (entry_0.groupName.HasValue()) {
-            newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
-                                                              length:entry_0.groupName.Value().size()
-                                                            encoding:NSUTF8StringEncoding];
-        } else {
-            newElement_0.groupName = nil;
-        }
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -4540,15 +4510,16 @@ void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+        CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
         newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
         newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
         newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
@@ -4582,16 +4553,17 @@ void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::O
 }
 
 void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
-        newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+        CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
         newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
         auto * array_2 = [NSMutableArray new];
         auto iter_2 = entry_0.endpoints.begin();
@@ -4609,9 +4581,13 @@ void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(vo
             }
         }
         newElement_0.endpoints = array_2;
-        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
-                                                          length:entry_0.groupName.size()
-                                                        encoding:NSUTF8StringEncoding];
+        if (entry_0.groupName.HasValue()) {
+            newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
+                                                              length:entry_0.groupName.Value().size()
+                                                            encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.groupName = nil;
+        }
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named

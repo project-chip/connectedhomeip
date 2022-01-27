@@ -2826,9 +2826,7 @@ public:
         CHIPCallbackBridge<ContentLauncherServerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
 class CHIPContentLauncherServerGeneratedCommandListListAttributeCallbackSubscriptionBridge
@@ -2857,9 +2855,7 @@ public:
         CHIPCallbackBridge<ContentLauncherClientGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
 class CHIPContentLauncherClientGeneratedCommandListListAttributeCallbackSubscriptionBridge
@@ -3946,10 +3942,9 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value);
 };
 
 class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge
@@ -3977,10 +3972,9 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value);
 };
 
 class CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge

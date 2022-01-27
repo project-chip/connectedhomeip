@@ -8290,51 +8290,15 @@ public class ChipClusters {
 
     public void keySetWrite(
         DefaultClusterCallback callback,
-        Integer groupKeySetID,
-        Integer groupKeySecurityPolicy,
-        @Nullable byte[] epochKey0,
-        @Nullable Long epochStartTime0,
-        @Nullable byte[] epochKey1,
-        @Nullable Long epochStartTime1,
-        @Nullable byte[] epochKey2,
-        @Nullable Long epochStartTime2) {
-      keySetWrite(
-          chipClusterPtr,
-          callback,
-          groupKeySetID,
-          groupKeySecurityPolicy,
-          epochKey0,
-          epochStartTime0,
-          epochKey1,
-          epochStartTime1,
-          epochKey2,
-          epochStartTime2,
-          null);
+        ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet) {
+      keySetWrite(chipClusterPtr, callback, groupKeySet, null);
     }
 
     public void keySetWrite(
         DefaultClusterCallback callback,
-        Integer groupKeySetID,
-        Integer groupKeySecurityPolicy,
-        @Nullable byte[] epochKey0,
-        @Nullable Long epochStartTime0,
-        @Nullable byte[] epochKey1,
-        @Nullable Long epochStartTime1,
-        @Nullable byte[] epochKey2,
-        @Nullable Long epochStartTime2,
+        ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet,
         int timedInvokeTimeoutMs) {
-      keySetWrite(
-          chipClusterPtr,
-          callback,
-          groupKeySetID,
-          groupKeySecurityPolicy,
-          epochKey0,
-          epochStartTime0,
-          epochKey1,
-          epochStartTime1,
-          epochKey2,
-          epochStartTime2,
-          timedInvokeTimeoutMs);
+      keySetWrite(chipClusterPtr, callback, groupKeySet, timedInvokeTimeoutMs);
     }
 
     private native void keySetRead(
@@ -8358,68 +8322,31 @@ public class ChipClusters {
     private native void keySetWrite(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer groupKeySetID,
-        Integer groupKeySecurityPolicy,
-        @Nullable byte[] epochKey0,
-        @Nullable Long epochStartTime0,
-        @Nullable byte[] epochKey1,
-        @Nullable Long epochStartTime1,
-        @Nullable byte[] epochKey2,
-        @Nullable Long epochStartTime2,
+        ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface KeySetReadAllIndicesResponseCallback {
-      void onSuccess( // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
-          // Conversion from this type to Java is not properly implemented yet
-          );
+      void onSuccess(ArrayList<Integer> groupKeySetIDs);
 
       void onError(Exception error);
     }
 
     public interface KeySetReadResponseCallback {
-      void onSuccess( // GroupKeySet: Struct GroupKeySetStruct
-          // Conversion from this type to Java is not properly implemented yet
-          );
+      void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet);
 
       void onError(Exception error);
     }
 
     public interface GroupKeyMapAttributeCallback {
-      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupKey> valueList);
+      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> valueList);
 
       void onError(Exception ex);
 
       default void onSubscriptionEstablished() {}
     }
 
-    public static class GroupTableAttribute {
-      public Integer fabricIndex;
-      public Integer groupId;
-      public Optional<String> groupName;
-
-      public GroupTableAttribute(Integer fabricIndex, Integer groupId, Optional<String> groupName) {
-        this.fabricIndex = fabricIndex;
-        this.groupId = groupId;
-        this.groupName = groupName;
-      }
-
-      @Override
-      public String toString() {
-        StringBuilder output = new StringBuilder("");
-        output.append("int fabricIndex: ");
-        output.append(this.fabricIndex);
-        output.append("\n");
-
-        output.append("int groupId: ");
-        output.append(this.groupId);
-        output.append("\n");
-
-        return output.toString();
-      }
-    }
-
     public interface GroupTableAttributeCallback {
-      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfo> valueList);
+      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct> valueList);
 
       void onError(Exception ex);
 
@@ -8456,13 +8383,13 @@ public class ChipClusters {
 
     public void writeGroupKeyMapAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value) {
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value) {
       writeGroupKeyMapAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeGroupKeyMapAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value,
         int timedWriteTimeoutMs) {
       writeGroupKeyMapAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -8545,7 +8472,7 @@ public class ChipClusters {
     private native void writeGroupKeyMapAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeGroupKeyMapAttribute(
@@ -10212,6 +10139,11 @@ public class ChipClusters {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     private native void readActiveLocaleAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
@@ -10256,6 +10188,9 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
@@ -20535,6 +20470,11 @@ public class ChipClusters {
       writeHourFormatAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
+    public void subscribeHourFormatAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeHourFormatAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readActiveCalendarTypeAttribute(IntegerAttributeCallback callback) {
       readActiveCalendarTypeAttribute(chipClusterPtr, callback);
     }
@@ -20546,6 +20486,11 @@ public class ChipClusters {
     public void writeActiveCalendarTypeAttribute(
         DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       writeActiveCalendarTypeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeActiveCalendarTypeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeActiveCalendarTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedCalendarTypesAttribute(
@@ -20584,6 +20529,11 @@ public class ChipClusters {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     private native void readHourFormatAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -20593,6 +20543,9 @@ public class ChipClusters {
         Integer value,
         @Nullable Integer timedWriteTimeoutMs);
 
+    private native void subscribeHourFormatAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
     private native void readActiveCalendarTypeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -20601,6 +20554,9 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer value,
         @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeActiveCalendarTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readSupportedCalendarTypesAttribute(
         long chipClusterPtr, SupportedCalendarTypesAttributeCallback callback);
@@ -20631,6 +20587,9 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
   public static class UnitLocalizationCluster extends BaseChipCluster {
