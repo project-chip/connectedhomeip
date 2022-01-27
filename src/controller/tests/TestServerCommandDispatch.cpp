@@ -198,7 +198,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     // Register descriptors for this endpoint since they are needed
     // at command validation time to ensure the command actually exists on that endpoint.
     //
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, nullptr);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.

@@ -165,6 +165,10 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId clusterId
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
 
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
+
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
 const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
@@ -241,8 +245,11 @@ uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
 uint16_t emberAfGetDeviceIdForEndpoint(chip::EndpointId endpoint);
+// dataVersionStorage needs to point to a memory area that holds one DataVersion
+// for every server cluster on this endpoint.  If nullptr is passed, the
+// endpoint will not be able to store data versions, which may break consumers.
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
-                                        uint8_t deviceVersion);
+                                        uint8_t deviceVersion, chip::DataVersion * dataVersionStorage);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 
