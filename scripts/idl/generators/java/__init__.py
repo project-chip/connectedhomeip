@@ -223,20 +223,20 @@ class EncodableValue:
         result.attrs.remove(EncodableValueAttr.LIST)   
         return result
 
-    def get_struct(self):
+    def get_underlying_struct(self):
         for s in self.context.all_structs():
             if s.name == self.data_type.name:
                 return s
         raise Exception("Struct %s not found" % self.data_type.name)
 
-    def get_enum(self):
+    def get_underlying_enum(self):
         for e in self.context.all_enums():
             if e.name == self.data_type.name:
                 return e
         raise Exception("Struct %s not found" % self.data_type.name)
 
     @property
-    def java_type(self):
+    def boxed_java_type(self):
         t = ParseDataType(self.data_type, self.context.all_enums())
 
         if type(t) == FundamentalType:
@@ -253,10 +253,46 @@ class EncodableValue:
                return "Long"
             else:
                return "Integer"
+        elif type(t) == BasicString:
+            if t.is_binary:
+                return "byte[]"
+            else:
+                return "String"
         else:
             return "Object"
 
+    @property
+    def boxed_java_signature(self):
+        if self.is_list:
+           return "Ljava/lang/ArrayList"
+        if self.is_optional:
+           return "Ljava/util/Optional"
 
+        t = ParseDataType(self.data_type, self.context.all_enums())
+
+        if type(t) == FundamentalType:
+            if t == FundamentalType.BOOL:
+                return "Ljava/lang/Boolean;"
+            elif t == FundamentalType.FLOAT:
+                return "Ljava/lang/Float;"
+            elif t == FundamentalType.DOUBLE:
+                return "Ljava/lang/Double;"
+            else:
+                raise Error("Unknown fundamental type")
+        elif type(t) == BasicInteger:
+            if t.byte_count >= 4:
+               return "Ljava/lang/Long;"
+            else:
+               return "Ljava/lang/Integer;"
+        elif type(t) == BasicString:
+            if t.is_binary:
+                return "[B"
+            else:
+                return "Ljava/lang/String;"
+        elif type(t) == IdlEnumType:
+            return "FIXME: No enum conversion %r" % t
+        else:
+            return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
 
 

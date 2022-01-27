@@ -63,22 +63,16 @@
     {% elif encodable.is_struct %}
         {% set struct = encodable.get_underlying_struct()  %}
         {%   for field in struct.fields %}
-          jobject {{source}}_{{field.definition.name}}Item_{{depth}};
-          chip::JniReferences::GetInstance().GetObjectField({{source}}, "{{field.definition.name}}", "FIXME_SIGNATURE", {{source}}_{{field.definition.name}}Item_{{depth}});
+          {% set fieldEncodable = field | asEncodable(encodable.context) %}
+          jobject {{source}}_{{field.name}}Item_{{depth}};
+          chip::JniReferences::GetInstance().GetObjectField({{source}}, "{{field.name}}", "{{fieldEncodable.boxed_java_signature}}", {{source}}_{{field.name}}Item_{{depth}});
           {{ encode_value(
               "{}.{}".format(target, field.name | lowercaseFirst),
-              "{}_{}Item_{}".format(source, field.definition.name, depty)
+              "{}_{}Item_{}".format(source, field.name, depth),
               depth + 1,
-              field | asEncodable(encodable.lookup)
+              fieldEncodable
           )}}
         {%   endfor -%}
-        {#
-          {{#zcl_struct_items_by_struct_name type}}
-          jobject {{../source}}_{{asLowerCamelCase label}}Item_{{../depth}};
-          chip::JniReferences::GetInstance().GetObjectField({{../source}}, "{{asLowerCamelCase label}}", "{{asJniSignature type null ../cluster true}}", {{../source}}_{{asLowerCamelCase label}}Item_{{../depth}});
-          {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "_" (asLowerCamelCase label) "Item_" ../depth) cluster=../cluster depth=(incrementDepth ../depth)}}
-          {{/zcl_struct_items_by_struct_name}}
-        #}
     {% elif encodable.is_enum %}
         // ENCODING {{ target }} = {{ source }} for enum {{ encodable.data_type }} 
         {#
@@ -90,7 +84,7 @@
         {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
         #}
     {% else %}
-        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{encodable.java_type}}ToPrimitive({{source}}));
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{encodable.boxed_java_type}}ToPrimitive({{source}}));
     {% endif -%}
     {#
 {{else}}
