@@ -41,28 +41,22 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+    ChipLogProgress(SoftwareUpdate, "Q: Applying - resetting device");
+
+    // Reset into Bootloader
+    qvCHIP_OtaReset();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mParams.imageFile.empty())
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
-
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    if (!1 /* What stops us processing a block?*/)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
     if ((block.data() == nullptr) || block.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -81,8 +75,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    qvCHIP_OtaStatus_t status = qvCHIP_OtaStatusSuccess;
-    auto * imageProcessor     = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -100,13 +93,15 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     qvCHIP_OtaEraseArea();
     qvCHIP_OtaStartWrite();
 
+    // Initialize tracking variables
+    imageProcessor->mParams.downloadedBytes = 0;
+
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    qvCHIP_OtaStatus_t status = qvCHIP_OtaStatusSuccess;
-    auto * imageProcessor     = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         return;
@@ -119,6 +114,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
                               static_cast<std::uint32_t>(imageProcessor->mParams.downloadedBytes) /*imgSz*/);
 
     imageProcessor->ReleaseBlock();
+    // Start from scratch
+    imageProcessor->mParams.downloadedBytes = 0;
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -129,17 +126,17 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    // TODO: What do we do when we abort?
     ChipLogProgress(SoftwareUpdate, "Q: HandleAbort");
 
-    remove(imageProcessor->mParams.imageFile.data());
     imageProcessor->ReleaseBlock();
+    // Start from scratch
+    imageProcessor->mParams.downloadedBytes = 0;
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    qvCHIP_OtaStatus_t status = qvCHIP_OtaStatusSuccess;
-    auto * imageProcessor     = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    qvCHIP_OtaStatus_t status;
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -160,6 +157,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (status != qvCHIP_OtaStatusSuccess)
     {
+        ChipLogError(SoftwareUpdate, "Flash write failed");
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
@@ -170,22 +168,24 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if ((block.data() == nullptr) || block.empty())
+    if (!IsSpanUsable(block))
     {
+        ReleaseBlock();
         return CHIP_NO_ERROR;
     }
-
-    // Allocate memory for block data if it has not been done yet
-    if (mBlock.empty())
+    if (mBlock.size() < block.size())
     {
-        mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-        if (mBlock.data() == nullptr)
+        if (!mBlock.empty())
+        {
+            ReleaseBlock();
+        }
+        uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+        if (mBlock_ptr == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
+        mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
-
-    // Store the actual block data
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
     if (err != CHIP_NO_ERROR)
     {
