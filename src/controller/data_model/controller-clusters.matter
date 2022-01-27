@@ -2859,6 +2859,10 @@ client cluster TestCluster = 1295 {
     SimpleEnum arg6[] = 6;
   }
 
+  info event TestFabricScopedEvent = 2 {
+    fabric_idx arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute bitmap8 bitmap8 = 1;
   attribute bitmap16 bitmap16 = 2;

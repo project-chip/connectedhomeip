@@ -38931,6 +38931,7 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * TestEvent                                                         | 0x0001 |
+| * TestFabricScopedEvent                                             | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -39426,6 +39427,78 @@ public:
     static void OnValueReport(void * context, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
     {
         DataModelLogger::LogValue("TestCluster.TestEvent report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+/*
+ * Event TestFabricScopedEvent
+ */
+class ReadTestClusterTestFabricScopedEvent : public ModelCommand
+{
+public:
+    ReadTestClusterTestFabricScopedEvent() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "test-fabric-scoped-event");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterTestFabricScopedEvent() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadEvent (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "TestCluster.TestFabricScopedEvent response", value);
+    }
+};
+
+class ReportTestClusterTestFabricScopedEvent : public ModelCommand
+{
+public:
+    ReportTestClusterTestFabricScopedEvent() : ModelCommand("subscribe-event")
+    {
+        AddArgument("event-name", "test-fabric-scoped-event");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterTestFabricScopedEvent() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportEvent (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType value)
+    {
+        DataModelLogger::LogValue("TestCluster.TestFabricScopedEvent report", 0, value);
     }
 
 private:
@@ -60413,6 +60486,8 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReportTestClusterClusterRevision>(),                   //
         make_unique<ReadTestClusterTestEvent>(),                           //
         make_unique<ReportTestClusterTestEvent>(),                         //
+        make_unique<ReadTestClusterTestFabricScopedEvent>(),               //
+        make_unique<ReportTestClusterTestFabricScopedEvent>(),             //
     };
 
     commands.Register(clusterName, clusterCommands);
