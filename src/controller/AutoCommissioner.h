@@ -25,14 +25,6 @@ namespace Controller {
 
 class DeviceCommissioner;
 
-// It seems like this should come from the zap
-enum NetworkClusterFeatureFlags : uint32_t
-{
-    kWifi     = 0x01,
-    kThread   = 0x02,
-    kEthernet = 0x04,
-};
-
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
@@ -70,7 +62,7 @@ private:
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     // TODO: if the device library adds a network commissioning device type, this will need to be 1 per endpoint.
-    BitFlags<NetworkClusterFeatureFlags> mNetworkTechnology;
+    BitFlags<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> mNetworkTechnology;
     bool mNeedsNetworkSetup = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
