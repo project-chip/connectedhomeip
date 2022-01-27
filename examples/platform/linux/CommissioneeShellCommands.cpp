@@ -148,7 +148,7 @@ void RegisterCommissioneeCommands()
                                                    "Commissionee commands. Usage: commissionee [command_name]" };
 
     // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sDeviceComand, 1);
     return;
 }
 

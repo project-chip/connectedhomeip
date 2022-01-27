@@ -25,9 +25,8 @@
 
 #include "streamer.h"
 
-#include <cstdio>
-#include <cstring>
 #include <lib/core/CHIPError.h>
+
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -46,10 +45,6 @@
 #ifndef CHIP_SHELL_MAX_TOKENS
 #define CHIP_SHELL_MAX_TOKENS 10
 #endif // CHIP_SHELL_MAX_TOKENS
-
-#ifndef CHIP_SHELL_MAX_CMD_COMPLETIONS
-#define CHIP_SHELL_MAX_CMD_COMPLETIONS 32
-#endif // CHIP_SHELL_MAX_CMD_COMPLETIONS
 
 namespace chip {
 namespace Shell {
@@ -98,76 +93,20 @@ typedef const struct shell_command shell_command_t;
  */
 typedef CHIP_ERROR shell_command_iterator_t(shell_command_t * command, void * arg);
 
-class Engine;
-
-/**
- * A map of the Engine instances and the command prefix that they correspond to.
- * The struct itself is a linked list node.
- *
- *  prefix:     The command prefix (until n-1th token of full command) e.g. "device",
- *              or "dns resolve".
- *  enginev:    An array of the shells that have registered commands under the preifx.
- *  enginec:    The number of shells that have registered commands under the preifx.
- *  next:       The next shell in the list.
- *
- */
-typedef struct shell_map
-{
-    const char * prefix;
-    Engine * enginev[CHIP_SHELL_MAX_MODULES];
-    size_t enginec = 0;
-    shell_map * next;
-} shell_map_t;
-
-/**
- * A context object for passing request and receiving results with GetCmdCompletion.
- *
- *  line_buf:           The user input command to request for completion. If the applications prepends
- *                      "matter " to all matter commands, please remove the "matter " prefix from the buffer.
- *  ret_prefix:         The returned command prefix (up until the last space, not included).
- *  cmdv:               The command completion candidates unter the prefix in "ret_prefix".
- *  cmdc:               The number of command completion candidates in cmdv.
- *
- * Initialization:
- *
- *  cmd_completion_context context = cmd_completion_context("dns browse c");
- *
- */
-typedef struct cmd_completion_context
-{
-    const char * line_buf;
-    const char * ret_prefix;
-    shell_command_t * cmdv[CHIP_SHELL_MAX_CMD_COMPLETIONS];
-    size_t cmdc = 0;
-
-    cmd_completion_context(){};
-    cmd_completion_context(const char * _line_buf) { line_buf = _line_buf; };
-} cmd_completion_context;
-
 class Engine
 {
 protected:
     static Engine theEngineRoot;
-    static shell_map_t * theShellMapListHead;
-    shell_command_t * _commands[CHIP_SHELL_MAX_MODULES];
-    unsigned _commandCount;
 
-    static void InsertShellMap(char const * prefix, Engine * shell);
+    shell_command_t * _commandSet[CHIP_SHELL_MAX_MODULES];
+    unsigned _commandSetSize[CHIP_SHELL_MAX_MODULES];
+    unsigned _commandSetCount;
 
 public:
-    Engine(){};
+    Engine() {}
 
     /** Return the root singleton for the Shell command hierarchy. */
-    static Engine & Root() { return theEngineRoot; };
-
-    /**
-     * Get command completions by command prefix.
-     *
-     * @param context               The command completion context to pass request and receive results.
-     *
-     * @return                      CHIP_ERROR error code.
-     */
-    static CHIP_ERROR GetCommandCompletions(cmd_completion_context * context);
+    static Engine & Root() { return theEngineRoot; }
 
     /**
      * Registers a set of defaults commands (help) for all Shell and sub-Shell instances.
@@ -202,11 +141,8 @@ public:
      *
      * @param command_set           An array of commands to add to the shell.
      * @param count                 The number of commands in the command set array.
-     * @param prefix                The prefix of this command set in the full command path.
-     *                              e.g. "matter base64" is prefix for "endcode" and "decode".
-     *                              Use double quoted empty string `""` or nullptr for root commands.
      */
-    void RegisterCommands(shell_command_t * command_set, unsigned count, const char * prefix);
+    void RegisterCommands(shell_command_t * command_set, unsigned count);
 
     /**
      * Runs the shell mainloop. Will display the prompt and enable interaction.

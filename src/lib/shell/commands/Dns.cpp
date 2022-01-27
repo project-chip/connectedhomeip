@@ -250,13 +250,13 @@ void RegisterDnsCommands()
     static const shell_command_t sDnsCommand = { &DnsHandler, "dns", "Dns client commands" };
 
     // Register `dns browse` subcommands
-    sShellDnsBrowseSubcommands.RegisterCommands(sDnsBrowseSubCommands, ArraySize(sDnsBrowseSubCommands), "dns browse");
+    sShellDnsBrowseSubcommands.RegisterCommands(sDnsBrowseSubCommands, ArraySize(sDnsBrowseSubCommands));
 
     // Register `dns` subcommands with the local shell dispatcher.
-    sShellDnsSubcommands.RegisterCommands(sDnsSubCommands, ArraySize(sDnsSubCommands), "dns");
+    sShellDnsSubcommands.RegisterCommands(sDnsSubCommands, ArraySize(sDnsSubCommands));
 
     // Register the root `dns` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDnsCommand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sDnsCommand, 1);
 }
 
 } // namespace Shell
