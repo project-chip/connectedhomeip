@@ -2263,8 +2263,11 @@ private:
 | * DoorState                                                         | 0x0003 |
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
+| * NumberOfRFIDUsersSupported                                        | 0x0013 |
 | * MaxPINCodeLength                                                  | 0x0017 |
 | * MinPINCodeLength                                                  | 0x0018 |
+| * MaxRFIDCodeLength                                                 | 0x0019 |
+| * MinRFIDCodeLength                                                 | 0x001A |
 | * Language                                                          | 0x0021 |
 | * AutoRelockTime                                                    | 0x0023 |
 | * SoundVolume                                                       | 0x0024 |
@@ -2305,7 +2308,8 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::DlCredential::Type>>
+        mComplex_Credential;
 };
 
 /*
@@ -2414,8 +2418,8 @@ public:
         AddArgument("Credential", &mComplex_Credential);
         AddArgument("CredentialData", &mRequest.credentialData);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
         ClusterCommand::AddArguments();
     }
 
@@ -2444,12 +2448,9 @@ public:
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserName", &mRequest.userName);
         AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("CredentialRule", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.credentialRule)> *>(&mRequest.credentialRule));
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
+        AddArgument("CredentialRule", 0, UINT8_MAX, &mRequest.credentialRule);
         ClusterCommand::AddArguments();
     }
 
@@ -9434,8 +9435,11 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<ReadAttribute>(Id, "door-state", Attributes::DoorState::Id),                                             //
         make_unique<ReadAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id),      //
         make_unique<ReadAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),           //
+        make_unique<ReadAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),         //
         make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                              //
         make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                              //
+        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),                            //
+        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id),                            //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id),                                                //
         make_unique<ReadAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id),                                  //
         make_unique<ReadAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id),                                         //
@@ -9460,8 +9464,11 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<SubscribeAttribute>(Id, "door-state", Attributes::DoorState::Id),                                        //
         make_unique<SubscribeAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id), //
         make_unique<SubscribeAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),      //
+        make_unique<SubscribeAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),    //
         make_unique<SubscribeAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                         //
         make_unique<SubscribeAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                         //
+        make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),                       //
+        make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id),                       //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id),                                           //
         make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id),                             //
         make_unique<SubscribeAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id),                                    //
