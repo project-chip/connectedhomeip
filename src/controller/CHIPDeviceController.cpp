@@ -180,8 +180,8 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
 {
     FabricInfo newFabric;
 
-    ReturnErrorCodeIf(params.ephemeralKeypair == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    newFabric.SetEphemeralKey(params.ephemeralKeypair);
+    ReturnErrorCodeIf(params.operationalKeypair == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    newFabric.SetOperationalKeypair(params.operationalKeypair);
 
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;

@@ -717,7 +717,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         }
 
         keypair.Initialize();
-        SuccessOrExit(err = gFabricBeingCommissioned.SetEphemeralKey(&keypair));
+        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key
         VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);

@@ -168,7 +168,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
 #endif
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
-    controllerParams.ephemeralKeypair               = params.ephemeralKeypair;
+    controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
