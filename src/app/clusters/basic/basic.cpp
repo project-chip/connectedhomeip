@@ -364,8 +364,6 @@ PlatformMgrDelegate gPlatformMgrDelegate;
 
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    registerAttributeAccessOverride(&gAttrAccess);
-
     EmberAfStatus status;
 
     char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
@@ -392,5 +390,6 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 
 void MatterBasicPluginServerInitCallback()
 {
+    registerAttributeAccessOverride(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 }

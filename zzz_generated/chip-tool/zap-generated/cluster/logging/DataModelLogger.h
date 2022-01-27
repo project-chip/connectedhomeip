@@ -251,3 +251,103 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value);

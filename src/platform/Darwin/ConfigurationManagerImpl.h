@@ -30,6 +30,8 @@
 namespace chip {
 namespace DeviceLayer {
 
+static constexpr int kCountryCodeLength = 2;
+
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Darwin platform.
  */
@@ -40,6 +42,8 @@ public:
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
+    char mCountryCode[kCountryCodeLength + 1];
+
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;
@@ -48,6 +52,8 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 

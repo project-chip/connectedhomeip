@@ -84,14 +84,14 @@ tests:
       attribute: "location"
       groupId: "1"
       arguments:
-          value: "FR"
+          value: "XX"
 
     # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
       attribute: "location"
       response:
-          value: "FR"
+          value: "XX"
 
     # Test Pair 3 : Sends a Group command
     - label: "Turn On the light to see attribute change"

@@ -190,7 +190,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     commissionerParams.storageDelegate                = &mCommissionerStorage;
     commissionerParams.fabricIndex                    = static_cast<chip::FabricIndex>(fabricId);
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
-    commissionerParams.ephemeralKeypair               = &ephemeralKey;
+    commissionerParams.operationalKeypair             = &ephemeralKey;
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;
     commissionerParams.controllerNOC                  = nocSpan;

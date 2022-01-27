@@ -222,7 +222,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             return;
         }
 
-        commissionerParams.ephemeralKeypair = &ephemeralKey;
+        commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC = rcac;
         commissionerParams.controllerICAC = icac;
         commissionerParams.controllerNOC = noc;
