@@ -138,63 +138,85 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
 {
-    ChipLogDetail(SoftwareUpdate, "Requestor endpoint:%" PRIu16 " node-id:0x" ChipLogFormatX64, commandPath.mEndpointId,
-                  ChipLogValueX64(commandObj->SourceNodeId()));
-
     OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
     OTAProviderExample::DeviceSoftwareVersionModel candidate;
-    bool otaAvailable                     = false;
     uint32_t newSoftwareVersion           = 0;
     const char * newSoftwareVersionString = nullptr;
     const char * otaFilePath              = nullptr;
     uint8_t updateToken[kUpdateTokenLen]  = { 0 };
     char strBuf[kUpdateTokenStrLen]       = { 0 };
     char uriBuf[kUriMaxLen]               = { 0 };
-    bool userConsentNeeded                = commandData.requestorCanConsent.ValueOr(false);
+    uint32_t delayedActionTimeSec         = mDelayedActionTimeSec;
+    bool requestorCanConsent              = commandData.requestorCanConsent.ValueOr(false);
     QueryImageResponse::Type response;
 
-    // This use-case is a subset of the ota-candidates-file option.
-    // Can be removed once all other platforms (ESP, etc.)
-    // start using the ota-candidates-file method.
-    if (strlen(mOTAFilePath)) // If OTA file is directly provided
+    switch (mQueryImageBehavior)
     {
-        otaAvailable       = true;
-        newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
-                                                              // available (if the user provides a file).
-        newSoftwareVersionString = "Example-Image-V0.1";
-        otaFilePath              = mOTAFilePath;
-        queryStatus              = OTAQueryStatus::kUpdateAvailable;
-    }
-    else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
-    {
-        otaAvailable = SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate);
-        if (otaAvailable)
+    case kRespondWithUnknown:
+        // This use-case is a subset of the ota-candidates-file option.
+        // Can be removed once all other platforms (ESP, etc.)
+        // start using the ota-candidates-file method.
+        if (strlen(mOTAFilePath)) // If OTA file is directly provided
         {
-            newSoftwareVersion       = candidate.softwareVersion;
-            newSoftwareVersionString = candidate.softwareVersionString;
-            otaFilePath              = candidate.otaURL;
+            newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
+                                                                  // available (if the user provides a file).
+            newSoftwareVersionString = "Example-Image-V0.1";
+            otaFilePath              = mOTAFilePath;
             queryStatus              = OTAQueryStatus::kUpdateAvailable;
         }
-    }
-
-    if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
-    {
-        UserConsentState state = mUserConsentDelegate->GetUserConsentState(commandObj->SourceNodeId(), commandPath.mEndpointId,
-                                                                           commandData.softwareVersion, newSoftwareVersion);
-        switch (state)
+        else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
         {
-        case UserConsentState::kGranted:
-            queryStatus = OTAQueryStatus::kUpdateAvailable;
-            break;
-
-        case chip::ota::UserConsentState::kObtaining:
-            queryStatus = OTAQueryStatus::kBusy;
-            break;
-
-        case chip::ota::UserConsentState::kDenied:
-            queryStatus = OTAQueryStatus::kNotAvailable;
-            break;
+            if (SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate))
+            {
+                newSoftwareVersion       = candidate.softwareVersion;
+                newSoftwareVersionString = candidate.softwareVersionString;
+                otaFilePath              = candidate.otaURL;
+                queryStatus              = OTAQueryStatus::kUpdateAvailable;
+            }
         }
+
+
+        if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
+        {
+            UserConsentState state = mUserConsentDelegate->GetUserConsentState(commandObj->SourceNodeId(), commandPath.mEndpointId,
+                                                                               commandData.softwareVersion, newSoftwareVersion);
+            switch (state)
+            {
+            case UserConsentState::kGranted:
+                queryStatus = OTAQueryStatus::kUpdateAvailable;
+                break;
+
+            case chip::ota::UserConsentState::kObtaining:
+                queryStatus = OTAQueryStatus::kBusy;
+                delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+                break;
+
+            case chip::ota::UserConsentState::kDenied:
+                queryStatus = OTAQueryStatus::kNotAvailable;
+                delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+                break;
+            }
+        }
+        break;
+
+    case kRespondWithUpdateAvailable:
+        queryStatus = OTAQueryStatus::kUpdateAvailable;
+        break;
+
+    case kRespondWithBusy:
+        queryStatus = OTAQueryStatus::kBusy;
+        delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+        break;
+
+    case kRespondWithNotAvailable:
+        queryStatus = OTAQueryStatus::kNotAvailable;
+        delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+        break;
+
+    default:
+        queryStatus = OTAQueryStatus::kNotAvailable;
+        delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+        break;
     }
 
     if (queryStatus == OTAQueryStatus::kUpdateAvailable)
@@ -233,7 +255,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     }
 
     response.status = queryStatus;
-    response.delayedActionTime.Emplace(mDelayedActionTimeSec);
+    response.delayedActionTime.Emplace(delayedActionTimeSec);
     response.userConsentNeeded.Emplace(requestorCanConsent);
     // Could also just not send metadataForRequestor at all.
     response.metadataForRequestor.Emplace(chip::ByteSpan());
