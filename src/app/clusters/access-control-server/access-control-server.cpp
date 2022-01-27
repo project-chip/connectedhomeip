@@ -272,6 +272,16 @@ struct AccessControlEntryCodec
         return CHIP_NO_ERROR;
     }
 
+    bool MatchesFabricIndex(FabricIndex fabricIndex) const
+    {
+        FabricIndex entryFabricIndex;
+        if (entry.GetFabricIndex(entryFabricIndex) == CHIP_NO_ERROR)
+        {
+            return fabricIndex == entryFabricIndex;
+        }
+        return false;
+    }
+
     AccessControl::Entry entry;
 };
 
