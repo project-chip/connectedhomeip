@@ -322,8 +322,8 @@ possible:
     procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
     initiated.
 
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    process. This feature is not currently supported.
+-   _Pressed for less than 3 s_ &mdash; Delete all fabric IDs and start BLE
+    advertising
 
 **Button 1** &mdash; Pressing the button once changes the lock state to the
 opposite one.
