@@ -47,6 +47,7 @@ public:
 
     enum QueryImageBehaviorType
     {
+        kRespondWithUnknown,
         kRespondWithUpdateAvailable,
         kRespondWithBusy,
         kRespondWithNotAvailable

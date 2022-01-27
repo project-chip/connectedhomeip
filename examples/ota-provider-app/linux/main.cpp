@@ -54,7 +54,7 @@ constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
 uint32_t gDelayedActionTimeSec                                 = 0;
 const char * gOtaFilepath                                      = nullptr;
 
