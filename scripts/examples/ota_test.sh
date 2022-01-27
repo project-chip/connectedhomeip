@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-ARG1=${1:-20202021}
-ARG2=${2:-42}
-ARG3=${3:-5560}
+PASSCODE=${1:-20202021}
+ID=${2:-42}
+DISCRIMINATOR=${3:-5560}
 
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app 
@@ -18,7 +18,7 @@ provider_pid=$!
 
 echo  "Commissioning Provider "
 
-./out/chip-tool pairing onnetwork 1 "$ARG1" | tee /tmp/ota/chip-tool-commission-provider.txt 
+./out/chip-tool pairing onnetwork 1 "$PASSCODE" | tee /tmp/ota/chip-tool-commission-provider.txt 
 if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commission-provider.txt;
 then echo Provider Commissioned;
 else echo Provider not commissioned properly;
@@ -26,12 +26,12 @@ fi
 
 rm /tmp/chip_kvs
 
-stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$ARG3" -d "$ARG2" | tee /tmp/ota/requestor-log.txt & 
+stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$DISCRIMINATOR" -d "$ID" | tee /tmp/ota/requestor-log.txt & 
 requestor_pid=$!
 
 echo  "Commissioning Requestor "
 
-./out/chip-tool pairing onnetwork-long 2 "$ARG1" "$ARG2" | tee /tmp/ota/chip-tool-commission-requestor.txt 
+./out/chip-tool pairing onnetwork-long 2 "$PASSCODE" "$ID" | tee /tmp/ota/chip-tool-commission-requestor.txt 
 
 if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commission-requestor.txt;
 then echo Requestor Commissioned;
