@@ -305,9 +305,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mNetworkTechnology.HasOnly(
                     chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
             {
-                ChipLogError(Controller,
-                             "Network Commissioning cluster is malformed - more than one network technology is specified (0x%x)",
-                             report.Get<FeatureMap>().features);
+                ChipLogError(
+                    Controller,
+                    "Network Commissioning cluster is malformed - more than one network technology is specified (0x%" PRIX32 ")",
+                    report.Get<FeatureMap>().features);
                 err = CHIP_ERROR_INTEGRITY_CHECK_FAILED;
                 break;
             }
