@@ -90,7 +90,7 @@ void RegisterNFCCommands()
                                                    "Start, stop or get nfc emulation state. Usage: nfc <start|stop|state>" };
 
     // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&sDeviceComand, 1, nullptr);
 }
 
 } // namespace Shell

@@ -273,7 +273,7 @@ void RegisterControllerCommands()
                                                    "Controller commands. Usage: controller [command_name]" };
 
     // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&sDeviceComand, 1, nullptr);
     return;
 }
 

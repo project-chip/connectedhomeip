@@ -88,10 +88,10 @@ void RegisterBase64Commands()
     static const shell_command_t sBase64Command = { &Base64Dispatch, "base64", "Base64 encode / decode utilities" };
 
     // Register `base64` subcommands with the local shell dispatcher.
-    sShellBase64Commands.RegisterCommands(sBase64SubCommands, ArraySize(sBase64SubCommands));
+    sShellBase64Commands.RegisterCommands(sBase64SubCommands, ArraySize(sBase64SubCommands), "base64");
 
     // Register the root `base64` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sBase64Command, 1);
+    Engine::Root().RegisterCommands(&sBase64Command, 1, nullptr);
 }
 
 } // namespace Shell
