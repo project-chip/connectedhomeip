@@ -147,6 +147,12 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
 // Declare Content App endpoint
 DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
+namespace {
+
+DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
+
+} // anonymous namespace
+
 ContentAppFactoryImpl::ContentAppFactoryImpl() {}
 
 uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
@@ -184,12 +190,14 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
                     vendorApp.catalogVendorId, vendorApp.applicationId);
 
-    for (auto & app : mContentApps)
+    for (size_t i = 0; i < ArraySize(mContentApps); ++i)
     {
+        auto & app = mContentApps[i];
+
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP, gDataVersions[i]);
             return &app;
         }
     }

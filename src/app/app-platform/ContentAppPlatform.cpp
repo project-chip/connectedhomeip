@@ -85,7 +85,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
+                                             DataVersion * dataVersionStorage)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -111,7 +112,8 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             EmberAfStatus ret;
             while (1)
             {
-                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
+                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
+                                                dataVersionStorage);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
