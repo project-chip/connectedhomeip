@@ -30,7 +30,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.45
+            image: connectedhomeip/chip-build:0.5.52
 
         steps:
             - name: Checkout

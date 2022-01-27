@@ -27,6 +27,7 @@ adb
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddThreadNetwork
 adk
 adoc
 AdvAutonomous
@@ -42,6 +43,7 @@ alloc
 Ameba
 amebad
 amebaiot
+announcementReason
 AnnounceOTAProvider
 APIs
 apk
@@ -252,12 +254,14 @@ customizations
 cvfJ
 cxx
 CY
+CYW
 DAC
 DAP
 DataFrame
 dataset
 datasets
 dbf
+DBG
 dBm
 DBUILD
 dbus
@@ -316,6 +320,7 @@ DMM
 DNS
 Dnsmasq
 dnsmasqd
+DNSSD
 DNSStubListener
 Dockerfile
 Dockerfiles
@@ -355,6 +360,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EnableNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName
@@ -413,7 +419,9 @@ FreeRTOSConfig
 fsl
 fstab
 fsync
+ftd
 fullclean
+gbl
 gcloud
 GDB
 GeneralCommissioning
@@ -650,6 +658,7 @@ MoveToSaturation
 MoveWithOnOff
 MPSL
 MRP
+MTD
 MTU
 Multiband
 Multicast
@@ -722,6 +731,7 @@ OTA
 OTADownloader
 OTAImageProcessorDriver
 OTAImageProcessorInterface
+OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
@@ -774,6 +784,7 @@ pre
 preprocessor
 Presetup
 prj
+providerNodeId
 ProductID
 ProductLabel
 ProductName
@@ -837,6 +848,8 @@ RendezVousTest
 repo
 req
 Requestor
+Requestor's
+Requestors
 responder
 retargeting
 reusability
@@ -878,6 +891,7 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
+SED
 SEGGER
 semver
 sendto
@@ -940,6 +954,7 @@ submodules
 subprocess
 SubscribeResponse
 SubscriptionId
+subtype
 sudo
 svg
 SVR
@@ -978,6 +993,7 @@ testws
 texinfo
 textboxes
 TFT
+threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
 Thunderboard
@@ -988,6 +1004,7 @@ TLV
 tmp
 tngvndl
 TODO
+tokenized
 toolchain
 toolchains
 topologies
@@ -1048,6 +1065,7 @@ VendorName
 vendorpayload
 venv
 Verifier
+Verifiers
 VID
 visualstudio
 vlatest

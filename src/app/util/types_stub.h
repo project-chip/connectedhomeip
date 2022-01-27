@@ -495,8 +495,40 @@ enum
  */
 struct EmberBindingTableEntry
 {
+    EmberBindingTableEntry() = default;
+
+    static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
+                                          chip::EndpointId remoteEndpoint, chip::ClusterId cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type        = EMBER_UNICAST_BINDING,
+            .fabricIndex = fabric,
+            .local       = localEndpoint,
+            .clusterId   = cluster,
+            .remote      = remoteEndpoint,
+            .nodeId      = node,
+        };
+        return entry;
+    }
+
+    static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
+                                           chip::ClusterId cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type        = EMBER_MULTICAST_BINDING,
+            .fabricIndex = fabric,
+            .local       = localEndpoint,
+            .clusterId   = cluster,
+            .remote      = 0,
+            .groupId     = group,
+        };
+        return entry;
+    }
+
     /** The type of binding. */
     EmberBindingType type;
+
+    chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
     chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
@@ -519,8 +551,6 @@ struct EmberBindingTableEntry
         chip::NodeId nodeId;
         chip::GroupId groupId;
     };
-    /** The index of the network the binding belongs to. */
-    uint8_t networkIndex;
 
     bool operator==(EmberBindingTableEntry const & other) const
     {
@@ -539,7 +569,7 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        return local == other.local && clusterId == other.clusterId && remote == other.remote && networkIndex == other.networkIndex;
+        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId && remote == other.remote;
     }
 };
 
@@ -1695,7 +1725,7 @@ typedef struct
 /**
  * @brief The broadcast endpoint, as defined in the ZigBee spec.
  */
-#define EMBER_BROADCAST_ENDPOINT 0xFF
+#define EMBER_BROADCAST_ENDPOINT (chip::kInvalidEndpointId)
 
 /**
  * @brief Useful to reference a single bit of a byte.

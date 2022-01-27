@@ -158,6 +158,10 @@ void SetupEmberAfCommandSender(CommandSender * command, const ConcreteCommandPat
     {
         imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
     }
+    else
+    {
+        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_UNICAST;
+    }
 
     imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
     imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
@@ -180,6 +184,10 @@ void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandP
     if (commandExchangeCtx->IsGroupExchangeContext())
     {
         imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
+    }
+    else
+    {
+        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_UNICAST;
     }
 
     imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
@@ -254,30 +262,14 @@ CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, Attr
     return aAttributeReport.EndOfAttributeReportIB().GetError();
 }
 
-CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIB::Builder & aAttributeReport,
+CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                              Protocols::InteractionModel::Status aStatus, TLV::TLVWriter * aReportCheckpoint)
 {
     if (aReportCheckpoint != nullptr)
     {
-        aAttributeReport.Rollback(*aReportCheckpoint);
+        aAttributeReports.Rollback(*aReportCheckpoint);
     }
-    AttributeStatusIB::Builder & attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
-    ReturnErrorOnFailure(aAttributeReport.GetError());
-    AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
-    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
-
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-        .Cluster(aPath.mClusterId)
-        .Attribute(aPath.mAttributeId)
-        .EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
-    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
-    statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
-    ReturnErrorOnFailure(statusIBBuilder.GetError());
-
-    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
-    return aAttributeReport.EndOfAttributeReportIB().GetError();
+    return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(aStatus));
 }
 
 // This reader should never actually be registered; we do manual dispatch to it
@@ -331,16 +323,15 @@ CHIP_ERROR AttributeListReader::Read(const ConcreteReadAttributePath & aPath, At
 // Helper function for trying to read an attribute value via an
 // AttributeAccessInterface.  On failure, the read has failed.  On success, the
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
-CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                  AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFabricFiltered,
+                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                   AttributeValueEncoder::AttributeEncodeState * aEncoderState,
                                   AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
 {
-    // TODO: We should probably clone the writer and convert failures here
-    // into status responses, unless our caller already does that.
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, state);
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, aIsFabricFiltered,
+                                       state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)
@@ -360,8 +351,8 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
 
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
@@ -387,9 +378,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
+        return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
@@ -409,15 +398,10 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             }
             else
             {
-                AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-                ReturnErrorOnFailure(aAttributeReports.GetError());
-                return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+                return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
             }
         }
     }
-
-    // Read attribute using attribute override, if appropriate. This includes registered overrides, but also
-    // specially handled mandatory global attributes (which use unregistered overrides).
 
     {
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
@@ -428,19 +412,19 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
         if (attributeOverride)
         {
             bool triedEncode;
-            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
-                                                        attributeOverride, &triedEncode));
+            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aIsFabricFiltered, aPath, aAttributeReports,
+                                                        apEncoderState, attributeOverride, &triedEncode));
             ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
         }
     }
 
     // Read attribute using Ember, if it doesn't have an override.
 
+    TLV::TLVWriter backup;
+    aAttributeReports.Checkpoint(backup);
+
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
-
-    TLV::TLVWriter backup;
-    attributeReport.Checkpoint(backup);
 
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
@@ -660,21 +644,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             }
             break;
         }
-        case ZCL_ARRAY_ATTRIBUTE_TYPE: {
-            // We only get here for attributes of list type that have no override
-            // registered.  There should not be any nonempty lists like that.
-            uint16_t length = emberAfGetInt16u(attributeData, 0, 2);
-            if (length != 0)
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-
-            // Just encode an empty array.
-            TLV::TLVType containerType;
-            ReturnErrorOnFailure(writer->StartContainer(tag, TLV::kTLVType_Array, containerType));
-            ReturnErrorOnFailure(writer->EndContainer(containerType));
-            break;
-        }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
             emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
@@ -687,7 +656,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, attributeReport, imStatus, &backup);
+    return SendFailureStatus(aPath, aAttributeReports, imStatus, &backup);
 }
 
 namespace {
@@ -837,16 +806,14 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
 
-    AttributePathParams attributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     if (attributeMetadata == nullptr)
     {
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAttribute);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
     if (attributeMetadata->IsReadOnly())
     {
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedWrite);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedWrite);
     }
 
     {
@@ -858,13 +825,13 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAccess);
+            return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
     {
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
@@ -875,7 +842,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         if (valueDecoder.TriedDecode())
         {
             MatterReportingAttributeChangeCallback(aPath);
-            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+            return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
         }
     }
 
@@ -884,19 +851,19 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
     if (dataLen > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
     auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                                                          CLUSTER_MASK_SERVER, attributeData,
                                                                          attributeMetadata->attributeType));
-    return apWriteHandler->AddStatus(attributePathParams, status);
+    return apWriteHandler->AddStatus(aPath, status);
 }
 
 } // namespace app

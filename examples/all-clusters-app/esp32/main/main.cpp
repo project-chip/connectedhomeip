@@ -61,6 +61,7 @@
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <binding-handler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
@@ -81,7 +82,10 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+#include <OnOffCommands.h>
+
 using namespace ::chip;
+using namespace ::chip::Shell;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -507,6 +511,18 @@ void SetupPretendDevices()
     AddEndpoint("Door 2");
     AddCluster("Door");
     AddAttribute("State", "Closed");
+
+    AddDevice("Occupancy Sensor");
+    AddEndpoint("External");
+    AddCluster("Occupancy Sensor");
+    AddAttribute("Occupancy", "1");
+    app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
+
+    AddDevice("Contact Sensor");
+    AddEndpoint("External");
+    AddCluster("Contact Sensor");
+    AddAttribute("BooleanState", "true");
+    app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
 }
 
 WiFiWidget pairingWindowLED;
@@ -537,6 +553,7 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
     SetupPretendDevices();
+    InitBindingHandlers();
 }
 
 static void InitOTARequestor(void)
@@ -579,6 +596,8 @@ extern "C" void app_main()
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
+    OnOffCommands & onOffCommands = OnOffCommands::GetInstance();
+    onOffCommands.Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
 #if CONFIG_OPENTHREAD_ENABLED

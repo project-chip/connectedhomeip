@@ -178,8 +178,8 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
 {
     _LabelStruct labelStruct;
 
-    labelStruct.label = chip::CharSpan(label, strlen(label));
-    labelStruct.value = chip::CharSpan(value, strlen(value));
+    labelStruct.label = chip::CharSpan::fromCharString(label);
+    labelStruct.value = chip::CharSpan::fromCharString(value);
 
     // TODO: Need to set up an AttributeAccessInterface to handle the lists here.
 }
@@ -257,8 +257,8 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
 }
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength)
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -284,8 +284,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer)
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 

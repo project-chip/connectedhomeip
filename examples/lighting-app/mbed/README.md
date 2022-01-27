@@ -124,13 +124,13 @@ example ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile)
+Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile) => (build type)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=lighting-app -b=<board name> -p=<build profile>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=lighting-app -b=<board name> -p=<build profile> -T=<build type>
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
@@ -139,6 +139,16 @@ Both approaches are limited to supported evaluation boards which are listed in
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit
 [ARM Mbed OS build profiles](https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html).
+
+There are also three types of built application: _simple, boot_ and _upgrade_:
+
+-   **simple** - standalone application, mainly for developing and testing
+    purpose (all building profiles are supported)
+-   **boot** - signed application + bootloader, it supports booting process and
+    can be use for firmware update (only _release_ building profiles is
+    supported)
+-   **update** - signed application, application image can be used for firmware
+    update (only _release_ building profiles is supported)
 
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.

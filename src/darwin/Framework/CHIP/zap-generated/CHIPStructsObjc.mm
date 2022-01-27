@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -200,6 +200,45 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPPowerSourceClusterBatChargeFaultChangeType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerSourceClusterBatFaultChangeType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerSourceClusterWiredFaultChangeType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPGeneralCommissioningClusterBasicCommissioningInfoType
 - (instancetype)init
 {
@@ -291,7 +330,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSoftwareDiagnosticsClusterSoftwareFault
+@implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -466,6 +505,8 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _noc = [NSData data];
+
+        _icac = [NSData data];
     }
     return self;
 }
@@ -933,6 +974,17 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _a = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestFabricScoped
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
     }
     return self;
 }

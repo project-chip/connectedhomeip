@@ -248,11 +248,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreManufacturingDate(
 
 template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
+{}
+
+template <class ImplClass>
+void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // Increment life time counter to protect against long-term tracking of rotating device ID.
     IncrementLifetimeCounter();
-#endif
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
+#endif
 }
 
 template <class ConfigClass>
@@ -322,73 +327,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreRegulatoryLocation
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHourFormat(uint8_t & format)
-{
-    uint32_t value = 0;
-
-    CHIP_ERROR err = ReadConfigValue(ConfigClass::kConfigKey_HourFormat, value);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        format = static_cast<uint8_t>(value);
-    }
-
-    return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHourFormat(uint8_t format)
-{
-    uint32_t value = format;
-    return WriteConfigValue(ConfigClass::kConfigKey_HourFormat, value);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCalendarType(uint8_t & type)
-{
-    uint32_t value = 0;
-
-    CHIP_ERROR err = ReadConfigValue(ConfigClass::kConfigKey_CalendarType, value);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        type = static_cast<uint8_t>(value);
-    }
-
-    return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCalendarType(uint8_t type)
-{
-    uint32_t value = type;
-    return WriteConfigValue(ConfigClass::kConfigKey_CalendarType, value);
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
 {
     return ReadConfigValueStr(ConfigClass::kConfigKey_CountryCode, buf, bufSize, codeLen);
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen)
-{
-    return ReadConfigValueStr(ConfigClass::kConfigKey_ActiveLocale, buf, bufSize, codeLen);
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCountryCode(const char * code, size_t codeLen)
 {
     return WriteConfigValueStr(ConfigClass::kConfigKey_CountryCode, code, codeLen);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreActiveLocale(const char * code, size_t codeLen)
-{
-    return WriteConfigValueStr(ConfigClass::kConfigKey_ActiveLocale, code, codeLen);
 }
 
 template <class ConfigClass>

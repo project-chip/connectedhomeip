@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -720,88 +720,145 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$AccessControlCluster$AclAttribute", attributeClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$AccessControlCluster$AclAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find AclAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
-
-        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
-
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_privilege;
+        std::string newElement_0_privilegeClassName     = "java/lang/Integer";
+        std::string newElement_0_privilegeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_privilegeClassName.c_str(), newElement_0_privilegeCtorSignature.c_str(),
+            static_cast<uint8_t>(entry_0.privilege), newElement_0_privilege);
+        jobject newElement_0_authMode;
+        std::string newElement_0_authModeClassName     = "java/lang/Integer";
+        std::string newElement_0_authModeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_authModeClassName.c_str(), newElement_0_authModeCtorSignature.c_str(),
+            static_cast<uint8_t>(entry_0.authMode), newElement_0_authMode);
+        jobject newElement_0_subjects;
+        if (entry_0.subjects.IsNull())
         {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
+            newElement_0_subjects = nullptr;
+        }
+        else
+        {
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_subjects);
+
+            auto iter_newElement_0_subjects_NaN = entry_0.subjects.Value().begin();
+            while (iter_newElement_0_subjects_NaN.Next())
+            {
+                auto & entry_NaN = iter_newElement_0_subjects_NaN.GetValue();
+                jobject newElement_NaN;
+                std::string newElement_NaNClassName     = "java/lang/Long";
+                std::string newElement_NaNCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+                    newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
+                chip::JniReferences::GetInstance().AddToArrayList(newElement_0_subjects, newElement_NaN);
+            }
+        }
+        jobject newElement_0_targets;
+        if (entry_0.targets.IsNull())
+        {
+            newElement_0_targets = nullptr;
+        }
+        else
+        {
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_targets);
+
+            auto iter_newElement_0_targets_NaN = entry_0.targets.Value().begin();
+            while (iter_newElement_0_targets_NaN.Next())
+            {
+                auto & entry_NaN = iter_newElement_0_targets_NaN.GetValue();
+                jobject newElement_NaN;
+                jobject newElement_NaN_cluster;
+                if (entry_NaN.cluster.IsNull())
+                {
+                    newElement_NaN_cluster = nullptr;
+                }
+                else
+                {
+                    std::string newElement_NaN_clusterClassName     = "java/lang/Long";
+                    std::string newElement_NaN_clusterCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                        newElement_NaN_clusterClassName.c_str(), newElement_NaN_clusterCtorSignature.c_str(),
+                        entry_NaN.cluster.Value(), newElement_NaN_cluster);
+                }
+                jobject newElement_NaN_endpoint;
+                if (entry_NaN.endpoint.IsNull())
+                {
+                    newElement_NaN_endpoint = nullptr;
+                }
+                else
+                {
+                    std::string newElement_NaN_endpointClassName     = "java/lang/Integer";
+                    std::string newElement_NaN_endpointCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                        newElement_NaN_endpointClassName.c_str(), newElement_NaN_endpointCtorSignature.c_str(),
+                        entry_NaN.endpoint.Value(), newElement_NaN_endpoint);
+                }
+                jobject newElement_NaN_deviceType;
+                if (entry_NaN.deviceType.IsNull())
+                {
+                    newElement_NaN_deviceType = nullptr;
+                }
+                else
+                {
+                    std::string newElement_NaN_deviceTypeClassName     = "java/lang/Long";
+                    std::string newElement_NaN_deviceTypeCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                        newElement_NaN_deviceTypeClassName.c_str(), newElement_NaN_deviceTypeCtorSignature.c_str(),
+                        entry_NaN.deviceType.Value(), newElement_NaN_deviceType);
+                }
+
+                jclass targetStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterTarget", targetStructClass);
+                VerifyOrReturn(err == CHIP_NO_ERROR,
+                               ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterTarget"));
+                chip::JniClass structJniClass(targetStructClass);
+                jmethodID targetStructCtor =
+                    env->GetMethodID(targetStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V");
+                VerifyOrReturn(targetStructCtor != nullptr,
+                               ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterTarget constructor"));
+
+                newElement_NaN = env->NewObject(targetStructClass, targetStructCtor, newElement_NaN_cluster,
+                                                newElement_NaN_endpoint, newElement_NaN_deviceType);
+                chip::JniReferences::GetInstance().AddToArrayList(newElement_0_targets, newElement_NaN);
+            }
         }
 
-        bool privilegeNull     = false;
-        bool privilegeHasValue = true;
+        jclass accessControlEntryStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntry", accessControlEntryStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlEntry"));
+        chip::JniClass structJniClass(accessControlEntryStructClass);
+        jmethodID accessControlEntryStructCtor =
+            env->GetMethodID(accessControlEntryStructClass, "<init>",
+                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Lchip/"
+                             "devicecontroller/ChipStructs$AccessControlClusterTarget;)V");
+        VerifyOrReturn(accessControlEntryStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlEntry constructor"));
 
-        chip::app::Clusters::AccessControl::Privilege privilegeValue = entry.privilege;
-
-        jobject privilege = nullptr;
-        if (!privilegeNull && privilegeHasValue)
-        {
-            jclass privilegeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", privilegeEntryCls);
-            chip::JniClass privilegeJniClass(privilegeEntryCls);
-            jmethodID privilegeEntryTypeCtor = env->GetMethodID(privilegeEntryCls, "<init>", "(I)V");
-            privilege                        = env->NewObject(privilegeEntryCls, privilegeEntryTypeCtor, privilegeValue);
-        }
-
-        bool authModeNull     = false;
-        bool authModeHasValue = true;
-
-        chip::app::Clusters::AccessControl::AuthMode authModeValue = entry.authMode;
-
-        jobject authMode = nullptr;
-        if (!authModeNull && authModeHasValue)
-        {
-            jclass authModeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", authModeEntryCls);
-            chip::JniClass authModeJniClass(authModeEntryCls);
-            jmethodID authModeEntryTypeCtor = env->GetMethodID(authModeEntryCls, "<init>", "(I)V");
-            authMode                        = env->NewObject(authModeEntryCls, authModeEntryTypeCtor, authModeValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, privilege, authMode);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create AclAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(accessControlEntryStructClass, accessControlEntryStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_privilege, newElement_0_authMode, newElement_0_subjects, newElement_0_targets);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding AclAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -854,70 +911,44 @@ void CHIPAccessControlExtensionAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$AccessControlCluster$ExtensionAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$AccessControlCluster$ExtensionAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;[B)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ExtensionAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_data;
+        jbyteArray newElement_0_dataByteArray = env->NewByteArray(static_cast<jsize>(entry_0.data.size()));
+        env->SetByteArrayRegion(newElement_0_dataByteArray, 0, static_cast<jsize>(entry_0.data.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.data.data()));
+        newElement_0_data = newElement_0_dataByteArray;
 
-        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
+        jclass extensionEntryStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$AccessControlClusterExtensionEntry", extensionEntryStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterExtensionEntry"));
+        chip::JniClass structJniClass(extensionEntryStructClass);
+        jmethodID extensionEntryStructCtor = env->GetMethodID(extensionEntryStructClass, "<init>", "(Ljava/lang/Integer;[B)V");
+        VerifyOrReturn(extensionEntryStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterExtensionEntry constructor"));
 
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
-        {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
-        }
-
-        bool dataNull     = false;
-        bool dataHasValue = true;
-
-        chip::ByteSpan dataValue = entry.data;
-
-        jbyteArray data = nullptr;
-        if (!dataNull && dataHasValue)
-        {
-            data = env->NewByteArray(dataValue.size());
-            env->SetByteArrayRegion(data, 0, dataValue.size(), reinterpret_cast<const jbyte *>(dataValue.data()));
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, data);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ExtensionAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(extensionEntryStructClass, extensionEntryStructCtor, newElement_0_fabricIndex, newElement_0_data);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ExtensionAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -971,43 +1002,24 @@ void CHIPAccessControlAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1061,43 +1073,24 @@ void CHIPAccountLoginAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1154,11 +1147,10 @@ void CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback::CallbackFn
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::FabricIndex>(javaValueClassName.c_str(),
-                                                                            javaValueCtorSignature.c_str(), value, javaValue);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value,
+                                                                  javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -1211,43 +1203,24 @@ void CHIPAdministratorCommissioningAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1301,43 +1274,24 @@ void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry              = iter.GetValue();
-        bool entryNull            = false;
-        chip::VendorId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint16_t>(entry_0), newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AllowedVendorListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1391,43 +1345,24 @@ void CHIPApplicationBasicAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1481,43 +1416,24 @@ void CHIPApplicationLauncherApplicationLauncherListAttributeCallback::CallbackFn
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry        = iter.GetValue();
-        bool entryNull      = false;
-        uint16_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ApplicationLauncherListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1571,43 +1487,24 @@ void CHIPApplicationLauncherAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1662,87 +1559,46 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$AudioOutputCluster$AudioOutputListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$AudioOutputCluster$AudioOutputListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find AudioOutputListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool indexNull     = false;
-        bool indexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_index;
+        std::string newElement_0_indexClassName     = "java/lang/Integer";
+        std::string newElement_0_indexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_indexClassName.c_str(), newElement_0_indexCtorSignature.c_str(), entry_0.index, newElement_0_index);
+        jobject newElement_0_outputType;
+        std::string newElement_0_outputTypeClassName     = "java/lang/Integer";
+        std::string newElement_0_outputTypeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_outputTypeClassName.c_str(), newElement_0_outputTypeCtorSignature.c_str(),
+            static_cast<uint8_t>(entry_0.outputType), newElement_0_outputType);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
 
-        uint8_t indexValue = entry.index;
+        jclass outputInfoStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AudioOutputClusterOutputInfo",
+                                                             outputInfoStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfo"));
+        chip::JniClass structJniClass(outputInfoStructClass);
+        jmethodID outputInfoStructCtor =
+            env->GetMethodID(outputInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
+        VerifyOrReturn(outputInfoStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$AudioOutputClusterOutputInfo constructor"));
 
-        jobject index = nullptr;
-        if (!indexNull && indexHasValue)
-        {
-            jclass indexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", indexEntryCls);
-            chip::JniClass indexJniClass(indexEntryCls);
-            jmethodID indexEntryTypeCtor = env->GetMethodID(indexEntryCls, "<init>", "(I)V");
-            index                        = env->NewObject(indexEntryCls, indexEntryTypeCtor, indexValue);
-        }
-
-        bool outputTypeNull     = false;
-        bool outputTypeHasValue = true;
-
-        chip::app::Clusters::AudioOutput::OutputTypeEnum outputTypeValue = entry.outputType;
-
-        jobject outputType = nullptr;
-        if (!outputTypeNull && outputTypeHasValue)
-        {
-            jclass outputTypeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", outputTypeEntryCls);
-            chip::JniClass outputTypeJniClass(outputTypeEntryCls);
-            jmethodID outputTypeEntryTypeCtor = env->GetMethodID(outputTypeEntryCls, "<init>", "(I)V");
-            outputType                        = env->NewObject(outputTypeEntryCls, outputTypeEntryTypeCtor, outputTypeValue);
-        }
-
-        bool nameNull     = false;
-        bool nameHasValue = true;
-
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, outputType, name);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create AudioOutputListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(outputInfoStructClass, outputInfoStructCtor, newElement_0_index, newElement_0_outputType,
+                                      newElement_0_name);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AudioOutputListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1794,43 +1650,24 @@ void CHIPAudioOutputAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1884,43 +1721,24 @@ void CHIPBarrierControlAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -1975,11 +1793,10 @@ void CHIPBasicVendorIDAttributeCallback::CallbackFn(void * context, chip::Vendor
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::VendorId>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                         value, javaValue);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                   static_cast<uint16_t>(value), javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -2030,43 +1847,24 @@ void CHIPBasicAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2120,43 +1918,24 @@ void CHIPBinaryInputBasicAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2208,43 +1987,24 @@ void CHIPBindingAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2298,43 +2058,24 @@ void CHIPBooleanStateAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2387,133 +2128,68 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$BridgedActionsCluster$ActionListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$ActionListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(
-        attributeClass, "<init>",
-        "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ActionListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool actionIDNull     = false;
-        bool actionIDHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_actionID;
+        std::string newElement_0_actionIDClassName     = "java/lang/Integer";
+        std::string newElement_0_actionIDCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_actionIDClassName.c_str(),
+                                                                       newElement_0_actionIDCtorSignature.c_str(), entry_0.actionID,
+                                                                       newElement_0_actionID);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        jobject newElement_0_type;
+        std::string newElement_0_typeClassName     = "java/lang/Integer";
+        std::string newElement_0_typeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_typeClassName.c_str(),
+                                                                      newElement_0_typeCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(entry_0.type), newElement_0_type);
+        jobject newElement_0_endpointListID;
+        std::string newElement_0_endpointListIDClassName     = "java/lang/Integer";
+        std::string newElement_0_endpointListIDCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_endpointListIDClassName.c_str(),
+                                                                       newElement_0_endpointListIDCtorSignature.c_str(),
+                                                                       entry_0.endpointListID, newElement_0_endpointListID);
+        jobject newElement_0_supportedCommands;
+        std::string newElement_0_supportedCommandsClassName     = "java/lang/Integer";
+        std::string newElement_0_supportedCommandsCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_supportedCommandsClassName.c_str(),
+                                                                       newElement_0_supportedCommandsCtorSignature.c_str(),
+                                                                       entry_0.supportedCommands, newElement_0_supportedCommands);
+        jobject newElement_0_status;
+        std::string newElement_0_statusClassName     = "java/lang/Integer";
+        std::string newElement_0_statusCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_statusClassName.c_str(),
+                                                                      newElement_0_statusCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(entry_0.status), newElement_0_status);
 
-        uint16_t actionIDValue = entry.actionID;
+        jclass actionStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$BridgedActionsClusterActionStruct", actionStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$BridgedActionsClusterActionStruct"));
+        chip::JniClass structJniClass(actionStructStructClass);
+        jmethodID actionStructStructCtor = env->GetMethodID(
+            actionStructStructClass, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        VerifyOrReturn(actionStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$BridgedActionsClusterActionStruct constructor"));
 
-        jobject actionID = nullptr;
-        if (!actionIDNull && actionIDHasValue)
-        {
-            jclass actionIDEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", actionIDEntryCls);
-            chip::JniClass actionIDJniClass(actionIDEntryCls);
-            jmethodID actionIDEntryTypeCtor = env->GetMethodID(actionIDEntryCls, "<init>", "(I)V");
-            actionID                        = env->NewObject(actionIDEntryCls, actionIDEntryTypeCtor, actionIDValue);
-        }
-
-        bool nameNull     = false;
-        bool nameHasValue = true;
-
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        bool typeNull     = false;
-        bool typeHasValue = true;
-
-        chip::app::Clusters::BridgedActions::ActionTypeEnum typeValue = entry.type;
-
-        jobject type = nullptr;
-        if (!typeNull && typeHasValue)
-        {
-            jclass typeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", typeEntryCls);
-            chip::JniClass typeJniClass(typeEntryCls);
-            jmethodID typeEntryTypeCtor = env->GetMethodID(typeEntryCls, "<init>", "(I)V");
-            type                        = env->NewObject(typeEntryCls, typeEntryTypeCtor, typeValue);
-        }
-
-        bool endpointListIDNull     = false;
-        bool endpointListIDHasValue = true;
-
-        uint16_t endpointListIDValue = entry.endpointListID;
-
-        jobject endpointListID = nullptr;
-        if (!endpointListIDNull && endpointListIDHasValue)
-        {
-            jclass endpointListIDEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", endpointListIDEntryCls);
-            chip::JniClass endpointListIDJniClass(endpointListIDEntryCls);
-            jmethodID endpointListIDEntryTypeCtor = env->GetMethodID(endpointListIDEntryCls, "<init>", "(I)V");
-            endpointListID = env->NewObject(endpointListIDEntryCls, endpointListIDEntryTypeCtor, endpointListIDValue);
-        }
-
-        bool supportedCommandsNull     = false;
-        bool supportedCommandsHasValue = true;
-
-        uint16_t supportedCommandsValue = entry.supportedCommands;
-
-        jobject supportedCommands = nullptr;
-        if (!supportedCommandsNull && supportedCommandsHasValue)
-        {
-            jclass supportedCommandsEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", supportedCommandsEntryCls);
-            chip::JniClass supportedCommandsJniClass(supportedCommandsEntryCls);
-            jmethodID supportedCommandsEntryTypeCtor = env->GetMethodID(supportedCommandsEntryCls, "<init>", "(I)V");
-            supportedCommands = env->NewObject(supportedCommandsEntryCls, supportedCommandsEntryTypeCtor, supportedCommandsValue);
-        }
-
-        bool statusNull     = false;
-        bool statusHasValue = true;
-
-        chip::app::Clusters::BridgedActions::ActionStateEnum statusValue = entry.status;
-
-        jobject status = nullptr;
-        if (!statusNull && statusHasValue)
-        {
-            jclass statusEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", statusEntryCls);
-            chip::JniClass statusJniClass(statusEntryCls);
-            jmethodID statusEntryTypeCtor = env->GetMethodID(statusEntryCls, "<init>", "(I)V");
-            status                        = env->NewObject(statusEntryCls, statusEntryTypeCtor, statusValue);
-        }
-
-        jobject attributeObj =
-            env->NewObject(attributeClass, attributeCtor, actionID, name, type, endpointListID, supportedCommands, status);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ActionListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(actionStructStructClass, actionStructStructCtor, newElement_0_actionID, newElement_0_name,
+                           newElement_0_type, newElement_0_endpointListID, newElement_0_supportedCommands, newElement_0_status);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ActionListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2569,86 +2245,63 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$BridgedActionsCluster$EndpointListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$EndpointListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find EndpointListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool endpointListIDNull     = false;
-        bool endpointListIDHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_endpointListID;
+        std::string newElement_0_endpointListIDClassName     = "java/lang/Integer";
+        std::string newElement_0_endpointListIDCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_endpointListIDClassName.c_str(),
+                                                                       newElement_0_endpointListIDCtorSignature.c_str(),
+                                                                       entry_0.endpointListID, newElement_0_endpointListID);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        jobject newElement_0_type;
+        std::string newElement_0_typeClassName     = "java/lang/Integer";
+        std::string newElement_0_typeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_typeClassName.c_str(),
+                                                                      newElement_0_typeCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(entry_0.type), newElement_0_type);
+        jobject newElement_0_endpoints;
+        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
 
-        uint16_t endpointListIDValue = entry.endpointListID;
-
-        jobject endpointListID = nullptr;
-        if (!endpointListIDNull && endpointListIDHasValue)
+        auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
+        while (iter_newElement_0_endpoints_NaN.Next())
         {
-            jclass endpointListIDEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", endpointListIDEntryCls);
-            chip::JniClass endpointListIDJniClass(endpointListIDEntryCls);
-            jmethodID endpointListIDEntryTypeCtor = env->GetMethodID(endpointListIDEntryCls, "<init>", "(I)V");
-            endpointListID = env->NewObject(endpointListIDEntryCls, endpointListIDEntryTypeCtor, endpointListIDValue);
+            auto & entry_NaN = iter_newElement_0_endpoints_NaN.GetValue();
+            jobject newElement_NaN;
+            std::string newElement_NaNClassName     = "java/lang/Integer";
+            std::string newElement_NaNCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
+            chip::JniReferences::GetInstance().AddToArrayList(newElement_0_endpoints, newElement_NaN);
         }
 
-        bool nameNull     = false;
-        bool nameHasValue = true;
+        jclass endpointListStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$BridgedActionsClusterEndpointListStruct", endpointListStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$BridgedActionsClusterEndpointListStruct"));
+        chip::JniClass structJniClass(endpointListStructStructClass);
+        jmethodID endpointListStructStructCtor =
+            env->GetMethodID(endpointListStructStructClass, "<init>",
+                             "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
+        VerifyOrReturn(endpointListStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$BridgedActionsClusterEndpointListStruct constructor"));
 
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        bool typeNull     = false;
-        bool typeHasValue = true;
-
-        chip::app::Clusters::BridgedActions::EndpointListTypeEnum typeValue = entry.type;
-
-        jobject type = nullptr;
-        if (!typeNull && typeHasValue)
-        {
-            jclass typeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", typeEntryCls);
-            chip::JniClass typeJniClass(typeEntryCls);
-            jmethodID typeEntryTypeCtor = env->GetMethodID(typeEntryCls, "<init>", "(I)V");
-            type                        = env->NewObject(typeEntryCls, typeEntryTypeCtor, typeValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, endpointListID, name, type);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create EndpointListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(endpointListStructStructClass, endpointListStructStructCtor, newElement_0_endpointListID,
+                                      newElement_0_name, newElement_0_type, newElement_0_endpoints);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding EndpointListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2702,43 +2355,24 @@ void CHIPBridgedActionsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2792,43 +2426,24 @@ void CHIPBridgedDeviceBasicAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -2881,112 +2496,54 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$ChannelCluster$ChannelListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$ChannelCluster$ChannelListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>",
-                         "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ChannelListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool majorNumberNull     = false;
-        bool majorNumberHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_majorNumber;
+        std::string newElement_0_majorNumberClassName     = "java/lang/Integer";
+        std::string newElement_0_majorNumberCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_majorNumberClassName.c_str(),
+                                                                       newElement_0_majorNumberCtorSignature.c_str(),
+                                                                       entry_0.majorNumber, newElement_0_majorNumber);
+        jobject newElement_0_minorNumber;
+        std::string newElement_0_minorNumberClassName     = "java/lang/Integer";
+        std::string newElement_0_minorNumberCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_minorNumberClassName.c_str(),
+                                                                       newElement_0_minorNumberCtorSignature.c_str(),
+                                                                       entry_0.minorNumber, newElement_0_minorNumber);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        jobject newElement_0_callSign;
+        newElement_0_callSign = env->NewStringUTF(std::string(entry_0.callSign.data(), entry_0.callSign.size()).c_str());
+        jobject newElement_0_affiliateCallSign;
+        newElement_0_affiliateCallSign =
+            env->NewStringUTF(std::string(entry_0.affiliateCallSign.data(), entry_0.affiliateCallSign.size()).c_str());
 
-        uint16_t majorNumberValue = entry.majorNumber;
+        jclass channelInfoStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo",
+                                                             channelInfoStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo"));
+        chip::JniClass structJniClass(channelInfoStructClass);
+        jmethodID channelInfoStructCtor =
+            env->GetMethodID(channelInfoStructClass, "<init>",
+                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+        VerifyOrReturn(channelInfoStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor"));
 
-        jobject majorNumber = nullptr;
-        if (!majorNumberNull && majorNumberHasValue)
-        {
-            jclass majorNumberEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", majorNumberEntryCls);
-            chip::JniClass majorNumberJniClass(majorNumberEntryCls);
-            jmethodID majorNumberEntryTypeCtor = env->GetMethodID(majorNumberEntryCls, "<init>", "(I)V");
-            majorNumber                        = env->NewObject(majorNumberEntryCls, majorNumberEntryTypeCtor, majorNumberValue);
-        }
-
-        bool minorNumberNull     = false;
-        bool minorNumberHasValue = true;
-
-        uint16_t minorNumberValue = entry.minorNumber;
-
-        jobject minorNumber = nullptr;
-        if (!minorNumberNull && minorNumberHasValue)
-        {
-            jclass minorNumberEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", minorNumberEntryCls);
-            chip::JniClass minorNumberJniClass(minorNumberEntryCls);
-            jmethodID minorNumberEntryTypeCtor = env->GetMethodID(minorNumberEntryCls, "<init>", "(I)V");
-            minorNumber                        = env->NewObject(minorNumberEntryCls, minorNumberEntryTypeCtor, minorNumberValue);
-        }
-
-        bool nameNull     = false;
-        bool nameHasValue = true;
-
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        bool callSignNull     = false;
-        bool callSignHasValue = true;
-
-        chip::CharSpan callSignValue = entry.callSign;
-
-        jstring callSign = nullptr;
-        chip::UtfString callSignStr(env, callSignValue);
-        if (!callSignNull && callSignHasValue)
-        {
-            callSign = jstring(callSignStr.jniValue());
-        }
-
-        bool affiliateCallSignNull     = false;
-        bool affiliateCallSignHasValue = true;
-
-        chip::CharSpan affiliateCallSignValue = entry.affiliateCallSign;
-
-        jstring affiliateCallSign = nullptr;
-        chip::UtfString affiliateCallSignStr(env, affiliateCallSignValue);
-        if (!affiliateCallSignNull && affiliateCallSignHasValue)
-        {
-            affiliateCallSign = jstring(affiliateCallSignStr.jniValue());
-        }
-
-        jobject attributeObj =
-            env->NewObject(attributeClass, attributeCtor, majorNumber, minorNumber, name, callSign, affiliateCallSign);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ChannelListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(channelInfoStructClass, channelInfoStructCtor, newElement_0_majorNumber, newElement_0_minorNumber,
+                           newElement_0_name, newElement_0_callSign, newElement_0_affiliateCallSign);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ChannelListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3038,43 +2595,24 @@ void CHIPChannelAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3128,43 +2666,24 @@ void CHIPColorControlAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3218,40 +2737,21 @@ void CHIPContentLauncherAcceptHeaderListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry              = iter.GetValue();
-        bool entryNull            = false;
-        chip::CharSpan entryValue = entry;
-
-        jstring entryObject = nullptr;
-        chip::UtfString entryStr(env, entryValue);
-        if (!entryNull)
-        {
-            entryObject = jstring(entryStr.jniValue());
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        newElement_0 = env->NewStringUTF(std::string(entry_0.data(), entry_0.size()).c_str());
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AcceptHeaderListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3305,43 +2805,24 @@ void CHIPContentLauncherAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3394,73 +2875,43 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$DescriptorCluster$DeviceListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$DescriptorCluster$DeviceListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find DeviceListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool typeNull     = false;
-        bool typeHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_type;
+        std::string newElement_0_typeClassName     = "java/lang/Long";
+        std::string newElement_0_typeCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+            newElement_0_typeClassName.c_str(), newElement_0_typeCtorSignature.c_str(), entry_0.type, newElement_0_type);
+        jobject newElement_0_revision;
+        std::string newElement_0_revisionClassName     = "java/lang/Integer";
+        std::string newElement_0_revisionCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_revisionClassName.c_str(),
+                                                                       newElement_0_revisionCtorSignature.c_str(), entry_0.revision,
+                                                                       newElement_0_revision);
 
-        chip::DeviceTypeId typeValue = entry.type;
+        jclass deviceTypeStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceType",
+                                                             deviceTypeStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceType"));
+        chip::JniClass structJniClass(deviceTypeStructClass);
+        jmethodID deviceTypeStructCtor =
+            env->GetMethodID(deviceTypeStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
+        VerifyOrReturn(deviceTypeStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterDeviceType constructor"));
 
-        jobject type = nullptr;
-        if (!typeNull && typeHasValue)
-        {
-            jclass typeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", typeEntryCls);
-            chip::JniClass typeJniClass(typeEntryCls);
-            jmethodID typeEntryTypeCtor = env->GetMethodID(typeEntryCls, "<init>", "(J)V");
-            type                        = env->NewObject(typeEntryCls, typeEntryTypeCtor, typeValue);
-        }
-
-        bool revisionNull     = false;
-        bool revisionHasValue = true;
-
-        uint16_t revisionValue = entry.revision;
-
-        jobject revision = nullptr;
-        if (!revisionNull && revisionHasValue)
-        {
-            jclass revisionEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", revisionEntryCls);
-            chip::JniClass revisionJniClass(revisionEntryCls);
-            jmethodID revisionEntryTypeCtor = env->GetMethodID(revisionEntryCls, "<init>", "(I)V");
-            revision                        = env->NewObject(revisionEntryCls, revisionEntryTypeCtor, revisionValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, type, revision);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create DeviceListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(deviceTypeStructClass, deviceTypeStructCtor, newElement_0_type, newElement_0_revision);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding DeviceListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3512,42 +2963,24 @@ void CHIPDescriptorServerListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry               = iter.GetValue();
-        bool entryNull             = false;
-        chip::ClusterId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ServerListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3599,42 +3032,24 @@ void CHIPDescriptorClientListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry               = iter.GetValue();
-        bool entryNull             = false;
-        chip::ClusterId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ClientListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3686,42 +3101,24 @@ void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                = iter.GetValue();
-        bool entryNull              = false;
-        chip::EndpointId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding PartsListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3773,43 +3170,24 @@ void CHIPDescriptorAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3863,43 +3241,24 @@ void CHIPDiagnosticLogsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -3955,11 +3314,17 @@ void CHIPDoorLockLockStateAttributeCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlLockState>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -4014,11 +3379,17 @@ void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlDoorState>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -4069,43 +3440,24 @@ void CHIPDoorLockAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4159,43 +3511,24 @@ void CHIPElectricalMeasurementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4249,43 +3582,24 @@ void CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4338,67 +3652,36 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$FixedLabelCluster$LabelListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$FixedLabelCluster$LabelListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find LabelListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool labelNull     = false;
-        bool labelHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_label;
+        newElement_0_label = env->NewStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+        jobject newElement_0_value;
+        newElement_0_value = env->NewStringUTF(std::string(entry_0.value.data(), entry_0.value.size()).c_str());
 
-        chip::CharSpan labelValue = entry.label;
+        jclass labelStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$FixedLabelClusterLabelStruct",
+                                                             labelStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$FixedLabelClusterLabelStruct"));
+        chip::JniClass structJniClass(labelStructStructClass);
+        jmethodID labelStructStructCtor =
+            env->GetMethodID(labelStructStructClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+        VerifyOrReturn(labelStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$FixedLabelClusterLabelStruct constructor"));
 
-        jstring label = nullptr;
-        chip::UtfString labelStr(env, labelValue);
-        if (!labelNull && labelHasValue)
-        {
-            label = jstring(labelStr.jniValue());
-        }
-
-        bool valueNull     = false;
-        bool valueHasValue = true;
-
-        chip::CharSpan valueValue = entry.value;
-
-        jstring value = nullptr;
-        chip::UtfString valueStr(env, valueValue);
-        if (!valueNull && valueHasValue)
-        {
-            value = jstring(valueStr.jniValue());
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, label, value);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create LabelListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(labelStructStructClass, labelStructStructCtor, newElement_0_label, newElement_0_value);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding LabelListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4450,43 +3733,24 @@ void CHIPFixedLabelAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4540,43 +3804,24 @@ void CHIPFlowMeasurementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4633,62 +3878,42 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::Callba
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$GeneralCommissioningCluster$BasicCommissioningInfoListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class "
-                     "chip/devicecontroller/ChipClusters$GeneralCommissioningCluster$BasicCommissioningInfoListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Long;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find BasicCommissioningInfoListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool failSafeExpiryLengthMsNull     = false;
-        bool failSafeExpiryLengthMsHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_failSafeExpiryLengthMs;
+        std::string newElement_0_failSafeExpiryLengthMsClassName     = "java/lang/Long";
+        std::string newElement_0_failSafeExpiryLengthMsCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+            newElement_0_failSafeExpiryLengthMsClassName.c_str(), newElement_0_failSafeExpiryLengthMsCtorSignature.c_str(),
+            entry_0.failSafeExpiryLengthMs, newElement_0_failSafeExpiryLengthMs);
 
-        uint32_t failSafeExpiryLengthMsValue = entry.failSafeExpiryLengthMs;
+        jclass basicCommissioningInfoTypeStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$GeneralCommissioningClusterBasicCommissioningInfoType",
+            basicCommissioningInfoTypeStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$GeneralCommissioningClusterBasicCommissioningInfoType"));
+        chip::JniClass structJniClass(basicCommissioningInfoTypeStructClass);
+        jmethodID basicCommissioningInfoTypeStructCtor =
+            env->GetMethodID(basicCommissioningInfoTypeStructClass, "<init>", "(Ljava/lang/Long;)V");
+        VerifyOrReturn(
+            basicCommissioningInfoTypeStructCtor != nullptr,
+            ChipLogError(Zcl, "Could not find ChipStructs$GeneralCommissioningClusterBasicCommissioningInfoType constructor"));
 
-        jobject failSafeExpiryLengthMs = nullptr;
-        if (!failSafeExpiryLengthMsNull && failSafeExpiryLengthMsHasValue)
-        {
-            jclass failSafeExpiryLengthMsEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", failSafeExpiryLengthMsEntryCls);
-            chip::JniClass failSafeExpiryLengthMsJniClass(failSafeExpiryLengthMsEntryCls);
-            jmethodID failSafeExpiryLengthMsEntryTypeCtor = env->GetMethodID(failSafeExpiryLengthMsEntryCls, "<init>", "(J)V");
-            failSafeExpiryLengthMs =
-                env->NewObject(failSafeExpiryLengthMsEntryCls, failSafeExpiryLengthMsEntryTypeCtor, failSafeExpiryLengthMsValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, failSafeExpiryLengthMs);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create BasicCommissioningInfoListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(basicCommissioningInfoTypeStructClass, basicCommissioningInfoTypeStructCtor,
+                                      newElement_0_failSafeExpiryLengthMs);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding BasicCommissioningInfoListAttribute value: %" CHIP_ERROR_FORMAT,
-                                iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4742,43 +3967,24 @@ void CHIPGeneralCommissioningAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -4834,139 +4040,71 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$GeneralDiagnosticsCluster$NetworkInterfacesAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            Zcl, "Could not find class chip/devicecontroller/ChipClusters$GeneralDiagnosticsCluster$NetworkInterfacesAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>",
-                         "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NetworkInterfacesAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool nameNull     = false;
-        bool nameHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        jobject newElement_0_fabricConnected;
+        std::string newElement_0_fabricConnectedClassName     = "java/lang/Boolean";
+        std::string newElement_0_fabricConnectedCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_fabricConnectedClassName.c_str(),
+                                                                   newElement_0_fabricConnectedCtorSignature.c_str(),
+                                                                   entry_0.fabricConnected, newElement_0_fabricConnected);
+        jobject newElement_0_offPremiseServicesReachableIPv4;
+        std::string newElement_0_offPremiseServicesReachableIPv4ClassName     = "java/lang/Boolean";
+        std::string newElement_0_offPremiseServicesReachableIPv4CtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_offPremiseServicesReachableIPv4ClassName.c_str(),
+            newElement_0_offPremiseServicesReachableIPv4CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv4,
+            newElement_0_offPremiseServicesReachableIPv4);
+        jobject newElement_0_offPremiseServicesReachableIPv6;
+        std::string newElement_0_offPremiseServicesReachableIPv6ClassName     = "java/lang/Boolean";
+        std::string newElement_0_offPremiseServicesReachableIPv6CtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_offPremiseServicesReachableIPv6ClassName.c_str(),
+            newElement_0_offPremiseServicesReachableIPv6CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv6,
+            newElement_0_offPremiseServicesReachableIPv6);
+        jobject newElement_0_hardwareAddress;
+        jbyteArray newElement_0_hardwareAddressByteArray = env->NewByteArray(static_cast<jsize>(entry_0.hardwareAddress.size()));
+        env->SetByteArrayRegion(newElement_0_hardwareAddressByteArray, 0, static_cast<jsize>(entry_0.hardwareAddress.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.hardwareAddress.data()));
+        newElement_0_hardwareAddress = newElement_0_hardwareAddressByteArray;
+        jobject newElement_0_type;
+        std::string newElement_0_typeClassName     = "java/lang/Integer";
+        std::string newElement_0_typeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_typeClassName.c_str(),
+                                                                      newElement_0_typeCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(entry_0.type), newElement_0_type);
 
-        chip::CharSpan nameValue = entry.name;
+        jclass networkInterfaceTypeStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType",
+            networkInterfaceTypeStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType"));
+        chip::JniClass structJniClass(networkInterfaceTypeStructClass);
+        jmethodID networkInterfaceTypeStructCtor =
+            env->GetMethodID(networkInterfaceTypeStructClass, "<init>",
+                             "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/lang/Integer;)V");
+        VerifyOrReturn(networkInterfaceTypeStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType constructor"));
 
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        bool fabricConnectedNull     = false;
-        bool fabricConnectedHasValue = true;
-
-        bool fabricConnectedValue = entry.fabricConnected;
-
-        jobject fabricConnected = nullptr;
-        if (!fabricConnectedNull && fabricConnectedHasValue)
-        {
-            jclass fabricConnectedEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", fabricConnectedEntryCls);
-            chip::JniClass fabricConnectedJniClass(fabricConnectedEntryCls);
-            jmethodID fabricConnectedEntryTypeCtor = env->GetMethodID(fabricConnectedEntryCls, "<init>", "(Z)V");
-            fabricConnected = env->NewObject(fabricConnectedEntryCls, fabricConnectedEntryTypeCtor, fabricConnectedValue);
-        }
-
-        bool offPremiseServicesReachableIPv4Null     = false;
-        bool offPremiseServicesReachableIPv4HasValue = true;
-
-        bool offPremiseServicesReachableIPv4Value = entry.offPremiseServicesReachableIPv4;
-
-        jobject offPremiseServicesReachableIPv4 = nullptr;
-        if (!offPremiseServicesReachableIPv4Null && offPremiseServicesReachableIPv4HasValue)
-        {
-            jclass offPremiseServicesReachableIPv4EntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", offPremiseServicesReachableIPv4EntryCls);
-            chip::JniClass offPremiseServicesReachableIPv4JniClass(offPremiseServicesReachableIPv4EntryCls);
-            jmethodID offPremiseServicesReachableIPv4EntryTypeCtor =
-                env->GetMethodID(offPremiseServicesReachableIPv4EntryCls, "<init>", "(Z)V");
-            offPremiseServicesReachableIPv4 =
-                env->NewObject(offPremiseServicesReachableIPv4EntryCls, offPremiseServicesReachableIPv4EntryTypeCtor,
-                               offPremiseServicesReachableIPv4Value);
-        }
-
-        bool offPremiseServicesReachableIPv6Null     = false;
-        bool offPremiseServicesReachableIPv6HasValue = true;
-
-        bool offPremiseServicesReachableIPv6Value = entry.offPremiseServicesReachableIPv6;
-
-        jobject offPremiseServicesReachableIPv6 = nullptr;
-        if (!offPremiseServicesReachableIPv6Null && offPremiseServicesReachableIPv6HasValue)
-        {
-            jclass offPremiseServicesReachableIPv6EntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", offPremiseServicesReachableIPv6EntryCls);
-            chip::JniClass offPremiseServicesReachableIPv6JniClass(offPremiseServicesReachableIPv6EntryCls);
-            jmethodID offPremiseServicesReachableIPv6EntryTypeCtor =
-                env->GetMethodID(offPremiseServicesReachableIPv6EntryCls, "<init>", "(Z)V");
-            offPremiseServicesReachableIPv6 =
-                env->NewObject(offPremiseServicesReachableIPv6EntryCls, offPremiseServicesReachableIPv6EntryTypeCtor,
-                               offPremiseServicesReachableIPv6Value);
-        }
-
-        bool hardwareAddressNull     = false;
-        bool hardwareAddressHasValue = true;
-
-        chip::ByteSpan hardwareAddressValue = entry.hardwareAddress;
-
-        jbyteArray hardwareAddress = nullptr;
-        if (!hardwareAddressNull && hardwareAddressHasValue)
-        {
-            hardwareAddress = env->NewByteArray(hardwareAddressValue.size());
-            env->SetByteArrayRegion(hardwareAddress, 0, hardwareAddressValue.size(),
-                                    reinterpret_cast<const jbyte *>(hardwareAddressValue.data()));
-        }
-
-        bool typeNull     = false;
-        bool typeHasValue = true;
-
-        chip::app::Clusters::GeneralDiagnostics::InterfaceType typeValue = entry.type;
-
-        jobject type = nullptr;
-        if (!typeNull && typeHasValue)
-        {
-            jclass typeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", typeEntryCls);
-            chip::JniClass typeJniClass(typeEntryCls);
-            jmethodID typeEntryTypeCtor = env->GetMethodID(typeEntryCls, "<init>", "(I)V");
-            type                        = env->NewObject(typeEntryCls, typeEntryTypeCtor, typeValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, name, fabricConnected, offPremiseServicesReachableIPv4,
-                                              offPremiseServicesReachableIPv6, hardwareAddress, type);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create NetworkInterfacesAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(networkInterfaceTypeStructClass, networkInterfaceTypeStructCtor, newElement_0_name,
+                           newElement_0_fabricConnected, newElement_0_offPremiseServicesReachableIPv4,
+                           newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress, newElement_0_type);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding NetworkInterfacesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5020,43 +4158,24 @@ void CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ActiveHardwareFaultsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5110,43 +4229,24 @@ void CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::CallbackFn(void *
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ActiveRadioFaultsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5200,43 +4300,24 @@ void CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ActiveNetworkFaultsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5290,43 +4371,24 @@ void CHIPGeneralDiagnosticsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5381,90 +4443,52 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeyMapAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeyMapAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupKeyMapAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_groupId;
+        std::string newElement_0_groupIdClassName     = "java/lang/Integer";
+        std::string newElement_0_groupIdCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupIdClassName.c_str(),
+                                                                       newElement_0_groupIdCtorSignature.c_str(), entry_0.groupId,
+                                                                       newElement_0_groupId);
+        jobject newElement_0_groupKeySetID;
+        std::string newElement_0_groupKeySetIDClassName     = "java/lang/Integer";
+        std::string newElement_0_groupKeySetIDCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupKeySetIDClassName.c_str(),
+                                                                       newElement_0_groupKeySetIDCtorSignature.c_str(),
+                                                                       entry_0.groupKeySetID, newElement_0_groupKeySetID);
 
-        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
+        jclass groupKeyStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKey", groupKeyStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKey"));
+        chip::JniClass structJniClass(groupKeyStructClass);
+        jmethodID groupKeyStructCtor =
+            env->GetMethodID(groupKeyStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        VerifyOrReturn(groupKeyStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKey constructor"));
 
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
-        {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
-        }
-
-        bool groupIdNull     = false;
-        bool groupIdHasValue = true;
-
-        uint16_t groupIdValue = entry.groupId;
-
-        jobject groupId = nullptr;
-        if (!groupIdNull && groupIdHasValue)
-        {
-            jclass groupIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupIdEntryCls);
-            chip::JniClass groupIdJniClass(groupIdEntryCls);
-            jmethodID groupIdEntryTypeCtor = env->GetMethodID(groupIdEntryCls, "<init>", "(I)V");
-            groupId                        = env->NewObject(groupIdEntryCls, groupIdEntryTypeCtor, groupIdValue);
-        }
-
-        bool groupKeySetIDNull     = false;
-        bool groupKeySetIDHasValue = true;
-
-        uint16_t groupKeySetIDValue = entry.groupKeySetID;
-
-        jobject groupKeySetID = nullptr;
-        if (!groupKeySetIDNull && groupKeySetIDHasValue)
-        {
-            jclass groupKeySetIDEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupKeySetIDEntryCls);
-            chip::JniClass groupKeySetIDJniClass(groupKeySetIDEntryCls);
-            jmethodID groupKeySetIDEntryTypeCtor = env->GetMethodID(groupKeySetIDEntryCls, "<init>", "(I)V");
-            groupKeySetID = env->NewObject(groupKeySetIDEntryCls, groupKeySetIDEntryTypeCtor, groupKeySetIDValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupKeySetID);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupKeyMapAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(groupKeyStructClass, groupKeyStructCtor, newElement_0_fabricIndex, newElement_0_groupId,
+                                      newElement_0_groupKeySetID);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding GroupKeyMapAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5519,86 +4543,62 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupTableAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                       newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_groupId;
+        std::string newElement_0_groupIdClassName     = "java/lang/Integer";
+        std::string newElement_0_groupIdCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupIdClassName.c_str(),
+                                                                       newElement_0_groupIdCtorSignature.c_str(), entry_0.groupId,
+                                                                       newElement_0_groupId);
+        jobject newElement_0_endpoints;
+        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
 
-        uint16_t fabricIndexValue = entry.fabricIndex;
-
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
+        auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
+        while (iter_newElement_0_endpoints_NaN.Next())
         {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
+            auto & entry_NaN = iter_newElement_0_endpoints_NaN.GetValue();
+            jobject newElement_NaN;
+            std::string newElement_NaNClassName     = "java/lang/Integer";
+            std::string newElement_NaNCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
+            chip::JniReferences::GetInstance().AddToArrayList(newElement_0_endpoints, newElement_NaN);
         }
+        jobject newElement_0_groupName;
+        newElement_0_groupName = env->NewStringUTF(std::string(entry_0.groupName.data(), entry_0.groupName.size()).c_str());
 
-        bool groupIdNull     = false;
-        bool groupIdHasValue = true;
+        jclass groupInfoStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupInfo", groupInfoStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupInfo"));
+        chip::JniClass structJniClass(groupInfoStructClass);
+        jmethodID groupInfoStructCtor = env->GetMethodID(
+            groupInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/lang/String;)V");
+        VerifyOrReturn(groupInfoStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupInfo constructor"));
 
-        uint16_t groupIdValue = entry.groupId;
-
-        jobject groupId = nullptr;
-        if (!groupIdNull && groupIdHasValue)
-        {
-            jclass groupIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupIdEntryCls);
-            chip::JniClass groupIdJniClass(groupIdEntryCls);
-            jmethodID groupIdEntryTypeCtor = env->GetMethodID(groupIdEntryCls, "<init>", "(I)V");
-            groupId                        = env->NewObject(groupIdEntryCls, groupIdEntryTypeCtor, groupIdValue);
-        }
-
-        bool groupNameNull     = false;
-        bool groupNameHasValue = true;
-
-        chip::CharSpan groupNameValue = entry.groupName;
-
-        jstring groupName = nullptr;
-        chip::UtfString groupNameStr(env, groupNameValue);
-        if (!groupNameNull && groupNameHasValue)
-        {
-            groupName = jstring(groupNameStr.jniValue());
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupName);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupTableAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(groupInfoStructClass, groupInfoStructCtor, newElement_0_fabricIndex, newElement_0_groupId,
+                                      newElement_0_endpoints, newElement_0_groupName);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding GroupTableAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5652,43 +4652,24 @@ void CHIPGroupKeyManagementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5740,43 +4721,24 @@ void CHIPGroupsAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5828,43 +4790,24 @@ void CHIPIdentifyAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -5922,11 +4865,17 @@ void CHIPIlluminanceMeasurementMeasuredValueAttributeCallback::CallbackFn(void *
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -5983,11 +4932,17 @@ void CHIPIlluminanceMeasurementMinMeasuredValueAttributeCallback::CallbackFn(voi
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6044,11 +4999,17 @@ void CHIPIlluminanceMeasurementMaxMeasuredValueAttributeCallback::CallbackFn(voi
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6105,11 +5066,17 @@ void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6162,43 +5129,24 @@ void CHIPIlluminanceMeasurementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -6250,43 +5198,24 @@ void CHIPKeypadInputAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -6341,11 +5270,17 @@ void CHIPLevelControlOnLevelAttributeCallback::CallbackFn(void * context, const 
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6402,11 +5337,17 @@ void CHIPLevelControlOnTransitionTimeAttributeCallback::CallbackFn(void * contex
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6463,11 +5404,17 @@ void CHIPLevelControlOffTransitionTimeAttributeCallback::CallbackFn(void * conte
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6524,11 +5471,84 @@ void CHIPLevelControlDefaultMoveRateAttributeCallback::CallbackFn(void * context
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPLevelControlStartUpCurrentLevelAttributeCallback::CHIPLevelControlStartUpCurrentLevelAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
+    chip::Callback::Callback<CHIPLevelControlClusterStartUpCurrentLevelAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPLevelControlStartUpCurrentLevelAttributeCallback::~CHIPLevelControlStartUpCurrentLevelAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPLevelControlStartUpCurrentLevelAttributeCallback::CallbackFn(void * context,
+                                                                      const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPLevelControlStartUpCurrentLevelAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPLevelControlStartUpCurrentLevelAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6581,43 +5601,24 @@ void CHIPLevelControlAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -6671,40 +5672,21 @@ void CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry              = iter.GetValue();
-        bool entryNull            = false;
-        chip::CharSpan entryValue = entry;
-
-        jstring entryObject = nullptr;
-        chip::UtfString entryStr(env, entryValue);
-        if (!entryNull)
-        {
-            entryObject = jstring(entryStr.jniValue());
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        newElement_0 = env->NewStringUTF(std::string(entry_0.data(), entry_0.size()).c_str());
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding SupportedLocalesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -6756,43 +5738,24 @@ void CHIPLowPowerAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -6845,99 +5808,48 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$MediaInputCluster$MediaInputListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$MediaInputCluster$MediaInputListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find MediaInputListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool indexNull     = false;
-        bool indexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_index;
+        std::string newElement_0_indexClassName     = "java/lang/Integer";
+        std::string newElement_0_indexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_indexClassName.c_str(), newElement_0_indexCtorSignature.c_str(), entry_0.index, newElement_0_index);
+        jobject newElement_0_inputType;
+        std::string newElement_0_inputTypeClassName     = "java/lang/Integer";
+        std::string newElement_0_inputTypeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_inputTypeClassName.c_str(), newElement_0_inputTypeCtorSignature.c_str(),
+            static_cast<uint8_t>(entry_0.inputType), newElement_0_inputType);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        jobject newElement_0_description;
+        newElement_0_description = env->NewStringUTF(std::string(entry_0.description.data(), entry_0.description.size()).c_str());
 
-        uint8_t indexValue = entry.index;
+        jclass inputInfoStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$MediaInputClusterInputInfo",
+                                                             inputInfoStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfo"));
+        chip::JniClass structJniClass(inputInfoStructClass);
+        jmethodID inputInfoStructCtor = env->GetMethodID(
+            inputInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
+        VerifyOrReturn(inputInfoStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$MediaInputClusterInputInfo constructor"));
 
-        jobject index = nullptr;
-        if (!indexNull && indexHasValue)
-        {
-            jclass indexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", indexEntryCls);
-            chip::JniClass indexJniClass(indexEntryCls);
-            jmethodID indexEntryTypeCtor = env->GetMethodID(indexEntryCls, "<init>", "(I)V");
-            index                        = env->NewObject(indexEntryCls, indexEntryTypeCtor, indexValue);
-        }
-
-        bool inputTypeNull     = false;
-        bool inputTypeHasValue = true;
-
-        chip::app::Clusters::MediaInput::InputTypeEnum inputTypeValue = entry.inputType;
-
-        jobject inputType = nullptr;
-        if (!inputTypeNull && inputTypeHasValue)
-        {
-            jclass inputTypeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", inputTypeEntryCls);
-            chip::JniClass inputTypeJniClass(inputTypeEntryCls);
-            jmethodID inputTypeEntryTypeCtor = env->GetMethodID(inputTypeEntryCls, "<init>", "(I)V");
-            inputType                        = env->NewObject(inputTypeEntryCls, inputTypeEntryTypeCtor, inputTypeValue);
-        }
-
-        bool nameNull     = false;
-        bool nameHasValue = true;
-
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        bool descriptionNull     = false;
-        bool descriptionHasValue = true;
-
-        chip::CharSpan descriptionValue = entry.description;
-
-        jstring description = nullptr;
-        chip::UtfString descriptionStr(env, descriptionValue);
-        if (!descriptionNull && descriptionHasValue)
-        {
-            description = jstring(descriptionStr.jniValue());
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, inputType, name, description);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create MediaInputListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(inputInfoStructClass, inputInfoStructCtor, newElement_0_index, newElement_0_inputType,
+                                      newElement_0_name, newElement_0_description);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding MediaInputListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -6989,43 +5901,24 @@ void CHIPMediaInputAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7079,43 +5972,24 @@ void CHIPMediaPlaybackAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7168,87 +6042,47 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$ModeSelectCluster$SupportedModesAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$ModeSelectCluster$SupportedModesAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Long;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find SupportedModesAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool labelNull     = false;
-        bool labelHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_label;
+        newElement_0_label = env->NewStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+        jobject newElement_0_mode;
+        std::string newElement_0_modeClassName     = "java/lang/Integer";
+        std::string newElement_0_modeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_modeClassName.c_str(), newElement_0_modeCtorSignature.c_str(), entry_0.mode, newElement_0_mode);
+        jobject newElement_0_semanticTag;
+        std::string newElement_0_semanticTagClassName     = "java/lang/Long";
+        std::string newElement_0_semanticTagCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_semanticTagClassName.c_str(),
+                                                                       newElement_0_semanticTagCtorSignature.c_str(),
+                                                                       entry_0.semanticTag, newElement_0_semanticTag);
 
-        chip::CharSpan labelValue = entry.label;
+        jclass modeOptionStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ModeSelectClusterModeOptionStruct", modeOptionStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterModeOptionStruct"));
+        chip::JniClass structJniClass(modeOptionStructStructClass);
+        jmethodID modeOptionStructStructCtor =
+            env->GetMethodID(modeOptionStructStructClass, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Long;)V");
+        VerifyOrReturn(modeOptionStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$ModeSelectClusterModeOptionStruct constructor"));
 
-        jstring label = nullptr;
-        chip::UtfString labelStr(env, labelValue);
-        if (!labelNull && labelHasValue)
-        {
-            label = jstring(labelStr.jniValue());
-        }
-
-        bool modeNull     = false;
-        bool modeHasValue = true;
-
-        uint8_t modeValue = entry.mode;
-
-        jobject mode = nullptr;
-        if (!modeNull && modeHasValue)
-        {
-            jclass modeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", modeEntryCls);
-            chip::JniClass modeJniClass(modeEntryCls);
-            jmethodID modeEntryTypeCtor = env->GetMethodID(modeEntryCls, "<init>", "(I)V");
-            mode                        = env->NewObject(modeEntryCls, modeEntryTypeCtor, modeValue);
-        }
-
-        bool semanticTagNull     = false;
-        bool semanticTagHasValue = true;
-
-        uint32_t semanticTagValue = entry.semanticTag;
-
-        jobject semanticTag = nullptr;
-        if (!semanticTagNull && semanticTagHasValue)
-        {
-            jclass semanticTagEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", semanticTagEntryCls);
-            chip::JniClass semanticTagJniClass(semanticTagEntryCls);
-            jmethodID semanticTagEntryTypeCtor = env->GetMethodID(semanticTagEntryCls, "<init>", "(J)V");
-            semanticTag                        = env->NewObject(semanticTagEntryCls, semanticTagEntryTypeCtor, semanticTagValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, label, mode, semanticTag);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create SupportedModesAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(modeOptionStructStructClass, modeOptionStructStructCtor, newElement_0_label,
+                                      newElement_0_mode, newElement_0_semanticTag);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding SupportedModesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7300,43 +6134,24 @@ void CHIPModeSelectAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7392,70 +6207,44 @@ void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$NetworkCommissioningCluster$NetworksAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$NetworkCommissioningCluster$NetworksAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([BLjava/lang/Boolean;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NetworksAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool networkIDNull     = false;
-        bool networkIDHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_networkID;
+        jbyteArray newElement_0_networkIDByteArray = env->NewByteArray(static_cast<jsize>(entry_0.networkID.size()));
+        env->SetByteArrayRegion(newElement_0_networkIDByteArray, 0, static_cast<jsize>(entry_0.networkID.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.networkID.data()));
+        newElement_0_networkID = newElement_0_networkIDByteArray;
+        jobject newElement_0_connected;
+        std::string newElement_0_connectedClassName     = "java/lang/Boolean";
+        std::string newElement_0_connectedCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_connectedClassName.c_str(),
+                                                                   newElement_0_connectedCtorSignature.c_str(), entry_0.connected,
+                                                                   newElement_0_connected);
 
-        chip::ByteSpan networkIDValue = entry.networkID;
+        jclass networkInfoStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfo", networkInfoStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfo"));
+        chip::JniClass structJniClass(networkInfoStructClass);
+        jmethodID networkInfoStructCtor = env->GetMethodID(networkInfoStructClass, "<init>", "([BLjava/lang/Boolean;)V");
+        VerifyOrReturn(networkInfoStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfo constructor"));
 
-        jbyteArray networkID = nullptr;
-        if (!networkIDNull && networkIDHasValue)
-        {
-            networkID = env->NewByteArray(networkIDValue.size());
-            env->SetByteArrayRegion(networkID, 0, networkIDValue.size(), reinterpret_cast<const jbyte *>(networkIDValue.data()));
-        }
-
-        bool connectedNull     = false;
-        bool connectedHasValue = true;
-
-        bool connectedValue = entry.connected;
-
-        jobject connected = nullptr;
-        if (!connectedNull && connectedHasValue)
-        {
-            jclass connectedEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", connectedEntryCls);
-            chip::JniClass connectedJniClass(connectedEntryCls);
-            jmethodID connectedEntryTypeCtor = env->GetMethodID(connectedEntryCls, "<init>", "(Z)V");
-            connected                        = env->NewObject(connectedEntryCls, connectedEntryTypeCtor, connectedValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, networkID, connected);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create NetworksAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(networkInfoStructClass, networkInfoStructCtor, newElement_0_networkID, newElement_0_connected);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding NetworksAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7509,43 +6298,24 @@ void CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7602,92 +6372,54 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::Callbac
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$OtaSoftwareUpdateRequestorCluster$DefaultOtaProvidersAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class "
-                     "chip/devicecontroller/ChipClusters$OtaSoftwareUpdateRequestorCluster$DefaultOtaProvidersAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find DefaultOtaProvidersAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_providerNodeID;
+        std::string newElement_0_providerNodeIDClassName     = "java/lang/Long";
+        std::string newElement_0_providerNodeIDCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_providerNodeIDClassName.c_str(),
+                                                                       newElement_0_providerNodeIDCtorSignature.c_str(),
+                                                                       entry_0.providerNodeID, newElement_0_providerNodeID);
+        jobject newElement_0_endpoint;
+        std::string newElement_0_endpointClassName     = "java/lang/Integer";
+        std::string newElement_0_endpointCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_endpointClassName.c_str(),
+                                                                       newElement_0_endpointCtorSignature.c_str(), entry_0.endpoint,
+                                                                       newElement_0_endpoint);
 
-        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
+        jclass providerLocationStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation",
+            providerLocationStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation"));
+        chip::JniClass structJniClass(providerLocationStructClass);
+        jmethodID providerLocationStructCtor =
+            env->GetMethodID(providerLocationStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
+        VerifyOrReturn(
+            providerLocationStructCtor != nullptr,
+            ChipLogError(Zcl, "Could not find ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation constructor"));
 
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
-        {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
-        }
-
-        bool providerNodeIDNull     = false;
-        bool providerNodeIDHasValue = true;
-
-        chip::NodeId providerNodeIDValue = entry.providerNodeID;
-
-        jobject providerNodeID = nullptr;
-        if (!providerNodeIDNull && providerNodeIDHasValue)
-        {
-            jclass providerNodeIDEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", providerNodeIDEntryCls);
-            chip::JniClass providerNodeIDJniClass(providerNodeIDEntryCls);
-            jmethodID providerNodeIDEntryTypeCtor = env->GetMethodID(providerNodeIDEntryCls, "<init>", "(J)V");
-            providerNodeID = env->NewObject(providerNodeIDEntryCls, providerNodeIDEntryTypeCtor, providerNodeIDValue);
-        }
-
-        bool endpointNull     = false;
-        bool endpointHasValue = true;
-
-        chip::EndpointId endpointValue = entry.endpoint;
-
-        jobject endpoint = nullptr;
-        if (!endpointNull && endpointHasValue)
-        {
-            jclass endpointEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", endpointEntryCls);
-            chip::JniClass endpointJniClass(endpointEntryCls);
-            jmethodID endpointEntryTypeCtor = env->GetMethodID(endpointEntryCls, "<init>", "(I)V");
-            endpoint                        = env->NewObject(endpointEntryCls, endpointEntryTypeCtor, endpointValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, providerNodeID, endpoint);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create DefaultOtaProvidersAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(providerLocationStructClass, providerLocationStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_providerNodeID, newElement_0_endpoint);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding DefaultOtaProvidersAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7746,11 +6478,17 @@ void CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::Callbac
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -7803,43 +6541,24 @@ void CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7893,43 +6612,24 @@ void CHIPOccupancySensingAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7981,43 +6681,24 @@ void CHIPOnOffAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8071,43 +6752,122 @@ void CHIPOnOffSwitchConfigurationAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPOperationalCredentialsNOCsAttributeCallback::CHIPOperationalCredentialsNOCsAttributeCallback(jobject javaCallback,
+                                                                                                 bool keepAlive) :
+    chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCsAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPOperationalCredentialsNOCsAttributeCallback::~CHIPOperationalCredentialsNOCsAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+        list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPOperationalCredentialsNOCsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOperationalCredentialsNOCsAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_noc;
+        jbyteArray newElement_0_nocByteArray = env->NewByteArray(static_cast<jsize>(entry_0.noc.size()));
+        env->SetByteArrayRegion(newElement_0_nocByteArray, 0, static_cast<jsize>(entry_0.noc.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.noc.data()));
+        newElement_0_noc = newElement_0_nocByteArray;
+        jobject newElement_0_icac;
+        jbyteArray newElement_0_icacByteArray = env->NewByteArray(static_cast<jsize>(entry_0.icac.size()));
+        env->SetByteArrayRegion(newElement_0_icacByteArray, 0, static_cast<jsize>(entry_0.icac.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.icac.data()));
+        newElement_0_icac = newElement_0_icacByteArray;
 
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
+        jclass NOCStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterNOCStruct", NOCStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterNOCStruct"));
+        chip::JniClass structJniClass(NOCStructStructClass);
+        jmethodID NOCStructStructCtor = env->GetMethodID(NOCStructStructClass, "<init>", "(Ljava/lang/Integer;[B[B)V");
+        VerifyOrReturn(NOCStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterNOCStruct constructor"));
 
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        newElement_0 = env->NewObject(NOCStructStructClass, NOCStructStructCtor, newElement_0_fabricIndex, newElement_0_noc,
+                                      newElement_0_icac);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8163,131 +6923,66 @@ void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$OperationalCredentialsCluster$FabricsListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class chip/devicecontroller/ChipClusters$OperationalCredentialsCluster$FabricsListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(
-        attributeClass, "<init>", "(Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find FabricsListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_rootPublicKey;
+        jbyteArray newElement_0_rootPublicKeyByteArray = env->NewByteArray(static_cast<jsize>(entry_0.rootPublicKey.size()));
+        env->SetByteArrayRegion(newElement_0_rootPublicKeyByteArray, 0, static_cast<jsize>(entry_0.rootPublicKey.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.rootPublicKey.data()));
+        newElement_0_rootPublicKey = newElement_0_rootPublicKeyByteArray;
+        jobject newElement_0_vendorId;
+        std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
+        std::string newElement_0_vendorIdCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_vendorIdClassName.c_str(),
+                                                                       newElement_0_vendorIdCtorSignature.c_str(), entry_0.vendorId,
+                                                                       newElement_0_vendorId);
+        jobject newElement_0_fabricId;
+        std::string newElement_0_fabricIdClassName     = "java/lang/Long";
+        std::string newElement_0_fabricIdCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIdClassName.c_str(),
+                                                                       newElement_0_fabricIdCtorSignature.c_str(), entry_0.fabricId,
+                                                                       newElement_0_fabricId);
+        jobject newElement_0_nodeId;
+        std::string newElement_0_nodeIdClassName     = "java/lang/Long";
+        std::string newElement_0_nodeIdCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            newElement_0_nodeIdClassName.c_str(), newElement_0_nodeIdCtorSignature.c_str(), entry_0.nodeId, newElement_0_nodeId);
+        jobject newElement_0_label;
+        newElement_0_label = env->NewStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str());
 
-        uint8_t fabricIndexValue = entry.fabricIndex;
+        jclass fabricDescriptorStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterFabricDescriptor", fabricDescriptorStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterFabricDescriptor"));
+        chip::JniClass structJniClass(fabricDescriptorStructClass);
+        jmethodID fabricDescriptorStructCtor =
+            env->GetMethodID(fabricDescriptorStructClass, "<init>",
+                             "(Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;)V");
+        VerifyOrReturn(fabricDescriptorStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterFabricDescriptor constructor"));
 
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
-        {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
-        }
-
-        bool rootPublicKeyNull     = false;
-        bool rootPublicKeyHasValue = true;
-
-        chip::ByteSpan rootPublicKeyValue = entry.rootPublicKey;
-
-        jbyteArray rootPublicKey = nullptr;
-        if (!rootPublicKeyNull && rootPublicKeyHasValue)
-        {
-            rootPublicKey = env->NewByteArray(rootPublicKeyValue.size());
-            env->SetByteArrayRegion(rootPublicKey, 0, rootPublicKeyValue.size(),
-                                    reinterpret_cast<const jbyte *>(rootPublicKeyValue.data()));
-        }
-
-        bool vendorIdNull     = false;
-        bool vendorIdHasValue = true;
-
-        uint16_t vendorIdValue = entry.vendorId;
-
-        jobject vendorId = nullptr;
-        if (!vendorIdNull && vendorIdHasValue)
-        {
-            jclass vendorIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", vendorIdEntryCls);
-            chip::JniClass vendorIdJniClass(vendorIdEntryCls);
-            jmethodID vendorIdEntryTypeCtor = env->GetMethodID(vendorIdEntryCls, "<init>", "(I)V");
-            vendorId                        = env->NewObject(vendorIdEntryCls, vendorIdEntryTypeCtor, vendorIdValue);
-        }
-
-        bool fabricIdNull     = false;
-        bool fabricIdHasValue = true;
-
-        chip::FabricId fabricIdValue = entry.fabricId;
-
-        jobject fabricId = nullptr;
-        if (!fabricIdNull && fabricIdHasValue)
-        {
-            jclass fabricIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", fabricIdEntryCls);
-            chip::JniClass fabricIdJniClass(fabricIdEntryCls);
-            jmethodID fabricIdEntryTypeCtor = env->GetMethodID(fabricIdEntryCls, "<init>", "(J)V");
-            fabricId                        = env->NewObject(fabricIdEntryCls, fabricIdEntryTypeCtor, fabricIdValue);
-        }
-
-        bool nodeIdNull     = false;
-        bool nodeIdHasValue = true;
-
-        chip::NodeId nodeIdValue = entry.nodeId;
-
-        jobject nodeId = nullptr;
-        if (!nodeIdNull && nodeIdHasValue)
-        {
-            jclass nodeIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", nodeIdEntryCls);
-            chip::JniClass nodeIdJniClass(nodeIdEntryCls);
-            jmethodID nodeIdEntryTypeCtor = env->GetMethodID(nodeIdEntryCls, "<init>", "(J)V");
-            nodeId                        = env->NewObject(nodeIdEntryCls, nodeIdEntryTypeCtor, nodeIdValue);
-        }
-
-        bool labelNull     = false;
-        bool labelHasValue = true;
-
-        chip::CharSpan labelValue = entry.label;
-
-        jstring label = nullptr;
-        chip::UtfString labelStr(env, labelValue);
-        if (!labelNull && labelHasValue)
-        {
-            label = jstring(labelStr.jniValue());
-        }
-
-        jobject attributeObj =
-            env->NewObject(attributeClass, attributeCtor, fabricIndex, rootPublicKey, vendorId, fabricId, nodeId, label);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create FabricsListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(fabricDescriptorStructClass, fabricDescriptorStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_rootPublicKey, newElement_0_vendorId, newElement_0_fabricId, newElement_0_nodeId,
+                                      newElement_0_label);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding FabricsListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8342,40 +7037,24 @@ void CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::Callbac
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry              = iter.GetValue();
-        bool entryNull            = false;
-        chip::ByteSpan entryValue = entry;
-
-        jbyteArray entryObject = nullptr;
-        if (!entryNull)
-        {
-            entryObject = env->NewByteArray(entryValue.size());
-            env->SetByteArrayRegion(entryObject, 0, entryValue.size(), reinterpret_cast<const jbyte *>(entryValue.data()));
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+        env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.data()));
+        newElement_0 = newElement_0ByteArray;
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding TrustedRootCertificatesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8432,11 +7111,10 @@ void CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback::CallbackFn(v
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::FabricIndex>(javaValueClassName.c_str(),
-                                                                            javaValueCtorSignature.c_str(), value, javaValue);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value,
+                                                                  javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -8489,43 +7167,24 @@ void CHIPOperationalCredentialsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8579,43 +7238,24 @@ void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * cont
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ActiveBatteryFaultsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8667,43 +7307,24 @@ void CHIPPowerSourceAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8757,42 +7378,24 @@ void CHIPPowerSourceConfigurationSourcesAttributeCallback::CallbackFn(void * con
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding SourcesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8846,43 +7449,24 @@ void CHIPPowerSourceConfigurationAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -8936,43 +7520,24 @@ void CHIPPressureMeasurementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9031,11 +7596,17 @@ void CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback::Callb
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -9093,11 +7664,17 @@ void CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback::Cal
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -9150,43 +7727,24 @@ void CHIPPumpConfigurationAndControlAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9240,43 +7798,24 @@ void CHIPRelativeHumidityMeasurementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9328,43 +7867,24 @@ void CHIPScenesAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9420,119 +7940,60 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$SoftwareDiagnosticsCluster$ThreadMetricsAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class chip/devicecontroller/ChipClusters$SoftwareDiagnosticsCluster$ThreadMetricsAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(
-        attributeClass, "<init>", "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ThreadMetricsAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool idNull     = false;
-        bool idHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_id;
+        std::string newElement_0_idClassName     = "java/lang/Long";
+        std::string newElement_0_idCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            newElement_0_idClassName.c_str(), newElement_0_idCtorSignature.c_str(), entry_0.id, newElement_0_id);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        jobject newElement_0_stackFreeCurrent;
+        std::string newElement_0_stackFreeCurrentClassName     = "java/lang/Long";
+        std::string newElement_0_stackFreeCurrentCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackFreeCurrentClassName.c_str(),
+                                                                       newElement_0_stackFreeCurrentCtorSignature.c_str(),
+                                                                       entry_0.stackFreeCurrent, newElement_0_stackFreeCurrent);
+        jobject newElement_0_stackFreeMinimum;
+        std::string newElement_0_stackFreeMinimumClassName     = "java/lang/Long";
+        std::string newElement_0_stackFreeMinimumCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackFreeMinimumClassName.c_str(),
+                                                                       newElement_0_stackFreeMinimumCtorSignature.c_str(),
+                                                                       entry_0.stackFreeMinimum, newElement_0_stackFreeMinimum);
+        jobject newElement_0_stackSize;
+        std::string newElement_0_stackSizeClassName     = "java/lang/Long";
+        std::string newElement_0_stackSizeCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackSizeClassName.c_str(),
+                                                                       newElement_0_stackSizeCtorSignature.c_str(),
+                                                                       entry_0.stackSize, newElement_0_stackSize);
 
-        uint64_t idValue = entry.id;
+        jclass threadMetricsStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$SoftwareDiagnosticsClusterThreadMetrics", threadMetricsStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$SoftwareDiagnosticsClusterThreadMetrics"));
+        chip::JniClass structJniClass(threadMetricsStructClass);
+        jmethodID threadMetricsStructCtor =
+            env->GetMethodID(threadMetricsStructClass, "<init>",
+                             "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
+        VerifyOrReturn(threadMetricsStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$SoftwareDiagnosticsClusterThreadMetrics constructor"));
 
-        jobject id = nullptr;
-        if (!idNull && idHasValue)
-        {
-            jclass idEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", idEntryCls);
-            chip::JniClass idJniClass(idEntryCls);
-            jmethodID idEntryTypeCtor = env->GetMethodID(idEntryCls, "<init>", "(J)V");
-            id                        = env->NewObject(idEntryCls, idEntryTypeCtor, idValue);
-        }
-
-        bool nameNull     = false;
-        bool nameHasValue = true;
-
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        bool stackFreeCurrentNull     = false;
-        bool stackFreeCurrentHasValue = true;
-
-        uint32_t stackFreeCurrentValue = entry.stackFreeCurrent;
-
-        jobject stackFreeCurrent = nullptr;
-        if (!stackFreeCurrentNull && stackFreeCurrentHasValue)
-        {
-            jclass stackFreeCurrentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", stackFreeCurrentEntryCls);
-            chip::JniClass stackFreeCurrentJniClass(stackFreeCurrentEntryCls);
-            jmethodID stackFreeCurrentEntryTypeCtor = env->GetMethodID(stackFreeCurrentEntryCls, "<init>", "(J)V");
-            stackFreeCurrent = env->NewObject(stackFreeCurrentEntryCls, stackFreeCurrentEntryTypeCtor, stackFreeCurrentValue);
-        }
-
-        bool stackFreeMinimumNull     = false;
-        bool stackFreeMinimumHasValue = true;
-
-        uint32_t stackFreeMinimumValue = entry.stackFreeMinimum;
-
-        jobject stackFreeMinimum = nullptr;
-        if (!stackFreeMinimumNull && stackFreeMinimumHasValue)
-        {
-            jclass stackFreeMinimumEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", stackFreeMinimumEntryCls);
-            chip::JniClass stackFreeMinimumJniClass(stackFreeMinimumEntryCls);
-            jmethodID stackFreeMinimumEntryTypeCtor = env->GetMethodID(stackFreeMinimumEntryCls, "<init>", "(J)V");
-            stackFreeMinimum = env->NewObject(stackFreeMinimumEntryCls, stackFreeMinimumEntryTypeCtor, stackFreeMinimumValue);
-        }
-
-        bool stackSizeNull     = false;
-        bool stackSizeHasValue = true;
-
-        uint32_t stackSizeValue = entry.stackSize;
-
-        jobject stackSize = nullptr;
-        if (!stackSizeNull && stackSizeHasValue)
-        {
-            jclass stackSizeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", stackSizeEntryCls);
-            chip::JniClass stackSizeJniClass(stackSizeEntryCls);
-            jmethodID stackSizeEntryTypeCtor = env->GetMethodID(stackSizeEntryCls, "<init>", "(J)V");
-            stackSize                        = env->NewObject(stackSizeEntryCls, stackSizeEntryTypeCtor, stackSizeValue);
-        }
-
-        jobject attributeObj =
-            env->NewObject(attributeClass, attributeCtor, id, name, stackFreeCurrent, stackFreeMinimum, stackSize);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ThreadMetricsAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(threadMetricsStructClass, threadMetricsStructCtor, newElement_0_id, newElement_0_name,
+                                      newElement_0_stackFreeCurrent, newElement_0_stackFreeMinimum, newElement_0_stackSize);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ThreadMetricsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9586,43 +8047,24 @@ void CHIPSoftwareDiagnosticsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9674,43 +8116,24 @@ void CHIPSwitchAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9765,72 +8188,41 @@ void CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$TargetNavigatorCluster$TargetNavigatorListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            Zcl, "Could not find class chip/devicecontroller/ChipClusters$TargetNavigatorCluster$TargetNavigatorListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find TargetNavigatorListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool identifierNull     = false;
-        bool identifierHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_identifier;
+        std::string newElement_0_identifierClassName     = "java/lang/Integer";
+        std::string newElement_0_identifierCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_identifierClassName.c_str(),
+                                                                      newElement_0_identifierCtorSignature.c_str(),
+                                                                      entry_0.identifier, newElement_0_identifier);
+        jobject newElement_0_name;
+        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
 
-        uint8_t identifierValue = entry.identifier;
+        jclass targetInfoStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfo", targetInfoStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfo"));
+        chip::JniClass structJniClass(targetInfoStructClass);
+        jmethodID targetInfoStructCtor =
+            env->GetMethodID(targetInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+        VerifyOrReturn(targetInfoStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfo constructor"));
 
-        jobject identifier = nullptr;
-        if (!identifierNull && identifierHasValue)
-        {
-            jclass identifierEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", identifierEntryCls);
-            chip::JniClass identifierJniClass(identifierEntryCls);
-            jmethodID identifierEntryTypeCtor = env->GetMethodID(identifierEntryCls, "<init>", "(I)V");
-            identifier                        = env->NewObject(identifierEntryCls, identifierEntryTypeCtor, identifierValue);
-        }
-
-        bool nameNull     = false;
-        bool nameHasValue = true;
-
-        chip::CharSpan nameValue = entry.name;
-
-        jstring name = nullptr;
-        chip::UtfString nameStr(env, nameValue);
-        if (!nameNull && nameHasValue)
-        {
-            name = jstring(nameStr.jniValue());
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, identifier, name);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create TargetNavigatorListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(targetInfoStructClass, targetInfoStructCtor, newElement_0_identifier, newElement_0_name);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding TargetNavigatorListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9884,43 +8276,24 @@ void CHIPTargetNavigatorAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -9974,43 +8347,24 @@ void CHIPTemperatureMeasurementAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -10062,42 +8416,24 @@ void CHIPTestClusterListInt8uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ListInt8uAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -10151,40 +8487,24 @@ void CHIPTestClusterListOctetStringAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry              = iter.GetValue();
-        bool entryNull            = false;
-        chip::ByteSpan entryValue = entry;
-
-        jbyteArray entryObject = nullptr;
-        if (!entryNull)
-        {
-            entryObject = env->NewByteArray(entryValue.size());
-            env->SetByteArrayRegion(entryObject, 0, entryValue.size(), reinterpret_cast<const jbyte *>(entryValue.data()));
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+        env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.data()));
+        newElement_0 = newElement_0ByteArray;
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ListOctetStringAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -10239,73 +8559,45 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$TestClusterCluster$ListStructOctetStringAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class chip/devicecontroller/ChipClusters$TestClusterCluster$ListStructOctetStringAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Long;[B)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ListStructOctetStringAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool fabricIndexNull     = false;
-        bool fabricIndexHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Long";
+        std::string newElement_0_fabricIndexCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                       newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_operationalCert;
+        jbyteArray newElement_0_operationalCertByteArray = env->NewByteArray(static_cast<jsize>(entry_0.operationalCert.size()));
+        env->SetByteArrayRegion(newElement_0_operationalCertByteArray, 0, static_cast<jsize>(entry_0.operationalCert.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.operationalCert.data()));
+        newElement_0_operationalCert = newElement_0_operationalCertByteArray;
 
-        uint64_t fabricIndexValue = entry.fabricIndex;
+        jclass testListStructOctetStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestListStructOctet", testListStructOctetStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterTestListStructOctet"));
+        chip::JniClass structJniClass(testListStructOctetStructClass);
+        jmethodID testListStructOctetStructCtor =
+            env->GetMethodID(testListStructOctetStructClass, "<init>", "(Ljava/lang/Long;[B)V");
+        VerifyOrReturn(testListStructOctetStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestListStructOctet constructor"));
 
-        jobject fabricIndex = nullptr;
-        if (!fabricIndexNull && fabricIndexHasValue)
-        {
-            jclass fabricIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", fabricIndexEntryCls);
-            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
-            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(J)V");
-            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
-        }
-
-        bool operationalCertNull     = false;
-        bool operationalCertHasValue = true;
-
-        chip::ByteSpan operationalCertValue = entry.operationalCert;
-
-        jbyteArray operationalCert = nullptr;
-        if (!operationalCertNull && operationalCertHasValue)
-        {
-            operationalCert = env->NewByteArray(operationalCertValue.size());
-            env->SetByteArrayRegion(operationalCert, 0, operationalCertValue.size(),
-                                    reinterpret_cast<const jbyte *>(operationalCertValue.data()));
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, operationalCert);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ListStructOctetStringAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(testListStructOctetStructClass, testListStructOctetStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_operationalCert);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ListStructOctetStringAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -10360,11 +8652,10 @@ void CHIPTestClusterVendorIdAttributeCallback::CallbackFn(void * context, chip::
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::VendorId>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                         value, javaValue);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                   static_cast<uint16_t>(value), javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -10419,181 +8710,432 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$TestClusterCluster$ListNullablesAndOptionalsStructAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            Zcl,
-            "Could not find class chip/devicecontroller/ChipClusters$TestClusterCluster$ListNullablesAndOptionalsStructAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(
-        attributeClass, "<init>",
-        "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;)V");
-    VerifyOrReturn(attributeCtor != nullptr,
-                   ChipLogError(Zcl, "Could not find ListNullablesAndOptionalsStructAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool nullableIntNull     = false;
-        bool nullableIntHasValue = true;
-        uint16_t nullableIntValue;
-        nullableIntNull = entry.nullableInt.IsNull();
-        if (!nullableIntNull)
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_nullableInt;
+        if (entry_0.nullableInt.IsNull())
         {
-            nullableIntValue = entry.nullableInt.Value();
+            newElement_0_nullableInt = nullptr;
         }
-
-        jobject nullableInt = nullptr;
-        if (!nullableIntNull && nullableIntHasValue)
+        else
         {
-            jclass nullableIntEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", nullableIntEntryCls);
-            chip::JniClass nullableIntJniClass(nullableIntEntryCls);
-            jmethodID nullableIntEntryTypeCtor = env->GetMethodID(nullableIntEntryCls, "<init>", "(I)V");
-            nullableInt                        = env->NewObject(nullableIntEntryCls, nullableIntEntryTypeCtor, nullableIntValue);
+            std::string newElement_0_nullableIntClassName     = "java/lang/Integer";
+            std::string newElement_0_nullableIntCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_nullableIntClassName.c_str(),
+                                                                           newElement_0_nullableIntCtorSignature.c_str(),
+                                                                           entry_0.nullableInt.Value(), newElement_0_nullableInt);
         }
-
-        bool optionalIntNull     = false;
-        bool optionalIntHasValue = true;
-
-        uint16_t optionalIntValue;
-        optionalIntHasValue = entry.optionalInt.HasValue();
-        if (optionalIntHasValue)
+        jobject newElement_0_optionalInt;
+        if (!entry_0.optionalInt.HasValue())
         {
-            optionalIntValue = entry.optionalInt.Value();
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_optionalInt);
         }
-
-        jobject optionalInt = nullptr;
-        if (!optionalIntNull && optionalIntHasValue)
+        else
         {
-            jclass optionalIntEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", optionalIntEntryCls);
-            chip::JniClass optionalIntJniClass(optionalIntEntryCls);
-            jmethodID optionalIntEntryTypeCtor = env->GetMethodID(optionalIntEntryCls, "<init>", "(I)V");
-            optionalInt                        = env->NewObject(optionalIntEntryCls, optionalIntEntryTypeCtor, optionalIntValue);
+            std::string newElement_0_optionalIntClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalIntCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_optionalIntClassName.c_str(),
+                                                                           newElement_0_optionalIntCtorSignature.c_str(),
+                                                                           entry_0.optionalInt.Value(), newElement_0_optionalInt);
         }
-
-        jobject optionalIntOptional = nullptr;
-        chip::JniReferences::GetInstance().CreateOptional(optionalInt, optionalIntOptional);
-        bool nullableOptionalIntNull     = false;
-        bool nullableOptionalIntHasValue = true;
-
-        uint16_t nullableOptionalIntValue;
-        nullableOptionalIntHasValue = entry.nullableOptionalInt.HasValue();
-        if (nullableOptionalIntHasValue)
+        jobject newElement_0_nullableOptionalInt;
+        if (!entry_0.nullableOptionalInt.HasValue())
         {
-            auto nullableOptionalIntValueFromOptional = entry.nullableOptionalInt.Value();
-            nullableOptionalIntNull                   = nullableOptionalIntValueFromOptional.IsNull();
-            if (!nullableOptionalIntNull)
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_nullableOptionalInt);
+        }
+        else
+        {
+            if (entry_0.nullableOptionalInt.Value().IsNull())
             {
-                nullableOptionalIntValue = nullableOptionalIntValueFromOptional.Value();
+                newElement_0_nullableOptionalInt = nullptr;
+            }
+            else
+            {
+                std::string newElement_0_nullableOptionalIntClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalIntCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                    newElement_0_nullableOptionalIntClassName.c_str(), newElement_0_nullableOptionalIntCtorSignature.c_str(),
+                    entry_0.nullableOptionalInt.Value().Value(), newElement_0_nullableOptionalInt);
+            }
+        }
+        jobject newElement_0_nullableString;
+        if (entry_0.nullableString.IsNull())
+        {
+            newElement_0_nullableString = nullptr;
+        }
+        else
+        {
+            newElement_0_nullableString = env->NewStringUTF(
+                std::string(entry_0.nullableString.Value().data(), entry_0.nullableString.Value().size()).c_str());
+        }
+        jobject newElement_0_optionalString;
+        if (!entry_0.optionalString.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_optionalString);
+        }
+        else
+        {
+            newElement_0_optionalString = env->NewStringUTF(
+                std::string(entry_0.optionalString.Value().data(), entry_0.optionalString.Value().size()).c_str());
+        }
+        jobject newElement_0_nullableOptionalString;
+        if (!entry_0.nullableOptionalString.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_nullableOptionalString);
+        }
+        else
+        {
+            if (entry_0.nullableOptionalString.Value().IsNull())
+            {
+                newElement_0_nullableOptionalString = nullptr;
+            }
+            else
+            {
+                newElement_0_nullableOptionalString =
+                    env->NewStringUTF(std::string(entry_0.nullableOptionalString.Value().Value().data(),
+                                                  entry_0.nullableOptionalString.Value().Value().size())
+                                          .c_str());
+            }
+        }
+        jobject newElement_0_nullableStruct;
+        if (entry_0.nullableStruct.IsNull())
+        {
+            newElement_0_nullableStruct = nullptr;
+        }
+        else
+        {
+            jobject newElement_0_nullableStruct_a;
+            std::string newElement_0_nullableStruct_aClassName     = "java/lang/Integer";
+            std::string newElement_0_nullableStruct_aCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_nullableStruct_aClassName.c_str(), newElement_0_nullableStruct_aCtorSignature.c_str(),
+                entry_0.nullableStruct.Value().a, newElement_0_nullableStruct_a);
+            jobject newElement_0_nullableStruct_b;
+            std::string newElement_0_nullableStruct_bClassName     = "java/lang/Boolean";
+            std::string newElement_0_nullableStruct_bCtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                newElement_0_nullableStruct_bClassName.c_str(), newElement_0_nullableStruct_bCtorSignature.c_str(),
+                entry_0.nullableStruct.Value().b, newElement_0_nullableStruct_b);
+            jobject newElement_0_nullableStruct_c;
+            std::string newElement_0_nullableStruct_cClassName     = "java/lang/Integer";
+            std::string newElement_0_nullableStruct_cCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_nullableStruct_cClassName.c_str(), newElement_0_nullableStruct_cCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_0.nullableStruct.Value().c), newElement_0_nullableStruct_c);
+            jobject newElement_0_nullableStruct_d;
+            jbyteArray newElement_0_nullableStruct_dByteArray =
+                env->NewByteArray(static_cast<jsize>(entry_0.nullableStruct.Value().d.size()));
+            env->SetByteArrayRegion(newElement_0_nullableStruct_dByteArray, 0,
+                                    static_cast<jsize>(entry_0.nullableStruct.Value().d.size()),
+                                    reinterpret_cast<const jbyte *>(entry_0.nullableStruct.Value().d.data()));
+            newElement_0_nullableStruct_d = newElement_0_nullableStruct_dByteArray;
+            jobject newElement_0_nullableStruct_e;
+            newElement_0_nullableStruct_e = env->NewStringUTF(
+                std::string(entry_0.nullableStruct.Value().e.data(), entry_0.nullableStruct.Value().e.size()).c_str());
+            jobject newElement_0_nullableStruct_f;
+            std::string newElement_0_nullableStruct_fClassName     = "java/lang/Integer";
+            std::string newElement_0_nullableStruct_fCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_nullableStruct_fClassName.c_str(), newElement_0_nullableStruct_fCtorSignature.c_str(),
+                entry_0.nullableStruct.Value().f.Raw(), newElement_0_nullableStruct_f);
+            jobject newElement_0_nullableStruct_g;
+            std::string newElement_0_nullableStruct_gClassName     = "java/lang/Float";
+            std::string newElement_0_nullableStruct_gCtorSignature = "(F)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<float>(
+                newElement_0_nullableStruct_gClassName.c_str(), newElement_0_nullableStruct_gCtorSignature.c_str(),
+                entry_0.nullableStruct.Value().g, newElement_0_nullableStruct_g);
+            jobject newElement_0_nullableStruct_h;
+            std::string newElement_0_nullableStruct_hClassName     = "java/lang/Double";
+            std::string newElement_0_nullableStruct_hCtorSignature = "(D)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<double>(
+                newElement_0_nullableStruct_hClassName.c_str(), newElement_0_nullableStruct_hCtorSignature.c_str(),
+                entry_0.nullableStruct.Value().h, newElement_0_nullableStruct_h);
+
+            jclass simpleStructStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct"));
+            chip::JniClass structJniClass(simpleStructStructClass);
+            jmethodID simpleStructStructCtor =
+                env->GetMethodID(simpleStructStructClass, "<init>",
+                                 "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
+                                 "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
+            VerifyOrReturn(simpleStructStructCtor != nullptr,
+                           ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor"));
+
+            newElement_0_nullableStruct = env->NewObject(
+                simpleStructStructClass, simpleStructStructCtor, newElement_0_nullableStruct_a, newElement_0_nullableStruct_b,
+                newElement_0_nullableStruct_c, newElement_0_nullableStruct_d, newElement_0_nullableStruct_e,
+                newElement_0_nullableStruct_f, newElement_0_nullableStruct_g, newElement_0_nullableStruct_h);
+        }
+        jobject newElement_0_optionalStruct;
+        if (!entry_0.optionalStruct.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_optionalStruct);
+        }
+        else
+        {
+            jobject newElement_0_optionalStruct_a;
+            std::string newElement_0_optionalStruct_aClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalStruct_aCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_optionalStruct_aClassName.c_str(), newElement_0_optionalStruct_aCtorSignature.c_str(),
+                entry_0.optionalStruct.Value().a, newElement_0_optionalStruct_a);
+            jobject newElement_0_optionalStruct_b;
+            std::string newElement_0_optionalStruct_bClassName     = "java/lang/Boolean";
+            std::string newElement_0_optionalStruct_bCtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                newElement_0_optionalStruct_bClassName.c_str(), newElement_0_optionalStruct_bCtorSignature.c_str(),
+                entry_0.optionalStruct.Value().b, newElement_0_optionalStruct_b);
+            jobject newElement_0_optionalStruct_c;
+            std::string newElement_0_optionalStruct_cClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalStruct_cCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_optionalStruct_cClassName.c_str(), newElement_0_optionalStruct_cCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_0.optionalStruct.Value().c), newElement_0_optionalStruct_c);
+            jobject newElement_0_optionalStruct_d;
+            jbyteArray newElement_0_optionalStruct_dByteArray =
+                env->NewByteArray(static_cast<jsize>(entry_0.optionalStruct.Value().d.size()));
+            env->SetByteArrayRegion(newElement_0_optionalStruct_dByteArray, 0,
+                                    static_cast<jsize>(entry_0.optionalStruct.Value().d.size()),
+                                    reinterpret_cast<const jbyte *>(entry_0.optionalStruct.Value().d.data()));
+            newElement_0_optionalStruct_d = newElement_0_optionalStruct_dByteArray;
+            jobject newElement_0_optionalStruct_e;
+            newElement_0_optionalStruct_e = env->NewStringUTF(
+                std::string(entry_0.optionalStruct.Value().e.data(), entry_0.optionalStruct.Value().e.size()).c_str());
+            jobject newElement_0_optionalStruct_f;
+            std::string newElement_0_optionalStruct_fClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalStruct_fCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_optionalStruct_fClassName.c_str(), newElement_0_optionalStruct_fCtorSignature.c_str(),
+                entry_0.optionalStruct.Value().f.Raw(), newElement_0_optionalStruct_f);
+            jobject newElement_0_optionalStruct_g;
+            std::string newElement_0_optionalStruct_gClassName     = "java/lang/Float";
+            std::string newElement_0_optionalStruct_gCtorSignature = "(F)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<float>(
+                newElement_0_optionalStruct_gClassName.c_str(), newElement_0_optionalStruct_gCtorSignature.c_str(),
+                entry_0.optionalStruct.Value().g, newElement_0_optionalStruct_g);
+            jobject newElement_0_optionalStruct_h;
+            std::string newElement_0_optionalStruct_hClassName     = "java/lang/Double";
+            std::string newElement_0_optionalStruct_hCtorSignature = "(D)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<double>(
+                newElement_0_optionalStruct_hClassName.c_str(), newElement_0_optionalStruct_hCtorSignature.c_str(),
+                entry_0.optionalStruct.Value().h, newElement_0_optionalStruct_h);
+
+            jclass simpleStructStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct"));
+            chip::JniClass structJniClass(simpleStructStructClass);
+            jmethodID simpleStructStructCtor =
+                env->GetMethodID(simpleStructStructClass, "<init>",
+                                 "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
+                                 "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
+            VerifyOrReturn(simpleStructStructCtor != nullptr,
+                           ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor"));
+
+            newElement_0_optionalStruct = env->NewObject(
+                simpleStructStructClass, simpleStructStructCtor, newElement_0_optionalStruct_a, newElement_0_optionalStruct_b,
+                newElement_0_optionalStruct_c, newElement_0_optionalStruct_d, newElement_0_optionalStruct_e,
+                newElement_0_optionalStruct_f, newElement_0_optionalStruct_g, newElement_0_optionalStruct_h);
+        }
+        jobject newElement_0_nullableOptionalStruct;
+        if (!entry_0.nullableOptionalStruct.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_nullableOptionalStruct);
+        }
+        else
+        {
+            if (entry_0.nullableOptionalStruct.Value().IsNull())
+            {
+                newElement_0_nullableOptionalStruct = nullptr;
+            }
+            else
+            {
+                jobject newElement_0_nullableOptionalStruct_a;
+                std::string newElement_0_nullableOptionalStruct_aClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalStruct_aCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_nullableOptionalStruct_aClassName.c_str(),
+                    newElement_0_nullableOptionalStruct_aCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().a,
+                    newElement_0_nullableOptionalStruct_a);
+                jobject newElement_0_nullableOptionalStruct_b;
+                std::string newElement_0_nullableOptionalStruct_bClassName     = "java/lang/Boolean";
+                std::string newElement_0_nullableOptionalStruct_bCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    newElement_0_nullableOptionalStruct_bClassName.c_str(),
+                    newElement_0_nullableOptionalStruct_bCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().b,
+                    newElement_0_nullableOptionalStruct_b);
+                jobject newElement_0_nullableOptionalStruct_c;
+                std::string newElement_0_nullableOptionalStruct_cClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalStruct_cCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_nullableOptionalStruct_cClassName.c_str(),
+                    newElement_0_nullableOptionalStruct_cCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.nullableOptionalStruct.Value().Value().c), newElement_0_nullableOptionalStruct_c);
+                jobject newElement_0_nullableOptionalStruct_d;
+                jbyteArray newElement_0_nullableOptionalStruct_dByteArray =
+                    env->NewByteArray(static_cast<jsize>(entry_0.nullableOptionalStruct.Value().Value().d.size()));
+                env->SetByteArrayRegion(newElement_0_nullableOptionalStruct_dByteArray, 0,
+                                        static_cast<jsize>(entry_0.nullableOptionalStruct.Value().Value().d.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.nullableOptionalStruct.Value().Value().d.data()));
+                newElement_0_nullableOptionalStruct_d = newElement_0_nullableOptionalStruct_dByteArray;
+                jobject newElement_0_nullableOptionalStruct_e;
+                newElement_0_nullableOptionalStruct_e =
+                    env->NewStringUTF(std::string(entry_0.nullableOptionalStruct.Value().Value().e.data(),
+                                                  entry_0.nullableOptionalStruct.Value().Value().e.size())
+                                          .c_str());
+                jobject newElement_0_nullableOptionalStruct_f;
+                std::string newElement_0_nullableOptionalStruct_fClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalStruct_fCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_nullableOptionalStruct_fClassName.c_str(),
+                    newElement_0_nullableOptionalStruct_fCtorSignature.c_str(),
+                    entry_0.nullableOptionalStruct.Value().Value().f.Raw(), newElement_0_nullableOptionalStruct_f);
+                jobject newElement_0_nullableOptionalStruct_g;
+                std::string newElement_0_nullableOptionalStruct_gClassName     = "java/lang/Float";
+                std::string newElement_0_nullableOptionalStruct_gCtorSignature = "(F)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<float>(
+                    newElement_0_nullableOptionalStruct_gClassName.c_str(),
+                    newElement_0_nullableOptionalStruct_gCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().g,
+                    newElement_0_nullableOptionalStruct_g);
+                jobject newElement_0_nullableOptionalStruct_h;
+                std::string newElement_0_nullableOptionalStruct_hClassName     = "java/lang/Double";
+                std::string newElement_0_nullableOptionalStruct_hCtorSignature = "(D)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<double>(
+                    newElement_0_nullableOptionalStruct_hClassName.c_str(),
+                    newElement_0_nullableOptionalStruct_hCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().h,
+                    newElement_0_nullableOptionalStruct_h);
+
+                jclass simpleStructStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
+                VerifyOrReturn(err == CHIP_NO_ERROR,
+                               ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct"));
+                chip::JniClass structJniClass(simpleStructStructClass);
+                jmethodID simpleStructStructCtor =
+                    env->GetMethodID(simpleStructStructClass, "<init>",
+                                     "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
+                                     "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
+                VerifyOrReturn(simpleStructStructCtor != nullptr,
+                               ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor"));
+
+                newElement_0_nullableOptionalStruct =
+                    env->NewObject(simpleStructStructClass, simpleStructStructCtor, newElement_0_nullableOptionalStruct_a,
+                                   newElement_0_nullableOptionalStruct_b, newElement_0_nullableOptionalStruct_c,
+                                   newElement_0_nullableOptionalStruct_d, newElement_0_nullableOptionalStruct_e,
+                                   newElement_0_nullableOptionalStruct_f, newElement_0_nullableOptionalStruct_g,
+                                   newElement_0_nullableOptionalStruct_h);
+            }
+        }
+        jobject newElement_0_nullableList;
+        if (entry_0.nullableList.IsNull())
+        {
+            newElement_0_nullableList = nullptr;
+        }
+        else
+        {
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableList);
+
+            auto iter_newElement_0_nullableList_NaN = entry_0.nullableList.Value().begin();
+            while (iter_newElement_0_nullableList_NaN.Next())
+            {
+                auto & entry_NaN = iter_newElement_0_nullableList_NaN.GetValue();
+                jobject newElement_NaN;
+                std::string newElement_NaNClassName     = "java/lang/Integer";
+                std::string newElement_NaNCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
+                                                                              newElement_NaNCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(entry_NaN), newElement_NaN);
+                chip::JniReferences::GetInstance().AddToArrayList(newElement_0_nullableList, newElement_NaN);
+            }
+        }
+        jobject newElement_0_optionalList;
+        if (!entry_0.optionalList.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_optionalList);
+        }
+        else
+        {
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_optionalList);
+
+            auto iter_newElement_0_optionalList_NaN = entry_0.optionalList.Value().begin();
+            while (iter_newElement_0_optionalList_NaN.Next())
+            {
+                auto & entry_NaN = iter_newElement_0_optionalList_NaN.GetValue();
+                jobject newElement_NaN;
+                std::string newElement_NaNClassName     = "java/lang/Integer";
+                std::string newElement_NaNCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
+                                                                              newElement_NaNCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(entry_NaN), newElement_NaN);
+                chip::JniReferences::GetInstance().AddToArrayList(newElement_0_optionalList, newElement_NaN);
+            }
+        }
+        jobject newElement_0_nullableOptionalList;
+        if (!entry_0.nullableOptionalList.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_nullableOptionalList);
+        }
+        else
+        {
+            if (entry_0.nullableOptionalList.Value().IsNull())
+            {
+                newElement_0_nullableOptionalList = nullptr;
+            }
+            else
+            {
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableOptionalList);
+
+                auto iter_newElement_0_nullableOptionalList_NaN = entry_0.nullableOptionalList.Value().Value().begin();
+                while (iter_newElement_0_nullableOptionalList_NaN.Next())
+                {
+                    auto & entry_NaN = iter_newElement_0_nullableOptionalList_NaN.GetValue();
+                    jobject newElement_NaN;
+                    std::string newElement_NaNClassName     = "java/lang/Integer";
+                    std::string newElement_NaNCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
+                                                                                  newElement_NaNCtorSignature.c_str(),
+                                                                                  static_cast<uint8_t>(entry_NaN), newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_nullableOptionalList, newElement_NaN);
+                }
             }
         }
 
-        jobject nullableOptionalInt = nullptr;
-        if (!nullableOptionalIntNull && nullableOptionalIntHasValue)
-        {
-            jclass nullableOptionalIntEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", nullableOptionalIntEntryCls);
-            chip::JniClass nullableOptionalIntJniClass(nullableOptionalIntEntryCls);
-            jmethodID nullableOptionalIntEntryTypeCtor = env->GetMethodID(nullableOptionalIntEntryCls, "<init>", "(I)V");
-            nullableOptionalInt =
-                env->NewObject(nullableOptionalIntEntryCls, nullableOptionalIntEntryTypeCtor, nullableOptionalIntValue);
-        }
+        jclass nullablesAndOptionalsStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$TestClusterClusterNullablesAndOptionalsStruct",
+            nullablesAndOptionalsStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterNullablesAndOptionalsStruct"));
+        chip::JniClass structJniClass(nullablesAndOptionalsStructStructClass);
+        jmethodID nullablesAndOptionalsStructStructCtor =
+            env->GetMethodID(nullablesAndOptionalsStructStructClass, "<init>",
+                             "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/"
+                             "Optional;Ljava/util/Optional;Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/"
+                             "util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/util/Optional;)V");
+        VerifyOrReturn(nullablesAndOptionalsStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterNullablesAndOptionalsStruct constructor"));
 
-        jobject nullableOptionalIntOptional = nullptr;
-        chip::JniReferences::GetInstance().CreateOptional(nullableOptionalInt, nullableOptionalIntOptional);
-        bool nullableStringNull     = false;
-        bool nullableStringHasValue = true;
-        chip::CharSpan nullableStringValue;
-        nullableStringNull = entry.nullableString.IsNull();
-        if (!nullableStringNull)
-        {
-            nullableStringValue = entry.nullableString.Value();
-        }
-
-        jstring nullableString = nullptr;
-        chip::UtfString nullableStringStr(env, nullableStringValue);
-        if (!nullableStringNull && nullableStringHasValue)
-        {
-            nullableString = jstring(nullableStringStr.jniValue());
-        }
-
-        bool optionalStringNull     = false;
-        bool optionalStringHasValue = true;
-
-        chip::CharSpan optionalStringValue;
-        optionalStringHasValue = entry.optionalString.HasValue();
-        if (optionalStringHasValue)
-        {
-            optionalStringValue = entry.optionalString.Value();
-        }
-
-        jstring optionalString = nullptr;
-        chip::UtfString optionalStringStr(env, optionalStringValue);
-        if (!optionalStringNull && optionalStringHasValue)
-        {
-            optionalString = jstring(optionalStringStr.jniValue());
-        }
-
-        jobject optionalStringOptional = nullptr;
-        chip::JniReferences::GetInstance().CreateOptional(optionalString, optionalStringOptional);
-        bool nullableOptionalStringNull     = false;
-        bool nullableOptionalStringHasValue = true;
-
-        chip::CharSpan nullableOptionalStringValue;
-        nullableOptionalStringHasValue = entry.nullableOptionalString.HasValue();
-        if (nullableOptionalStringHasValue)
-        {
-            auto nullableOptionalStringValueFromOptional = entry.nullableOptionalString.Value();
-            nullableOptionalStringNull                   = nullableOptionalStringValueFromOptional.IsNull();
-            if (!nullableOptionalStringNull)
-            {
-                nullableOptionalStringValue = nullableOptionalStringValueFromOptional.Value();
-            }
-        }
-
-        jstring nullableOptionalString = nullptr;
-        chip::UtfString nullableOptionalStringStr(env, nullableOptionalStringValue);
-        if (!nullableOptionalStringNull && nullableOptionalStringHasValue)
-        {
-            nullableOptionalString = jstring(nullableOptionalStringStr.jniValue());
-        }
-
-        jobject nullableOptionalStringOptional = nullptr;
-        chip::JniReferences::GetInstance().CreateOptional(nullableOptionalString, nullableOptionalStringOptional);
-
-        jobject attributeObj =
-            env->NewObject(attributeClass, attributeCtor, nullableInt, optionalIntOptional, nullableOptionalIntOptional,
-                           nullableString, optionalStringOptional, nullableOptionalStringOptional);
-        VerifyOrReturn(attributeObj != nullptr,
-                       ChipLogError(Zcl, "Could not create ListNullablesAndOptionalsStructAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(nullablesAndOptionalsStructStructClass, nullablesAndOptionalsStructStructCtor,
+                                      newElement_0_nullableInt, newElement_0_optionalInt, newElement_0_nullableOptionalInt,
+                                      newElement_0_nullableString, newElement_0_optionalString, newElement_0_nullableOptionalString,
+                                      newElement_0_nullableStruct, newElement_0_optionalStruct, newElement_0_nullableOptionalStruct,
+                                      newElement_0_nullableList, newElement_0_optionalList, newElement_0_nullableOptionalList);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding ListNullablesAndOptionalsStructAttribute value: %" CHIP_ERROR_FORMAT,
-                                iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -10647,40 +9189,24 @@ void CHIPTestClusterListLongOctetStringAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry              = iter.GetValue();
-        bool entryNull            = false;
-        chip::ByteSpan entryValue = entry;
-
-        jbyteArray entryObject = nullptr;
-        if (!entryNull)
-        {
-            entryObject = env->NewByteArray(entryValue.size());
-            env->SetByteArrayRegion(entryObject, 0, entryValue.size(), reinterpret_cast<const jbyte *>(entryValue.data()));
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+        env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.data()));
+        newElement_0 = newElement_0ByteArray;
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ListLongOctetStringAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -10737,11 +9263,17 @@ void CHIPTestClusterNullableBooleanAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Boolean";
-    std::string javaValueCtorSignature = "(Z)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                               value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Boolean";
+        std::string javaValueCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                   value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -10798,11 +9330,17 @@ void CHIPTestClusterNullableBitmap8AttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -10859,11 +9397,17 @@ void CHIPTestClusterNullableBitmap16AttributeCallback::CallbackFn(void * context
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -10920,11 +9464,17 @@ void CHIPTestClusterNullableBitmap32AttributeCallback::CallbackFn(void * context
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -10981,11 +9531,17 @@ void CHIPTestClusterNullableBitmap64AttributeCallback::CallbackFn(void * context
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11040,11 +9596,17 @@ void CHIPTestClusterNullableInt8uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11101,11 +9663,17 @@ void CHIPTestClusterNullableInt16uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11162,11 +9730,17 @@ void CHIPTestClusterNullableInt24uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11223,11 +9797,17 @@ void CHIPTestClusterNullableInt32uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11284,11 +9864,17 @@ void CHIPTestClusterNullableInt40uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11345,11 +9931,17 @@ void CHIPTestClusterNullableInt48uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11406,11 +9998,17 @@ void CHIPTestClusterNullableInt56uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11467,11 +10065,17 @@ void CHIPTestClusterNullableInt64uAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11525,11 +10129,17 @@ void CHIPTestClusterNullableInt8sAttributeCallback::CallbackFn(void * context, c
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                 value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                     value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11586,11 +10196,17 @@ void CHIPTestClusterNullableInt16sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11647,11 +10263,17 @@ void CHIPTestClusterNullableInt24sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11708,11 +10330,17 @@ void CHIPTestClusterNullableInt32sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11769,11 +10397,17 @@ void CHIPTestClusterNullableInt40sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11830,11 +10464,17 @@ void CHIPTestClusterNullableInt48sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11891,11 +10531,17 @@ void CHIPTestClusterNullableInt56sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -11952,11 +10598,17 @@ void CHIPTestClusterNullableInt64sAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Long";
-    std::string javaValueCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12011,11 +10663,17 @@ void CHIPTestClusterNullableEnum8AttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12072,11 +10730,17 @@ void CHIPTestClusterNullableEnum16AttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12133,11 +10797,17 @@ void CHIPTestClusterNullableFloatSingleAttributeCallback::CallbackFn(void * cont
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Float";
-    std::string javaValueCtorSignature = "(F)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<float>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Float";
+        std::string javaValueCtorSignature = "(F)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<float>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                    value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12194,11 +10864,17 @@ void CHIPTestClusterNullableFloatDoubleAttributeCallback::CallbackFn(void * cont
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Double";
-    std::string javaValueCtorSignature = "(D)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<double>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                 value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Double";
+        std::string javaValueCtorSignature = "(D)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<double>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                     value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12255,9 +10931,17 @@ void CHIPTestClusterNullableOctetStringAttributeCallback::CallbackFn(void * cont
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    chip::ByteArray javaValueByteArray(env, value.Value());
-    javaValue = javaValueByteArray.jniValue();
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
+        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
+                                reinterpret_cast<const jbyte *>(value.Value().data()));
+        javaValue = javaValueByteArray;
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12314,9 +10998,14 @@ void CHIPTestClusterNullableCharStringAttributeCallback::CallbackFn(void * conte
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    chip::UtfString javaValueUtfString(env, value.Value());
-    javaValue = javaValueUtfString.jniValue();
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        javaValue = env->NewStringUTF(std::string(value.Value().data(), value.Value().size()).c_str());
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12373,11 +11062,17 @@ void CHIPTestClusterNullableEnumAttrAttributeCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TestCluster::SimpleEnum>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12434,11 +11129,17 @@ void CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback::CallbackFn(vo
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12495,11 +11196,17 @@ void CHIPTestClusterNullableRangeRestrictedInt8sAttributeCallback::CallbackFn(vo
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                 value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                     value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12556,11 +11263,17 @@ void CHIPTestClusterNullableRangeRestrictedInt16uAttributeCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12617,11 +11330,17 @@ void CHIPTestClusterNullableRangeRestrictedInt16sAttributeCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                  value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -12672,43 +11391,24 @@ void CHIPTestClusterAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -12760,43 +11460,24 @@ void CHIPThermostatAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -12851,43 +11532,24 @@ void CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback::Cal
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -12943,262 +11605,121 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$NeighborTableListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            Zcl,
-            "Could not find class chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$NeighborTableListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>",
-                         "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/"
-                         "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                         "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NeighborTableListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool extAddressNull     = false;
-        bool extAddressHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_extAddress;
+        std::string newElement_0_extAddressClassName     = "java/lang/Long";
+        std::string newElement_0_extAddressCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_extAddressClassName.c_str(),
+                                                                       newElement_0_extAddressCtorSignature.c_str(),
+                                                                       entry_0.extAddress, newElement_0_extAddress);
+        jobject newElement_0_age;
+        std::string newElement_0_ageClassName     = "java/lang/Long";
+        std::string newElement_0_ageCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+            newElement_0_ageClassName.c_str(), newElement_0_ageCtorSignature.c_str(), entry_0.age, newElement_0_age);
+        jobject newElement_0_rloc16;
+        std::string newElement_0_rloc16ClassName     = "java/lang/Integer";
+        std::string newElement_0_rloc16CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            newElement_0_rloc16ClassName.c_str(), newElement_0_rloc16CtorSignature.c_str(), entry_0.rloc16, newElement_0_rloc16);
+        jobject newElement_0_linkFrameCounter;
+        std::string newElement_0_linkFrameCounterClassName     = "java/lang/Long";
+        std::string newElement_0_linkFrameCounterCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_linkFrameCounterClassName.c_str(),
+                                                                       newElement_0_linkFrameCounterCtorSignature.c_str(),
+                                                                       entry_0.linkFrameCounter, newElement_0_linkFrameCounter);
+        jobject newElement_0_mleFrameCounter;
+        std::string newElement_0_mleFrameCounterClassName     = "java/lang/Long";
+        std::string newElement_0_mleFrameCounterCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_mleFrameCounterClassName.c_str(),
+                                                                       newElement_0_mleFrameCounterCtorSignature.c_str(),
+                                                                       entry_0.mleFrameCounter, newElement_0_mleFrameCounter);
+        jobject newElement_0_lqi;
+        std::string newElement_0_lqiClassName     = "java/lang/Integer";
+        std::string newElement_0_lqiCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_lqiClassName.c_str(), newElement_0_lqiCtorSignature.c_str(), entry_0.lqi, newElement_0_lqi);
+        jobject newElement_0_averageRssi;
+        std::string newElement_0_averageRssiClassName     = "java/lang/Integer";
+        std::string newElement_0_averageRssiCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(newElement_0_averageRssiClassName.c_str(),
+                                                                     newElement_0_averageRssiCtorSignature.c_str(),
+                                                                     entry_0.averageRssi, newElement_0_averageRssi);
+        jobject newElement_0_lastRssi;
+        std::string newElement_0_lastRssiClassName     = "java/lang/Integer";
+        std::string newElement_0_lastRssiCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(newElement_0_lastRssiClassName.c_str(),
+                                                                     newElement_0_lastRssiCtorSignature.c_str(), entry_0.lastRssi,
+                                                                     newElement_0_lastRssi);
+        jobject newElement_0_frameErrorRate;
+        std::string newElement_0_frameErrorRateClassName     = "java/lang/Integer";
+        std::string newElement_0_frameErrorRateCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_frameErrorRateClassName.c_str(),
+                                                                      newElement_0_frameErrorRateCtorSignature.c_str(),
+                                                                      entry_0.frameErrorRate, newElement_0_frameErrorRate);
+        jobject newElement_0_messageErrorRate;
+        std::string newElement_0_messageErrorRateClassName     = "java/lang/Integer";
+        std::string newElement_0_messageErrorRateCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_messageErrorRateClassName.c_str(),
+                                                                      newElement_0_messageErrorRateCtorSignature.c_str(),
+                                                                      entry_0.messageErrorRate, newElement_0_messageErrorRate);
+        jobject newElement_0_rxOnWhenIdle;
+        std::string newElement_0_rxOnWhenIdleClassName     = "java/lang/Boolean";
+        std::string newElement_0_rxOnWhenIdleCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_rxOnWhenIdleClassName.c_str(),
+                                                                   newElement_0_rxOnWhenIdleCtorSignature.c_str(),
+                                                                   entry_0.rxOnWhenIdle, newElement_0_rxOnWhenIdle);
+        jobject newElement_0_fullThreadDevice;
+        std::string newElement_0_fullThreadDeviceClassName     = "java/lang/Boolean";
+        std::string newElement_0_fullThreadDeviceCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_fullThreadDeviceClassName.c_str(),
+                                                                   newElement_0_fullThreadDeviceCtorSignature.c_str(),
+                                                                   entry_0.fullThreadDevice, newElement_0_fullThreadDevice);
+        jobject newElement_0_fullNetworkData;
+        std::string newElement_0_fullNetworkDataClassName     = "java/lang/Boolean";
+        std::string newElement_0_fullNetworkDataCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_fullNetworkDataClassName.c_str(),
+                                                                   newElement_0_fullNetworkDataCtorSignature.c_str(),
+                                                                   entry_0.fullNetworkData, newElement_0_fullNetworkData);
+        jobject newElement_0_isChild;
+        std::string newElement_0_isChildClassName     = "java/lang/Boolean";
+        std::string newElement_0_isChildCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_isChildClassName.c_str(),
+                                                                   newElement_0_isChildCtorSignature.c_str(), entry_0.isChild,
+                                                                   newElement_0_isChild);
 
-        uint64_t extAddressValue = entry.extAddress;
+        jclass neighborTableStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable", neighborTableStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable"));
+        chip::JniClass structJniClass(neighborTableStructClass);
+        jmethodID neighborTableStructCtor =
+            env->GetMethodID(neighborTableStructClass, "<init>",
+                             "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/"
+                             "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
+                             "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
+        VerifyOrReturn(neighborTableStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable constructor"));
 
-        jobject extAddress = nullptr;
-        if (!extAddressNull && extAddressHasValue)
-        {
-            jclass extAddressEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", extAddressEntryCls);
-            chip::JniClass extAddressJniClass(extAddressEntryCls);
-            jmethodID extAddressEntryTypeCtor = env->GetMethodID(extAddressEntryCls, "<init>", "(J)V");
-            extAddress                        = env->NewObject(extAddressEntryCls, extAddressEntryTypeCtor, extAddressValue);
-        }
-
-        bool ageNull     = false;
-        bool ageHasValue = true;
-
-        uint32_t ageValue = entry.age;
-
-        jobject age = nullptr;
-        if (!ageNull && ageHasValue)
-        {
-            jclass ageEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", ageEntryCls);
-            chip::JniClass ageJniClass(ageEntryCls);
-            jmethodID ageEntryTypeCtor = env->GetMethodID(ageEntryCls, "<init>", "(J)V");
-            age                        = env->NewObject(ageEntryCls, ageEntryTypeCtor, ageValue);
-        }
-
-        bool rloc16Null     = false;
-        bool rloc16HasValue = true;
-
-        uint16_t rloc16Value = entry.rloc16;
-
-        jobject rloc16 = nullptr;
-        if (!rloc16Null && rloc16HasValue)
-        {
-            jclass rloc16EntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", rloc16EntryCls);
-            chip::JniClass rloc16JniClass(rloc16EntryCls);
-            jmethodID rloc16EntryTypeCtor = env->GetMethodID(rloc16EntryCls, "<init>", "(I)V");
-            rloc16                        = env->NewObject(rloc16EntryCls, rloc16EntryTypeCtor, rloc16Value);
-        }
-
-        bool linkFrameCounterNull     = false;
-        bool linkFrameCounterHasValue = true;
-
-        uint32_t linkFrameCounterValue = entry.linkFrameCounter;
-
-        jobject linkFrameCounter = nullptr;
-        if (!linkFrameCounterNull && linkFrameCounterHasValue)
-        {
-            jclass linkFrameCounterEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", linkFrameCounterEntryCls);
-            chip::JniClass linkFrameCounterJniClass(linkFrameCounterEntryCls);
-            jmethodID linkFrameCounterEntryTypeCtor = env->GetMethodID(linkFrameCounterEntryCls, "<init>", "(J)V");
-            linkFrameCounter = env->NewObject(linkFrameCounterEntryCls, linkFrameCounterEntryTypeCtor, linkFrameCounterValue);
-        }
-
-        bool mleFrameCounterNull     = false;
-        bool mleFrameCounterHasValue = true;
-
-        uint32_t mleFrameCounterValue = entry.mleFrameCounter;
-
-        jobject mleFrameCounter = nullptr;
-        if (!mleFrameCounterNull && mleFrameCounterHasValue)
-        {
-            jclass mleFrameCounterEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", mleFrameCounterEntryCls);
-            chip::JniClass mleFrameCounterJniClass(mleFrameCounterEntryCls);
-            jmethodID mleFrameCounterEntryTypeCtor = env->GetMethodID(mleFrameCounterEntryCls, "<init>", "(J)V");
-            mleFrameCounter = env->NewObject(mleFrameCounterEntryCls, mleFrameCounterEntryTypeCtor, mleFrameCounterValue);
-        }
-
-        bool lqiNull     = false;
-        bool lqiHasValue = true;
-
-        uint8_t lqiValue = entry.lqi;
-
-        jobject lqi = nullptr;
-        if (!lqiNull && lqiHasValue)
-        {
-            jclass lqiEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", lqiEntryCls);
-            chip::JniClass lqiJniClass(lqiEntryCls);
-            jmethodID lqiEntryTypeCtor = env->GetMethodID(lqiEntryCls, "<init>", "(I)V");
-            lqi                        = env->NewObject(lqiEntryCls, lqiEntryTypeCtor, lqiValue);
-        }
-
-        bool averageRssiNull     = false;
-        bool averageRssiHasValue = true;
-
-        int8_t averageRssiValue = entry.averageRssi;
-
-        jobject averageRssi = nullptr;
-        if (!averageRssiNull && averageRssiHasValue)
-        {
-            jclass averageRssiEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", averageRssiEntryCls);
-            chip::JniClass averageRssiJniClass(averageRssiEntryCls);
-            jmethodID averageRssiEntryTypeCtor = env->GetMethodID(averageRssiEntryCls, "<init>", "(I)V");
-            averageRssi                        = env->NewObject(averageRssiEntryCls, averageRssiEntryTypeCtor, averageRssiValue);
-        }
-
-        bool lastRssiNull     = false;
-        bool lastRssiHasValue = true;
-
-        int8_t lastRssiValue = entry.lastRssi;
-
-        jobject lastRssi = nullptr;
-        if (!lastRssiNull && lastRssiHasValue)
-        {
-            jclass lastRssiEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", lastRssiEntryCls);
-            chip::JniClass lastRssiJniClass(lastRssiEntryCls);
-            jmethodID lastRssiEntryTypeCtor = env->GetMethodID(lastRssiEntryCls, "<init>", "(I)V");
-            lastRssi                        = env->NewObject(lastRssiEntryCls, lastRssiEntryTypeCtor, lastRssiValue);
-        }
-
-        bool frameErrorRateNull     = false;
-        bool frameErrorRateHasValue = true;
-
-        uint8_t frameErrorRateValue = entry.frameErrorRate;
-
-        jobject frameErrorRate = nullptr;
-        if (!frameErrorRateNull && frameErrorRateHasValue)
-        {
-            jclass frameErrorRateEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", frameErrorRateEntryCls);
-            chip::JniClass frameErrorRateJniClass(frameErrorRateEntryCls);
-            jmethodID frameErrorRateEntryTypeCtor = env->GetMethodID(frameErrorRateEntryCls, "<init>", "(I)V");
-            frameErrorRate = env->NewObject(frameErrorRateEntryCls, frameErrorRateEntryTypeCtor, frameErrorRateValue);
-        }
-
-        bool messageErrorRateNull     = false;
-        bool messageErrorRateHasValue = true;
-
-        uint8_t messageErrorRateValue = entry.messageErrorRate;
-
-        jobject messageErrorRate = nullptr;
-        if (!messageErrorRateNull && messageErrorRateHasValue)
-        {
-            jclass messageErrorRateEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", messageErrorRateEntryCls);
-            chip::JniClass messageErrorRateJniClass(messageErrorRateEntryCls);
-            jmethodID messageErrorRateEntryTypeCtor = env->GetMethodID(messageErrorRateEntryCls, "<init>", "(I)V");
-            messageErrorRate = env->NewObject(messageErrorRateEntryCls, messageErrorRateEntryTypeCtor, messageErrorRateValue);
-        }
-
-        bool rxOnWhenIdleNull     = false;
-        bool rxOnWhenIdleHasValue = true;
-
-        bool rxOnWhenIdleValue = entry.rxOnWhenIdle;
-
-        jobject rxOnWhenIdle = nullptr;
-        if (!rxOnWhenIdleNull && rxOnWhenIdleHasValue)
-        {
-            jclass rxOnWhenIdleEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", rxOnWhenIdleEntryCls);
-            chip::JniClass rxOnWhenIdleJniClass(rxOnWhenIdleEntryCls);
-            jmethodID rxOnWhenIdleEntryTypeCtor = env->GetMethodID(rxOnWhenIdleEntryCls, "<init>", "(Z)V");
-            rxOnWhenIdle = env->NewObject(rxOnWhenIdleEntryCls, rxOnWhenIdleEntryTypeCtor, rxOnWhenIdleValue);
-        }
-
-        bool fullThreadDeviceNull     = false;
-        bool fullThreadDeviceHasValue = true;
-
-        bool fullThreadDeviceValue = entry.fullThreadDevice;
-
-        jobject fullThreadDevice = nullptr;
-        if (!fullThreadDeviceNull && fullThreadDeviceHasValue)
-        {
-            jclass fullThreadDeviceEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", fullThreadDeviceEntryCls);
-            chip::JniClass fullThreadDeviceJniClass(fullThreadDeviceEntryCls);
-            jmethodID fullThreadDeviceEntryTypeCtor = env->GetMethodID(fullThreadDeviceEntryCls, "<init>", "(Z)V");
-            fullThreadDevice = env->NewObject(fullThreadDeviceEntryCls, fullThreadDeviceEntryTypeCtor, fullThreadDeviceValue);
-        }
-
-        bool fullNetworkDataNull     = false;
-        bool fullNetworkDataHasValue = true;
-
-        bool fullNetworkDataValue = entry.fullNetworkData;
-
-        jobject fullNetworkData = nullptr;
-        if (!fullNetworkDataNull && fullNetworkDataHasValue)
-        {
-            jclass fullNetworkDataEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", fullNetworkDataEntryCls);
-            chip::JniClass fullNetworkDataJniClass(fullNetworkDataEntryCls);
-            jmethodID fullNetworkDataEntryTypeCtor = env->GetMethodID(fullNetworkDataEntryCls, "<init>", "(Z)V");
-            fullNetworkData = env->NewObject(fullNetworkDataEntryCls, fullNetworkDataEntryTypeCtor, fullNetworkDataValue);
-        }
-
-        bool isChildNull     = false;
-        bool isChildHasValue = true;
-
-        bool isChildValue = entry.isChild;
-
-        jobject isChild = nullptr;
-        if (!isChildNull && isChildHasValue)
-        {
-            jclass isChildEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", isChildEntryCls);
-            chip::JniClass isChildJniClass(isChildEntryCls);
-            jmethodID isChildEntryTypeCtor = env->GetMethodID(isChildEntryCls, "<init>", "(Z)V");
-            isChild                        = env->NewObject(isChildEntryCls, isChildEntryTypeCtor, isChildValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, extAddress, age, rloc16, linkFrameCounter,
-                                              mleFrameCounter, lqi, averageRssi, lastRssi, frameErrorRate, messageErrorRate,
-                                              rxOnWhenIdle, fullThreadDevice, fullNetworkData, isChild);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create NeighborTableListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(neighborTableStructClass, neighborTableStructCtor, newElement_0_extAddress, newElement_0_age,
+                                      newElement_0_rloc16, newElement_0_linkFrameCounter, newElement_0_mleFrameCounter,
+                                      newElement_0_lqi, newElement_0_averageRssi, newElement_0_lastRssi,
+                                      newElement_0_frameErrorRate, newElement_0_messageErrorRate, newElement_0_rxOnWhenIdle,
+                                      newElement_0_fullThreadDevice, newElement_0_fullNetworkData, newElement_0_isChild);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding NeighborTableListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -13254,200 +11775,93 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$RouteTableListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            Zcl,
-            "Could not find class chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$RouteTableListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>",
-                         "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                         "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find RouteTableListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool extAddressNull     = false;
-        bool extAddressHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_extAddress;
+        std::string newElement_0_extAddressClassName     = "java/lang/Long";
+        std::string newElement_0_extAddressCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_extAddressClassName.c_str(),
+                                                                       newElement_0_extAddressCtorSignature.c_str(),
+                                                                       entry_0.extAddress, newElement_0_extAddress);
+        jobject newElement_0_rloc16;
+        std::string newElement_0_rloc16ClassName     = "java/lang/Integer";
+        std::string newElement_0_rloc16CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            newElement_0_rloc16ClassName.c_str(), newElement_0_rloc16CtorSignature.c_str(), entry_0.rloc16, newElement_0_rloc16);
+        jobject newElement_0_routerId;
+        std::string newElement_0_routerIdClassName     = "java/lang/Integer";
+        std::string newElement_0_routerIdCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_routerIdClassName.c_str(),
+                                                                      newElement_0_routerIdCtorSignature.c_str(), entry_0.routerId,
+                                                                      newElement_0_routerId);
+        jobject newElement_0_nextHop;
+        std::string newElement_0_nextHopClassName     = "java/lang/Integer";
+        std::string newElement_0_nextHopCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_nextHopClassName.c_str(),
+                                                                      newElement_0_nextHopCtorSignature.c_str(), entry_0.nextHop,
+                                                                      newElement_0_nextHop);
+        jobject newElement_0_pathCost;
+        std::string newElement_0_pathCostClassName     = "java/lang/Integer";
+        std::string newElement_0_pathCostCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_pathCostClassName.c_str(),
+                                                                      newElement_0_pathCostCtorSignature.c_str(), entry_0.pathCost,
+                                                                      newElement_0_pathCost);
+        jobject newElement_0_LQIIn;
+        std::string newElement_0_LQIInClassName     = "java/lang/Integer";
+        std::string newElement_0_LQIInCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_LQIInClassName.c_str(), newElement_0_LQIInCtorSignature.c_str(), entry_0.LQIIn, newElement_0_LQIIn);
+        jobject newElement_0_LQIOut;
+        std::string newElement_0_LQIOutClassName     = "java/lang/Integer";
+        std::string newElement_0_LQIOutCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_LQIOutClassName.c_str(), newElement_0_LQIOutCtorSignature.c_str(), entry_0.LQIOut, newElement_0_LQIOut);
+        jobject newElement_0_age;
+        std::string newElement_0_ageClassName     = "java/lang/Integer";
+        std::string newElement_0_ageCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_ageClassName.c_str(), newElement_0_ageCtorSignature.c_str(), entry_0.age, newElement_0_age);
+        jobject newElement_0_allocated;
+        std::string newElement_0_allocatedClassName     = "java/lang/Boolean";
+        std::string newElement_0_allocatedCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_allocatedClassName.c_str(),
+                                                                   newElement_0_allocatedCtorSignature.c_str(), entry_0.allocated,
+                                                                   newElement_0_allocated);
+        jobject newElement_0_linkEstablished;
+        std::string newElement_0_linkEstablishedClassName     = "java/lang/Boolean";
+        std::string newElement_0_linkEstablishedCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_linkEstablishedClassName.c_str(),
+                                                                   newElement_0_linkEstablishedCtorSignature.c_str(),
+                                                                   entry_0.linkEstablished, newElement_0_linkEstablished);
 
-        uint64_t extAddressValue = entry.extAddress;
+        jclass routeTableStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable", routeTableStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable"));
+        chip::JniClass structJniClass(routeTableStructClass);
+        jmethodID routeTableStructCtor =
+            env->GetMethodID(routeTableStructClass, "<init>",
+                             "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
+                             "lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
+        VerifyOrReturn(routeTableStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable constructor"));
 
-        jobject extAddress = nullptr;
-        if (!extAddressNull && extAddressHasValue)
-        {
-            jclass extAddressEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", extAddressEntryCls);
-            chip::JniClass extAddressJniClass(extAddressEntryCls);
-            jmethodID extAddressEntryTypeCtor = env->GetMethodID(extAddressEntryCls, "<init>", "(J)V");
-            extAddress                        = env->NewObject(extAddressEntryCls, extAddressEntryTypeCtor, extAddressValue);
-        }
-
-        bool rloc16Null     = false;
-        bool rloc16HasValue = true;
-
-        uint16_t rloc16Value = entry.rloc16;
-
-        jobject rloc16 = nullptr;
-        if (!rloc16Null && rloc16HasValue)
-        {
-            jclass rloc16EntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", rloc16EntryCls);
-            chip::JniClass rloc16JniClass(rloc16EntryCls);
-            jmethodID rloc16EntryTypeCtor = env->GetMethodID(rloc16EntryCls, "<init>", "(I)V");
-            rloc16                        = env->NewObject(rloc16EntryCls, rloc16EntryTypeCtor, rloc16Value);
-        }
-
-        bool routerIdNull     = false;
-        bool routerIdHasValue = true;
-
-        uint8_t routerIdValue = entry.routerId;
-
-        jobject routerId = nullptr;
-        if (!routerIdNull && routerIdHasValue)
-        {
-            jclass routerIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", routerIdEntryCls);
-            chip::JniClass routerIdJniClass(routerIdEntryCls);
-            jmethodID routerIdEntryTypeCtor = env->GetMethodID(routerIdEntryCls, "<init>", "(I)V");
-            routerId                        = env->NewObject(routerIdEntryCls, routerIdEntryTypeCtor, routerIdValue);
-        }
-
-        bool nextHopNull     = false;
-        bool nextHopHasValue = true;
-
-        uint8_t nextHopValue = entry.nextHop;
-
-        jobject nextHop = nullptr;
-        if (!nextHopNull && nextHopHasValue)
-        {
-            jclass nextHopEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", nextHopEntryCls);
-            chip::JniClass nextHopJniClass(nextHopEntryCls);
-            jmethodID nextHopEntryTypeCtor = env->GetMethodID(nextHopEntryCls, "<init>", "(I)V");
-            nextHop                        = env->NewObject(nextHopEntryCls, nextHopEntryTypeCtor, nextHopValue);
-        }
-
-        bool pathCostNull     = false;
-        bool pathCostHasValue = true;
-
-        uint8_t pathCostValue = entry.pathCost;
-
-        jobject pathCost = nullptr;
-        if (!pathCostNull && pathCostHasValue)
-        {
-            jclass pathCostEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", pathCostEntryCls);
-            chip::JniClass pathCostJniClass(pathCostEntryCls);
-            jmethodID pathCostEntryTypeCtor = env->GetMethodID(pathCostEntryCls, "<init>", "(I)V");
-            pathCost                        = env->NewObject(pathCostEntryCls, pathCostEntryTypeCtor, pathCostValue);
-        }
-
-        bool LQIInNull     = false;
-        bool LQIInHasValue = true;
-
-        uint8_t LQIInValue = entry.LQIIn;
-
-        jobject LQIIn = nullptr;
-        if (!LQIInNull && LQIInHasValue)
-        {
-            jclass LQIInEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", LQIInEntryCls);
-            chip::JniClass LQIInJniClass(LQIInEntryCls);
-            jmethodID LQIInEntryTypeCtor = env->GetMethodID(LQIInEntryCls, "<init>", "(I)V");
-            LQIIn                        = env->NewObject(LQIInEntryCls, LQIInEntryTypeCtor, LQIInValue);
-        }
-
-        bool LQIOutNull     = false;
-        bool LQIOutHasValue = true;
-
-        uint8_t LQIOutValue = entry.LQIOut;
-
-        jobject LQIOut = nullptr;
-        if (!LQIOutNull && LQIOutHasValue)
-        {
-            jclass LQIOutEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", LQIOutEntryCls);
-            chip::JniClass LQIOutJniClass(LQIOutEntryCls);
-            jmethodID LQIOutEntryTypeCtor = env->GetMethodID(LQIOutEntryCls, "<init>", "(I)V");
-            LQIOut                        = env->NewObject(LQIOutEntryCls, LQIOutEntryTypeCtor, LQIOutValue);
-        }
-
-        bool ageNull     = false;
-        bool ageHasValue = true;
-
-        uint8_t ageValue = entry.age;
-
-        jobject age = nullptr;
-        if (!ageNull && ageHasValue)
-        {
-            jclass ageEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", ageEntryCls);
-            chip::JniClass ageJniClass(ageEntryCls);
-            jmethodID ageEntryTypeCtor = env->GetMethodID(ageEntryCls, "<init>", "(I)V");
-            age                        = env->NewObject(ageEntryCls, ageEntryTypeCtor, ageValue);
-        }
-
-        bool allocatedNull     = false;
-        bool allocatedHasValue = true;
-
-        bool allocatedValue = entry.allocated;
-
-        jobject allocated = nullptr;
-        if (!allocatedNull && allocatedHasValue)
-        {
-            jclass allocatedEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", allocatedEntryCls);
-            chip::JniClass allocatedJniClass(allocatedEntryCls);
-            jmethodID allocatedEntryTypeCtor = env->GetMethodID(allocatedEntryCls, "<init>", "(Z)V");
-            allocated                        = env->NewObject(allocatedEntryCls, allocatedEntryTypeCtor, allocatedValue);
-        }
-
-        bool linkEstablishedNull     = false;
-        bool linkEstablishedHasValue = true;
-
-        bool linkEstablishedValue = entry.linkEstablished;
-
-        jobject linkEstablished = nullptr;
-        if (!linkEstablishedNull && linkEstablishedHasValue)
-        {
-            jclass linkEstablishedEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", linkEstablishedEntryCls);
-            chip::JniClass linkEstablishedJniClass(linkEstablishedEntryCls);
-            jmethodID linkEstablishedEntryTypeCtor = env->GetMethodID(linkEstablishedEntryCls, "<init>", "(Z)V");
-            linkEstablished = env->NewObject(linkEstablishedEntryCls, linkEstablishedEntryTypeCtor, linkEstablishedValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, extAddress, rloc16, routerId, nextHop, pathCost, LQIIn,
-                                              LQIOut, age, allocated, linkEstablished);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create RouteTableListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(routeTableStructClass, routeTableStructCtor, newElement_0_extAddress, newElement_0_rloc16,
+                                      newElement_0_routerId, newElement_0_nextHop, newElement_0_pathCost, newElement_0_LQIIn,
+                                      newElement_0_LQIOut, newElement_0_age, newElement_0_allocated, newElement_0_linkEstablished);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding RouteTableListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -13503,76 +11917,45 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$SecurityPolicyAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            Zcl,
-            "Could not find class chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$SecurityPolicyAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find SecurityPolicyAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool rotationTimeNull     = false;
-        bool rotationTimeHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_rotationTime;
+        std::string newElement_0_rotationTimeClassName     = "java/lang/Integer";
+        std::string newElement_0_rotationTimeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_rotationTimeClassName.c_str(),
+                                                                       newElement_0_rotationTimeCtorSignature.c_str(),
+                                                                       entry_0.rotationTime, newElement_0_rotationTime);
+        jobject newElement_0_flags;
+        std::string newElement_0_flagsClassName     = "java/lang/Integer";
+        std::string newElement_0_flagsCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags, newElement_0_flags);
 
-        uint16_t rotationTimeValue = entry.rotationTime;
+        jclass securityPolicyStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy", securityPolicyStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy"));
+        chip::JniClass structJniClass(securityPolicyStructClass);
+        jmethodID securityPolicyStructCtor =
+            env->GetMethodID(securityPolicyStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        VerifyOrReturn(securityPolicyStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy constructor"));
 
-        jobject rotationTime = nullptr;
-        if (!rotationTimeNull && rotationTimeHasValue)
-        {
-            jclass rotationTimeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", rotationTimeEntryCls);
-            chip::JniClass rotationTimeJniClass(rotationTimeEntryCls);
-            jmethodID rotationTimeEntryTypeCtor = env->GetMethodID(rotationTimeEntryCls, "<init>", "(I)V");
-            rotationTime = env->NewObject(rotationTimeEntryCls, rotationTimeEntryTypeCtor, rotationTimeValue);
-        }
-
-        bool flagsNull     = false;
-        bool flagsHasValue = true;
-
-        uint16_t flagsValue = entry.flags;
-
-        jobject flags = nullptr;
-        if (!flagsNull && flagsHasValue)
-        {
-            jclass flagsEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", flagsEntryCls);
-            chip::JniClass flagsJniClass(flagsEntryCls);
-            jmethodID flagsEntryTypeCtor = env->GetMethodID(flagsEntryCls, "<init>", "(I)V");
-            flags                        = env->NewObject(flagsEntryCls, flagsEntryTypeCtor, flagsValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, rotationTime, flags);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create SecurityPolicyAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(securityPolicyStructClass, securityPolicyStructCtor, newElement_0_rotationTime, newElement_0_flags);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding SecurityPolicyAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -13630,240 +12013,117 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$OperationalDatasetComponentsAttribute",
-        attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl,
-                     "Could not find class "
-                     "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$OperationalDatasetComponentsAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(
-        attributeClass, "<init>",
-        "(Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/"
-        "lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find OperationalDatasetComponentsAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool activeTimestampPresentNull     = false;
-        bool activeTimestampPresentHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_activeTimestampPresent;
+        std::string newElement_0_activeTimestampPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_activeTimestampPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_activeTimestampPresentClassName.c_str(), newElement_0_activeTimestampPresentCtorSignature.c_str(),
+            entry_0.activeTimestampPresent, newElement_0_activeTimestampPresent);
+        jobject newElement_0_pendingTimestampPresent;
+        std::string newElement_0_pendingTimestampPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_pendingTimestampPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_pendingTimestampPresentClassName.c_str(), newElement_0_pendingTimestampPresentCtorSignature.c_str(),
+            entry_0.pendingTimestampPresent, newElement_0_pendingTimestampPresent);
+        jobject newElement_0_masterKeyPresent;
+        std::string newElement_0_masterKeyPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_masterKeyPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_masterKeyPresentClassName.c_str(),
+                                                                   newElement_0_masterKeyPresentCtorSignature.c_str(),
+                                                                   entry_0.masterKeyPresent, newElement_0_masterKeyPresent);
+        jobject newElement_0_networkNamePresent;
+        std::string newElement_0_networkNamePresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_networkNamePresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_networkNamePresentClassName.c_str(),
+                                                                   newElement_0_networkNamePresentCtorSignature.c_str(),
+                                                                   entry_0.networkNamePresent, newElement_0_networkNamePresent);
+        jobject newElement_0_extendedPanIdPresent;
+        std::string newElement_0_extendedPanIdPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_extendedPanIdPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_extendedPanIdPresentClassName.c_str(),
+                                                                   newElement_0_extendedPanIdPresentCtorSignature.c_str(),
+                                                                   entry_0.extendedPanIdPresent, newElement_0_extendedPanIdPresent);
+        jobject newElement_0_meshLocalPrefixPresent;
+        std::string newElement_0_meshLocalPrefixPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_meshLocalPrefixPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_meshLocalPrefixPresentClassName.c_str(), newElement_0_meshLocalPrefixPresentCtorSignature.c_str(),
+            entry_0.meshLocalPrefixPresent, newElement_0_meshLocalPrefixPresent);
+        jobject newElement_0_delayPresent;
+        std::string newElement_0_delayPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_delayPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_delayPresentClassName.c_str(),
+                                                                   newElement_0_delayPresentCtorSignature.c_str(),
+                                                                   entry_0.delayPresent, newElement_0_delayPresent);
+        jobject newElement_0_panIdPresent;
+        std::string newElement_0_panIdPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_panIdPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_panIdPresentClassName.c_str(),
+                                                                   newElement_0_panIdPresentCtorSignature.c_str(),
+                                                                   entry_0.panIdPresent, newElement_0_panIdPresent);
+        jobject newElement_0_channelPresent;
+        std::string newElement_0_channelPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_channelPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_channelPresentClassName.c_str(),
+                                                                   newElement_0_channelPresentCtorSignature.c_str(),
+                                                                   entry_0.channelPresent, newElement_0_channelPresent);
+        jobject newElement_0_pskcPresent;
+        std::string newElement_0_pskcPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_pskcPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_pskcPresentClassName.c_str(),
+                                                                   newElement_0_pskcPresentCtorSignature.c_str(),
+                                                                   entry_0.pskcPresent, newElement_0_pskcPresent);
+        jobject newElement_0_securityPolicyPresent;
+        std::string newElement_0_securityPolicyPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_securityPolicyPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_securityPolicyPresentClassName.c_str(), newElement_0_securityPolicyPresentCtorSignature.c_str(),
+            entry_0.securityPolicyPresent, newElement_0_securityPolicyPresent);
+        jobject newElement_0_channelMaskPresent;
+        std::string newElement_0_channelMaskPresentClassName     = "java/lang/Boolean";
+        std::string newElement_0_channelMaskPresentCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_channelMaskPresentClassName.c_str(),
+                                                                   newElement_0_channelMaskPresentCtorSignature.c_str(),
+                                                                   entry_0.channelMaskPresent, newElement_0_channelMaskPresent);
 
-        bool activeTimestampPresentValue = entry.activeTimestampPresent;
+        jclass operationalDatasetComponentsStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents",
+            operationalDatasetComponentsStructClass);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents"));
+        chip::JniClass structJniClass(operationalDatasetComponentsStructClass);
+        jmethodID operationalDatasetComponentsStructCtor =
+            env->GetMethodID(operationalDatasetComponentsStructClass, "<init>",
+                             "(Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
+                             "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
+                             "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
+        VerifyOrReturn(
+            operationalDatasetComponentsStructCtor != nullptr,
+            ChipLogError(Zcl,
+                         "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents constructor"));
 
-        jobject activeTimestampPresent = nullptr;
-        if (!activeTimestampPresentNull && activeTimestampPresentHasValue)
-        {
-            jclass activeTimestampPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", activeTimestampPresentEntryCls);
-            chip::JniClass activeTimestampPresentJniClass(activeTimestampPresentEntryCls);
-            jmethodID activeTimestampPresentEntryTypeCtor = env->GetMethodID(activeTimestampPresentEntryCls, "<init>", "(Z)V");
-            activeTimestampPresent =
-                env->NewObject(activeTimestampPresentEntryCls, activeTimestampPresentEntryTypeCtor, activeTimestampPresentValue);
-        }
-
-        bool pendingTimestampPresentNull     = false;
-        bool pendingTimestampPresentHasValue = true;
-
-        bool pendingTimestampPresentValue = entry.pendingTimestampPresent;
-
-        jobject pendingTimestampPresent = nullptr;
-        if (!pendingTimestampPresentNull && pendingTimestampPresentHasValue)
-        {
-            jclass pendingTimestampPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", pendingTimestampPresentEntryCls);
-            chip::JniClass pendingTimestampPresentJniClass(pendingTimestampPresentEntryCls);
-            jmethodID pendingTimestampPresentEntryTypeCtor = env->GetMethodID(pendingTimestampPresentEntryCls, "<init>", "(Z)V");
-            pendingTimestampPresent =
-                env->NewObject(pendingTimestampPresentEntryCls, pendingTimestampPresentEntryTypeCtor, pendingTimestampPresentValue);
-        }
-
-        bool masterKeyPresentNull     = false;
-        bool masterKeyPresentHasValue = true;
-
-        bool masterKeyPresentValue = entry.masterKeyPresent;
-
-        jobject masterKeyPresent = nullptr;
-        if (!masterKeyPresentNull && masterKeyPresentHasValue)
-        {
-            jclass masterKeyPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", masterKeyPresentEntryCls);
-            chip::JniClass masterKeyPresentJniClass(masterKeyPresentEntryCls);
-            jmethodID masterKeyPresentEntryTypeCtor = env->GetMethodID(masterKeyPresentEntryCls, "<init>", "(Z)V");
-            masterKeyPresent = env->NewObject(masterKeyPresentEntryCls, masterKeyPresentEntryTypeCtor, masterKeyPresentValue);
-        }
-
-        bool networkNamePresentNull     = false;
-        bool networkNamePresentHasValue = true;
-
-        bool networkNamePresentValue = entry.networkNamePresent;
-
-        jobject networkNamePresent = nullptr;
-        if (!networkNamePresentNull && networkNamePresentHasValue)
-        {
-            jclass networkNamePresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", networkNamePresentEntryCls);
-            chip::JniClass networkNamePresentJniClass(networkNamePresentEntryCls);
-            jmethodID networkNamePresentEntryTypeCtor = env->GetMethodID(networkNamePresentEntryCls, "<init>", "(Z)V");
-            networkNamePresent =
-                env->NewObject(networkNamePresentEntryCls, networkNamePresentEntryTypeCtor, networkNamePresentValue);
-        }
-
-        bool extendedPanIdPresentNull     = false;
-        bool extendedPanIdPresentHasValue = true;
-
-        bool extendedPanIdPresentValue = entry.extendedPanIdPresent;
-
-        jobject extendedPanIdPresent = nullptr;
-        if (!extendedPanIdPresentNull && extendedPanIdPresentHasValue)
-        {
-            jclass extendedPanIdPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", extendedPanIdPresentEntryCls);
-            chip::JniClass extendedPanIdPresentJniClass(extendedPanIdPresentEntryCls);
-            jmethodID extendedPanIdPresentEntryTypeCtor = env->GetMethodID(extendedPanIdPresentEntryCls, "<init>", "(Z)V");
-            extendedPanIdPresent =
-                env->NewObject(extendedPanIdPresentEntryCls, extendedPanIdPresentEntryTypeCtor, extendedPanIdPresentValue);
-        }
-
-        bool meshLocalPrefixPresentNull     = false;
-        bool meshLocalPrefixPresentHasValue = true;
-
-        bool meshLocalPrefixPresentValue = entry.meshLocalPrefixPresent;
-
-        jobject meshLocalPrefixPresent = nullptr;
-        if (!meshLocalPrefixPresentNull && meshLocalPrefixPresentHasValue)
-        {
-            jclass meshLocalPrefixPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", meshLocalPrefixPresentEntryCls);
-            chip::JniClass meshLocalPrefixPresentJniClass(meshLocalPrefixPresentEntryCls);
-            jmethodID meshLocalPrefixPresentEntryTypeCtor = env->GetMethodID(meshLocalPrefixPresentEntryCls, "<init>", "(Z)V");
-            meshLocalPrefixPresent =
-                env->NewObject(meshLocalPrefixPresentEntryCls, meshLocalPrefixPresentEntryTypeCtor, meshLocalPrefixPresentValue);
-        }
-
-        bool delayPresentNull     = false;
-        bool delayPresentHasValue = true;
-
-        bool delayPresentValue = entry.delayPresent;
-
-        jobject delayPresent = nullptr;
-        if (!delayPresentNull && delayPresentHasValue)
-        {
-            jclass delayPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", delayPresentEntryCls);
-            chip::JniClass delayPresentJniClass(delayPresentEntryCls);
-            jmethodID delayPresentEntryTypeCtor = env->GetMethodID(delayPresentEntryCls, "<init>", "(Z)V");
-            delayPresent = env->NewObject(delayPresentEntryCls, delayPresentEntryTypeCtor, delayPresentValue);
-        }
-
-        bool panIdPresentNull     = false;
-        bool panIdPresentHasValue = true;
-
-        bool panIdPresentValue = entry.panIdPresent;
-
-        jobject panIdPresent = nullptr;
-        if (!panIdPresentNull && panIdPresentHasValue)
-        {
-            jclass panIdPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", panIdPresentEntryCls);
-            chip::JniClass panIdPresentJniClass(panIdPresentEntryCls);
-            jmethodID panIdPresentEntryTypeCtor = env->GetMethodID(panIdPresentEntryCls, "<init>", "(Z)V");
-            panIdPresent = env->NewObject(panIdPresentEntryCls, panIdPresentEntryTypeCtor, panIdPresentValue);
-        }
-
-        bool channelPresentNull     = false;
-        bool channelPresentHasValue = true;
-
-        bool channelPresentValue = entry.channelPresent;
-
-        jobject channelPresent = nullptr;
-        if (!channelPresentNull && channelPresentHasValue)
-        {
-            jclass channelPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", channelPresentEntryCls);
-            chip::JniClass channelPresentJniClass(channelPresentEntryCls);
-            jmethodID channelPresentEntryTypeCtor = env->GetMethodID(channelPresentEntryCls, "<init>", "(Z)V");
-            channelPresent = env->NewObject(channelPresentEntryCls, channelPresentEntryTypeCtor, channelPresentValue);
-        }
-
-        bool pskcPresentNull     = false;
-        bool pskcPresentHasValue = true;
-
-        bool pskcPresentValue = entry.pskcPresent;
-
-        jobject pskcPresent = nullptr;
-        if (!pskcPresentNull && pskcPresentHasValue)
-        {
-            jclass pskcPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", pskcPresentEntryCls);
-            chip::JniClass pskcPresentJniClass(pskcPresentEntryCls);
-            jmethodID pskcPresentEntryTypeCtor = env->GetMethodID(pskcPresentEntryCls, "<init>", "(Z)V");
-            pskcPresent                        = env->NewObject(pskcPresentEntryCls, pskcPresentEntryTypeCtor, pskcPresentValue);
-        }
-
-        bool securityPolicyPresentNull     = false;
-        bool securityPolicyPresentHasValue = true;
-
-        bool securityPolicyPresentValue = entry.securityPolicyPresent;
-
-        jobject securityPolicyPresent = nullptr;
-        if (!securityPolicyPresentNull && securityPolicyPresentHasValue)
-        {
-            jclass securityPolicyPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", securityPolicyPresentEntryCls);
-            chip::JniClass securityPolicyPresentJniClass(securityPolicyPresentEntryCls);
-            jmethodID securityPolicyPresentEntryTypeCtor = env->GetMethodID(securityPolicyPresentEntryCls, "<init>", "(Z)V");
-            securityPolicyPresent =
-                env->NewObject(securityPolicyPresentEntryCls, securityPolicyPresentEntryTypeCtor, securityPolicyPresentValue);
-        }
-
-        bool channelMaskPresentNull     = false;
-        bool channelMaskPresentHasValue = true;
-
-        bool channelMaskPresentValue = entry.channelMaskPresent;
-
-        jobject channelMaskPresent = nullptr;
-        if (!channelMaskPresentNull && channelMaskPresentHasValue)
-        {
-            jclass channelMaskPresentEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", channelMaskPresentEntryCls);
-            chip::JniClass channelMaskPresentJniClass(channelMaskPresentEntryCls);
-            jmethodID channelMaskPresentEntryTypeCtor = env->GetMethodID(channelMaskPresentEntryCls, "<init>", "(Z)V");
-            channelMaskPresent =
-                env->NewObject(channelMaskPresentEntryCls, channelMaskPresentEntryTypeCtor, channelMaskPresentValue);
-        }
-
-        jobject attributeObj =
-            env->NewObject(attributeClass, attributeCtor, activeTimestampPresent, pendingTimestampPresent, masterKeyPresent,
-                           networkNamePresent, extendedPanIdPresent, meshLocalPrefixPresent, delayPresent, panIdPresent,
-                           channelPresent, pskcPresent, securityPolicyPresent, channelMaskPresent);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create OperationalDatasetComponentsAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 =
+            env->NewObject(operationalDatasetComponentsStructClass, operationalDatasetComponentsStructCtor,
+                           newElement_0_activeTimestampPresent, newElement_0_pendingTimestampPresent, newElement_0_masterKeyPresent,
+                           newElement_0_networkNamePresent, newElement_0_extendedPanIdPresent, newElement_0_meshLocalPrefixPresent,
+                           newElement_0_delayPresent, newElement_0_panIdPresent, newElement_0_channelPresent,
+                           newElement_0_pskcPresent, newElement_0_securityPolicyPresent, newElement_0_channelMaskPresent);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding OperationalDatasetComponentsAttribute value: %" CHIP_ERROR_FORMAT,
-                                iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -13918,43 +12178,24 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::Callb
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                                                           = iter.GetValue();
-        bool entryNull                                                         = false;
-        chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding ActiveNetworkFaultsListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -14008,43 +12249,96 @@ void CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::
+    CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::
+    ~CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -14097,67 +12391,36 @@ void CHIPUserLabelLabelListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$UserLabelCluster$LabelListAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$UserLabelCluster$LabelListAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find LabelListAttribute constructor"));
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-    auto iter = list.begin();
-    while (iter.Next())
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool labelNull     = false;
-        bool labelHasValue = true;
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_label;
+        newElement_0_label = env->NewStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+        jobject newElement_0_value;
+        newElement_0_value = env->NewStringUTF(std::string(entry_0.value.data(), entry_0.value.size()).c_str());
 
-        chip::CharSpan labelValue = entry.label;
+        jclass labelStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$UserLabelClusterLabelStruct",
+                                                             labelStructStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$UserLabelClusterLabelStruct"));
+        chip::JniClass structJniClass(labelStructStructClass);
+        jmethodID labelStructStructCtor =
+            env->GetMethodID(labelStructStructClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+        VerifyOrReturn(labelStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$UserLabelClusterLabelStruct constructor"));
 
-        jstring label = nullptr;
-        chip::UtfString labelStr(env, labelValue);
-        if (!labelNull && labelHasValue)
-        {
-            label = jstring(labelStr.jniValue());
-        }
-
-        bool valueNull     = false;
-        bool valueHasValue = true;
-
-        chip::CharSpan valueValue = entry.value;
-
-        jstring value = nullptr;
-        chip::UtfString valueStr(env, valueValue);
-        if (!valueNull && valueHasValue)
-        {
-            value = jstring(valueStr.jniValue());
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, label, value);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create LabelListAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        newElement_0 = env->NewObject(labelStructStructClass, labelStructStructCtor, newElement_0_label, newElement_0_value);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding LabelListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -14209,43 +12472,24 @@ void CHIPWakeOnLanAttributeListAttributeCallback::CallbackFn(void * context,
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -14299,43 +12543,24 @@ void CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -14393,11 +12618,17 @@ void CHIPWindowCoveringCurrentPositionLiftAttributeCallback::CallbackFn(void * c
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14454,11 +12685,17 @@ void CHIPWindowCoveringCurrentPositionTiltAttributeCallback::CallbackFn(void * c
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14516,11 +12753,17 @@ void CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback::CallbackF
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::Percent>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                        value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14578,11 +12821,17 @@ void CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback::CallbackF
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::Percent>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                        value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14640,11 +12889,17 @@ void CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback::Callbac
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::Percent100ths>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14702,11 +12957,17 @@ void CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback::Callbac
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::Percent100ths>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14764,11 +13025,17 @@ void CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback::Callba
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::Percent100ths>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14826,11 +13093,17 @@ void CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback::Callba
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject javaValue;
-
-    std::string javaValueClassName     = "java/lang/Integer";
-    std::string javaValueCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::Percent100ths>(
-        javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value.Value(), javaValue);
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -14883,43 +13156,24 @@ void CHIPWindowCoveringAttributeListAttributeCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
     jmethodID javaMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    auto iter = list.begin();
-    while (iter.Next())
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
-
-        jobject entryObject = nullptr;
-        if (!entryNull)
-        {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
-        }
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);

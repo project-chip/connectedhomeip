@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -339,6 +339,13 @@
 #define ZCL_CALENDAR_TYPE_ATTRIBUTE_ID (0x0001)
 #define ZCL_SUPPORTED_CALENDAR_TYPES_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: Unit Localization
+
+// Client attributes
+
+// Server attributes
+#define ZCL_TEMPERATURE_UNIT_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Power Source Configuration
 
 // Client attributes
@@ -590,6 +597,7 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_NOCS_ATTRIBUTE_ID (0x0000)
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 #define ZCL_SUPPORTED_FABRICS_ATTRIBUTE_ID (0x0002)
 #define ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID (0x0003)
@@ -1501,7 +1509,10 @@
 #define ZCL_RANGE_RESTRICTED_INT16_U_ATTRIBUTE_ID (0x0028)
 #define ZCL_RANGE_RESTRICTED_INT16S_ATTRIBUTE_ID (0x0029)
 #define ZCL_LIST_LONG_OCTET_STRING_ATTRIBUTE_ID (0x002A)
+#define ZCL_LIST_FABRIC_SCOPED_ATTRIBUTE_ID (0x002B)
 #define ZCL_TIMED_WRITE_BOOLEAN_ATTRIBUTE_ID (0x0030)
+#define ZCL_GENERAL_ERROR_BOOLEAN_ATTRIBUTE_ID (0x0031)
+#define ZCL_CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID (0x0032)
 #define ZCL_UNSUPPORTED_ATTRIBUTE_ID (0x00FF)
 #define ZCL_NULLABLE_BOOLEAN_ATTRIBUTE_ID (0x8000)
 #define ZCL_NULLABLE_BITMAP8_ATTRIBUTE_ID (0x8001)

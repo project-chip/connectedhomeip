@@ -228,5 +228,60 @@ private:
     uint32_t mPendingPeerAckMessageCounter;
 };
 
+inline bool ReliableMessageContext::AutoRequestAck() const
+{
+    return mFlags.Has(Flags::kFlagAutoRequestAck);
+}
+
+inline bool ReliableMessageContext::IsAckPending() const
+{
+    return mFlags.Has(Flags::kFlagAckPending);
+}
+
+inline bool ReliableMessageContext::HasRcvdMsgFromPeer() const
+{
+    return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
+}
+
+inline bool ReliableMessageContext::IsMessageNotAcked() const
+{
+    return mFlags.Has(Flags::kFlagMesageNotAcked);
+}
+
+inline bool ReliableMessageContext::ShouldDropAckDebug() const
+{
+    return mFlags.Has(Flags::kFlagDropAckDebug);
+}
+
+inline bool ReliableMessageContext::HasPiggybackAckPending() const
+{
+    return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
+}
+
+inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
+{
+    mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
+}
+
+inline void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
+{
+    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
+}
+
+inline void ReliableMessageContext::SetAckPending(bool inAckPending)
+{
+    mFlags.Set(Flags::kFlagAckPending, inAckPending);
+}
+
+inline void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
+{
+    mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
+}
+
+inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
+{
+    mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
+}
+
 } // namespace Messaging
 } // namespace chip

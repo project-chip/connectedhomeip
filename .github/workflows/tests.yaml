@@ -29,7 +29,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 60
+        timeout-minutes: 120
 
         strategy:
             matrix:
@@ -43,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.45
+            image: connectedhomeip/chip-build:0.5.52
             options:
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -73,7 +73,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -114,7 +114,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 60
+        timeout-minutes: 120
 
         strategy:
             matrix:
@@ -163,7 +163,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

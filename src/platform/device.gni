@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, none.
+  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, none.
 
   chip_device_platform = "auto"
   chip_platform_target = ""
@@ -114,6 +114,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "android"
 } else if (chip_device_platform == "ameba") {
   _chip_device_layer = "Ameba"
+} else if (chip_device_platform == "cyw30739") {
+  _chip_device_layer = "CYW30739"
 }
 
 if (chip_device_platform != "external") {
@@ -156,5 +158,5 @@ assert(
         chip_device_platform == "k32w0" || chip_device_platform == "qpg" ||
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
         chip_device_platform == "p6" || chip_device_platform == "android" ||
-        chip_device_platform == "ameba",
+        chip_device_platform == "ameba" || chip_device_platform == "cyw30739",
     "Please select a valid value for chip_device_platform")

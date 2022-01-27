@@ -43,6 +43,7 @@ public:
         kQueryImage = 0,
         kStartBDX,
         kApplyUpdate,
+        kNotifyUpdateApplied,
     };
 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
@@ -62,9 +63,13 @@ public:
     // Send ApplyImage
     void ApplyUpdate() override;
 
+    // Send NotifyUpdateApplied, update Basic cluster SoftwareVersion attribute, log the VersionApplied event
+    void NotifyUpdateApplied(uint32_t version) override;
+
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
-    void OnDownloadStateChanged(OTADownloader::State state) override;
-    void OnUpdateProgressChanged(uint8_t percent) override;
+    void OnDownloadStateChanged(OTADownloader::State state,
+                                app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
+    void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override;
 
     /**
      * Called to perform some initialization including:
@@ -80,8 +85,14 @@ public:
         mOtaRequestorDriver = driver;
         mBdxDownloader      = downloader;
 
-        OtaRequestorServerSetUpdateState(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle);
-        OtaRequestorServerSetUpdateStateProgress(0);
+        uint32_t version;
+        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
+        mCurrentVersion = version;
+
+        OtaRequestorServerSetUpdateState(mCurrentUpdateState);
+        app::DataModel::Nullable<uint8_t> percent;
+        percent.SetNull();
+        OtaRequestorServerSetUpdateStateProgress(percent);
     }
 
     /**
@@ -91,6 +102,12 @@ public:
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    // Get image update progress in percents unit
+    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
+
+    // Get requestor state
+    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
 
     /**
      * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
@@ -103,13 +120,9 @@ public:
         mProviderEndpointId  = endpointId;
     }
 
-    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
-    // as the QueryImageResponse content) is preserved
-    void AbortImageUpdate();
-
-    // Application directs the Requestor to abort the download in progress. All the Requestor state is
-    // cleared, UploadState is reset to Idle
-    void AbortAndResetState();
+    // Application directs the Requestor to cancel image update in progress. All the Requestor state is
+    // cleared, UpdateState is reset to Idle
+    void CancelImageUpdate() override;
 
     // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
@@ -118,6 +131,8 @@ public:
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
+    using OTAUpdateStateEnum               = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using OTAChangeReasonEnum              = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
     static constexpr size_t kMaxUpdateTokenLen = 32;
 
@@ -133,10 +148,6 @@ private:
             VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
             chip::Messaging::SendFlags sendFlags;
-            if (event.msgTypeData.HasMessageType(chip::bdx::MessageType::ReceiveInit))
-            {
-                sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
-            }
             if (!event.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF) &&
                 !event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
@@ -189,6 +200,22 @@ private:
     };
 
     /**
+     * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
+     */
+    void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason);
+
+    /**
+     * Record the error update state by informing the driver of the error and calling `RecordNewUpdateState`
+     */
+    void RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error,
+                                OTAChangeReasonEnum reason = OTAChangeReasonEnum::kFailure);
+
+    /**
+     * Generate an update token using the operational node ID in case of token lost, received in QueryImageResponse
+     */
+    CHIP_ERROR GenerateUpdateToken();
+
+    /**
      * Send QueryImage request using values matching Basic cluster
      */
     CHIP_ERROR SendQueryImageRequest(OperationalDeviceProxy & deviceProxy);
@@ -209,6 +236,11 @@ private:
     CHIP_ERROR SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
+     * Send NotifyUpdateApplied request
+     */
+    CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -220,18 +252,24 @@ private:
      * QueryImage callbacks
      */
     static void OnQueryImageResponse(void * context, const QueryImageResponseDecodableType & response);
-    static void OnQueryImageFailure(void * context, EmberAfStatus status);
+    static void OnQueryImageFailure(void * context, CHIP_ERROR error);
 
     /**
      * ApplyUpdate callbacks
      */
     static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
-    static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+    static void OnApplyUpdateFailure(void * context, CHIP_ERROR error);
+
+    /**
+     * NotifyUpdateApplied callbacks
+     */
+    static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
+    static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    NodeId mProviderNodeId                    = kUndefinedNodeId;
-    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
-    EndpointId mProviderEndpointId            = kRootEndpointId;
+    NodeId mProviderNodeId                    = kUndefinedNodeId;      // Only valid for the current update in progress
+    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex; // Only valid for the current update in progress
+    EndpointId mProviderEndpointId            = kRootEndpointId;       // Only valid for the current update in progress
     uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
@@ -240,8 +278,10 @@ private:
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
-    uint32_t mUpdateVersion = 0;
-    Server * mServer        = nullptr;
+    uint32_t mCurrentVersion               = 0;
+    uint32_t mTargetVersion                = 0;
+    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
+    Server * mServer                       = nullptr;
 };
 
 } // namespace chip

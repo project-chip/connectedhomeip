@@ -107,17 +107,22 @@ CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::AudioOutput::Attributes::AudioOutputList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadOutputListAttribute(aEncoder, delegate);
     }
     case app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentOutputAttribute(aEncoder, delegate);
     }
     default: {

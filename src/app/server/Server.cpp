@@ -92,8 +92,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage),
-    mAttributePersister(mServerStorage)
+    }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
+    mAttributePersister(mDeviceStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -112,8 +112,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     // handler.
     SetAttributePersistenceProvider(&mAttributePersister);
 
-    InitDataModelHandler(&mExchangeMgr);
-
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
     SuccessOrExit(err);
@@ -121,10 +119,12 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
 
-    err = mFabrics.Init(&mServerStorage);
+    InitDataModelHandler(&mExchangeMgr);
+
+    err = mFabrics.Init(&mDeviceStorage);
     SuccessOrExit(err);
 
-    // Group data provider must be initialized after mServerStorage
+    // Group data provider must be initialized after mDeviceStorage
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
@@ -149,20 +149,14 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     );
 
+    err = mListener.Init(&mTransports);
+    SuccessOrExit(err);
+    mGroupsProvider.SetListener(&mListener);
+
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     SuccessOrExit(err);
-
-// Enable Group Listening
-// TODO : Fix this once GroupDataProvider is implemented #Issue 11075
-// for (iterate through all GroupDataProvider multicast Address)
-// {
-#ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
-    err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(0, 1234), true);
-    SuccessOrExit(err);
-#endif
-    //}
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
     SuccessOrExit(err);
@@ -172,7 +166,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mMessageCounterManager.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, nullptr);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr);
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
@@ -238,6 +232,40 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     err = mCASESessionManager.Init();
 
+    // This code is necessary to restart listening to existing groups after a reboot
+    // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
+    //
+    // This is disabled for thread device because the same code is already present for thread devices in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
+    // https://github.com/project-chip/connectedhomeip/issues/14254
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    {
+        ChipLogProgress(AppServer, "Adding Multicast groups");
+        ConstFabricIterator fabricIterator = mFabrics.cbegin();
+        while (!fabricIterator.IsAtEnd())
+        {
+            const FabricInfo & fabric = *fabricIterator;
+            Credentials::GroupDataProvider::GroupInfo groupInfo;
+
+            Credentials::GroupDataProvider::GroupInfoIterator * iterator =
+                mGroupsProvider.IterateGroupInfo(fabric.GetFabricIndex());
+            while (iterator->Next(groupInfo))
+            {
+                err = mTransports.MulticastGroupJoinLeave(
+                    Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %" PRIu8,
+                                 groupInfo.group_id, fabric.GetFabricIndex());
+                    break;
+                }
+            }
+
+            fabricIterator++;
+            iterator->Release();
+        }
+    }
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_THREAD
 exit:
     if (err != CHIP_NO_ERROR)
     {

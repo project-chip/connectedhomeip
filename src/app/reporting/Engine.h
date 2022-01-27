@@ -96,6 +96,11 @@ public:
      */
     CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
 
+    /*
+     * Resets the tracker that tracks the currently serviced read handler.
+     */
+    void ResetReadHandlerTracker() { mCurReadHandlerIdx = 0; }
+
 private:
     friend class TestReportingEngine;
     /**
@@ -108,7 +113,7 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool * apHasMoreChunks, bool * apHasEncodedData);
-    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);

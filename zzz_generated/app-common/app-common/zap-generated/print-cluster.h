@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -168,6 +168,12 @@
     { ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID, 44, "Time Format Localization" },
 #else
 #define CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER
+#endif
+
+#if defined(ZCL_USING_UNIT_LOCALIZATION_CLUSTER_SERVER) || defined(ZCL_USING_UNIT_LOCALIZATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_UNIT_LOCALIZATION_CLUSTER { ZCL_UNIT_LOCALIZATION_CLUSTER_ID, 45, "Unit Localization" },
+#else
+#define CHIP_PRINTCLUSTER_UNIT_LOCALIZATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_CLIENT)
@@ -819,6 +825,7 @@
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_UNIT_LOCALIZATION_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_POWER_SOURCE_CONFIGURATION_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_POWER_SOURCE_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \

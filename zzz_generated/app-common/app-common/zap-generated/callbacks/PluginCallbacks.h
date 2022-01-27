@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,6 +67,8 @@ void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallba
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterTimeFormatLocalizationPluginClientInitCallback() {}
 void MatterTimeFormatLocalizationPluginServerInitCallback();
+void __attribute__((weak)) MatterUnitLocalizationPluginClientInitCallback() {}
+void MatterUnitLocalizationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
 void MatterPowerSourceConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}

@@ -72,7 +72,7 @@ public:
          * receives an OnDone call to destroy the object.
          *
          */
-        virtual void OnReportBegin(const ReadClient * apReadClient) {}
+        virtual void OnReportBegin() {}
 
         /**
          * Used to signal the completion of processing of the last attribute report in a given exchange.
@@ -81,7 +81,7 @@ public:
          * receives an OnDone call to destroy the object.
          *
          */
-        virtual void OnReportEnd(const ReadClient * apReadClient) {}
+        virtual void OnReportEnd() {}
 
         /**
          * Used to deliver event data received through the Read and Subscribe interactions
@@ -91,15 +91,12 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
          * @param[in] apData: A TLVReader positioned right on the payload of the event.
          * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
-                                 const StatusIB * apStatus)
-        {}
+        virtual void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) {}
 
         /**
          * Used to deliver attribute data received through the Read and Subscribe interactions.
@@ -112,15 +109,12 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient The read client object that initiated the read or subscribe transaction.
          * @param[in] aPath        The attribute path field in report response.
          * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
-                                     TLV::TLVReader * apData, const StatusIB & aStatus)
-        {}
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) {}
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
@@ -128,9 +122,9 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient The read client object that initiated the read transaction.
+         * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
-        virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
+        virtual void OnSubscriptionEstablished(uint64_t aSubscriptionId) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -138,15 +132,17 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient The read client object that initiated the attribute read transaction.
          * @param[in] aError       A system error code that conveys the overall error code.
          */
-        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
+        virtual void OnError(CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
@@ -158,9 +154,8 @@ public:
          *      - Only be called after a successful call to SendRequest has been
          *        made, when the read completes or the subscription is shut down.
          *
-         * @param[in] apReadClient The read client object of the terminated read or subscribe interaction.
          */
-        virtual void OnDone(ReadClient * apReadClient) = 0;
+        virtual void OnDone() = 0;
     };
 
     enum class InteractionType : uint8_t

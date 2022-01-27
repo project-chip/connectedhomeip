@@ -38,6 +38,8 @@ public:
 
     void OnPairingDeleted(CHIP_ERROR error) override;
 
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+
     void OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error) override;
 
 private:

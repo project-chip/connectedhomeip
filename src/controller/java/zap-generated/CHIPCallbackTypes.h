@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataModel::NullObjectType &);
 typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
-typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 typedef void (*CHIPAccessControlClusterAclAttributeCallbackType)(
     void *, const chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo::DecodableType &);
@@ -581,6 +581,8 @@ typedef void (*CHIPLevelControlClusterStartUpCurrentLevelAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableArgType);
 typedef void (*CHIPLevelControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPLevelControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPLevelControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -588,6 +590,8 @@ typedef void (*CHIPLocalizationConfigurationClusterActiveLocaleAttributeCallback
     void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo::DecodableArgType);
 typedef void (*CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType)(
     void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo::DecodableType &);
+typedef void (*CHIPLocalizationConfigurationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPLowPowerClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo::DecodableType &);
@@ -731,6 +735,8 @@ typedef void (*CHIPOperationalCredentialsClusterNOCResponseCallbackType)(
 typedef void (*CHIPOperationalCredentialsClusterOpCSRResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType &);
 
+typedef void (*CHIPOperationalCredentialsClusterNOCsAttributeCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo::DecodableType &);
 typedef void (*CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo::DecodableType &);
 typedef void (*CHIPOperationalCredentialsClusterSupportedFabricsAttributeCallbackType)(
@@ -1040,6 +1046,10 @@ typedef void (*CHIPTestClusterClusterListLongOctetStringAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterGeneralErrorBooleanAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterClusterErrorBooleanAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterUnsupportedAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableBooleanAttributeCallbackType)(
@@ -1306,6 +1316,22 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterFeatureMapAttributeCallbackTyp
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
+typedef void (*CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::HourFormat::TypeInfo::DecodableArgType);
+typedef void (*CHIPTimeFormatLocalizationClusterActiveCalendarTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo::DecodableArgType);
+typedef void (*CHIPTimeFormatLocalizationClusterSupportedCalendarTypesAttributeCallbackType)(
+    void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo::DecodableType &);
+typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
+typedef void (*CHIPUnitLocalizationClusterTemperatureUnitAttributeCallbackType)(
+    void *, chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::TypeInfo::DecodableArgType);
+typedef void (*CHIPUnitLocalizationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::UnitLocalization::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPUnitLocalizationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::UnitLocalization::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPUserLabelClusterLabelListAttributeCallbackType)(
     void *, const chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo::DecodableType &);

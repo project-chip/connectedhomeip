@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,6 +58,9 @@ constexpr uint32_t kPBKDFMaximumIterations = 100000;
 constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
 constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
 
+// Specifications section 5.1.1.6
+constexpr uint32_t kSetupPINCodeMaximumValue = 99999998;
+
 using namespace Crypto;
 
 constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
@@ -85,8 +88,6 @@ public:
     PASESession();
     PASESession(PASESession &&)      = default;
     PASESession(const PASESession &) = delete;
-    PASESession & operator=(const PASESession &) = default;
-    PASESession & operator=(PASESession &&) = default;
 
     virtual ~PASESession();
 
@@ -332,7 +333,7 @@ constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
 class SecurePairingUsingTestSecret : public PairingSession
 {
 public:
-    SecurePairingUsingTestSecret()
+    SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
     {
         // Do not set to 0 to prevent unwanted unsecured session
         // since the session type is unknown.
@@ -340,7 +341,8 @@ public:
         SetPeerSessionId(1);
     }
 
-    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)
+    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId) :
+        PairingSession(Transport::SecureSession::Type::kPASE)
     {
         SetLocalSessionId(localSessionId);
         SetPeerSessionId(peerSessionId);

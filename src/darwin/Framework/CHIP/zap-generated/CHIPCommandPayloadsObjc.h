@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1815,6 +1815,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull value;
+- (instancetype)init;
+@end
+
 @interface CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 - (instancetype)init;
@@ -1866,6 +1871,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 @property (strong, nonatomic) NSNumber * _Nonnull arg3;
+- (instancetype)init;
+@end
+
+@interface CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull arg1;
 - (instancetype)init;
 @end
 

@@ -84,6 +84,12 @@ function getCommands(methodName)
                                  : ensureClusters(this).getServerCommands(clusterName);
 }
 
+function getAttributes(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return ensureClusters(this).getAttributesByClusterName(clusterName);
+}
+
 function getResponses(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
@@ -164,7 +170,7 @@ async function if_in_global_responses(options)
   const globalResponses    = await getServerGlobalAttributeResponses(this);
   const responseTypeExists = globalResponses.find(
       // Some fields of item/attribute here may be undefined.
-      item => item.isList == attribute.isList && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
+      item => item.isArray == attribute.isArray && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
           && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
 
   if (responseTypeExists)
@@ -182,10 +188,10 @@ function getServerGlobalAttributeResponses(context)
   const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
 
   const reducer = (unique, item) => {
-    const { type, size, isList, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
+    const { type, size, isArray, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
 
     // List-typed elements have a dedicated callback
-    if (isList) {
+    if (isArray) {
       return unique;
     }
 
@@ -309,7 +315,7 @@ function chip_server_has_list_attributes(options)
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
   const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
-  const filter = attribute => attribute.isList;
+  const filter = attribute => attribute.isArray;
   return attributes.then(items => items.find(filter));
 }
 
@@ -326,7 +332,24 @@ function chip_client_has_list_attributes(options)
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
   const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
-  const filter = attribute => attribute.isList;
+  const filter = attribute => attribute.isArray;
+  return attributes.then(items => items.find(filter));
+}
+
+/**
+ * Returns if a given server cluster has any reportable attribute
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_has_reportable_attributes(options)
+{
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_reportable_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
+
+  const filter = attribute => attribute.isReportableAttribute;
   return attributes.then(items => items.find(filter));
 }
 
@@ -392,6 +415,39 @@ function chip_available_cluster_commands(options)
 }
 
 /**
+ * Creates block iterator over structures belonging to the current cluster
+ */
+async function chip_cluster_specific_structs(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_cluster_specific_structs');
+
+  const structs = await ensureClusters(this).getStructuresByClusterName(clusterName);
+
+  return templateUtil.collectBlocks(structs, options, this);
+}
+
+/**
+ * Creates block iterator over structures that are shared between clusters
+ */
+async function chip_shared_structs(options)
+{
+  const structs = await ensureClusters(this).getSharedStructs();
+  return templateUtil.collectBlocks(structs, options, this);
+}
+
+async function chip_endpoints(options)
+{
+  const endpoints = await ensureClusters(this).getEndPoints();
+  return templateUtil.collectBlocks(endpoints, options, this);
+}
+
+async function chip_endpoint_clusters(options)
+{
+  const clusters = this.clusters;
+  return templateUtil.collectBlocks(clusters, options, this);
+}
+
+/**
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
  */
@@ -431,6 +487,11 @@ exports.chip_attribute_list_entryTypes                       = chip_attribute_li
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
 exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
+exports.chip_server_has_reportable_attributes                = chip_server_has_reportable_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
+exports.chip_endpoints                                       = chip_endpoints;
+exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
 exports.if_chip_enum                                         = if_chip_enum;
 exports.if_in_global_responses                               = if_in_global_responses;
+exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
+exports.chip_shared_structs                                  = chip_shared_structs;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,9 +92,8 @@ using HKDF_sha_crypto = HKDF_sha;
 // The session establishment fails if the response is not received within timeout window.
 static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Clock::Seconds16(30);
 
-CASESession::CASESession()
+CASESession::CASESession() : PairingSession(Transport::SecureSession::Type::kCASE)
 {
-    SetSecureSessionType(Transport::SecureSession::Type::kCASE);
     mTrustedRootId = CertificateKeyId();
 }
 
@@ -537,7 +536,7 @@ CHIP_ERROR CASESession::SendSigma2()
     ByteSpan nocCert;
     ReturnErrorOnFailure(mFabricInfo->GetNOCCert(nocCert));
 
-    mTrustedRootId = mFabricInfo->GetTrustedRootId();
+    ReturnErrorOnFailure(mFabricInfo->GetTrustedRootId(mTrustedRootId));
     VerifyOrReturnError(!mTrustedRootId.empty(), CHIP_ERROR_INTERNAL);
 
     // Fill in the random value
@@ -918,7 +917,7 @@ CHIP_ERROR CASESession::SendSigma3()
     SuccessOrExit(err = mFabricInfo->GetICACert(icaCert));
     SuccessOrExit(err = mFabricInfo->GetNOCCert(nocCert));
 
-    mTrustedRootId = mFabricInfo->GetTrustedRootId();
+    SuccessOrExit(err = mFabricInfo->GetTrustedRootId(mTrustedRootId));
     VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
 
     // Prepare Sigma3 TBS Data Blob
