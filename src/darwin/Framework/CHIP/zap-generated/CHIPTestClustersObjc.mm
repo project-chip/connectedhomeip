@@ -22,11 +22,11 @@
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPListUtils_internal.h"
 
 #import "zap-generated/CHIPTestClustersObjc.h"
 #import "zap-generated/tests/CHIPClustersTest.h"
 
+#include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -3183,6 +3183,25 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeNumberOfRFIDUsersSupportedWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -3211,6 +3230,42 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
             using TypeInfo = DoorLock::Attributes::MinPINCodeLength::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMinRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::MinRFIDCodeLength::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -6761,7 +6816,12 @@ using namespace chip::app::Clusters;
                         auto element_0 = (CHIPOperationalCredentialsClusterNOCStruct *) value[i_0];
                         listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].noc = [self asByteSpan:element_0.noc];
-                        listHolder_0->mList[i_0].icac = [self asByteSpan:element_0.icac];
+                        if (element_0.icac == nil) {
+                            listHolder_0->mList[i_0].icac.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].icac.SetNonNull();
+                            nonNullValue_2 = [self asByteSpan:element_0.icac];
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -10679,6 +10739,55 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
             using TypeInfo = TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+@end
+
+@interface CHIPTestUnitLocalization ()
+@property (readonly) chip::Controller::UnitLocalizationClusterTest cppCluster;
+@end
+
+@implementation CHIPTestUnitLocalization
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = UnitLocalization::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = UnitLocalization::Attributes::ClusterRevision::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);

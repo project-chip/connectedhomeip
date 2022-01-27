@@ -73,6 +73,21 @@
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
 #endif
 
+//
+// Default of 8 ECs is not sufficient for some of the unit tests
+// that try to validate multiple simultaneous interactions.
+//
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 16
+
+//
+// Set this to a value greater than the value for CHIP_IM_MAX_NUM_READ_HANDLER
+// to ensure some of the tests for validating resource exhaustion and heap allocation
+// pass correctly.
+//
+// TODO: Once we fix ReadClients to be heap allocated, we no longer need this override.
+//
+#define CHIP_IM_MAX_NUM_READ_CLIENT 6
+
 #define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

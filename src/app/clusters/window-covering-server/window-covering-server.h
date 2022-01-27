@@ -18,13 +18,23 @@
 #pragma once
 
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
+
+#include <app/data-model/Nullable.h>
+
+#define WC_PERCENT100THS_MIN_OPEN 0
+#define WC_PERCENT100THS_MAX_CLOSED 10000
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+
+typedef DataModel::Nullable<Percent> NPercent;
+typedef DataModel::Nullable<Percent100ths> NPercent100ths;
+typedef DataModel::Nullable<uint16_t> NAbsolute;
 
 struct Mode
 {
@@ -81,11 +91,25 @@ struct SafetyStatus
 };
 static_assert(sizeof(SafetyStatus) == sizeof(uint16_t), "SafetyStatus Size is not correct");
 
-bool IsLiftOpen(chip::EndpointId endpoint);
-bool IsLiftClosed(chip::EndpointId endpoint);
+// Declare Position Limit Status
+enum class LimitStatus : uint8_t
+{
+    Intermediate      = 0x00,
+    IsUpOrOpen        = 0x01,
+    IsDownOrClose     = 0x02,
+    Inverted          = 0x03,
+    IsPastUpOrOpen    = 0x04,
+    IsPastDownOrClose = 0x05,
+};
+static_assert(sizeof(LimitStatus) == sizeof(uint8_t), "LimitStatus Size is not correct");
 
-bool IsTiltOpen(chip::EndpointId endpoint);
-bool IsTiltClosed(chip::EndpointId endpoint);
+struct AbsoluteLimits
+{
+    uint16_t open;
+    uint16_t closed;
+};
+
+bool HasFeature(chip::EndpointId endpoint, WcFeature feature);
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type);
 EmberAfWcType TypeGet(chip::EndpointId endpoint);
@@ -94,7 +118,11 @@ void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status);
 const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint);
 
 void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status);
+void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status);
 const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
+
+OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
+OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
 
 void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type);
 EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint);
@@ -104,6 +132,11 @@ const Mode ModeGet(chip::EndpointId endpoint);
 
 void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
 const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);
+
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
+
+bool IsPercent100thsValid(Percent100ths percent100ths);
+bool IsPercent100thsValid(NPercent100ths npercent100ths);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);

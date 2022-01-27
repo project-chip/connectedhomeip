@@ -128,8 +128,8 @@ private:
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
     SessionHolder mSessionBobToFriends;
-    FabricIndex mSrcFabricIndex  = 0;
-    FabricIndex mDestFabricIndex = 0;
+    FabricIndex mSrcFabricIndex  = 1;
+    FabricIndex mDestFabricIndex = 1;
 };
 
 template <typename Transport = LoopbackTransport>

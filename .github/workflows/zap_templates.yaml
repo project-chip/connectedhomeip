@@ -29,7 +29,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-zap:0.5.48
+            image: connectedhomeip/chip-build-zap:0.5.52
         defaults:
             run:
                 shell: sh
@@ -41,7 +41,7 @@ jobs:
               with:
                   submodules: true
             - name: Setup ZAP
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                 cd third_party/zap/repo/
                 npm ci
@@ -49,7 +49,7 @@ jobs:
                 npm rebuild canvas --update-binary
                 npm run build-spa
             - name: Generate all
-              timeout-minutes: 15
+              timeout-minutes: 30
               run: scripts/tools/zap_regen_all.py
             - name: Check for uncommited changes
               run: |

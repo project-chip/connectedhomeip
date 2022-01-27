@@ -104,6 +104,7 @@ protected:
 private:
     // TODO: This is temporary until Darwin implements a proper ReadConfigValue
     static uint16_t mPosixSetupDiscriminator;
+    static char mPosixCountryCode[2 + 1];
 };
 
 struct PosixConfig::Key

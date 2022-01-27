@@ -116,13 +116,6 @@ int AppTask::Init()
     LightingMgr().Init(MBED_CONF_APP_LIGHTING_STATE_LED);
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Start BLE advertising if needed
-    if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
-    {
-        ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-    }
-
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
@@ -380,7 +373,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         return;
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
     {
         ChipLogProgress(NotSpecified, "Factory Reset Triggered. Release button within %ums to cancel.",
                         FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
@@ -418,17 +411,29 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
         // If the button was released before factory reset got initiated, trigger a software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
-            ChipLogError(NotSpecified, "Software Update not supported.");
+
+            chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ChipLogProgress(NotSpecified, "BLE advertising is already enabled");
+                return;
+            }
+
+            if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(NotSpecified, "OpenBasicCommissioningWindow() failed");
+            }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {

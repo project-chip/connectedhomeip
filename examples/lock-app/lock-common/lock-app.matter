@@ -472,7 +472,7 @@ server cluster OperationalCredentials = 62 {
   struct NOCStruct {
     fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
-    OCTET_STRING icac = 2;
+    nullable OCTET_STRING icac = 2;
   }
 
   struct FabricDescriptor {
@@ -565,6 +565,64 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster PowerSource = 47 {
+  enum BatChargeFaultType : ENUM8 {
+    kUnspecfied = 0;
+    kAmbientTooHot = 1;
+    kAmbientTooCold = 2;
+    kBatteryTooHot = 3;
+    kBatteryTooCold = 4;
+    kBatteryAbsent = 5;
+    kBatteryOverVoltage = 6;
+    kBatteryUnderVoltage = 7;
+    kChargerOverVoltage = 8;
+    kChargerUnderVoltage = 9;
+    kSafetyTimeout = 10;
+  }
+
+  enum BatChargeLevel : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum BatChargeState : ENUM8 {
+    kUnknown = 0;
+    kIsCharging = 1;
+    kIsAtFullCharge = 2;
+    kIsNotCharging = 3;
+  }
+
+  enum BatFaultType : ENUM8 {
+    kUnspecfied = 0;
+    kOverTemp = 1;
+    kUnderTemp = 2;
+  }
+
+  enum BatReplaceability : ENUM8 {
+    kUnspecified = 0;
+    kNotReplaceable = 1;
+    kUserReplaceable = 2;
+    kFactoryReplaceable = 3;
+  }
+
+  enum PowerSourceStatus : ENUM8 {
+    kUnspecfied = 0;
+    kActive = 1;
+    kStandby = 2;
+    kUnavailable = 3;
+  }
+
+  enum WiredCurrentType : ENUM8 {
+    kAc = 0;
+    kDc = 1;
+  }
+
+  enum WiredFaultType : ENUM8 {
+    kUnspecfied = 0;
+    kOverVoltage = 1;
+    kUnderVoltage = 2;
+  }
+
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
@@ -592,7 +650,7 @@ server cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   readonly attribute ThreadMetrics threadMetrics[] = 0;

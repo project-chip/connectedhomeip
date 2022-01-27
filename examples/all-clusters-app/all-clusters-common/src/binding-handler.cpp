@@ -82,7 +82,7 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, ch
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");
         };
-        auto onFailure = [](const StatusIB & status, CHIP_ERROR error) {
+        auto onFailure = [](CHIP_ERROR error) {
             ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
         };
 

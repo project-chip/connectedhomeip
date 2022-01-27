@@ -63,6 +63,8 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
+    void InitOTARequestor();
+
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void LightActionEventHandler(AppEvent * aEvent);

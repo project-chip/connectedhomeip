@@ -395,12 +395,6 @@ class ChipClusters:
             "clusterName": "Basic",
             "clusterId": 0x00000028,
             "commands": {
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "MfgSpecificPing",
-                    "args": {
-                    },
-                },
             },
             "attributes": {
                 0x00000000: {
@@ -1571,6 +1565,7 @@ class ChipClusters:
                         "credentialData": "bytes",
                         "userIndex": "int",
                         "userStatus": "int",
+                        "userType": "int",
                     },
                 },
             0x0000001A: {
@@ -1631,6 +1626,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000013: {
+                    "attributeName": "NumberOfRFIDUsersSupported",
+                    "attributeId": 0x00000013,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000017: {
                     "attributeName": "MaxPINCodeLength",
                     "attributeId": 0x00000017,
@@ -1640,6 +1641,18 @@ class ChipClusters:
                 0x00000018: {
                     "attributeName": "MinPINCodeLength",
                     "attributeId": 0x00000018,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000019: {
+                    "attributeName": "MaxRFIDCodeLength",
+                    "attributeId": 0x00000019,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000001A: {
+                    "attributeName": "MinRFIDCodeLength",
+                    "attributeId": 0x0000001A,
                     "type": "int",
                     "reportable": True,
                 },
@@ -4502,6 +4515,20 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x00000031: {
+                    "attributeName": "GeneralErrorBoolean",
+                    "attributeId": 0x00000031,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000032: {
+                    "attributeName": "ClusterErrorBoolean",
+                    "attributeId": 0x00000032,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
                 0x000000FF: {
                     "attributeName": "Unsupported",
                     "attributeId": 0x000000FF,
@@ -5414,6 +5441,33 @@ class ChipClusters:
                 },
             },
     }
+    _UNIT_LOCALIZATION_CLUSTER_INFO = {
+            "clusterName": "UnitLocalization",
+            "clusterId": 0x0000002D,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "TemperatureUnit",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
     _USER_LABEL_CLUSTER_INFO = {
             "clusterName": "UserLabel",
             "clusterId": 0x00000041,
@@ -5814,6 +5868,7 @@ class ChipClusters:
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x0000002C: _TIME_FORMAT_LOCALIZATION_CLUSTER_INFO,
+    0x0000002D: _UNIT_LOCALIZATION_CLUSTER_INFO,
     0x00000041: _USER_LABEL_CLUSTER_INFO,
     0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
@@ -5879,6 +5934,7 @@ class ChipClusters:
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "TimeFormatLocalization": _TIME_FORMAT_LOCALIZATION_CLUSTER_INFO,
+        "UnitLocalization": _UNIT_LOCALIZATION_CLUSTER_INFO,
         "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,

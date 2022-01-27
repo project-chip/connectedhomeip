@@ -1,1 +1,1 @@
-0.5.50 Version bump reason: [Ameba] Support Rotating ID for BLE beaconing
+0.5.52 Version bump reason: add python packages to zap image, for use by the python control scripts

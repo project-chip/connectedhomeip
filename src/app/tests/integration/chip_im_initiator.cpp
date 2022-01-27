@@ -132,12 +132,12 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
                                 public ::chip::app::ReadClient::Callback
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
-                     chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
+    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+                     const chip::app::StatusIB * apStatus) override
     {}
-    void OnSubscriptionEstablished(const chip::app::ReadClient * apReadClient) override
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {
-        if (apReadClient->IsSubscriptionType())
+        if (mReadClient->IsSubscriptionType())
         {
             gSubReportCount++;
             if (gSubReportCount == gSubMaxReport)
@@ -146,22 +146,20 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteDataAttributePath & aPath,
-                         chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
+                         const chip::app::StatusIB & status) override
     {}
 
-    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(CHIP_ERROR aError) override { printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format()); }
+
+    void OnDone() override
     {
-        printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
-    }
-    void OnDone(chip::app::ReadClient * apReadClient) override
-    {
-        if (!apReadClient->IsSubscriptionType())
+        if (!mReadClient->IsSubscriptionType())
         {
             HandleReadComplete();
         }
 
-        chip::Platform::Delete(apReadClient);
+        mReadClient.reset();
     }
 
     void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
@@ -180,9 +178,9 @@ public:
                static_cast<double>(gCommandRespCount) * 100 / static_cast<double>(gCommandCount),
                static_cast<double>(transitTime.count()) / 1000);
     }
-    void OnError(const chip::app::CommandSender * apCommandSender, const chip::app::StatusIB & aStatus, CHIP_ERROR aError) override
+    void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
-        gCommandRespCount += (aError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        gCommandRespCount += (aError.IsIMStatus());
         gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
@@ -200,11 +198,18 @@ public:
                static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount),
                static_cast<double>(transitTime.count()) / 1000);
     }
-    void OnError(const chip::app::WriteClient * apCommandSender, const chip::app::StatusIB &, CHIP_ERROR aError) override
+    void OnError(const chip::app::WriteClient * apCommandSender, CHIP_ERROR aError) override
     {
         printf("WriteClient::OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
     void OnDone(chip::app::WriteClient * apWriteClient) override {}
+
+    void AdoptReadClient(chip::Platform::UniquePtr<chip::app::ReadClient> apReadClient) { mReadClient = std::move(apReadClient); }
+
+    void Shutdown() { mReadClient.reset(); }
+
+private:
+    chip::Platform::UniquePtr<chip::app::ReadClient> mReadClient;
 };
 
 MockInteractionModelApp gMockDelegate;
@@ -326,7 +331,7 @@ CHIP_ERROR SendReadRequest()
 
     SuccessOrExit(readClient->SendRequest(readPrepareParams));
 
-    readClient.release();
+    gMockDelegate.AdoptReadClient(std::move(readClient));
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -409,7 +414,7 @@ CHIP_ERROR SendSubscribeRequest()
 
     SuccessOrExit(readClient->SendRequest(readPrepareParams));
 
-    readClient.release();
+    gMockDelegate.AdoptReadClient(std::move(readClient));
 
     gSubCount++;
 
@@ -718,7 +723,7 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gMockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.
@@ -729,6 +734,8 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+    gMockDelegate.Shutdown();
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     gTransportManager.Close();

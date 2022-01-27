@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/clusters/door-lock-server/door-lock-server.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -25,17 +26,59 @@
 
 #include <app/util/af.h>
 
+struct LockUserInfo
+{
+    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
+    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
+    size_t totalCredentials;
+    uint32_t userUniqueId;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    DlCredentialRule credentialRule;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+};
+
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
+
+struct LockCredentialInfo
+{
+    DlCredentialStatus status;
+    DlCredentialType credentialType;
+    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
+    size_t credentialDataSize;
+};
+
 class LockManager
 {
 public:
-    LockManager() : mLocked(false) {}
+    LockManager() : mLocked(DlLockState::kLocked) {}
 
     bool Lock(chip::Optional<chip::ByteSpan> pin);
     bool Unlock(chip::Optional<chip::ByteSpan> pin);
 
+    bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
+    bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                 const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
+                 DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
+
+    bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                       EmberAfPluginDoorLockCredentialInfo & credential);
+
+    bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+                       DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+
     static LockManager & Instance();
 
 private:
-    bool mLocked;
+    bool setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin);
+    const char * lockStateToString(DlLockState lockState);
+
+    DlLockState mLocked;
+
+    // TODO: Support multiple endpoints in the app.
+    std::array<LockUserInfo, 10> mLockUsers;
+    // Also include programming User PIN as a zero index
+    std::array<LockCredentialInfo, 11> mLockCredentials;
     static LockManager instance;
 };

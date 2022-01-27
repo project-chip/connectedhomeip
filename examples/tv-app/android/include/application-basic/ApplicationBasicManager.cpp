@@ -19,11 +19,13 @@
 #include "ApplicationBasicManager.h"
 
 using namespace std;
+using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-chip::CharSpan ApplicationBasicManager::HandleGetVendorName()
+CHIP_ERROR ApplicationBasicManager::HandleGetVendorName(AttributeValueEncoder & aEncoder)
 {
-    return chip::CharSpan("exampleVendorName1", strlen("exampleVendorName1"));
+    return aEncoder.Encode(CharSpan::fromCharString("exampleVendorName1"));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
@@ -31,9 +33,9 @@ uint16_t ApplicationBasicManager::HandleGetVendorId()
     return 1;
 }
 
-chip::CharSpan ApplicationBasicManager::HandleGetApplicationName()
+CHIP_ERROR ApplicationBasicManager::HandleGetApplicationName(AttributeValueEncoder & aEncoder)
 {
-    return chip::CharSpan("exampleName1", strlen("exampleName1"));
+    return aEncoder.Encode(CharSpan::fromCharString("exampleName1"));
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
@@ -41,25 +43,19 @@ uint16_t ApplicationBasicManager::HandleGetProductId()
     return 1;
 }
 
-chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type ApplicationBasicManager::HandleGetApplication()
+CHIP_ERROR ApplicationBasicManager::HandleGetApplicationVersion(AttributeValueEncoder & aEncoder)
 {
-    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
-    application.catalogVendorId = 123;
-    application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
-    return application;
+    return aEncoder.Encode(CharSpan::fromCharString("exampleVersion"));
 }
 
-ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus()
+CHIP_ERROR ApplicationBasicManager::HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder)
 {
-    return ApplicationStatusEnum::kStopped;
-}
-
-chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
-{
-    return chip::CharSpan("exampleVersion", strlen("exampleVersion"));
-}
-
-std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList()
-{
-    return { 123, 456 };
+    std::list<uint16_t> allowedVendorList = { 123, 456 };
+    return aEncoder.EncodeList([allowedVendorList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & allowedVendor : allowedVendorList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(allowedVendor));
+        }
+        return CHIP_NO_ERROR;
+    });
 }

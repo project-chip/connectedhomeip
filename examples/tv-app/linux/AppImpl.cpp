@@ -16,7 +16,7 @@
  */
 
 /**
- * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ * @file Contains Implementation of the ContentApp and the ContentAppPlatform.
  */
 
 #include "AppImpl.h"
@@ -43,9 +43,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
-using namespace chip::AppPlatform;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
 
 namespace chip {
 namespace AppPlatform {
@@ -147,117 +147,54 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
 // Declare Content App endpoint
 DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
-ContentAppImpl::ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                               const char * szApplicationVersion)
+ContentAppFactoryImpl::ContentAppFactoryImpl() {}
+
+uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
 {
-    mApplicationBasic.SetApplicationName(szApplicationName);
-    mApplicationBasic.SetVendorName(szApplicationName);
-    mApplicationBasic.SetVendorId(vendorId);
-    mApplicationBasic.SetProductId(productId);
-    mApplicationBasic.SetApplicationVersion(szApplicationVersion);
+    return kCatalogVendorId;
 }
 
-void ApplicationBasicImpl::SetApplicationName(const char * szApplicationName)
+CHIP_ERROR ContentAppFactoryImpl::LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp)
 {
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationName, szApplicationName);
-
-    strncpy(mApplicationName, szApplicationName, sizeof(mApplicationName));
+    std::string appId               = BuildAppId(vendorId);
+    destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
+    Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), appId.c_str());
+    return CHIP_NO_ERROR;
 }
 
-void ApplicationBasicImpl::SetVendorName(const char * szVendorName)
+CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp)
 {
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Vendor Name=\"%s\"", mApplicationName, szVendorName);
-
-    strncpy(mVendorName, szVendorName, sizeof(mVendorName));
-}
-
-void ApplicationBasicImpl::SetApplicationVersion(const char * szApplicationVersion)
-{
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Version=\"%s\"", mApplicationName, szApplicationVersion);
-
-    strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
-}
-
-bool AccountLoginImpl::Login(const char * tempAccountId, uint32_t setupPin)
-{
-    ChipLogProgress(DeviceLayer, "AccountLogin: Login TempAccountId=\"%s\" SetupPIN=\"%d\"", tempAccountId, setupPin);
-    return (setupPin == mSetupPIN);
-}
-
-uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
-{
-    ChipLogProgress(DeviceLayer, "AccountLogin: GetSetupPIN TempAccountId=\"%s\" returning setuppin=%d", tempAccountId, mSetupPIN);
-    return mSetupPIN;
-}
-
-chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApplication application, std::string data)
-{
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    ChipLogProgress(DeviceLayer,
-                    "ApplicationLauncherResponse: LaunchApp application.catalogVendorId=%d "
-                    "application.applicationId=%s data=%s",
-                    application.catalogVendorId, appId.c_str(), data.c_str());
-
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
-    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
-
-    return response;
-}
-
-chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
-ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
-{
-    ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
-
-    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
-    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    return response;
-}
-
-ContentAppFactoryImpl::ContentAppFactoryImpl()
-{
-    mContentApps[1].GetAccountLogin()->SetSetupPIN(34567890);
-    mContentApps[2].GetAccountLogin()->SetSetupPIN(20202021);
-}
-
-ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
-{
-    for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
+    destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
+    std::string appId(sourceApp.applicationId);
+    if (appId == "applicationId")
     {
-        ContentAppImpl app = mContentApps[i];
-        if (app.GetApplicationBasic()->GetVendorId() == vendorId)
+        // test case passes "applicationId", map this to our test suite app
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "1111");
+    }
+    else
+    {
+        // for now, just return the applicationId passed in
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), sourceApp.applicationId);
+    }
+    return CHIP_NO_ERROR;
+}
+
+ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
+{
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
+                    vendorApp.catalogVendorId, vendorApp.applicationId);
+
+    for (auto & app : mContentApps)
+    {
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
+        if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
-            return &mContentApps[i];
+            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            return &app;
         }
     }
-    ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendor %d not found ", vendorId);
-
-    return nullptr;
-}
-
-ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApplication application)
-{
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    ChipLogProgress(DeviceLayer,
-                    "ContentAppFactoryImpl: LoadContentAppByAppId application.catalogVendorId=%d "
-                    "application.applicationIdSize=%ld application.applicationId=%s ",
-                    application.catalogVendorId, application.applicationId.size(), appId.c_str());
-
-    for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
-    {
-        ContentAppImpl app = mContentApps[i];
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasic()->GetApplicationName());
-        if (strcmp(app.GetApplicationBasic()->GetApplicationName(), appId.c_str()) == 0)
-        {
-            AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
-            return &mContentApps[i];
-        }
-    }
-    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId() - app id %s not found ", appId.c_str());
+    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
+                    vendorApp.applicationId);
 
     return nullptr;
 }
