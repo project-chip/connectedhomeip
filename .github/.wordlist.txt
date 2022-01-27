@@ -43,6 +43,7 @@ alloc
 Ameba
 amebad
 amebaiot
+announcementReason
 AnnounceOTAProvider
 APIs
 apk
@@ -418,6 +419,7 @@ FreeRTOSConfig
 fsl
 fstab
 fsync
+ftd
 fullclean
 gbl
 gcloud
@@ -782,6 +784,7 @@ pre
 preprocessor
 Presetup
 prj
+providerNodeId
 ProductID
 ProductLabel
 ProductName
@@ -845,6 +848,7 @@ RendezVousTest
 repo
 req
 Requestor
+Requestor's
 Requestors
 responder
 retargeting
@@ -887,6 +891,7 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
+SED
 SEGGER
 semver
 sendto
@@ -1060,6 +1065,7 @@ VendorName
 vendorpayload
 venv
 Verifier
+Verifiers
 VID
 visualstudio
 vlatest

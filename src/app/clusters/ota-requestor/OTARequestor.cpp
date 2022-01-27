@@ -123,13 +123,27 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-        CopySpanToMutableSpan(update.updateToken, updateToken);
-        requestorCore->mTargetVersion = update.softwareVersion;
-        requestorCore->mUpdateToken   = updateToken;
+        if (update.softwareVersion > requestorCore->mCurrentVersion)
+        {
+            ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
+                          requestorCore->mCurrentVersion, update.softwareVersion);
+            MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
+            CopySpanToMutableSpan(update.updateToken, updateToken);
+            requestorCore->mTargetVersion = update.softwareVersion;
+            requestorCore->mUpdateToken   = updateToken;
 
-        requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
-                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+            requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
+                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+        else
+        {
+            ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
+                          update.softwareVersion, requestorCore->mCurrentVersion);
+
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
+                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        }
+
         break;
     }
     case OTAQueryStatus::kBusy:
@@ -148,13 +162,13 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     }
 }
 
-void OTARequestor::OnQueryImageFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
 }
 
 void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
@@ -180,24 +194,24 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
     }
 }
 
-void OTARequestor::OnApplyUpdateFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, error);
 }
 
 void OTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) {}
 
-void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus status)
+void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" PRIu8, status);
-    requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, CHIP_ERROR_BAD_REQUEST);
+    ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
+    requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, error);
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
@@ -255,6 +269,7 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
     VerifyOrReturn(mOtaRequestorDriver != nullptr, ChipLogError(SoftwareUpdate, "OTA requestor driver not set"));
     VerifyOrReturn(mServer != nullptr, ChipLogError(SoftwareUpdate, "Server not set"));
+    VerifyOrReturn(mProviderNodeId != kUndefinedNodeId, ChipLogError(SoftwareUpdate, "Provider Node ID not set"));
 
     FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderFabricIndex);
     VerifyOrReturn(fabricInfo != nullptr, ChipLogError(SoftwareUpdate, "Cannot find fabric"));
@@ -268,6 +283,36 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
                                                                  &mOnConnectedCallback, &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
+}
+
+// Application directs the Requestor to cancel image update in progress. All the Requestor state is
+// cleared, UpdateState is reset to Idle
+void OTARequestor::CancelImageUpdate()
+{
+    mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
+
+    // All Provider info should be invalidated
+    mProviderNodeId      = kUndefinedNodeId;
+    mProviderFabricIndex = kUndefinedFabricIndex;
+    mProviderEndpointId  = kRootEndpointId;
+
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+
+    // Notify the platform, it might choose to take additional actions
+    mOtaRequestorDriver->UpdateCancelled();
+}
+
+CHIP_ERROR OTARequestor::GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
+{
+    VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == EMBER_ZCL_STATUS_SUCCESS,
+                        CHIP_ERROR_BAD_REQUEST);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTARequestor::GetState(EndpointId endpointId, OTAUpdateStateEnum & state)
+{
+    VerifyOrReturnError(OtaRequestorServerGetUpdateState(endpointId, state) == EMBER_ZCL_STATUS_SUCCESS, CHIP_ERROR_BAD_REQUEST);
+    return CHIP_NO_ERROR;
 }
 
 // Called whenever FindOrEstablishSession is successful
@@ -388,12 +433,11 @@ void OTARequestor::ApplyUpdate()
 void OTARequestor::NotifyUpdateApplied(uint32_t version)
 {
     // New version is executing so update where applicable
-    VerifyOrReturn(Basic::Attributes::SoftwareVersion::Set(kRootEndpointId, version) == EMBER_ZCL_STATUS_SUCCESS);
     mCurrentVersion = version;
 
     // Log the VersionApplied event
     uint16_t productId;
-    VerifyOrReturn(Basic::Attributes::ProductID::Get(kRootEndpointId, &productId) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(DeviceLayer::ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR);
     OtaRequestorServerOnVersionApplied(version, productId);
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -491,28 +535,32 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
-    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &args.vendorId) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    uint16_t vendorId;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(vendorId));
+    args.vendorId = static_cast<VendorId>(vendorId);
 
-    VerifyOrReturnError(Basic::Attributes::ProductID::Get(kRootEndpointId, &args.productId) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(args.productId));
 
-    VerifyOrReturnError(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &args.softwareVersion) == EMBER_ZCL_STATUS_SUCCESS,
-                        CHIP_ERROR_READ_FAILED);
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (Basic::Attributes::HardwareVersion::Get(kRootEndpointId, &hardwareVersion) == EMBER_ZCL_STATUS_SUCCESS)
+    if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
-    if (Basic::Attributes::Location::Get(kRootEndpointId, MutableCharSpan(location)) == EMBER_ZCL_STATUS_SUCCESS)
+    size_t codeLen = 0;
+    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen > 0))
     {
-        args.location.SetValue(CharSpan(location));
+        args.location.SetValue(CharSpan(location, codeLen));
+    }
+    else
+    {
+        args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
@@ -536,6 +584,8 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
     update.softwareVersion = response.softwareVersion.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(response.updateToken.Value().size() >= 8 && response.updateToken.Value().size() <= 32,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
 
     update.userConsentNeeded    = response.userConsentNeeded.ValueOr(false);

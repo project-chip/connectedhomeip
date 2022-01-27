@@ -200,6 +200,45 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPPowerSourceClusterBatChargeFaultChangeType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerSourceClusterBatFaultChangeType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerSourceClusterWiredFaultChangeType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPGeneralCommissioningClusterBasicCommissioningInfoType
 - (instancetype)init
 {
@@ -291,7 +330,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSoftwareDiagnosticsClusterSoftwareFault
+@implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct
 - (instancetype)init
 {
     if (self = [super init]) {

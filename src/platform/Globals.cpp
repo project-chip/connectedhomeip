@@ -21,7 +21,6 @@
 
 #include <inet/TCPEndPointImpl.h>
 #include <inet/UDPEndPointImpl.h>
-#include <platform/internal/BLEManager.h>
 #include <system/SystemLayerImpl.h>
 
 namespace chip {

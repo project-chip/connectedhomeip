@@ -68,6 +68,14 @@ server cluster Basic = 40 {
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
   readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
+  attribute boolean localConfigDisabled = 16;
+  readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -523,7 +531,7 @@ server cluster OperationalCredentials = 62 {
 
 server cluster SoftwareDiagnostics = 52 {
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   readonly attribute int64u currentHeapHighWatermark = 3;
@@ -562,6 +570,18 @@ server cluster TimeFormatLocalization = 44 {
   attribute HourFormat hourFormat = 0;
   attribute CalendarType activeCalendarType = 1;
   readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
+server cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -646,6 +666,7 @@ endpoint 0 {
   server  cluster OperationalCredentials;
   server  cluster SoftwareDiagnostics;
   server  cluster TimeFormatLocalization;
+  server  cluster UnitLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

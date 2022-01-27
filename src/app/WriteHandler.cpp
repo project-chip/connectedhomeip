@@ -23,6 +23,7 @@
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>
 
 namespace chip {
@@ -30,9 +31,8 @@ namespace app {
 
 using namespace Protocols::InteractionModel;
 
-CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
+CHIP_ERROR WriteHandler::Init()
 {
-    IgnoreUnusedVariable(apDelegate);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     MoveToState(State::Initialized);
@@ -129,7 +129,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         AttributePathIB::Parser attributePath;
         ConcreteDataAttributePath dataAttributePath;
         TLV::TLVReader reader = aAttributeDataIBsReader;
-        err                   = element.Init(reader);
+
+        err = element.Init(reader);
         SuccessOrExit(err);
 
         err = element.GetPath(&attributePath);
@@ -138,19 +139,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
         // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
 
-        if (mpExchangeCtx->IsGroupExchangeContext())
-        {
-            // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
-            // Issue 11075
-
-            // Using endpoint 0 for test purposes
-            dataAttributePath.mEndpointId = 0;
-        }
-        else
-        {
-            err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
-            SuccessOrExit(err);
-        }
+        err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
+        SuccessOrExit(err);
 
         err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
         SuccessOrExit(err);
@@ -169,6 +159,19 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
 
+        {
+            MatterPreAttributeWriteCallback(dataAttributePath);
+            TLV::TLVWriter backup;
+            mWriteResponseBuilder.Checkpoint(backup);
+            err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
+            if (err != CHIP_NO_ERROR)
+            {
+                mWriteResponseBuilder.Rollback(backup);
+                err = AddStatus(dataAttributePath, StatusIB(err));
+            }
+            MatterPostAttributeWriteCallback(dataAttributePath);
+        }
+
         // TODO: We should check if there is another write transaction writing the same attribute, we should reject such request
         // since it will cause unexpected behavior.
 
@@ -183,6 +186,122 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = CHIP_NO_ERROR;
     }
 
+exit:
+    return err;
+}
+
+CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorCodeIf(mpExchangeCtx == nullptr, CHIP_ERROR_INTERNAL);
+    const Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetSubjectDescriptor();
+
+    while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
+    {
+        chip::TLV::TLVReader dataReader;
+        AttributeDataIB::Parser element;
+        AttributePathIB::Parser attributePath;
+        ClusterInfo clusterInfo;
+        GroupId groupId;
+        FabricIndex fabric;
+        TLV::TLVReader reader = aAttributeDataIBsReader;
+
+        Credentials::GroupDataProvider::GroupEndpoint mapping;
+        Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+        Credentials::GroupDataProvider::EndpointIterator * iterator;
+
+        err = element.Init(reader);
+        SuccessOrExit(err);
+
+        err = element.GetPath(&attributePath);
+        SuccessOrExit(err);
+
+        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
+        // cluster info will be invalid / wildcard, it is safe to ignore CHIP_END_OF_TLV.
+
+        err = attributePath.GetNode(&(clusterInfo.mNodeId));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+
+        err = attributePath.GetCluster(&(clusterInfo.mClusterId));
+        SuccessOrExit(err);
+
+        err = attributePath.GetAttribute(&(clusterInfo.mAttributeId));
+        SuccessOrExit(err);
+
+        groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+        fabric  = GetAccessingFabricIndex();
+
+        err = attributePath.GetListIndex(&(clusterInfo.mListIndex));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+
+        err = element.GetData(&dataReader);
+        SuccessOrExit(err);
+
+        ChipLogDetail(DataManagement,
+                      "Received group attribute write for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                      " attribute=" ChipLogFormatMEI,
+                      groupId, ChipLogValueMEI(clusterInfo.mClusterId), ChipLogValueMEI(clusterInfo.mAttributeId));
+
+        iterator = groupDataProvider->IterateEndpoints(fabric);
+        VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        while (iterator->Next(mapping))
+        {
+            if (groupId != mapping.group_id)
+            {
+                continue;
+            }
+
+            clusterInfo.mEndpointId = mapping.endpoint_id;
+
+            if (!clusterInfo.IsValidAttributePath() || clusterInfo.HasAttributeWildcard())
+            {
+                ChipLogDetail(DataManagement,
+                              "Invalid group attribute write for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                              " attribute=" ChipLogFormatMEI,
+                              mapping.endpoint_id, ChipLogValueMEI(clusterInfo.mClusterId),
+                              ChipLogValueMEI(clusterInfo.mAttributeId));
+
+                continue;
+            }
+
+            ChipLogDetail(DataManagement,
+                          "Processing group attribute write for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                          " attribute=" ChipLogFormatMEI,
+                          mapping.endpoint_id, ChipLogValueMEI(clusterInfo.mClusterId), ChipLogValueMEI(clusterInfo.mAttributeId));
+
+            chip::TLV::TLVReader tmpDataReader(dataReader);
+
+            const ConcreteAttributePath concretePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
+
+            MatterPreAttributeWriteCallback(concretePath);
+            err = WriteSingleClusterData(subjectDescriptor, clusterInfo, tmpDataReader, this);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement,
+                             "Error when calling WriteSingleClusterData for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                             " Attribute =" ChipLogFormatMEI " : %" CHIP_ERROR_FORMAT,
+                             mapping.endpoint_id, ChipLogValueMEI(clusterInfo.mClusterId),
+                             ChipLogValueMEI(clusterInfo.mAttributeId), err.Format());
+            }
+            MatterPostAttributeWriteCallback(concretePath);
+        }
+
+        iterator->Release();
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
 exit:
     return err;
 }
@@ -246,7 +365,16 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     }
 
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
-    err = ProcessAttributeDataIBs(AttributeDataIBsReader);
+
+    if (mpExchangeCtx->IsGroupExchangeContext())
+    {
+        err = ProcessGroupAttributeDataIBs(AttributeDataIBsReader);
+    }
+    else
+    {
+        err = ProcessAttributeDataIBs(AttributeDataIBsReader);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         status = Status::Success;
@@ -260,8 +388,12 @@ exit:
     return status;
 }
 
-CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aAttributePathParams,
-                                   const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
+{
+    return AddStatus(aPath, StatusIB(aStatus));
+}
+
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus)
 {
     AttributeStatusIBs::Builder & writeResponses   = mWriteResponseBuilder.GetWriteResponses();
     AttributeStatusIB::Builder & attributeStatusIB = writeResponses.CreateAttributeStatus();
@@ -269,13 +401,11 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aAttributeP
 
     AttributePathIB::Builder & path = attributeStatusIB.CreatePath();
     ReturnErrorOnFailure(attributeStatusIB.GetError());
-    ReturnErrorOnFailure(path.Encode(aAttributePathParams));
+    ReturnErrorOnFailure(path.Encode(AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId)));
 
-    StatusIB statusIB;
-    statusIB.mStatus                    = aStatus;
     StatusIB::Builder & statusIBBuilder = attributeStatusIB.CreateErrorStatus();
     ReturnErrorOnFailure(attributeStatusIB.GetError());
-    statusIBBuilder.EncodeStatusIB(statusIB);
+    statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
     attributeStatusIB.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatusIB.GetError());

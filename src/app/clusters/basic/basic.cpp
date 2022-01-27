@@ -84,16 +84,16 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     {
         if (codeLen == 0)
         {
-            err = aEncoder.Encode(chip::CharSpan("XX", strlen("XX")));
+            err = aEncoder.Encode(chip::CharSpan::fromCharString("XX"));
         }
         else
         {
-            err = aEncoder.Encode(chip::CharSpan(location, strlen(location)));
+            err = aEncoder.Encode(chip::CharSpan::fromCharString(location));
         }
     }
     else
     {
-        err = aEncoder.Encode(chip::CharSpan("XX", strlen("XX")));
+        err = aEncoder.Encode(chip::CharSpan::fromCharString("XX"));
     }
 
     return err;
@@ -175,7 +175,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
     if (ConfigurationMgr().GetNodeLabel(nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
     {
-        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan(nodeLabel, strlen(nodeLabel)));
+        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan::fromCharString(nodeLabel));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
     }
 
@@ -185,24 +185,24 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         if (codeLen == 0)
         {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+            status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString("XX"));
         }
         else
         {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
+            status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString(location));
         }
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
     }
     else
     {
-        status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+        status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString("XX"));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
     }
 
     char vendorName[DeviceLayer::ConfigurationManager::kMaxVendorNameLength + 1];
     if (ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName)) == CHIP_NO_ERROR)
     {
-        status = Attributes::VendorName::Set(endpoint, chip::CharSpan(vendorName, strlen(vendorName)));
+        status = Attributes::VendorName::Set(endpoint, chip::CharSpan::fromCharString(vendorName));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Vendor Name: 0x%02x", status));
     }
 
@@ -216,7 +216,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char productName[DeviceLayer::ConfigurationManager::kMaxProductNameLength + 1];
     if (ConfigurationMgr().GetProductName(productName, sizeof(productName)) == CHIP_NO_ERROR)
     {
-        status = Attributes::ProductName::Set(endpoint, chip::CharSpan(productName, strlen(productName)));
+        status = Attributes::ProductName::Set(endpoint, chip::CharSpan::fromCharString(productName));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Name: 0x%02x", status));
     }
 
@@ -230,7 +230,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char hardwareVersionString[DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength + 1];
     if (ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString)) == CHIP_NO_ERROR)
     {
-        status = Attributes::HardwareVersionString::Set(endpoint, CharSpan(hardwareVersionString, strlen(hardwareVersionString)));
+        status = Attributes::HardwareVersionString::Set(endpoint, CharSpan::fromCharString(hardwareVersionString));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Hardware Version String: 0x%02x", status));
     }
 
@@ -244,11 +244,11 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char softwareVersionString[DeviceLayer::ConfigurationManager::kMaxSoftwareVersionLength + 1];
     if (ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)) == CHIP_NO_ERROR)
     {
-        status = Attributes::SoftwareVersionString::Set(endpoint, CharSpan(softwareVersionString, strlen(softwareVersionString)));
+        status = Attributes::SoftwareVersionString::Set(endpoint, CharSpan::fromCharString(softwareVersionString));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
     }
 
-    uint16_t softwareVersion;
+    uint32_t softwareVersion;
     if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
     {
         status = Attributes::SoftwareVersion::Set(endpoint, softwareVersion);
@@ -258,7 +258,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char serialNumberString[DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     if (ConfigurationMgr().GetSerialNumber(serialNumberString, sizeof(serialNumberString)) == CHIP_NO_ERROR)
     {
-        status = Attributes::SerialNumber::Set(endpoint, CharSpan(serialNumberString, strlen(serialNumberString)));
+        status = Attributes::SerialNumber::Set(endpoint, CharSpan::fromCharString(serialNumberString));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Serial Number String: 0x%02x", status));
     }
 
@@ -270,7 +270,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8,
                  manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
-        status = Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
+        status = Attributes::ManufacturingDate::Set(endpoint, CharSpan::fromCharString(manufacturingDateString));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,
                    ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
     }
@@ -278,21 +278,21 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char partNumber[DeviceLayer::ConfigurationManager::kMaxPartNumberLength + 1];
     if (ConfigurationMgr().GetPartNumber(partNumber, sizeof(partNumber)) == CHIP_NO_ERROR)
     {
-        status = Attributes::PartNumber::Set(endpoint, CharSpan(partNumber, strlen(partNumber)));
+        status = Attributes::PartNumber::Set(endpoint, CharSpan::fromCharString(partNumber));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Part Number: 0x%02x", status));
     }
 
     char productURL[DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1];
     if (ConfigurationMgr().GetProductURL(productURL, sizeof(productURL)) == CHIP_NO_ERROR)
     {
-        status = Attributes::ProductURL::Set(endpoint, CharSpan(productURL, strlen(productURL)));
+        status = Attributes::ProductURL::Set(endpoint, CharSpan::fromCharString(productURL));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product URL: 0x%02x", status));
     }
 
     char productLabel[DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1];
     if (ConfigurationMgr().GetProductLabel(productLabel, sizeof(productLabel)) == CHIP_NO_ERROR)
     {
-        status = Attributes::ProductLabel::Set(endpoint, CharSpan(productLabel, strlen(productLabel)));
+        status = Attributes::ProductLabel::Set(endpoint, CharSpan::fromCharString(productLabel));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Label: 0x%02x", status));
     }
 
@@ -313,7 +313,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char uniqueId[DeviceLayer::ConfigurationManager::kMaxUniqueIDLength + 1];
     if (ConfigurationMgr().GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
     {
-        status = Attributes::UniqueID::Set(endpoint, CharSpan(uniqueId, strlen(uniqueId)));
+        status = Attributes::UniqueID::Set(endpoint, CharSpan::fromCharString(uniqueId));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Unique Id: 0x%02x", status));
     }
 }

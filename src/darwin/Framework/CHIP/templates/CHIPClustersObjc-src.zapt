@@ -10,8 +10,8 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPStructsObjc.h"
 #import "CHIPCommandPayloadsObjc.h"
-#import "CHIPListUtils_internal.h"
 
+#include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -87,7 +87,7 @@ using namespace chip::app::Clusters;
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}
-  {{~#if isList~}}
+  {{~#if isArray~}}
     {{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List
   {{~else~}}
     {{~#if isNullable}}Nullable{{/if~}}
@@ -146,7 +146,7 @@ using namespace chip::app::Clusters;
 {{#if isReportableAttribute}}
 {{! This callbackName bit is duplicated with the readAttribute code above. }}
 {{#*inline "callbackName"}}
-  {{~#if isList~}}
+  {{~#if isArray~}}
     {{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List
   {{~else~}}
     {{~#if isNullable}}Nullable{{/if~}}

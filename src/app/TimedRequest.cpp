@@ -53,16 +53,11 @@ CHIP_ERROR TimedRequest::Send(ExchangeContext * aExchangeContext, uint16_t aTime
     return aExchangeContext->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
 }
 
-CHIP_ERROR TimedRequest::HandleResponse(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
-                                        StatusIB & aStatusIB)
+CHIP_ERROR TimedRequest::HandleResponse(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     VerifyOrReturnError(aPayloadHeader.HasMessageType(MsgType::StatusResponse), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    ReturnErrorOnFailure(StatusResponse::ProcessStatusResponse(std::move(aPayload), aStatusIB));
-
-    VerifyOrReturnError(aStatusIB.mStatus == Status::Success, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-
-    return CHIP_NO_ERROR;
+    return StatusResponse::ProcessStatusResponse(std::move(aPayload));
 }
 
 } // namespace app

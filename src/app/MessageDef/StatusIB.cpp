@@ -96,7 +96,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
             {
                 ClusterStatus clusterStatus;
                 ReturnErrorOnFailure(reader.Get(clusterStatus));
-                PRETTY_PRINT("\tstatus = 0x%" PRIx8 ",", clusterStatus);
+                PRETTY_PRINT("\tcluster-status = 0x%" PRIx8 ",", clusterStatus);
             }
 #endif // CHIP_DETAIL_LOGGING
         }

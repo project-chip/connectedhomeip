@@ -185,14 +185,6 @@ public:
      */
     bool IsTimedInvoke() const { return mTimedRequest; }
 
-    /*
-     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
-     * not arise during normal message processing flows that all normally call Close() above. This can only
-     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
-     * message payloads.
-     */
-    void Abort();
-
     /**
      * Gets the inner exchange context object, without ownership.
      *
@@ -217,6 +209,15 @@ private:
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
+
     /**
      * IncrementHoldOff will increase the inner refcount of the CommandHandler.
      *
@@ -248,7 +249,17 @@ private:
      */
     void Close();
 
+    /**
+     * ProcessCommandDataIB is only called when a unicast invoke command request is received
+     * It requires the endpointId in its command path to be able to dispatch the command
+     */
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
+
+    /**
+     * ProcessGroupCommandDataIB is only called when a group invoke command request is received
+     * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
+     */
+    CHIP_ERROR ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);

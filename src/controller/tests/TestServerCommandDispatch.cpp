@@ -142,8 +142,9 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [apSuite](const app::StatusIB & aStatus, CHIP_ERROR aError) {
-        NL_TEST_ASSERT(apSuite, aStatus.mStatus == Protocols::InteractionModel::Status::InvalidCommand);
+    auto onFailureCb = [apSuite](CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite,
+                       aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::InvalidCommand);
     };
 
     responseDirective = kSendDataResponse;
@@ -224,7 +225,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureWasCalled](const app::StatusIB & aStatus, CHIP_ERROR aError) { onFailureWasCalled = true; };
+    auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) { onFailureWasCalled = true; };
 
     responseDirective = kSendDataResponse;
 

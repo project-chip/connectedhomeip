@@ -84,16 +84,18 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
          * @param[in] apWriteClient The write client object that initiated the attribute write transaction.
-         * @param[in] aStatus       A status response if we got one; might be Status::Failure if we did not.
          * @param[in] aError        A system error code that conveys the overall error code.
          */
-        virtual void OnError(const WriteClient * apWriteClient, const StatusIB & aStatus, CHIP_ERROR aError) {}
+        virtual void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when WriteClient has finished all work and is reserved for future WriteClient ownership change.
@@ -329,10 +331,10 @@ private:
     // Timed Request.  The caller is assumed to have already checked that our
     // exchange context member is the one the message came in on.
     //
-    // aStatusIB will be populated with the returned status if we can parse it
-    // successfully.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
-                                 StatusIB & aStatusIB);
+    // If the server returned an error status response its status will be
+    // encapsulated in the CHIP_ERROR this returns.  In that case,
+    // StatusIB::InitFromChipError can be used to extract the status.
+    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     // Send our queued-up Write Request message.  Assumes the exchange is ready
     // and mPendingWriteData is populated.

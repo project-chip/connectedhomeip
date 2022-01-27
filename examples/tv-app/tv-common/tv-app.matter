@@ -196,10 +196,9 @@ server cluster Basic = 40 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   attribute boolean localConfigDisabled = 16;
+  readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 client cluster Binding = 30 {
@@ -815,11 +814,11 @@ server cluster LevelControl = 8 {
   readonly attribute int16u maxFrequency = 6;
   attribute bitmap8 options = 15;
   attribute int16u onOffTransitionTime = 16;
-  attribute int8u onLevel = 17;
-  attribute int16u onTransitionTime = 18;
-  attribute int16u offTransitionTime = 19;
-  attribute int8u defaultMoveRate = 20;
-  attribute int8u startUpCurrentLevel = 16384;
+  attribute nullable int8u onLevel = 17;
+  attribute nullable int16u onTransitionTime = 18;
+  attribute nullable int16u offTransitionTime = 19;
+  attribute nullable int8u defaultMoveRate = 20;
+  attribute nullable int8u startUpCurrentLevel = 16384;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -1541,7 +1540,7 @@ server cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   readonly attribute ThreadMetrics threadMetrics[] = 0;
@@ -1752,6 +1751,18 @@ server cluster TimeFormatLocalization = 44 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+server cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -1847,6 +1858,7 @@ endpoint 0 {
   server  cluster SoftwareDiagnostics;
   server  cluster ThreadNetworkDiagnostics;
   server  cluster TimeFormatLocalization;
+  server  cluster UnitLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

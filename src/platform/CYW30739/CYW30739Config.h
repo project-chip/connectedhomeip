@@ -62,7 +62,6 @@ public:
     static constexpr Key kConfigKey_HardwareVersion    = 16;
     static constexpr Key kConfigKey_RegulatoryLocation = 17;
     static constexpr Key kConfigKey_CountryCode        = 18;
-    static constexpr Key kConfigKey_ActiveLocale       = 19;
     static constexpr Key kConfigKey_HourFormat         = 20;
     static constexpr Key kConfigKey_CalendarType       = 21;
     static constexpr Key kConfigKey_Breadcrumb         = 22;

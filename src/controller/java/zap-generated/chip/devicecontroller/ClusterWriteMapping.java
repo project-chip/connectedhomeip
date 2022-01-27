@@ -81,7 +81,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeBasicLocalConfigDisabledCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo basiclocalConfigDisabledCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeBasicLocalConfigDisabledCommandParams.put(
         "value", basiclocalConfigDisabledCommandParameterInfo);
     InteractionInfo writeBasicLocalConfigDisabledAttributeInteractionInfo =
@@ -100,7 +100,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeBinaryInputBasicOutOfServiceCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo binaryInputBasicoutOfServiceCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeBinaryInputBasicOutOfServiceCommandParams.put(
         "value", binaryInputBasicoutOfServiceCommandParameterInfo);
     InteractionInfo writeBinaryInputBasicOutOfServiceAttributeInteractionInfo =
@@ -117,7 +117,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeBinaryInputBasicPresentValueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo binaryInputBasicpresentValueCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeBinaryInputBasicPresentValueCommandParams.put(
         "value", binaryInputBasicpresentValueCommandParameterInfo);
     InteractionInfo writeBinaryInputBasicPresentValueAttributeInteractionInfo =
@@ -146,7 +146,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorControlOptionsCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorControlOptionsCommandParams.put(
         "value", colorControlcolorControlOptionsCommandParameterInfo);
     InteractionInfo writeColorControlColorControlOptionsAttributeInteractionInfo =
@@ -164,7 +164,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlWhitePointXCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlwhitePointXCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlWhitePointXCommandParams.put(
         "value", colorControlwhitePointXCommandParameterInfo);
     InteractionInfo writeColorControlWhitePointXAttributeInteractionInfo =
@@ -181,7 +181,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlWhitePointYCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlwhitePointYCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlWhitePointYCommandParams.put(
         "value", colorControlwhitePointYCommandParameterInfo);
     InteractionInfo writeColorControlWhitePointYAttributeInteractionInfo =
@@ -198,7 +198,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointRXCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointRXCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointRXCommandParams.put(
         "value", colorControlcolorPointRXCommandParameterInfo);
     InteractionInfo writeColorControlColorPointRXAttributeInteractionInfo =
@@ -215,7 +215,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointRYCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointRYCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointRYCommandParams.put(
         "value", colorControlcolorPointRYCommandParameterInfo);
     InteractionInfo writeColorControlColorPointRYAttributeInteractionInfo =
@@ -232,7 +232,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointRIntensityCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointRIntensityCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointRIntensityCommandParams.put(
         "value", colorControlcolorPointRIntensityCommandParameterInfo);
     InteractionInfo writeColorControlColorPointRIntensityAttributeInteractionInfo =
@@ -250,7 +250,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointGXCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointGXCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointGXCommandParams.put(
         "value", colorControlcolorPointGXCommandParameterInfo);
     InteractionInfo writeColorControlColorPointGXAttributeInteractionInfo =
@@ -267,7 +267,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointGYCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointGYCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointGYCommandParams.put(
         "value", colorControlcolorPointGYCommandParameterInfo);
     InteractionInfo writeColorControlColorPointGYAttributeInteractionInfo =
@@ -284,7 +284,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointGIntensityCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointGIntensityCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointGIntensityCommandParams.put(
         "value", colorControlcolorPointGIntensityCommandParameterInfo);
     InteractionInfo writeColorControlColorPointGIntensityAttributeInteractionInfo =
@@ -302,7 +302,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointBXCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointBXCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointBXCommandParams.put(
         "value", colorControlcolorPointBXCommandParameterInfo);
     InteractionInfo writeColorControlColorPointBXAttributeInteractionInfo =
@@ -319,7 +319,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointBYCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointBYCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointBYCommandParams.put(
         "value", colorControlcolorPointBYCommandParameterInfo);
     InteractionInfo writeColorControlColorPointBYAttributeInteractionInfo =
@@ -336,7 +336,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlColorPointBIntensityCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlcolorPointBIntensityCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlColorPointBIntensityCommandParams.put(
         "value", colorControlcolorPointBIntensityCommandParameterInfo);
     InteractionInfo writeColorControlColorPointBIntensityAttributeInteractionInfo =
@@ -354,7 +354,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeColorControlStartUpColorTemperatureMiredsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlstartUpColorTemperatureMiredsCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeColorControlStartUpColorTemperatureMiredsCommandParams.put(
         "value", colorControlstartUpColorTemperatureMiredsCommandParameterInfo);
     InteractionInfo writeColorControlStartUpColorTemperatureMiredsAttributeInteractionInfo =
@@ -374,7 +374,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeContentLauncherSupportedStreamingProtocolsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo contentLaunchersupportedStreamingProtocolsCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeContentLauncherSupportedStreamingProtocolsCommandParams.put(
         "value", contentLaunchersupportedStreamingProtocolsCommandParameterInfo);
     InteractionInfo writeContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo =
@@ -414,7 +414,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeDoorLockAutoRelockTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockautoRelockTimeCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeDoorLockAutoRelockTimeCommandParams.put(
         "value", doorLockautoRelockTimeCommandParameterInfo);
     InteractionInfo writeDoorLockAutoRelockTimeAttributeInteractionInfo =
@@ -431,7 +431,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeDoorLockSoundVolumeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLocksoundVolumeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeDoorLockSoundVolumeCommandParams.put("value", doorLocksoundVolumeCommandParameterInfo);
     InteractionInfo writeDoorLockSoundVolumeAttributeInteractionInfo =
         new InteractionInfo(
@@ -447,7 +447,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeDoorLockOperatingModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockoperatingModeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeDoorLockOperatingModeCommandParams.put("value", doorLockoperatingModeCommandParameterInfo);
     InteractionInfo writeDoorLockOperatingModeAttributeInteractionInfo =
         new InteractionInfo(
@@ -463,7 +463,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeDoorLockEnableOneTouchLockingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockenableOneTouchLockingCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeDoorLockEnableOneTouchLockingCommandParams.put(
         "value", doorLockenableOneTouchLockingCommandParameterInfo);
     InteractionInfo writeDoorLockEnableOneTouchLockingAttributeInteractionInfo =
@@ -481,7 +481,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeDoorLockEnablePrivacyModeButtonCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockenablePrivacyModeButtonCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeDoorLockEnablePrivacyModeButtonCommandParams.put(
         "value", doorLockenablePrivacyModeButtonCommandParameterInfo);
     InteractionInfo writeDoorLockEnablePrivacyModeButtonAttributeInteractionInfo =
@@ -499,7 +499,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeDoorLockWrongCodeEntryLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockwrongCodeEntryLimitCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeDoorLockWrongCodeEntryLimitCommandParams.put(
         "value", doorLockwrongCodeEntryLimitCommandParameterInfo);
     InteractionInfo writeDoorLockWrongCodeEntryLimitAttributeInteractionInfo =
@@ -529,7 +529,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeGeneralCommissioningBreadcrumbCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo generalCommissioningbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeGeneralCommissioningBreadcrumbCommandParams.put(
         "value", generalCommissioningbreadcrumbCommandParameterInfo);
     InteractionInfo writeGeneralCommissioningBreadcrumbAttributeInteractionInfo =
@@ -554,7 +554,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeIdentifyIdentifyTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo identifyidentifyTimeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeIdentifyIdentifyTimeCommandParams.put("value", identifyidentifyTimeCommandParameterInfo);
     InteractionInfo writeIdentifyIdentifyTimeAttributeInteractionInfo =
         new InteractionInfo(
@@ -576,7 +576,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControloptionsCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlOptionsCommandParams.put("value", levelControloptionsCommandParameterInfo);
     InteractionInfo writeLevelControlOptionsAttributeInteractionInfo =
         new InteractionInfo(
@@ -592,7 +592,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlOnOffTransitionTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControlonOffTransitionTimeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlOnOffTransitionTimeCommandParams.put(
         "value", levelControlonOffTransitionTimeCommandParameterInfo);
     InteractionInfo writeLevelControlOnOffTransitionTimeAttributeInteractionInfo =
@@ -610,7 +610,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlOnLevelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControlonLevelCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlOnLevelCommandParams.put("value", levelControlonLevelCommandParameterInfo);
     InteractionInfo writeLevelControlOnLevelAttributeInteractionInfo =
         new InteractionInfo(
@@ -626,7 +626,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlOnTransitionTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControlonTransitionTimeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlOnTransitionTimeCommandParams.put(
         "value", levelControlonTransitionTimeCommandParameterInfo);
     InteractionInfo writeLevelControlOnTransitionTimeAttributeInteractionInfo =
@@ -644,7 +644,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlOffTransitionTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControloffTransitionTimeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlOffTransitionTimeCommandParams.put(
         "value", levelControloffTransitionTimeCommandParameterInfo);
     InteractionInfo writeLevelControlOffTransitionTimeAttributeInteractionInfo =
@@ -662,7 +662,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlDefaultMoveRateCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControldefaultMoveRateCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlDefaultMoveRateCommandParams.put(
         "value", levelControldefaultMoveRateCommandParameterInfo);
     InteractionInfo writeLevelControlDefaultMoveRateAttributeInteractionInfo =
@@ -679,7 +679,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeLevelControlStartUpCurrentLevelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo levelControlstartUpCurrentLevelCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeLevelControlStartUpCurrentLevelCommandParams.put(
         "value", levelControlstartUpCurrentLevelCommandParameterInfo);
     InteractionInfo writeLevelControlStartUpCurrentLevelAttributeInteractionInfo =
@@ -727,7 +727,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeModeSelectOnModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo modeSelectonModeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeModeSelectOnModeCommandParams.put("value", modeSelectonModeCommandParameterInfo);
     InteractionInfo writeModeSelectOnModeAttributeInteractionInfo =
         new InteractionInfo(
@@ -745,7 +745,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeNetworkCommissioningInterfaceEnabledCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioninginterfaceEnabledCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeNetworkCommissioningInterfaceEnabledCommandParams.put(
         "value", networkCommissioninginterfaceEnabledCommandParameterInfo);
     InteractionInfo writeNetworkCommissioningInterfaceEnabledAttributeInteractionInfo =
@@ -775,7 +775,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeOnOffOnTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo onOffonTimeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeOnOffOnTimeCommandParams.put("value", onOffonTimeCommandParameterInfo);
     InteractionInfo writeOnOffOnTimeAttributeInteractionInfo =
         new InteractionInfo(
@@ -790,7 +790,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeOnOffOffWaitTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo onOffoffWaitTimeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeOnOffOffWaitTimeCommandParams.put("value", onOffoffWaitTimeCommandParameterInfo);
     InteractionInfo writeOnOffOffWaitTimeAttributeInteractionInfo =
         new InteractionInfo(
@@ -806,7 +806,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeOnOffStartUpOnOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo onOffstartUpOnOffCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeOnOffStartUpOnOffCommandParams.put("value", onOffstartUpOnOffCommandParameterInfo);
     InteractionInfo writeOnOffStartUpOnOffAttributeInteractionInfo =
         new InteractionInfo(
@@ -825,7 +825,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeOnOffSwitchConfigurationSwitchActionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo onOffSwitchConfigurationswitchActionsCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeOnOffSwitchConfigurationSwitchActionsCommandParams.put(
         "value", onOffSwitchConfigurationswitchActionsCommandParameterInfo);
     InteractionInfo writeOnOffSwitchConfigurationSwitchActionsAttributeInteractionInfo =
@@ -856,7 +856,7 @@ public class ClusterWriteMapping {
         writePumpConfigurationAndControlLifetimeRunningHoursCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControllifetimeRunningHoursCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writePumpConfigurationAndControlLifetimeRunningHoursCommandParams.put(
         "value", pumpConfigurationAndControllifetimeRunningHoursCommandParameterInfo);
     InteractionInfo writePumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo =
@@ -875,7 +875,7 @@ public class ClusterWriteMapping {
         writePumpConfigurationAndControlLifetimeEnergyConsumedCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControllifetimeEnergyConsumedCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writePumpConfigurationAndControlLifetimeEnergyConsumedCommandParams.put(
         "value", pumpConfigurationAndControllifetimeEnergyConsumedCommandParameterInfo);
     InteractionInfo writePumpConfigurationAndControlLifetimeEnergyConsumedAttributeInteractionInfo =
@@ -893,7 +893,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writePumpConfigurationAndControlOperationModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControloperationModeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writePumpConfigurationAndControlOperationModeCommandParams.put(
         "value", pumpConfigurationAndControloperationModeCommandParameterInfo);
     InteractionInfo writePumpConfigurationAndControlOperationModeAttributeInteractionInfo =
@@ -911,7 +911,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writePumpConfigurationAndControlControlModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControlcontrolModeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writePumpConfigurationAndControlControlModeCommandParams.put(
         "value", pumpConfigurationAndControlcontrolModeCommandParameterInfo);
     InteractionInfo writePumpConfigurationAndControlControlModeAttributeInteractionInfo =
@@ -946,7 +946,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterbooleanCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeTestClusterBooleanCommandParams.put("value", testClusterbooleanCommandParameterInfo);
     InteractionInfo writeTestClusterBooleanAttributeInteractionInfo =
         new InteractionInfo(
@@ -962,7 +962,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterBitmap8CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterbitmap8CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterBitmap8CommandParams.put("value", testClusterbitmap8CommandParameterInfo);
     InteractionInfo writeTestClusterBitmap8AttributeInteractionInfo =
         new InteractionInfo(
@@ -978,7 +978,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterBitmap16CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterbitmap16CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterBitmap16CommandParams.put("value", testClusterbitmap16CommandParameterInfo);
     InteractionInfo writeTestClusterBitmap16AttributeInteractionInfo =
         new InteractionInfo(
@@ -994,7 +994,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterBitmap32CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterbitmap32CommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterBitmap32CommandParams.put("value", testClusterbitmap32CommandParameterInfo);
     InteractionInfo writeTestClusterBitmap32AttributeInteractionInfo =
         new InteractionInfo(
@@ -1010,7 +1010,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterBitmap64CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterbitmap64CommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterBitmap64CommandParams.put("value", testClusterbitmap64CommandParameterInfo);
     InteractionInfo writeTestClusterBitmap64AttributeInteractionInfo =
         new InteractionInfo(
@@ -1026,7 +1026,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt8uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint8uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterInt8uCommandParams.put("value", testClusterint8uCommandParameterInfo);
     InteractionInfo writeTestClusterInt8uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1042,7 +1042,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt16uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint16uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterInt16uCommandParams.put("value", testClusterint16uCommandParameterInfo);
     InteractionInfo writeTestClusterInt16uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1058,7 +1058,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt24uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint24uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt24uCommandParams.put("value", testClusterint24uCommandParameterInfo);
     InteractionInfo writeTestClusterInt24uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1074,7 +1074,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt32uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint32uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt32uCommandParams.put("value", testClusterint32uCommandParameterInfo);
     InteractionInfo writeTestClusterInt32uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1090,7 +1090,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt40uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint40uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt40uCommandParams.put("value", testClusterint40uCommandParameterInfo);
     InteractionInfo writeTestClusterInt40uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1106,7 +1106,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt48uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint48uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt48uCommandParams.put("value", testClusterint48uCommandParameterInfo);
     InteractionInfo writeTestClusterInt48uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1122,7 +1122,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt56uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint56uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt56uCommandParams.put("value", testClusterint56uCommandParameterInfo);
     InteractionInfo writeTestClusterInt56uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1138,7 +1138,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt64uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint64uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt64uCommandParams.put("value", testClusterint64uCommandParameterInfo);
     InteractionInfo writeTestClusterInt64uAttributeInteractionInfo =
         new InteractionInfo(
@@ -1154,7 +1154,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt8sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint8sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterInt8sCommandParams.put("value", testClusterint8sCommandParameterInfo);
     InteractionInfo writeTestClusterInt8sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1170,7 +1170,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt16sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint16sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterInt16sCommandParams.put("value", testClusterint16sCommandParameterInfo);
     InteractionInfo writeTestClusterInt16sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1186,7 +1186,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt24sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint24sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt24sCommandParams.put("value", testClusterint24sCommandParameterInfo);
     InteractionInfo writeTestClusterInt24sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1202,7 +1202,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt32sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint32sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt32sCommandParams.put("value", testClusterint32sCommandParameterInfo);
     InteractionInfo writeTestClusterInt32sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1218,7 +1218,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt40sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint40sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt40sCommandParams.put("value", testClusterint40sCommandParameterInfo);
     InteractionInfo writeTestClusterInt40sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1234,7 +1234,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt48sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint48sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt48sCommandParams.put("value", testClusterint48sCommandParameterInfo);
     InteractionInfo writeTestClusterInt48sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1250,7 +1250,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt56sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint56sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt56sCommandParams.put("value", testClusterint56sCommandParameterInfo);
     InteractionInfo writeTestClusterInt56sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1266,7 +1266,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterInt64sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterint64sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterInt64sCommandParams.put("value", testClusterint64sCommandParameterInfo);
     InteractionInfo writeTestClusterInt64sAttributeInteractionInfo =
         new InteractionInfo(
@@ -1282,7 +1282,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterEnum8CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterenum8CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterEnum8CommandParams.put("value", testClusterenum8CommandParameterInfo);
     InteractionInfo writeTestClusterEnum8AttributeInteractionInfo =
         new InteractionInfo(
@@ -1298,7 +1298,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterEnum16CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterenum16CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterEnum16CommandParams.put("value", testClusterenum16CommandParameterInfo);
     InteractionInfo writeTestClusterEnum16AttributeInteractionInfo =
         new InteractionInfo(
@@ -1314,7 +1314,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterFloatSingleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterfloatSingleCommandParameterInfo =
-        new CommandParameterInfo("value", float.class);
+        new CommandParameterInfo("value", Float.class);
     writeTestClusterFloatSingleCommandParams.put(
         "value", testClusterfloatSingleCommandParameterInfo);
     InteractionInfo writeTestClusterFloatSingleAttributeInteractionInfo =
@@ -1331,7 +1331,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterFloatDoubleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterfloatDoubleCommandParameterInfo =
-        new CommandParameterInfo("value", double.class);
+        new CommandParameterInfo("value", Double.class);
     writeTestClusterFloatDoubleCommandParams.put(
         "value", testClusterfloatDoubleCommandParameterInfo);
     InteractionInfo writeTestClusterFloatDoubleAttributeInteractionInfo =
@@ -1415,7 +1415,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterEpochUsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterepochUsCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterEpochUsCommandParams.put("value", testClusterepochUsCommandParameterInfo);
     InteractionInfo writeTestClusterEpochUsAttributeInteractionInfo =
         new InteractionInfo(
@@ -1431,7 +1431,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterEpochSCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterepochSCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterEpochSCommandParams.put("value", testClusterepochSCommandParameterInfo);
     InteractionInfo writeTestClusterEpochSAttributeInteractionInfo =
         new InteractionInfo(
@@ -1447,7 +1447,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterVendorIdCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustervendorIdCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterVendorIdCommandParams.put("value", testClustervendorIdCommandParameterInfo);
     InteractionInfo writeTestClusterVendorIdAttributeInteractionInfo =
         new InteractionInfo(
@@ -1463,7 +1463,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterEnumAttrCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterenumAttrCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterEnumAttrCommandParams.put("value", testClusterenumAttrCommandParameterInfo);
     InteractionInfo writeTestClusterEnumAttrAttributeInteractionInfo =
         new InteractionInfo(
@@ -1479,7 +1479,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterRangeRestrictedInt8uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterrangeRestrictedInt8uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterRangeRestrictedInt8uCommandParams.put(
         "value", testClusterrangeRestrictedInt8uCommandParameterInfo);
     InteractionInfo writeTestClusterRangeRestrictedInt8uAttributeInteractionInfo =
@@ -1497,7 +1497,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterRangeRestrictedInt8sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterrangeRestrictedInt8sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterRangeRestrictedInt8sCommandParams.put(
         "value", testClusterrangeRestrictedInt8sCommandParameterInfo);
     InteractionInfo writeTestClusterRangeRestrictedInt8sAttributeInteractionInfo =
@@ -1515,7 +1515,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterRangeRestrictedInt16uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterrangeRestrictedInt16uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterRangeRestrictedInt16uCommandParams.put(
         "value", testClusterrangeRestrictedInt16uCommandParameterInfo);
     InteractionInfo writeTestClusterRangeRestrictedInt16uAttributeInteractionInfo =
@@ -1533,7 +1533,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterRangeRestrictedInt16sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterrangeRestrictedInt16sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterRangeRestrictedInt16sCommandParams.put(
         "value", testClusterrangeRestrictedInt16sCommandParameterInfo);
     InteractionInfo writeTestClusterRangeRestrictedInt16sAttributeInteractionInfo =
@@ -1551,7 +1551,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterTimedWriteBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertimedWriteBooleanCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeTestClusterTimedWriteBooleanCommandParams.put(
         "value", testClustertimedWriteBooleanCommandParameterInfo);
     InteractionInfo writeTestClusterTimedWriteBooleanAttributeInteractionInfo =
@@ -1568,10 +1568,46 @@ public class ClusterWriteMapping {
     writeTestClusterInteractionInfo.put(
         "writeTimedWriteBooleanAttribute",
         writeTestClusterTimedWriteBooleanAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterGeneralErrorBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClustergeneralErrorBooleanCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class);
+    writeTestClusterGeneralErrorBooleanCommandParams.put(
+        "value", testClustergeneralErrorBooleanCommandParameterInfo);
+    InteractionInfo writeTestClusterGeneralErrorBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeGeneralErrorBooleanAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterGeneralErrorBooleanCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeGeneralErrorBooleanAttribute",
+        writeTestClusterGeneralErrorBooleanAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterClusterErrorBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClusterclusterErrorBooleanCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class);
+    writeTestClusterClusterErrorBooleanCommandParams.put(
+        "value", testClusterclusterErrorBooleanCommandParameterInfo);
+    InteractionInfo writeTestClusterClusterErrorBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeClusterErrorBooleanAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterClusterErrorBooleanCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeClusterErrorBooleanAttribute",
+        writeTestClusterClusterErrorBooleanAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeTestClusterUnsupportedCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterunsupportedCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeTestClusterUnsupportedCommandParams.put(
         "value", testClusterunsupportedCommandParameterInfo);
     InteractionInfo writeTestClusterUnsupportedAttributeInteractionInfo =
@@ -1588,7 +1624,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableBooleanCommandParameterInfo =
-        new CommandParameterInfo("value", boolean.class);
+        new CommandParameterInfo("value", Boolean.class);
     writeTestClusterNullableBooleanCommandParams.put(
         "value", testClusternullableBooleanCommandParameterInfo);
     InteractionInfo writeTestClusterNullableBooleanAttributeInteractionInfo =
@@ -1605,7 +1641,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableBitmap8CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableBitmap8CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableBitmap8CommandParams.put(
         "value", testClusternullableBitmap8CommandParameterInfo);
     InteractionInfo writeTestClusterNullableBitmap8AttributeInteractionInfo =
@@ -1622,7 +1658,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableBitmap16CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableBitmap16CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableBitmap16CommandParams.put(
         "value", testClusternullableBitmap16CommandParameterInfo);
     InteractionInfo writeTestClusterNullableBitmap16AttributeInteractionInfo =
@@ -1639,7 +1675,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableBitmap32CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableBitmap32CommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableBitmap32CommandParams.put(
         "value", testClusternullableBitmap32CommandParameterInfo);
     InteractionInfo writeTestClusterNullableBitmap32AttributeInteractionInfo =
@@ -1656,7 +1692,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableBitmap64CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableBitmap64CommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableBitmap64CommandParams.put(
         "value", testClusternullableBitmap64CommandParameterInfo);
     InteractionInfo writeTestClusterNullableBitmap64AttributeInteractionInfo =
@@ -1673,7 +1709,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt8uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt8uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableInt8uCommandParams.put(
         "value", testClusternullableInt8uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt8uAttributeInteractionInfo =
@@ -1690,7 +1726,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt16uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt16uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableInt16uCommandParams.put(
         "value", testClusternullableInt16uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt16uAttributeInteractionInfo =
@@ -1707,7 +1743,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt24uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt24uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt24uCommandParams.put(
         "value", testClusternullableInt24uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt24uAttributeInteractionInfo =
@@ -1724,7 +1760,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt32uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt32uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt32uCommandParams.put(
         "value", testClusternullableInt32uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt32uAttributeInteractionInfo =
@@ -1741,7 +1777,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt40uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt40uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt40uCommandParams.put(
         "value", testClusternullableInt40uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt40uAttributeInteractionInfo =
@@ -1758,7 +1794,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt48uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt48uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt48uCommandParams.put(
         "value", testClusternullableInt48uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt48uAttributeInteractionInfo =
@@ -1775,7 +1811,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt56uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt56uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt56uCommandParams.put(
         "value", testClusternullableInt56uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt56uAttributeInteractionInfo =
@@ -1792,7 +1828,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt64uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt64uCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt64uCommandParams.put(
         "value", testClusternullableInt64uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt64uAttributeInteractionInfo =
@@ -1809,7 +1845,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt8sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt8sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableInt8sCommandParams.put(
         "value", testClusternullableInt8sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt8sAttributeInteractionInfo =
@@ -1826,7 +1862,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt16sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt16sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableInt16sCommandParams.put(
         "value", testClusternullableInt16sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt16sAttributeInteractionInfo =
@@ -1843,7 +1879,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt24sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt24sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt24sCommandParams.put(
         "value", testClusternullableInt24sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt24sAttributeInteractionInfo =
@@ -1860,7 +1896,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt32sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt32sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt32sCommandParams.put(
         "value", testClusternullableInt32sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt32sAttributeInteractionInfo =
@@ -1877,7 +1913,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt40sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt40sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt40sCommandParams.put(
         "value", testClusternullableInt40sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt40sAttributeInteractionInfo =
@@ -1894,7 +1930,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt48sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt48sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt48sCommandParams.put(
         "value", testClusternullableInt48sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt48sAttributeInteractionInfo =
@@ -1911,7 +1947,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt56sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt56sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt56sCommandParams.put(
         "value", testClusternullableInt56sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt56sAttributeInteractionInfo =
@@ -1928,7 +1964,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableInt64sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableInt64sCommandParameterInfo =
-        new CommandParameterInfo("value", long.class);
+        new CommandParameterInfo("value", Long.class);
     writeTestClusterNullableInt64sCommandParams.put(
         "value", testClusternullableInt64sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableInt64sAttributeInteractionInfo =
@@ -1945,7 +1981,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableEnum8CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableEnum8CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableEnum8CommandParams.put(
         "value", testClusternullableEnum8CommandParameterInfo);
     InteractionInfo writeTestClusterNullableEnum8AttributeInteractionInfo =
@@ -1962,7 +1998,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableEnum16CommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableEnum16CommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableEnum16CommandParams.put(
         "value", testClusternullableEnum16CommandParameterInfo);
     InteractionInfo writeTestClusterNullableEnum16AttributeInteractionInfo =
@@ -1979,7 +2015,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableFloatSingleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableFloatSingleCommandParameterInfo =
-        new CommandParameterInfo("value", float.class);
+        new CommandParameterInfo("value", Float.class);
     writeTestClusterNullableFloatSingleCommandParams.put(
         "value", testClusternullableFloatSingleCommandParameterInfo);
     InteractionInfo writeTestClusterNullableFloatSingleAttributeInteractionInfo =
@@ -1997,7 +2033,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableFloatDoubleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableFloatDoubleCommandParameterInfo =
-        new CommandParameterInfo("value", double.class);
+        new CommandParameterInfo("value", Double.class);
     writeTestClusterNullableFloatDoubleCommandParams.put(
         "value", testClusternullableFloatDoubleCommandParameterInfo);
     InteractionInfo writeTestClusterNullableFloatDoubleAttributeInteractionInfo =
@@ -2051,7 +2087,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableEnumAttrCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableEnumAttrCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableEnumAttrCommandParams.put(
         "value", testClusternullableEnumAttrCommandParameterInfo);
     InteractionInfo writeTestClusterNullableEnumAttrAttributeInteractionInfo =
@@ -2068,7 +2104,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableRangeRestrictedInt8uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableRangeRestrictedInt8uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableRangeRestrictedInt8uCommandParams.put(
         "value", testClusternullableRangeRestrictedInt8uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableRangeRestrictedInt8uAttributeInteractionInfo =
@@ -2086,7 +2122,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableRangeRestrictedInt8sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableRangeRestrictedInt8sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableRangeRestrictedInt8sCommandParams.put(
         "value", testClusternullableRangeRestrictedInt8sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableRangeRestrictedInt8sAttributeInteractionInfo =
@@ -2104,7 +2140,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableRangeRestrictedInt16uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableRangeRestrictedInt16uCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableRangeRestrictedInt16uCommandParams.put(
         "value", testClusternullableRangeRestrictedInt16uCommandParameterInfo);
     InteractionInfo writeTestClusterNullableRangeRestrictedInt16uAttributeInteractionInfo =
@@ -2122,7 +2158,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTestClusterNullableRangeRestrictedInt16sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableRangeRestrictedInt16sCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTestClusterNullableRangeRestrictedInt16sCommandParams.put(
         "value", testClusternullableRangeRestrictedInt16sCommandParameterInfo);
     InteractionInfo writeTestClusterNullableRangeRestrictedInt16sAttributeInteractionInfo =
@@ -2142,7 +2178,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatOccupiedCoolingSetpointCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatoccupiedCoolingSetpointCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatOccupiedCoolingSetpointCommandParams.put(
         "value", thermostatoccupiedCoolingSetpointCommandParameterInfo);
     InteractionInfo writeThermostatOccupiedCoolingSetpointAttributeInteractionInfo =
@@ -2160,7 +2196,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatOccupiedHeatingSetpointCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatoccupiedHeatingSetpointCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatOccupiedHeatingSetpointCommandParams.put(
         "value", thermostatoccupiedHeatingSetpointCommandParameterInfo);
     InteractionInfo writeThermostatOccupiedHeatingSetpointAttributeInteractionInfo =
@@ -2178,7 +2214,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatMinHeatSetpointLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatminHeatSetpointLimitCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatMinHeatSetpointLimitCommandParams.put(
         "value", thermostatminHeatSetpointLimitCommandParameterInfo);
     InteractionInfo writeThermostatMinHeatSetpointLimitAttributeInteractionInfo =
@@ -2196,7 +2232,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatMaxHeatSetpointLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatmaxHeatSetpointLimitCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatMaxHeatSetpointLimitCommandParams.put(
         "value", thermostatmaxHeatSetpointLimitCommandParameterInfo);
     InteractionInfo writeThermostatMaxHeatSetpointLimitAttributeInteractionInfo =
@@ -2214,7 +2250,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatMinCoolSetpointLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatminCoolSetpointLimitCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatMinCoolSetpointLimitCommandParams.put(
         "value", thermostatminCoolSetpointLimitCommandParameterInfo);
     InteractionInfo writeThermostatMinCoolSetpointLimitAttributeInteractionInfo =
@@ -2232,7 +2268,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatMaxCoolSetpointLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatmaxCoolSetpointLimitCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatMaxCoolSetpointLimitCommandParams.put(
         "value", thermostatmaxCoolSetpointLimitCommandParameterInfo);
     InteractionInfo writeThermostatMaxCoolSetpointLimitAttributeInteractionInfo =
@@ -2250,7 +2286,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatMinSetpointDeadBandCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatminSetpointDeadBandCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatMinSetpointDeadBandCommandParams.put(
         "value", thermostatminSetpointDeadBandCommandParameterInfo);
     InteractionInfo writeThermostatMinSetpointDeadBandAttributeInteractionInfo =
@@ -2268,7 +2304,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatControlSequenceOfOperationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatcontrolSequenceOfOperationCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatControlSequenceOfOperationCommandParams.put(
         "value", thermostatcontrolSequenceOfOperationCommandParameterInfo);
     InteractionInfo writeThermostatControlSequenceOfOperationAttributeInteractionInfo =
@@ -2286,7 +2322,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeThermostatSystemModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatsystemModeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatSystemModeCommandParams.put("value", thermostatsystemModeCommandParameterInfo);
     InteractionInfo writeThermostatSystemModeAttributeInteractionInfo =
         new InteractionInfo(
@@ -2307,7 +2343,7 @@ public class ClusterWriteMapping {
             new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
         thermostatUserInterfaceConfigurationtemperatureDisplayModeCommandParameterInfo =
-            new CommandParameterInfo("value", int.class);
+            new CommandParameterInfo("value", Integer.class);
     writeThermostatUserInterfaceConfigurationTemperatureDisplayModeCommandParams.put(
         "value", thermostatUserInterfaceConfigurationtemperatureDisplayModeCommandParameterInfo);
     InteractionInfo
@@ -2328,7 +2364,7 @@ public class ClusterWriteMapping {
         writeThermostatUserInterfaceConfigurationKeypadLockoutCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatUserInterfaceConfigurationkeypadLockoutCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeThermostatUserInterfaceConfigurationKeypadLockoutCommandParams.put(
         "value", thermostatUserInterfaceConfigurationkeypadLockoutCommandParameterInfo);
     InteractionInfo writeThermostatUserInterfaceConfigurationKeypadLockoutAttributeInteractionInfo =
@@ -2348,7 +2384,7 @@ public class ClusterWriteMapping {
             new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
         thermostatUserInterfaceConfigurationscheduleProgrammingVisibilityCommandParameterInfo =
-            new CommandParameterInfo("value", int.class);
+            new CommandParameterInfo("value", Integer.class);
     writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCommandParams.put(
         "value",
         thermostatUserInterfaceConfigurationscheduleProgrammingVisibilityCommandParameterInfo);
@@ -2376,7 +2412,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTimeFormatLocalizationHourFormatCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo timeFormatLocalizationhourFormatCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTimeFormatLocalizationHourFormatCommandParams.put(
         "value", timeFormatLocalizationhourFormatCommandParameterInfo);
     InteractionInfo writeTimeFormatLocalizationHourFormatAttributeInteractionInfo =
@@ -2393,7 +2429,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeTimeFormatLocalizationActiveCalendarTypeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo timeFormatLocalizationactiveCalendarTypeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeTimeFormatLocalizationActiveCalendarTypeCommandParams.put(
         "value", timeFormatLocalizationactiveCalendarTypeCommandParameterInfo);
     InteractionInfo writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo =
@@ -2409,6 +2445,26 @@ public class ClusterWriteMapping {
         "writeActiveCalendarTypeAttribute",
         writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo);
     writeAttributeMap.put("timeFormatLocalization", writeTimeFormatLocalizationInteractionInfo);
+    Map<String, InteractionInfo> writeUnitLocalizationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeUnitLocalizationTemperatureUnitCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitLocalizationtemperatureUnitCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeUnitLocalizationTemperatureUnitCommandParams.put(
+        "value", unitLocalizationtemperatureUnitCommandParameterInfo);
+    InteractionInfo writeUnitLocalizationTemperatureUnitAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .writeTemperatureUnitAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeUnitLocalizationTemperatureUnitCommandParams);
+    writeUnitLocalizationInteractionInfo.put(
+        "writeTemperatureUnitAttribute",
+        writeUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+    writeAttributeMap.put("unitLocalization", writeUnitLocalizationInteractionInfo);
     Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
@@ -2419,7 +2475,7 @@ public class ClusterWriteMapping {
     Map<String, CommandParameterInfo> writeWindowCoveringModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo windowCoveringmodeCommandParameterInfo =
-        new CommandParameterInfo("value", int.class);
+        new CommandParameterInfo("value", Integer.class);
     writeWindowCoveringModeCommandParams.put("value", windowCoveringmodeCommandParameterInfo);
     InteractionInfo writeWindowCoveringModeAttributeInteractionInfo =
         new InteractionInfo(

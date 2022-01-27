@@ -128,7 +128,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
 class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDelegate
 {
     // Gets called when a software fault that has taken place on the Node.
-    void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFault::Type & softwareFault) override
+    void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault) override
     {
         ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 

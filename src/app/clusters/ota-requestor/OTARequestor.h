@@ -86,7 +86,7 @@ public:
         mBdxDownloader      = downloader;
 
         uint32_t version;
-        VerifyOrDie(app::Clusters::Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &version) == EMBER_ZCL_STATUS_SUCCESS);
+        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
@@ -103,6 +103,12 @@ public:
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
 
+    // Get image update progress in percents unit
+    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
+
+    // Get requestor state
+    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
+
     /**
      * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
      * explicitly.
@@ -114,13 +120,9 @@ public:
         mProviderEndpointId  = endpointId;
     }
 
-    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
-    // as the QueryImageResponse content) is preserved
-    void AbortImageUpdate();
-
-    // Application directs the Requestor to abort the download in progress. All the Requestor state is
-    // cleared, UploadState is reset to Idle
-    void AbortAndResetState();
+    // Application directs the Requestor to cancel image update in progress. All the Requestor state is
+    // cleared, UpdateState is reset to Idle
+    void CancelImageUpdate() override;
 
     // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
@@ -254,24 +256,24 @@ private:
      * QueryImage callbacks
      */
     static void OnQueryImageResponse(void * context, const QueryImageResponseDecodableType & response);
-    static void OnQueryImageFailure(void * context, EmberAfStatus status);
+    static void OnQueryImageFailure(void * context, CHIP_ERROR error);
 
     /**
      * ApplyUpdate callbacks
      */
     static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
-    static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+    static void OnApplyUpdateFailure(void * context, CHIP_ERROR error);
 
     /**
      * NotifyUpdateApplied callbacks
      */
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
-    static void OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus);
+    static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    NodeId mProviderNodeId                    = kUndefinedNodeId;
-    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
-    EndpointId mProviderEndpointId            = kRootEndpointId;
+    NodeId mProviderNodeId                    = kUndefinedNodeId;      // Only valid for the current update in progress
+    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex; // Only valid for the current update in progress
+    EndpointId mProviderEndpointId            = kRootEndpointId;       // Only valid for the current update in progress
     uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;

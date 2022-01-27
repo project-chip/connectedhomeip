@@ -59,11 +59,11 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
         [expectation fulfill];
       }
-                                                               reportHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
+                                                               reportHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
     {{else if isWaitForReport}}
-    {{> subscribeDataCallback }} = ^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
+    {{> subscribeDataCallback }} = ^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
     {{else if isReadAttribute}}
-    [cluster readAttribute{{asUpperCamelCase attribute}}WithCompletionHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttribute{{asUpperCamelCase attribute}}WithCompletionHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
     {{else if isWriteAttribute}}
     {{#chip_tests_item_parameters}}
     id {{asLowerCamelCase name}}Argument;
@@ -102,15 +102,6 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {
           {{> actualValue}}
           {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
-          {{#if saveAs}}
-          {{#if (isOctetString type)}}
-          {{saveAs}} = [NSMutableData dataWithData:actualValue];
-          {{else if (isCharString type)}}
-          {{saveAs}} = [NSMutableString stringWithString:actualValue];
-          {{else}}
-          {{saveAs}} = [actualValue {{asObjectiveCNumberType "" type true}}Value];
-          {{/if}}
-          {{/if}}
         }
         {{/if}}
         {{#if hasExpectedConstraints}}
@@ -192,6 +183,18 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{/if}}
         }
         {{/if}}
+        {{/if}}
+        {{#if saveAs}}
+        {
+          {{> actualValue}}
+          {{#if (isOctetString type)}}
+        {{saveAs}} = [NSMutableData dataWithData:actualValue];
+          {{else if (isCharString type)}}
+        {{saveAs}} = [NSMutableString stringWithString:actualValue];
+          {{else}}
+        {{saveAs}} = [actualValue {{asObjectiveCNumberType "" type true}}Value];
+          {{/if}}
+        }
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 
