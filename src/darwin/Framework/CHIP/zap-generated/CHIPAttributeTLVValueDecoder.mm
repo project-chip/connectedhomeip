@@ -5004,7 +5004,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
-                newElement_0.icac = [NSData dataWithBytes:entry_0.icac.data() length:entry_0.icac.size()];
+                if (entry_0.icac.IsNull()) {
+                    newElement_0.icac = nil;
+                } else {
+                    newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
+                }
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named

@@ -6761,7 +6761,12 @@ using namespace chip::app::Clusters;
                         auto element_0 = (CHIPOperationalCredentialsClusterNOCStruct *) value[i_0];
                         listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].noc = [self asByteSpan:element_0.noc];
-                        listHolder_0->mList[i_0].icac = [self asByteSpan:element_0.icac];
+                        if (element_0.icac == nil) {
+                            listHolder_0->mList[i_0].icac.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].icac.SetNonNull();
+                            nonNullValue_2 = [self asByteSpan:element_0.icac];
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

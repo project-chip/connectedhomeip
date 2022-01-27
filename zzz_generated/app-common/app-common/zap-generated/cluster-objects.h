@@ -14695,7 +14695,7 @@ struct Type
 public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
-    chip::ByteSpan icac;
+    DataModel::Nullable<chip::ByteSpan> icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
