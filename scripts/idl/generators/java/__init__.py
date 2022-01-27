@@ -107,7 +107,7 @@ def NamedFilter(choices: List, name: str):
     raise Exception("No item named %s in %r" % (name, choices))
 
 def ToBoxedJavaType(field: Field):
-  if field.is_nullable:
+  if field.is_optional:
     return 'jobject'
   elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
     return 'jbyteArray'
