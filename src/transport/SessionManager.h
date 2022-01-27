@@ -27,6 +27,7 @@
 
 #include <utility>
 
+#include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -206,7 +207,8 @@ public:
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
     {
-        return mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
+        NodeId ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
+        return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
     // TODO: implements group sessions
