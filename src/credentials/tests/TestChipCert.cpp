@@ -1077,6 +1077,19 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
         certSet.Release();
     }
 
+    // Test fabric ID extraction from the raw ByteSpan form.
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(testCase.Cert, sNullLoadFlag, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        FabricId fabricId;
+        err = ExtractFabricIdFromCert(cert, &fabricId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
+    }
+
     // Test fabric ID extraction from the parsed form.
     for (auto & testCase : sTestCases)
     {
@@ -1091,6 +1104,17 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
         certSet.Release();
+    }
+
+    // Test fabric ID extraction from the raw ByteSpan form of ICA Cert that doesn't have FabricId.
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(TestCert::kICA01, sNullLoadFlag, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        FabricId fabricId;
+        err = ExtractFabricIdFromCert(cert, &fabricId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Test extraction from the parsed form of ICA Cert that doesn't have FabricId.
