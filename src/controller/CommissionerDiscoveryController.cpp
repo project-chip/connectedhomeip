@@ -25,9 +25,6 @@
  *      and User Directed Commissioning workflow
  *
  */
-#include <iostream>
-#include <thread>
-
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
 

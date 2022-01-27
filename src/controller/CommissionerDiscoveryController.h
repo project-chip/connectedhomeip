@@ -28,9 +28,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <thread>
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
