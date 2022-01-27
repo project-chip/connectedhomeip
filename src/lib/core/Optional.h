@@ -68,10 +68,13 @@ public:
     {
         if (mHasValue)
         {
+            // The -Wmaybe-uninitialized warning gets confused about the fact
+            // that other.mValue is always initialized if other.mHasValue is
+            // true, so suppress it for our access to other.mValue.
 #pragma GCC diagnostic push
 #if !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
+#endif // !defined(__clang__)
             new (&mValue.mData) T(other.mValue.mData);
 #pragma GCC diagnostic pop
         }
