@@ -215,10 +215,10 @@ class TestParser(unittest.TestCase):
                     code=0xab,
                     bitmaps=[
                         Bitmap(name="TestBitmap", base_type="BITMAP32",
-                             entries=[
-                                 ConstantEntry(name="kFirst", code=0x1),
-                                 ConstantEntry(name="kSecond", code=0x2),
-                             ])],
+                               entries=[
+                                   ConstantEntry(name="kFirst", code=0x1),
+                                   ConstantEntry(name="kSecond", code=0x2),
+                               ])],
                     )])
         self.assertEqual(actual, expected)
 

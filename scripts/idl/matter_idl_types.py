@@ -103,6 +103,7 @@ class Enum:
     base_type: str
     entries: List[ConstantEntry]
 
+
 @dataclass
 class Bitmap:
     name: str
