@@ -201,7 +201,7 @@ private:
 class SubscribeAttribute : public ReportCommand
 {
 public:
-    SubscribeAttribute() : ReportCommand("report-by-id")
+    SubscribeAttribute() : ReportCommand("subscribe-by-id")
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
@@ -211,7 +211,7 @@ public:
         ReportCommand::AddArguments();
     }
 
-    SubscribeAttribute(chip::ClusterId clusterId) : ReportCommand("report-by-id"), mClusterId(clusterId)
+    SubscribeAttribute(chip::ClusterId clusterId) : ReportCommand("subscribe-by-id"), mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -221,7 +221,7 @@ public:
     }
 
     SubscribeAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId) :
-        ReportCommand("report"), mClusterId(clusterId), mAttributeId(attributeId)
+        ReportCommand("subscribe"), mClusterId(clusterId), mAttributeId(attributeId)
     {
         AddArgument("attr-name", attributeName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -302,7 +302,7 @@ private:
 class SubscribeEvent : public ReportCommand
 {
 public:
-    SubscribeEvent() : ReportCommand("report-event-by-id")
+    SubscribeEvent() : ReportCommand("subscribe-event-by-id")
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
@@ -312,7 +312,7 @@ public:
         ReportCommand::AddArguments();
     }
 
-    SubscribeEvent(chip::ClusterId clusterId) : ReportCommand("report-event-by-id"), mClusterId(clusterId)
+    SubscribeEvent(chip::ClusterId clusterId) : ReportCommand("subscribe-event-by-id"), mClusterId(clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -322,7 +322,7 @@ public:
     }
 
     SubscribeEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId) :
-        ReportCommand("report-event"), mClusterId(clusterId), mEventId(eventId)
+        ReportCommand("subscribe-event"), mClusterId(clusterId), mEventId(eventId)
     {
         AddArgument("attr-name", eventName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
