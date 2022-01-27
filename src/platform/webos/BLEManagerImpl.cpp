@@ -68,10 +68,8 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
-{
-}
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode) {}
+return CHIP_ERROR_NOT_IMPLEMENTED;
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
@@ -98,13 +96,9 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
-void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
-{
-}
+void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent) {}
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
@@ -153,45 +147,25 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return true;
 }
 
-void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId) {}
 
-void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
-{
-}
+void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error) {}
 
-void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId) {}
 
-void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed)
-{
-}
+void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed) {}
 
-void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
-{
-}
+void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len) {}
 
-void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
-{
-}
+void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len) {}
 
-void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
-void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId) {}
 
-void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId) {}
 
-void BLEManagerImpl::DriveBLEState()
-{
-}
+void BLEManagerImpl::DriveBLEState() {}
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
 {
@@ -203,50 +177,30 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
 }
 
-void BLEManagerImpl::InitiateScan(BleScanState scanType)
-{
-}
+void BLEManagerImpl::InitiateScan(BleScanState scanType) {}
 
-void BLEManagerImpl::CleanScanConfig()
-{
-}
+void BLEManagerImpl::CleanScanConfig() {}
 
-void BLEManagerImpl::InitiateScan(intptr_t arg)
-{
-}
+void BLEManagerImpl::InitiateScan(intptr_t arg) {}
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
-{
-}
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator) {}
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
-{
-}
+void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate) {}
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
-{
-}
+void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate) {}
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate)
-{
-}
+void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate) {}
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate)
-{
-}
+void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate) {}
 
-void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
-{
-}
+void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) {}
 
-void BLEManagerImpl::OnScanComplete()
-{
-}
+void BLEManagerImpl::OnScanComplete() {}
 
 } // namespace Internal
 } // namespace DeviceLayer

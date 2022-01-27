@@ -79,9 +79,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 bool ConnectivityManagerImpl::mAssociattionStarted = false;
@@ -130,9 +128,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     return true;
 }
 
-void ConnectivityManagerImpl::_ClearWiFiStationProvision()
-{
-}
+void ConnectivityManagerImpl::_ClearWiFiStationProvision() {}
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
@@ -144,74 +140,49 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ConnectivityManagerImpl::_DemandStartWiFiAP()
-{
-}
+void ConnectivityManagerImpl::_DemandStartWiFiAP() {}
 
-void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
-{
-}
+void ConnectivityManagerImpl::_StopOnDemandWiFiAP() {}
 
-void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
-{
-}
+void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP() {}
 
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
-{
-}
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val) {}
 
 void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
                                                       const gchar * const * invalidated_properties, gpointer user_data)
-{
-}
+{}
 
-void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
-{
-}
+void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data) {}
 
-void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
-{
-}
+void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data) {}
 
-void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
-{
-}
+void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data) {}
 
 void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                    gpointer user_data)
-{
-}
+{}
 
 void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                      gpointer user_data)
-{
-}
+{}
 
-void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
-{
-}
+void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data) {}
 
-void ConnectivityManagerImpl::StartWiFiManagement()
-{
-}
+void ConnectivityManagerImpl::StartWiFiManagement() {}
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
     return true;
 }
 
-void ConnectivityManagerImpl::DriveAPState()
-{
-}
+void ConnectivityManagerImpl::DriveAPState() {}
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
-{
-}
+void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState) {}
 
 void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState)
 {
@@ -225,18 +196,14 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data)
-{
-}
+void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data) {}
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ConnectivityManagerImpl::PostNetworkConnect()
-{
-}
+void ConnectivityManagerImpl::PostNetworkConnect() {}
 
 CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
 {
@@ -278,9 +245,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     return true;
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data)
-{
-}
+void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data) {}
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
