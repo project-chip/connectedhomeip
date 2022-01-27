@@ -131,7 +131,7 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("lighting_app") {
+efr32_executable("light_switch_app") {
   output_name = "chip-efr32-light-switch-example.out"
   include_dirs = [ "include" ]
   defines = []
@@ -261,7 +261,7 @@ efr32_executable("lighting_app") {
 }
 
 group("efr32") {
-  deps = [ ":lighting_app" ]
+  deps = [ ":light_switch_app" ]
 }
 
 group("default") {
