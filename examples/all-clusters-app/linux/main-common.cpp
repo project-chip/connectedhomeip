@@ -18,6 +18,7 @@
 
 #include "include/tv-callbacks.h"
 #include <app/CommandHandler.h>
+#include <app-common/zap-generated/callback.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
@@ -115,4 +116,16 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
     chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+}
+
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+{
+     switch (attributePath.mClusterId)
+    {
+        case chip::app::Clusters::WindowCovering::Id:
+            MatterWindowCoveringClusterServerAttributeChangedCallback(attributePath);
+            break;
+        default:
+            break;
+    }
 }
