@@ -33,9 +33,10 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode)
+CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
 {
     SetupPayload payload;
+    mConnectionType = commission;
 
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     ReturnErrorOnFailure(isQRCode ? QRCodeSetupPayloadParser(setUpCode).populatePayload(payload)
@@ -136,7 +137,14 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
 {
-    LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    if (mConnectionType == SetupCodePairerBehaviour::kCommission)
+    {
+        LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    }
+    else
+    {
+        LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    }
 }
 
 #if CONFIG_NETWORK_LAYER_BLE

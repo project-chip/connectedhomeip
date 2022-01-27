@@ -148,9 +148,7 @@ private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
-    CHIP_ERROR PairWithQRCode(NodeId remoteId);
-    CHIP_ERROR PairWithManualCode(NodeId remoteId);
-    CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
+    CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
 

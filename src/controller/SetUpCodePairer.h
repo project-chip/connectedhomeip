@@ -47,13 +47,19 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+enum class SetupCodePairerBehaviour : uint8_t
+{
+    kCommission,
+    kPaseOnly,
+};
 class DLL_EXPORT SetUpCodePairer
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     virtual ~SetUpCodePairer() {}
 
-    CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode);
+    CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
+                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission);
 
 // Called by the DeviceCommissioner to notify that we have discovered a new device.
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -90,7 +96,8 @@ private:
 
     DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mRemoteId;
-    uint32_t mSetUpPINCode = 0;
+    uint32_t mSetUpPINCode                   = 0;
+    SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
 };
 
 } // namespace Controller
