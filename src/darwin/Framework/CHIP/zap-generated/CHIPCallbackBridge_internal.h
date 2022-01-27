@@ -347,9 +347,6 @@ typedef void (*NullableDoorLockClusterDlCredentialTypeAttributeCallback)(
 typedef void (*DoorLockClusterDlDataOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDataOperationType);
 typedef void (*NullableDoorLockClusterDlDataOperationTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> &);
-typedef void (*DoorLockClusterDlDoorLockStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorLockStatus);
-typedef void (*NullableDoorLockClusterDlDoorLockStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorLockStatus> &);
 typedef void (*DoorLockClusterDlDoorStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorState);
 typedef void (*NullableDoorLockClusterDlDoorStateAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> &);
@@ -8543,64 +8540,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterDlDoorLockStatusAttributeCallback>
-{
-public:
-    CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterDlDoorLockStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlDoorLockStatus value);
-};
-
-class CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableDoorLockClusterDlDoorLockStatusAttributeCallback>
-{
-public:
-    CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableDoorLockClusterDlDoorLockStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorLockStatus> & value);
-};
-
-class CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge
-    : public CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-{
-public:
-    CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
