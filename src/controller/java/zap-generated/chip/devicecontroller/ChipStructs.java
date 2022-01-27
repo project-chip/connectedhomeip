@@ -1175,9 +1175,10 @@ public class ChipStructs {
   public static class OperationalCredentialsClusterNOCStruct {
     public Integer fabricIndex;
     public byte[] noc;
-    public byte[] icac;
+    public @Nullable byte[] icac;
 
-    public OperationalCredentialsClusterNOCStruct(Integer fabricIndex, byte[] noc, byte[] icac) {
+    public OperationalCredentialsClusterNOCStruct(
+        Integer fabricIndex, byte[] noc, @Nullable byte[] icac) {
       this.fabricIndex = fabricIndex;
       this.noc = noc;
       this.icac = icac;

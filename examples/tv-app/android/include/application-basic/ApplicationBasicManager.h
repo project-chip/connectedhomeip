@@ -20,15 +20,16 @@
 
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
-class ApplicationBasicManager : public chip::app::Clusters::ApplicationBasic::Delegate
+using chip::app::AttributeValueEncoder;
+using ApplicationBasicDelegate = chip::app::Clusters::ApplicationBasic::Delegate;
+
+class ApplicationBasicManager : public ApplicationBasicDelegate
 {
 public:
-    chip::CharSpan HandleGetVendorName() override;
+    CHIP_ERROR HandleGetVendorName(AttributeValueEncoder & aEncoder) override;
     uint16_t HandleGetVendorId() override;
-    chip::CharSpan HandleGetApplicationName() override;
+    CHIP_ERROR HandleGetApplicationName(AttributeValueEncoder & aEncoder) override;
     uint16_t HandleGetProductId() override;
-    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication() override;
-    chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum HandleGetStatus() override;
-    chip::CharSpan HandleGetApplicationVersion() override;
-    std::list<uint16_t> HandleGetAllowedVendorList() override;
+    CHIP_ERROR HandleGetApplicationVersion(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder) override;
 };

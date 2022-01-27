@@ -112,8 +112,15 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
 
             if (accessingFabricIndex == fabricInfo.GetFabricIndex())
             {
+                ByteSpan icac;
+
                 ReturnErrorOnFailure(fabricInfo.GetNOCCert(noc.noc));
-                ReturnErrorOnFailure(fabricInfo.GetICACert(noc.icac));
+                ReturnErrorOnFailure(fabricInfo.GetICACert(icac));
+
+                if (!icac.empty())
+                {
+                    noc.icac.SetNonNull(icac);
+                }
             }
 
             ReturnErrorOnFailure(encoder.Encode(noc));

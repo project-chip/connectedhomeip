@@ -20,29 +20,33 @@
 
 #include <app/clusters/media-playback-server/media-playback-server.h>
 
-class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using MediaPlaybackDelegate = chip::app::Clusters::MediaPlayback::Delegate;
+using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+
+class MediaPlaybackManager : public MediaPlaybackDelegate
 {
 public:
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
     uint64_t HandleGetDuration() override;
-    chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type HandleGetSampledPosition() override;
+    CHIP_ERROR HandleGetSampledPosition(AttributeValueEncoder & aEncoder) override;
     float HandleGetPlaybackSpeed() override;
     uint64_t HandleGetSeekRangeStart() override;
     uint64_t HandleGetSeekRangeEnd() override;
 
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePlay() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePause() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleStop() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleFastForward() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePrevious() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleRewind() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
-    HandleSkipBackward(const uint64_t & deltaPositionMilliseconds) override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
-    HandleSkipForward(const uint64_t & deltaPositionMilliseconds) override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
-    HandleSeekRequest(const uint64_t & positionMilliseconds) override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleNext() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleStartOverRequest() override;
+    void HandlePlay(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandlePause(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandleStop(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandleFastForward(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandlePrevious(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandleRewind(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandleSkipBackward(CommandResponseHelper<PlaybackResponseType> & helper,
+                            const uint64_t & deltaPositionMilliseconds) override;
+    void HandleSkipForward(CommandResponseHelper<PlaybackResponseType> & helper,
+                           const uint64_t & deltaPositionMilliseconds) override;
+    void HandleSeekRequest(CommandResponseHelper<PlaybackResponseType> & helper, const uint64_t & positionMilliseconds) override;
+    void HandleNext(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandleStartOverRequest(CommandResponseHelper<PlaybackResponseType> & helper) override;
 };
