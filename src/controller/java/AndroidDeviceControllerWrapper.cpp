@@ -269,10 +269,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         return nullptr;
     }
 
-    setupParams.ephemeralKeypair = &ephemeralKey;
-    setupParams.controllerRCAC   = rcacSpan;
-    setupParams.controllerICAC   = icacSpan;
-    setupParams.controllerNOC    = nocSpan;
+    setupParams.operationalKeypair = &ephemeralKey;
+    setupParams.controllerRCAC     = rcacSpan;
+    setupParams.controllerICAC     = icacSpan;
+    setupParams.controllerNOC      = nocSpan;
 
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
     if (*errInfoOnFailure != CHIP_NO_ERROR)

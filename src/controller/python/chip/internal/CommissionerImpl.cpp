@@ -144,7 +144,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             SuccessOrExit(err);
 
             commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
-            commissionerParams.ephemeralKeypair               = &ephemeralKey;
+            commissionerParams.operationalKeypair             = &ephemeralKey;
             commissionerParams.controllerRCAC                 = rcacSpan;
             commissionerParams.controllerICAC                 = icacSpan;
             commissionerParams.controllerNOC                  = nocSpan;
