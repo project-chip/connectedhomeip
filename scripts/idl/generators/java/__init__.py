@@ -117,7 +117,10 @@ def ToBoxedJavaType(field: Field):
     return 'jobject'
 
 def LowercaseFirst(name: str):
-  return name[0].lower() + name[1:]
+    if len(name) > 1 and name[1].lower() != name[1]:
+        # Odd workaround: PAKEVerifier should not become pAKEVerifier
+        return name
+    return name[0].lower() + name[1:]
 
 class LookupContext:
     """Ability to lookup enumerations and structure types"""
@@ -258,15 +261,18 @@ class EncodableValue:
                 return "byte[]"
             else:
                 return "String"
+        elif type(t) == IdlEnumType:
+            return "Integer;"
         else:
             return "Object"
 
     @property
     def boxed_java_signature(self):
         if self.is_list:
-           return "Ljava/lang/ArrayList"
+           return "Ljava/lang/ArrayList;"
+           
         if self.is_optional:
-           return "Ljava/util/Optional"
+           return "Ljava/util/Optional;"
 
         t = ParseDataType(self.data_type, self.context.all_enums())
 
@@ -290,7 +296,7 @@ class EncodableValue:
             else:
                 return "Ljava/lang/String;"
         elif type(t) == IdlEnumType:
-            return "FIXME: No enum conversion %r" % t
+            return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
