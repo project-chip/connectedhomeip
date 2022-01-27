@@ -260,7 +260,7 @@ class BaseTestHelper:
         requests = [
             AttributeWriteRequest("Basic", "NodeLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
-                                  "a pretty loooooooooooooog string", IM.Status.Failure),
+                                  "a pretty loooooooooooooog string", IM.Status.InvalidValue),
         ]
         failed_zcl = []
         for req in requests:

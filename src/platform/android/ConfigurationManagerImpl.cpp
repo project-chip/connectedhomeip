@@ -203,11 +203,11 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        softwareVer = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        softwareVer = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
     }
     else
     {
-        softwareVer = static_cast<uint16_t>(u32SoftwareVer);
+        softwareVer = u32SoftwareVer;
     }
 
     return CHIP_NO_ERROR;
