@@ -109,9 +109,9 @@ def NamedFilter(choices: List, name: str):
 def ToBoxedJavaType(field: Field):
   if field.is_nullable:
     return 'jobject'
-  elif field.data_type.name.lower() == 'octet_string':
+  elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
     return 'jbyteArray'
-  elif field.data_type.name.lower() == 'char_string':
+  elif field.data_type.name.lower() in ['char_string', 'long_char_string']:
     return 'jstring'
   else:
     return 'jobject'
@@ -184,11 +184,11 @@ class EncodableValue:
 
     @property
     def is_octet_string(self):
-        return self.data_type.name.lower() == 'octet_string'
+        return self.data_type.name.lower() in ['octet_string', 'long_octet_string']
 
     @property
     def is_char_string(self):
-        return self.data_type.name.lower() == 'char_string'
+        return self.data_type.name.lower() in ['char_string', 'long_char_string']
 
     @property
     def is_struct(self):
@@ -269,8 +269,8 @@ class EncodableValue:
     @property
     def boxed_java_signature(self):
         if self.is_list:
-           return "Ljava/lang/ArrayList;"
-           
+           return "Ljava/util/ArrayList;"
+
         if self.is_optional:
            return "Ljava/util/Optional;"
 
