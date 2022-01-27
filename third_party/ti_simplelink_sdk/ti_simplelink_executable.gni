@@ -18,8 +18,8 @@ import("//build_overrides/ti_simplelink_sdk.gni")
 
 import("${build_root}/toolchain/flashable_executable.gni")
 import("${chip_root}/src/platform/device.gni")
-import("ti_simplelink_sdk.gni")
 import("ti_simplelink_board.gni")
+import("ti_simplelink_sdk.gni")
 
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
@@ -42,12 +42,10 @@ template("ti_simplelink_executable") {
 
     if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       if (chip_enable_ota_requestor) {
-        sources += [
-          "${chip_root}/src/platform/cc13x2_26x2/oad_image_header.c",
-        ]
+        sources +=
+            [ "${chip_root}/src/platform/cc13x2_26x2/oad_image_header.c" ]
         ldscript = "${chip_root}/src/platform/cc13x2_26x2/cc13x2x7_cc26x2x7_freertos_ota.lds"
-      }
-      else {
+      } else {
         ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
       }
 
@@ -55,19 +53,21 @@ template("ti_simplelink_executable") {
 
       ldflags = [
         "-L${ti_simplelink_sdk_root}/source",
-        rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
-                    root_build_dir),
+        rebase_path(
+            "${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
+            root_build_dir),
         "-T" + rebase_path(ldscript, root_build_dir),
       ]
     }
   }
 
-  if (chip_enable_ota_requestor && ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+  if (chip_enable_ota_requestor &&
+      ti_simplelink_device_family == "cc13x2x7_26x2x7") {
     pw_python_action("${target_name}_ota") {
       public_deps = [ ":${simplelink_target_name}.out.image" ]
 
       script = "${ti_simplelink_sdk_build_root}/run_oad_tool.py"
-      sources = ["${root_out_dir}/${objcopy_image_name}"]
+      sources = [ "${root_out_dir}/${objcopy_image_name}" ]
       outputs = [
         "${root_out_dir}/${output_base_name}.bin",
         "${root_out_dir}/${output_base_name}-bim.hex",
@@ -75,15 +75,13 @@ template("ti_simplelink_executable") {
 
       if (defined(invoker.pem_file)) {
         pem_file = invoker.pem_file
-      }
-      else {
+      } else {
         pem_file = "${ti_simplelink_sdk_root}/tools/common/oad/private.pem"
       }
 
       if (defined(invoker.bim_hex)) {
         bim_hex = invoker.bim_hex
-      }
-      else {
+      } else {
         bim_hex = "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/ble5stack/hexfiles/bim_offchip/Release/${ti_simplelink_bim_name}_bim_offchip.hex"
       }
 
