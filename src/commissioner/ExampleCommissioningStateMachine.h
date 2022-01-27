@@ -245,8 +245,7 @@ struct SigningCertificates : SdkStates::Base
         // Note that OperationalCredentialsDelegate is just used here for
         // convenience.  The exmaple app can use any signer interface it
         // chooses, and from SigningCertificates state context,
-        // everything needed for end-to-end attestation, IPK and admin subject
-        // assignment is accessible.
+        // everything needed for end-to-end attestation.
         chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> callback(OnDeviceNOCChainGeneration, this);
         FabricInfo * fabric = this->mCommissionee.mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
         if (fabric == nullptr)
@@ -265,17 +264,29 @@ struct SigningCertificates : SdkStates::Base
         }
     }
     void Dispatch(Event event) { this->mCtx.Dispatch(event); }
+    FabricInfo * GetFabric() { return this->mCommissionee.mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex); }
 
 private:
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR err, const chip::ByteSpan & derNoc,
-                                           const chip::ByteSpan & derIcac, const chip::ByteSpan & derRcac)
+                                           const chip::ByteSpan & derIcac, const chip::ByteSpan & derRcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
     {
 
         ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(err));
         SigningCertificates * state = static_cast<SigningCertificates *>(context);
         SdkEvents::OperationalCredentials opCreds;
+        FabricInfo * fabric;
         SuccessOrExit(err);
 
+        fabric = state->GetFabric();
+        VerifyOrExit(fabric != nullptr, CHIP_ERROR_NOT_FOUND);
+        opCreds.mAdminSubject = adminSubject.ValueOr(fabric->GetPeerId().GetNodeId());
+        {
+            // TODO(#13825): If not passed by the signer, the commissioner should
+            // provide its current IPK to the commissionee in the AddNOC command.
+            const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+            opCreds.Ipk()->Set(ipk.ValueOr(AesCcm128KeySpan(placeHolderIpk)));
+        }
         {
             chip::MutableByteSpan chipRcac;
             SuccessOrExit(err = opCreds.Rcac()->Allocate(chip::Credentials::kMaxCHIPCertLength));

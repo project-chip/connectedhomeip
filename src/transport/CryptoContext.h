@@ -114,7 +114,7 @@ public:
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                        const MessageAuthenticationCode & mac) const;
 
-    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
+    Crypto::AesCcm128KeySpan GetAttestationChallenge() const { return Crypto::AesCcm128KeySpan(mKeys[kAttestationChallengeKey]); }
 
     /**
      * @brief

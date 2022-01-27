@@ -110,6 +110,15 @@ private:
     Crypto::CapacityBoundBuffer<MaxSize> mBuffer;
 };
 
+struct AesCcm128KeyBuffer : private AesCcm128Key
+{
+    AesCcm128KeyBuffer(AesCcm128KeySpan keySpan) : AesCcm128Key(keySpan) {}
+    AesCcm128KeyBuffer() {}
+    const AesCcm128KeySpan Get() const { return this->Span(); };
+    void Set(AesCcm128KeySpan keySpan) { *this = AesCcm128KeyBuffer(keySpan); }
+    void Clear() { *this =  AesCcm128KeyBuffer(); }
+};
+
 using OnboardingPayload        = chip::Platform::SharedPtr<chip::SetupPayload>;
 using ArmFailSafe              = chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type;
 using NetworkFeatureMap        = app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo::DecodableType;
@@ -179,7 +188,7 @@ public:
 
 private:
     CapacityBoundNonce mNonce;
-    CapacityBoundStaticBuffer<kAES_CCM128_Key_Length> mChallenge;
+    AesCcm128KeyBuffer mChallenge;
     CapacityBoundSharedBuffer<kMax_ECDSA_Signature_Length> mSignature;
     CapacityBoundSharedBuffer<Credentials::kMaxDERCertLength> mPai;
     CapacityBoundSharedBuffer<Credentials::kMaxDERCertLength> mDac;
@@ -272,7 +281,7 @@ private:
     CapacityBoundSharedBuffer<Credentials::kMaxCHIPCertLength> mRcac;
     CapacityBoundSharedBuffer<Credentials::kMaxCHIPCertLength> mIcac;
     CapacityBoundSharedBuffer<Credentials::kMaxCHIPCertLength> mNoc;
-    CapacityBoundStaticBuffer<kAES_CCM128_Key_Length> mIpk;
+    AesCcm128KeyBuffer mIpk;
 };
 
 } // namespace Events
