@@ -257,7 +257,7 @@ struct InvokingArmFailSafe : Base<TContext>
                                 const Response & response) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>());
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err =
@@ -299,7 +299,7 @@ struct InvokingAttestationRequest : Base<TContext>
                 this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
             }
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.template PaseInvoke<AttestationRequest>(
@@ -337,7 +337,7 @@ struct InvokingDacCertificateChainRequest : Base<TContext>
                 this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
             }
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.template PaseInvoke<CertificateChainRequest>(
@@ -375,7 +375,7 @@ struct InvokingPaiCertificateChainRequest : Base<TContext>
                 this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
             }
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.template PaseInvoke(
@@ -400,16 +400,10 @@ struct CapturingAttestationChallenge : Base<TContext>
     {}
     void Enter()
     {
-        ByteSpan challenge =
+        auto challenge =
             this->mCommissionee.mPaseSession.Get()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-        if (mAttestationInformation.Challenge()->Set(challenge) == CHIP_NO_ERROR)
-        {
-            this->mCtx.Dispatch(TContext::Event::template Create<Events::AttestationInformation>(mAttestationInformation));
-        }
-        else
-        {
-            this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
-        }
+        mAttestationInformation.Challenge()->Set(challenge);
+        this->mCtx.Dispatch(TContext::Event::template Create<Events::AttestationInformation>(mAttestationInformation));
     }
 
 protected:
@@ -441,7 +435,7 @@ struct InvokingOpCSRRequest : Base<TContext>
                 this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
             }
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.template PaseInvoke<OpCSRRequest>(
@@ -470,7 +464,7 @@ struct InvokingAddTrustedRootCertificate : Base<TContext>
                                 const Response & response) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::OperationalCredentials>(mOpCreds));
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.template PaseInvoke<AddTrustedRootCertificate>(
@@ -514,7 +508,7 @@ struct InvokingAddNOC : Base<TContext>
                 this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
             }
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         AddNOC request = {
@@ -550,7 +544,7 @@ struct ReadingNetworkCommissioningClusterFeatureMap : Base<TContext>
             this->mCtx.Dispatch(TContext::Event::template Create<FeatureMap>(aData));
         };
 
-        auto onFailure = [this](const app::ConcreteAttributePath * commandPath, app::StatusIB status, CHIP_ERROR aError) {
+        auto onFailure = [this](const app::ConcreteAttributePath * commandPath, ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
 
@@ -577,7 +571,7 @@ struct InvokingAddOrUpdateWiFiNetwork : Base<TContext>
                                 const Response & response) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::NetworkId>(mNetworkId));
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err;
@@ -610,7 +604,7 @@ struct InvokingAddOrUpdateThreadNetwork : Base<TContext>
                                 const Response & response) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::NetworkId>(mNetworkId));
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err;
@@ -645,7 +639,7 @@ struct InvokingConnectNetwork : Base<TContext>
                                 const Response & response) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>());
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.template PaseInvoke<ConnectNetwork>(
@@ -857,7 +851,7 @@ struct InvokingCommissioningComplete : Base<TContext>
                                 const Response & response) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>());
         };
-        auto onFailure = [this](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        auto onFailure = [this](const ChipError aError) {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         };
         CHIP_ERROR err = this->mCommissionee.CaseInvoke(kCommissioningEndpoint, CommissioningComplete{}, onSuccess, onFailure);
