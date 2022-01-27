@@ -2620,6 +2620,10 @@ server cluster TestCluster = 1295 {
     SimpleEnum arg6[] = 6;
   }
 
+  info event TestFabricScopedEvent = 2 {
+    fabric_idx arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute bitmap8 bitmap8 = 1;
   attribute bitmap16 bitmap16 = 2;
@@ -2717,6 +2721,10 @@ server cluster TestCluster = 1295 {
     BOOLEAN arg3 = 2;
   }
 
+  request struct TestEmitTestFabricScopedEventRequestRequest {
+    INT8U arg1 = 0;
+  }
+
   request struct TestEnumsRequestRequest {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
@@ -2770,6 +2778,10 @@ server cluster TestCluster = 1295 {
     INT64U value = 0;
   }
 
+  response struct TestEmitTestFabricScopedEventResponse {
+    INT64U value = 0;
+  }
+
   response struct TestEnumsResponse {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
@@ -2794,6 +2806,7 @@ server cluster TestCluster = 1295 {
   command Test(): DefaultSuccess = 0;
   command TestAddArguments(TestAddArgumentsRequest): TestAddArgumentsResponse = 4;
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
+  command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
   command TestEnumsRequest(TestEnumsRequestRequest): TestEnumsResponse = 14;
   command TestListInt8UArgumentRequest(TestListInt8UArgumentRequestRequest): BooleanResponse = 10;
   command TestListInt8UReverseRequest(TestListInt8UReverseRequestRequest): TestListInt8UReverseResponse = 13;
