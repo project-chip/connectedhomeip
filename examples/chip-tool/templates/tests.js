@@ -290,7 +290,7 @@ function getTests()
     SoftwareDiagnostics, //
     Subscriptions, //
     DoorLock, //
-    Groups,
+    Groups, //
   ];
   return tests.flat(1);
 }
