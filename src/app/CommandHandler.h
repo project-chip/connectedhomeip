@@ -193,7 +193,18 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
-    NodeId SourceNodeId() const { return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId(); }
+    NodeId SourceNodeId() const
+    {
+        if (mpExchangeCtx->IsGroupExchangeContext() == false)
+        {
+            return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+        }
+        else
+        {
+            // TODO: Return the source node id in case of group exchange context.
+            return kUndefinedNodeId;
+        }
+    }
 
 private:
     friend class TestCommandInteraction;
