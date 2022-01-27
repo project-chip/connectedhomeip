@@ -20,9 +20,9 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 ## Introduction
 
-The EFR32 light switch example provides a baseline demonstration of a on-off light switch
-device, built using CHIP and the Silicon Labs gecko SDK. It can be controlled by
-a Chip controller over Openthread network.
+The EFR32 light switch example provides a baseline demonstration of a on-off
+light switch device, built using CHIP and the Silicon Labs gecko SDK. It can be
+controlled by a Chip controller over Openthread network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
@@ -51,10 +51,12 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#### Linux 
+#### Linux
+
     $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build```
 
-#### Mac OS X 
+#### Mac OS X
+
     $ brew install ninja
 
 -   Supported hardware:
@@ -202,7 +204,11 @@ combination with JLinkRTTClient as follows:
     Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
--   For this example to work, it is necessary to have a second efr32 device running the [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/efr32/README.md) commisionned on the same openthread network
+
+-   For this example to work, it is necessary to have a second efr32 device
+    running the
+    [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/efr32/README.md)
+    commisionned on the same openthread network
 
 -   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
     Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
@@ -243,9 +249,9 @@ combination with JLinkRTTClient as follows:
             procedure. **LEDs** blink in unison when the factory reset procedure is
             initiated.
 
-    **Push Button 1** 
-        
-        -  Sends a Toggle command to bound light app
+    **Push Button 1**
+
+    -   Sends a Toggle command to bound light app
 
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
@@ -267,12 +273,13 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-#### On Border Router: 
+#### On Border Router:
 
-```$ sudo ip addr add dev <Network interface> 2002::2/64```
+`$ sudo ip addr add dev <Network interface> 2002::2/64`
 
-#### On PC(Linux): 
-```$ sudo ip addr add dev <Network interface> 2002::1/64```
+#### On PC(Linux):
+
+`$ sudo ip addr add dev <Network interface> 2002::1/64`
 
 #Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
 via 2002::2
@@ -289,17 +296,17 @@ via 2002::2
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
 -   To use the chip-rpc console after it has been installed run:
-    
+
     `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
     RELEASE Test toggling the LED with
-    
+
     `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
 
 -   You can also Get and Set the light directly using the RPCs:
-   
+
     `rpcs.chip.rpc.Lighting.Get()`
 
     `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
