@@ -18,9 +18,9 @@ client cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 1;
   }
 
-  command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
+  timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
   command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
-  command LogoutRequest(): DefaultSuccess = 3;
+  timed command LogoutRequest(): DefaultSuccess = 3;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -2167,6 +2167,10 @@ server cluster TestCluster = 1295 {
     SimpleStruct arg4 = 4;
     SimpleStruct arg5[] = 5;
     SimpleEnum arg6[] = 6;
+  }
+
+  info event TestFabricScopedEvent = 2 {
+    fabric_idx arg1 = 1;
   }
 
   attribute boolean boolean = 0;

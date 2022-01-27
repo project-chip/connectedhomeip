@@ -239,10 +239,10 @@ CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::SetEphemeralKey(const P256Keypair * key)
+CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
     P256SerializedKeypair serialized;
-    ReturnErrorOnFailure(key->Serialize(serialized));
+    ReturnErrorOnFailure(keyPair->Serialize(serialized));
     if (mOperationalKey == nullptr)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -492,7 +492,7 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
 
-    SetEphemeralKey(newFabric.GetOperationalKey());
+    SetOperationalKeypair(newFabric.GetOperationalKey());
     SetRootCert(newFabric.mRootCert);
 
     ChipLogProgress(Discovery, "Verifying the received credentials");

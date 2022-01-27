@@ -36,7 +36,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 3;
+const uint16_t kTimeoutInSeconds = 5;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -8722,7 +8722,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_1_000023_ReadAttribute
 {
@@ -11191,7 +11191,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000003_ReadAttribute
 {
@@ -11953,7 +11953,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000006_ReadAttribute
 {
@@ -12010,7 +12010,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 200);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(200 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000009_ReadAttribute
 {
@@ -12091,7 +12091,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000013_ReadAttribute
 {
@@ -12148,7 +12148,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTest_TC_LVL_4_1_000000_WaitForCommissionee
@@ -12238,7 +12238,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000005_ReadAttribute
 {
@@ -12319,7 +12319,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000009_ReadAttribute
 {
@@ -12431,7 +12431,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000014_ReadAttribute
 {
@@ -12490,7 +12490,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTest_TC_LVL_5_1_000000_WaitForCommissionee
@@ -12552,7 +12552,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000004_ReadAttribute
 {
@@ -12610,7 +12610,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000007_ReadAttribute
 {
@@ -12668,7 +12668,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000010_ReadAttribute
 {
@@ -12725,7 +12725,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000013_Off
 {
@@ -12805,7 +12805,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000004_ReadAttribute
 {
@@ -12870,7 +12870,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000007_Stop
 {
@@ -12958,7 +12958,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000011_Off
 {
@@ -15032,7 +15032,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000003_ReadAttribute
 {
@@ -15107,7 +15107,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000007_ReadAttribute
 {
@@ -15182,7 +15182,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000011_ReadAttribute
 {
@@ -18621,7 +18621,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000016_UserPrompt
 {
@@ -18677,7 +18677,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000023_UserPrompt
 {
@@ -40378,7 +40378,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTestDescriptorCluster_000000_WaitForCommissionee

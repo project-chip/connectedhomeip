@@ -249,3 +249,5 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType & value);

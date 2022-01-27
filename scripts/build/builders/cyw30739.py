@@ -20,16 +20,21 @@ from .gn import GnBuilder
 
 class Cyw30739App(Enum):
     LIGHT = auto()
+    LOCK = auto()
 
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
             return "lighting-app"
+        elif self == Cyw30739App.LOCK:
+            return "lock-app"
         else:
             raise Exception("Unknown app type: %r" % self)
 
     def AppNamePrefix(self):
         if self == Cyw30739App.LIGHT:
             return "chip-cyw30739-lighting-example"
+        elif self == Cyw30739App.LOCK:
+            return "chip-cyw30739-lock-example"
         else:
             raise Exception("Unknown app type: %r" % self)
 

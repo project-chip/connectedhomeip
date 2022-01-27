@@ -85,9 +85,9 @@ client cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 0;
   }
 
-  command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
+  timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
   command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
-  command LogoutRequest(): DefaultSuccess = 3;
+  timed command LogoutRequest(): DefaultSuccess = 3;
 }
 
 client cluster AdministratorCommissioning = 60 {
@@ -2859,6 +2859,10 @@ client cluster TestCluster = 1295 {
     SimpleEnum arg6[] = 6;
   }
 
+  info event TestFabricScopedEvent = 2 {
+    fabric_idx arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute bitmap8 bitmap8 = 1;
   attribute bitmap16 bitmap16 = 2;
@@ -3051,7 +3055,7 @@ client cluster TestCluster = 1295 {
   command TestSpecific(): TestSpecificResponse = 2;
   command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
   command TestUnknownCommand(): DefaultSuccess = 3;
-  command TimedInvokeRequest(): DefaultSuccess = 18;
+  timed command TimedInvokeRequest(): DefaultSuccess = 18;
 }
 
 client cluster Thermostat = 513 {

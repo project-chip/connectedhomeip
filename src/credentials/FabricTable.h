@@ -172,7 +172,7 @@ public:
         }
         return mOperationalKey;
     }
-    CHIP_ERROR SetEphemeralKey(const Crypto::P256Keypair * key);
+    CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.

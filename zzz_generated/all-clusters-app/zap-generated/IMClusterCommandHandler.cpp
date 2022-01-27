@@ -1712,6 +1712,16 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TestEmitTestFabricScopedEventRequest::Id: {
+            Commands::TestEmitTestFabricScopedEventRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::TestEnumsRequest::Id: {
             Commands::TestEnumsRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
