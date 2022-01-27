@@ -97,13 +97,9 @@ buildconfig_header("system_buildconfig") {
   }
 
   if (chip_system_layer_impl_config_file != "") {
-    defines += [
-      "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=${chip_system_layer_impl_config_file}",
-    ]
+    defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=${chip_system_layer_impl_config_file}" ]
   } else {
-    defines += [
-      "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>"
-    ]
+    defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
   }
 }
 
