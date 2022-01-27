@@ -42,11 +42,43 @@ public:
     {}
 };
 
+class PairQRCodeWifi : public PairingCommand
+{
+public:
+    PairQRCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("qrcode-wifi", PairingMode::QRCode, PairingNetworkType::WiFi, credsIssuerConfig)
+    {}
+};
+
+class PairQRCodeThread : public PairingCommand
+{
+public:
+    PairQRCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("qrcode-thread", PairingMode::QRCode, PairingNetworkType::Thread, credsIssuerConfig)
+    {}
+};
+
 class PairManualCode : public PairingCommand
 {
 public:
     PairManualCode(CredentialIssuerCommands * credsIssuerConfig) :
         PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
+class PairManualCodeWifi : public PairingCommand
+{
+public:
+    PairManualCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("manualcode-wifi", PairingMode::ManualCode, PairingNetworkType::WiFi, credsIssuerConfig)
+    {}
+};
+
+class PairManualCodeThread : public PairingCommand
+{
+public:
+    PairManualCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("manualcode-thread", PairingMode::ManualCode, PairingNetworkType::Thread, credsIssuerConfig)
     {}
 };
 
@@ -182,7 +214,11 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
     commands_list clusterCommands = {
         make_unique<Unpair>(credsIssuerConfig),
         make_unique<PairQRCode>(credsIssuerConfig),
+        make_unique<PairQRCodeWifi>(credsIssuerConfig),
+        make_unique<PairQRCodeThread>(credsIssuerConfig),
         make_unique<PairManualCode>(credsIssuerConfig),
+        make_unique<PairManualCodeWifi>(credsIssuerConfig),
+        make_unique<PairManualCodeThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),

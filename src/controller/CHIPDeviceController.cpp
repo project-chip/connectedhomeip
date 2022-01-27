@@ -744,6 +744,12 @@ CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Cal
     return DeviceController::GetConnectedDevice(deviceId, onConnection, onFailure);
 }
 
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
+{
+    ReturnErrorOnFailure(mAutoCommissioner.AddCommissioningParameters(params));
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode);
+}
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
 {
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode);
@@ -890,18 +896,13 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    if (!params.GetWiFiCredentials().HasValue() && !params.GetThreadOperationalDataset().HasValue() && !mIsIPRendezvous)
-    {
-        ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
 
     mAutoCommissioner.SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
-    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    ReturnErrorOnFailure(mAutoCommissioner.AddCommissioningParameters(params));
     if (device->IsSecureConnected())
     {
         mAutoCommissioner.StartCommissioning(device);
@@ -1608,7 +1609,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         SetupCluster(genCom, proxy, endpoint, timeout);
-        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
+        constexpr uint16_t kDefaultFailsafeSeconds = 60;
+        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeSeconds),
+                           breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {

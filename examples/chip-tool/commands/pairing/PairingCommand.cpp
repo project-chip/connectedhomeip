@@ -85,12 +85,14 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
 {
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload);
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
 {
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload);
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
