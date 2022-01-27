@@ -41,11 +41,17 @@
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS   {{chip_endpoint_generated_functions}}
 
+// clang-format off
 #define GENERATED_COMMANDS {{chip_endpoint_generated_commands_list}}
+// clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
 #define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
+
+
+// clang-format off
 #define GENERATED_CLUSTERS {{chip_endpoint_cluster_list}}
+// clang-format on
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster*)(&generatedClusters[index]))
 

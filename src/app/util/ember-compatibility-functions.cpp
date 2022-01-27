@@ -324,7 +324,8 @@ CHIP_ERROR GlobalListAttributeReader::Read(const ConcreteReadAttributePath & aPa
         });
     case ClientGeneratedCommandList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            for (size_t i = 0; mCluster->clientGeneratedCommandList && mCluster->clientGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
+            for (size_t i = 0;
+                 mCluster->clientGeneratedCommandList != nullptr && mCluster->clientGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
             {
                 ReturnErrorOnFailure(encoder.Encode(mCluster->clientGeneratedCommandList[i]));
             }
@@ -332,7 +333,8 @@ CHIP_ERROR GlobalListAttributeReader::Read(const ConcreteReadAttributePath & aPa
         });
     case ServerGeneratedCommandList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            for (size_t i = 0; mCluster->serverGeneratedCommandList && mCluster->serverGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
+            for (size_t i = 0;
+                 mCluster->serverGeneratedCommandList != nullptr && mCluster->serverGeneratedCommandList[i] != 0xFFFF'FFFF; ++i)
             {
                 ReturnErrorOnFailure(encoder.Encode(mCluster->serverGeneratedCommandList[i]));
             }

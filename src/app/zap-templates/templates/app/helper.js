@@ -182,13 +182,12 @@ function chip_endpoint_generated_functions()
 
 function chip_endpoint_generated_commands_list()
 {
-  let ret = '{';
+  let ret = '{ \\\n';
   this.clusterList.forEach((c) => {
-    clientGeneratedCommands = [];
-    serverGeneratedCommands = [];
+    let clientGeneratedCommands = [];
+    let serverGeneratedCommands = [];
 
     c.commands.forEach((cmd) => {
-      console.log(cmd);
       if (cmd.mask.includes('incoming_server')) {
         clientGeneratedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
       }
@@ -197,15 +196,15 @@ function chip_endpoint_generated_commands_list()
       }
     });
 
-    if (clientGeneratedCommands > 0) {
-      clientGeneratedCommands.push("0xFFFF'FFFF /* end of list */");
+    ret = ret.concat(`/* ${c.comment} */\\\n`);
+    if (clientGeneratedCommands.length > 0) {
+      clientGeneratedCommands.push('0xffffffff /* end of list */')
+      ret = ret.concat(`/*   incoming_server */ ${clientGeneratedCommands.join(' , ')}, \\\n`);
     }
-
-    if (serverGeneratedCommands > 0) {
-      serverGeneratedCommands.push("0xFFFF'FFFF /* end of list */");
+    if (serverGeneratedCommands.length > 0) {
+      serverGeneratedCommands.push('0xffffffff /* end of list */')
+      ret = ret.concat(`/*   incoming_client */ ${serverGeneratedCommands.join(' , ')}, \\\n`);
     }
-
-    ret = ret.concat(`/* ${c.comment} */ ${clientGeneratedCommands.join(' , ')}, ${serverGeneratedCommands.join(' , ')}, `)
   })
   return ret.concat('}\n');
 }
@@ -223,8 +222,6 @@ function chip_endpoint_cluster_list()
     let mask          = '';
     let functionArray = c.functions;
     let clusterName   = c.clusterName;
-
-    console.log(c);
 
     if (c.comment.includes('server')) {
       let hasFunctionArray = false;
@@ -259,32 +256,33 @@ function chip_endpoint_cluster_list()
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
 
-    clientGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
-    serverGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
+    let clientGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
+    let serverGeneratedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
 
-    clientGeneratedCommandsListVal = "nullptr";
-    serverGeneratedCommandsListVal = "nullptr";
+    let clientGeneratedCommandsListVal = "nullptr";
+    let serverGeneratedCommandsListVal = "nullptr";
 
     if (clientGeneratedCommands > 0) {
       clientGeneratedCommands++;
-      clientGeneratedCommandsListVal += `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands} )`;
+      clientGeneratedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands} )`;
     }
 
     if (serverGeneratedCommands > 0) {
       serverGeneratedCommands++;
-      serverGeneratedCommandsListVal += `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands + clientGeneratedCommands} )`;
+      serverGeneratedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands + clientGeneratedCommands} )`;
     }
 
     ret = ret.concat(`  { \\
+      /* ${c.comment} */ \\
       .clusterId = ${c.clusterId},  \\
-        .attributes = ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), \\
-        .attributeCount = ${c.attributeCount}, \\
-        .clusterSize = ${c.attributeSize}, \\
-        .mask = ${mask}, \\
-        .functions = ${functionArray}, \\
-        .clientGeneratedCommandList = ${clientGeneratedCommandsListVal} ,\\
-        .serverGeneratedCommandList = ${serverGeneratedCommandsListVal} ,\\
-    }, /* ${c.comment} */ \\\n`)
+      .attributes = ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), \\
+      .attributeCount = ${c.attributeCount}, \\
+      .clusterSize = ${c.attributeSize}, \\
+      .mask = ${mask}, \\
+      .functions = ${functionArray}, \\
+      .clientGeneratedCommandList = ${clientGeneratedCommandsListVal} ,\\
+      .serverGeneratedCommandList = ${serverGeneratedCommandsListVal} ,\\
+    },\\\n`)
 
     totalCommands = totalCommands + clientGeneratedCommands + serverGeneratedCommands;
   })
