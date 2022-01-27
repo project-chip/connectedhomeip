@@ -805,289 +805,319 @@
         (EmberAfGenericClusterFunction) MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback,                    \
     };
 
-#define GENERATED_COMMANDS                                                                                                         \
-    { /* Endpoint: 0, Cluster: Descriptor (server) */                                                                              \
-        , , /* Endpoint: 0, Cluster: Basic (server) */, , /* Endpoint: 0, Cluster: Localization Configuration (server) */, ,       \
-            /* Endpoint: 0, Cluster: Time Format Localization (server) */, ,                                                       \
-            /* Endpoint: 0, Cluster: General Commissioning (server) */ 0x00000000 /* ArmFailSafe */,                               \
-            0x00000002 /* SetRegulatoryConfig */, 0x00000004 /* CommissioningComplete */, 0x00000001 /* ArmFailSafeResponse */,    \
-            0x00000005 /* CommissioningCompleteResponse */,                                                                        \
-            /* Endpoint: 0, Cluster: Network Commissioning (server) */ 0x00000000 /* ScanNetworks */,                              \
-            0x00000002 /* AddOrUpdateWiFiNetwork */, 0x00000003 /* AddOrUpdateThreadNetwork */, 0x00000004 /* RemoveNetwork */,    \
-            0x00000006 /* ConnectNetwork */, 0x00000008 /* ReorderNetwork */, 0x00000001 /* ScanNetworksResponse */,               \
-            0x00000007 /* ConnectNetworkResponse */,                                                                               \
-            /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ 0x00000000 /* RetrieveLogsRequest */, ,                           \
-            /* Endpoint: 0, Cluster: General Diagnostics (server) */, ,                                                            \
-            /* Endpoint: 0, Cluster: Software Diagnostics (server) */ 0x00000000 /* ResetWatermarks */, ,                          \
-            /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */, ,                                                     \
-            /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ 0x00000000 /* OpenCommissioningWindow */,              \
-            0x00000001 /* OpenBasicCommissioningWindow */, 0x00000002 /* RevokeCommissioning */, ,                                 \
-            /* Endpoint: 0, Cluster: Operational Credentials (server) */ 0x00000000 /* AttestationRequest */,                      \
-            0x00000002 /* CertificateChainRequest */, 0x00000004 /* OpCSRRequest */, 0x00000006 /* AddNOC */,                      \
-            0x00000007 /* UpdateNOC */, 0x00000009 /* UpdateFabricLabel */, 0x0000000A /* RemoveFabric */,                         \
-            0x0000000B /* AddTrustedRootCertificate */, 0x0000000C /* RemoveTrustedRootCertificate */,                             \
-            0x00000001 /* AttestationResponse */, 0x00000003 /* CertificateChainResponse */, 0x00000005 /* OpCSRResponse */,       \
-            0x00000008 /* NOCResponse */, /* Endpoint: 0, Cluster: Fixed Label (server) */, ,                                      \
-            /* Endpoint: 0, Cluster: User Label (server) */, , /* Endpoint: 1, Cluster: On/Off (server) */ 0x00000000 /* Off */,   \
-            0x00000001 /* On */, 0x00000002 /* Toggle */, ,                                                                        \
-            /* Endpoint: 1, Cluster: Level Control (server) */ 0x00000000 /* MoveToLevel */, 0x00000001 /* Move */,                \
-            0x00000002 /* Step */, 0x00000003 /* Stop */, 0x00000004 /* MoveToLevelWithOnOff */, 0x00000005 /* MoveWithOnOff */,   \
-            0x00000006 /* StepWithOnOff */, 0x00000007 /* StopWithOnOff */, , /* Endpoint: 1, Cluster: Descriptor (server) */, ,   \
-            /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */, ,                                                 \
-            /* Endpoint: 1, Cluster: Temperature Measurement (client) */, ,                                                        \
-            /* Endpoint: 1, Cluster: Temperature Measurement (server) */, ,                                                        \
-            /* Endpoint: 1, Cluster: Pressure Measurement (client) */, ,                                                           \
-            /* Endpoint: 1, Cluster: Pressure Measurement (server) */, , /* Endpoint: 1, Cluster: Flow Measurement (client) */, ,  \
-            /* Endpoint: 1, Cluster: Flow Measurement (server) */, ,                                                               \
-    }
+// clang-format off
+#define GENERATED_COMMANDS { \
+/* Endpoint: 0, Cluster: Descriptor (server) */\
+/* Endpoint: 0, Cluster: Basic (server) */\
+/* Endpoint: 0, Cluster: Localization Configuration (server) */\
+/* Endpoint: 0, Cluster: Time Format Localization (server) */\
+/* Endpoint: 0, Cluster: General Commissioning (server) */\
+/*   incoming_server */ 0x00000000 /* ArmFailSafe */ , 0x00000002 /* SetRegulatoryConfig */ , 0x00000004 /* CommissioningComplete */ , 0xffffffff /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ArmFailSafeResponse */ , 0x00000005 /* CommissioningCompleteResponse */ , 0xffffffff /* end of list */, \
+/* Endpoint: 0, Cluster: Network Commissioning (server) */\
+/*   incoming_server */ 0x00000000 /* ScanNetworks */ , 0x00000002 /* AddOrUpdateWiFiNetwork */ , 0x00000003 /* AddOrUpdateThreadNetwork */ , 0x00000004 /* RemoveNetwork */ , 0x00000006 /* ConnectNetwork */ , 0x00000008 /* ReorderNetwork */ , 0xffffffff /* end of list */, \
+/*   incoming_client */ 0x00000001 /* ScanNetworksResponse */ , 0x00000007 /* ConnectNetworkResponse */ , 0xffffffff /* end of list */, \
+/* Endpoint: 0, Cluster: Diagnostic Logs (server) */\
+/*   incoming_server */ 0x00000000 /* RetrieveLogsRequest */ , 0xffffffff /* end of list */, \
+/* Endpoint: 0, Cluster: General Diagnostics (server) */\
+/* Endpoint: 0, Cluster: Software Diagnostics (server) */\
+/*   incoming_server */ 0x00000000 /* ResetWatermarks */ , 0xffffffff /* end of list */, \
+/* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */\
+/* Endpoint: 0, Cluster: AdministratorCommissioning (server) */\
+/*   incoming_server */ 0x00000000 /* OpenCommissioningWindow */ , 0x00000001 /* OpenBasicCommissioningWindow */ , 0x00000002 /* RevokeCommissioning */ , 0xffffffff /* end of list */, \
+/* Endpoint: 0, Cluster: Operational Credentials (server) */\
+/*   incoming_server */ 0x00000000 /* AttestationRequest */ , 0x00000002 /* CertificateChainRequest */ , 0x00000004 /* OpCSRRequest */ , 0x00000006 /* AddNOC */ , 0x00000007 /* UpdateNOC */ , 0x00000009 /* UpdateFabricLabel */ , 0x0000000A /* RemoveFabric */ , 0x0000000B /* AddTrustedRootCertificate */ , 0x0000000C /* RemoveTrustedRootCertificate */ , 0xffffffff /* end of list */, \
+/*   incoming_client */ 0x00000001 /* AttestationResponse */ , 0x00000003 /* CertificateChainResponse */ , 0x00000005 /* OpCSRResponse */ , 0x00000008 /* NOCResponse */ , 0xffffffff /* end of list */, \
+/* Endpoint: 0, Cluster: Fixed Label (server) */\
+/* Endpoint: 0, Cluster: User Label (server) */\
+/* Endpoint: 1, Cluster: On/Off (server) */\
+/*   incoming_server */ 0x00000000 /* Off */ , 0x00000001 /* On */ , 0x00000002 /* Toggle */ , 0xffffffff /* end of list */, \
+/* Endpoint: 1, Cluster: Level Control (server) */\
+/*   incoming_server */ 0x00000000 /* MoveToLevel */ , 0x00000001 /* Move */ , 0x00000002 /* Step */ , 0x00000003 /* Stop */ , 0x00000004 /* MoveToLevelWithOnOff */ , 0x00000005 /* MoveWithOnOff */ , 0x00000006 /* StepWithOnOff */ , 0x00000007 /* StopWithOnOff */ , 0xffffffff /* end of list */, \
+/* Endpoint: 1, Cluster: Descriptor (server) */\
+/* Endpoint: 1, Cluster: Pump Configuration and Control (server) */\
+/* Endpoint: 1, Cluster: Temperature Measurement (client) */\
+/* Endpoint: 1, Cluster: Temperature Measurement (server) */\
+/* Endpoint: 1, Cluster: Pressure Measurement (client) */\
+/* Endpoint: 1, Cluster: Pressure Measurement (server) */\
+/* Endpoint: 1, Cluster: Flow Measurement (client) */\
+/* Endpoint: 1, Cluster: Flow Measurement (server) */\
+}
+
+// clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
 #define GENERATED_CLUSTER_COUNT 24
-#define GENERATED_CLUSTERS                                                                                                         \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            .clusterId                  = 0x0000001D,                                                                              \
-            .attributes                 = ZAP_ATTRIBUTE_INDEX(0),                                                                  \
-            .attributeCount             = 5,                                                                                       \
-            .clusterSize                = 0,                                                                                       \
-            .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                                \
-            .functions                  = NULL,                                                                                    \
-            .clientGeneratedCommandList = nullptr,                                                                                 \
-            .serverGeneratedCommandList = nullptr,                                                                                 \
-        }, /* Endpoint: 0, Cluster: Descriptor (server) */                                                                         \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000028,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(5),                                                              \
-                .attributeCount             = 20,                                                                                  \
-                .clusterSize                = 687,                                                                                 \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                          \
-                .functions                  = chipFuncArrayBasicServer,                                                            \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Basic (server) */                                                                          \
-            {                                                                                                                      \
-                .clusterId      = 0x0000002B,                                                                                      \
-                .attributes     = ZAP_ATTRIBUTE_INDEX(25),                                                                         \
-                .attributeCount = 3,                                                                                               \
-                .clusterSize    = 38,                                                                                              \
-                .mask =                                                                                                            \
-                    ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-                .functions                  = chipFuncArrayLocalizationConfigurationServer,                                        \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Localization Configuration (server) */                                                     \
-            {                                                                                                                      \
-                .clusterId      = 0x0000002C,                                                                                      \
-                .attributes     = ZAP_ATTRIBUTE_INDEX(28),                                                                         \
-                .attributeCount = 4,                                                                                               \
-                .clusterSize    = 4,                                                                                               \
-                .mask =                                                                                                            \
-                    ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-                .functions                  = chipFuncArrayTimeFormatLocalizationServer,                                           \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                       \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000030,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(32),                                                             \
-                .attributeCount             = 6,                                                                                   \
-                .clusterSize                = 270,                                                                                 \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(0),                                              \
-                .serverGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(4),                                              \
-            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000031,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(38),                                                             \
-                .attributeCount             = 10,                                                                                  \
-                .clusterSize                = 60,                                                                                  \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(7),                                              \
-                .serverGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(14),                                             \
-            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000032,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(48),                                                             \
-                .attributeCount             = 0,                                                                                   \
-                .clusterSize                = 0,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(17),                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000033,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(48),                                                             \
-                .attributeCount             = 9,                                                                                   \
-                .clusterSize                = 17,                                                                                  \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000034,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(57),                                                             \
-                .attributeCount             = 6,                                                                                   \
-                .clusterSize                = 30,                                                                                  \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(19),                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000035,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(63),                                                             \
-                .attributeCount             = 65,                                                                                  \
-                .clusterSize                = 247,                                                                                 \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
-            {                                                                                                                      \
-                .clusterId                  = 0x0000003C,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(128),                                                            \
-                .attributeCount             = 4,                                                                                   \
-                .clusterSize                = 2,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(21),                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
-            {                                                                                                                      \
-                .clusterId                  = 0x0000003E,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(132),                                                            \
-                .attributeCount             = 7,                                                                                   \
-                .clusterSize                = 4,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(25),                                             \
-                .serverGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(35),                                             \
-            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000040,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(139),                                                            \
-                .attributeCount             = 2,                                                                                   \
-                .clusterSize                = 2,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000041,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(141),                                                            \
-                .attributeCount             = 2,                                                                                   \
-                .clusterSize                = 2,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 0, Cluster: User Label (server) */                                                                     \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000006,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(143),                                                            \
-                .attributeCount             = 2,                                                                                   \
-                .clusterSize                = 3,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                          \
-                .functions                  = chipFuncArrayOnOffServer,                                                            \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(40),                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: On/Off (server) */                                                                         \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000008,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(145),                                                            \
-                .attributeCount             = 2,                                                                                   \
-                .clusterSize                = 3,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                          \
-                .functions                  = chipFuncArrayLevelControlServer,                                                     \
-                .clientGeneratedCommandList = nullptrZAP_GENERATED_COMMANDS_INDEX(44),                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Level Control (server) */                                                                  \
-            {                                                                                                                      \
-                .clusterId                  = 0x0000001D,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(147),                                                            \
-                .attributeCount             = 5,                                                                                   \
-                .clusterSize                = 0,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Descriptor (server) */                                                                     \
-            {                                                                                                                      \
-                .clusterId      = 0x00000200,                                                                                      \
-                .attributes     = ZAP_ATTRIBUTE_INDEX(152),                                                                        \
-                .attributeCount = 26,                                                                                              \
-                .clusterSize    = 54,                                                                                              \
-                .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
-                .functions                  = chipFuncArrayPumpConfigurationAndControlServer,                                      \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000402,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(178),                                                            \
-                .attributeCount             = 1,                                                                                   \
-                .clusterSize                = 2,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(CLIENT),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000402,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(179),                                                            \
-                .attributeCount             = 4,                                                                                   \
-                .clusterSize                = 8,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000403,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(183),                                                            \
-                .attributeCount             = 1,                                                                                   \
-                .clusterSize                = 2,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(CLIENT),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Pressure Measurement (client) */                                                           \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000403,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(184),                                                            \
-                .attributeCount             = 4,                                                                                   \
-                .clusterSize                = 8,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Pressure Measurement (server) */                                                           \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000404,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(188),                                                            \
-                .attributeCount             = 1,                                                                                   \
-                .clusterSize                = 2,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(CLIENT),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Flow Measurement (client) */                                                               \
-            {                                                                                                                      \
-                .clusterId                  = 0x00000404,                                                                          \
-                .attributes                 = ZAP_ATTRIBUTE_INDEX(189),                                                            \
-                .attributeCount             = 4,                                                                                   \
-                .clusterSize                = 8,                                                                                   \
-                .mask                       = ZAP_CLUSTER_MASK(SERVER),                                                            \
-                .functions                  = NULL,                                                                                \
-                .clientGeneratedCommandList = nullptr,                                                                             \
-                .serverGeneratedCommandList = nullptr,                                                                             \
-            }, /* Endpoint: 1, Cluster: Flow Measurement (server) */                                                               \
-    }
+
+// clang-format off
+#define GENERATED_CLUSTERS { \
+  { \
+      /* Endpoint: 0, Cluster: Descriptor (server) */ \
+      .clusterId = 0x0000001D,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 5, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Basic (server) */ \
+      .clusterId = 0x00000028,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(5), \
+      .attributeCount = 20, \
+      .clusterSize = 687, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayBasicServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Localization Configuration (server) */ \
+      .clusterId = 0x0000002B,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(25), \
+      .attributeCount = 3, \
+      .clusterSize = 38, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayLocalizationConfigurationServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
+      .clusterId = 0x0000002C,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(28), \
+      .attributeCount = 4, \
+      .clusterSize = 4, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayTimeFormatLocalizationServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: General Commissioning (server) */ \
+      .clusterId = 0x00000030,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(32), \
+      .attributeCount = 6, \
+      .clusterSize = 270, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 4 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
+      .clusterId = 0x00000031,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(38), \
+      .attributeCount = 10, \
+      .clusterSize = 60, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 7 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 14 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
+      .clusterId = 0x00000032,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(48), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 17 ) ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
+      .clusterId = 0x00000033,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(48), \
+      .attributeCount = 9, \
+      .clusterSize = 17, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
+      .clusterId = 0x00000034,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(57), \
+      .attributeCount = 6, \
+      .clusterSize = 30, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 19 ) ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
+      .clusterId = 0x00000035,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(63), \
+      .attributeCount = 65, \
+      .clusterSize = 247, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
+      .clusterId = 0x0000003C,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(128), \
+      .attributeCount = 4, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ) ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
+      .clusterId = 0x0000003E,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(132), \
+      .attributeCount = 7, \
+      .clusterSize = 4, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 25 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 35 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Fixed Label (server) */ \
+      .clusterId = 0x00000040,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(139), \
+      .attributeCount = 2, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: User Label (server) */ \
+      .clusterId = 0x00000041,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(141), \
+      .attributeCount = 2, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: On/Off (server) */ \
+      .clusterId = 0x00000006,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(143), \
+      .attributeCount = 2, \
+      .clusterSize = 3, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayOnOffServer, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 40 ) ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Level Control (server) */ \
+      .clusterId = 0x00000008,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(145), \
+      .attributeCount = 2, \
+      .clusterSize = 3, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayLevelControlServer, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 44 ) ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Descriptor (server) */ \
+      .clusterId = 0x0000001D,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(147), \
+      .attributeCount = 5, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */ \
+      .clusterId = 0x00000200,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(152), \
+      .attributeCount = 26, \
+      .clusterSize = 54, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayPumpConfigurationAndControlServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Temperature Measurement (client) */ \
+      .clusterId = 0x00000402,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(178), \
+      .attributeCount = 1, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Temperature Measurement (server) */ \
+      .clusterId = 0x00000402,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(179), \
+      .attributeCount = 4, \
+      .clusterSize = 8, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Pressure Measurement (client) */ \
+      .clusterId = 0x00000403,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(183), \
+      .attributeCount = 1, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Pressure Measurement (server) */ \
+      .clusterId = 0x00000403,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(184), \
+      .attributeCount = 4, \
+      .clusterSize = 8, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Flow Measurement (client) */ \
+      .clusterId = 0x00000404,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(188), \
+      .attributeCount = 1, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Flow Measurement (server) */ \
+      .clusterId = 0x00000404,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(189), \
+      .attributeCount = 4, \
+      .clusterSize = 8, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+}
+
+// clang-format on
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
 
