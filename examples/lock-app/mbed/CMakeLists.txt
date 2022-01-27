@@ -90,9 +90,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/power-source-configuration-server/power-source-configuration-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
                ${CHIP_ROOT}/src/app/clusters/power-source-server/power-source-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp
 )
