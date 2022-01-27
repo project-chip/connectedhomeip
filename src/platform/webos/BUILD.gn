@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,31 +66,31 @@ static_library("webos") {
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
-    "CHIPLinuxStorage.cpp",
-    "CHIPLinuxStorage.h",
-    "CHIPLinuxStorageIni.cpp",
-    "CHIPLinuxStorageIni.h",
+    "../Linux/CHIPLinuxStorage.cpp",
+    "../Linux/CHIPLinuxStorage.h",
+    "../Linux/CHIPLinuxStorageIni.cpp",
+    "../Linux/CHIPLinuxStorageIni.h",
     "CHIPPlatformConfig.h",
-    "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
+    "../Linux/ConfigurationManagerImpl.cpp",
+    "../Linux/ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "ConnectivityUtils.cpp",
-    "ConnectivityUtils.h",
+    "../Linux/ConnectivityUtils.cpp",
+    "../Linux/ConnectivityUtils.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
+    "../Linux/DiagnosticDataProviderImpl.cpp",
+    "../Linux/DiagnosticDataProviderImpl.h",
+    "../Linux/InetPlatformConfig.h",
+    "../Linux/KeyValueStoreManagerImpl.cpp",
+    "../Linux/KeyValueStoreManagerImpl.h",
     "Logging.cpp",
-    "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "PosixConfig.cpp",
-    "PosixConfig.h",
+    "../Linux/PlatformManagerImpl.cpp",
+    "../Linux/PlatformManagerImpl.h",
+    "../Linux/PosixConfig.cpp",
+    "../Linux/PosixConfig.h",
     "SystemPlatformConfig.h",
-    "SystemTimeSupport.cpp",
+    "../Linux/SystemTimeSupport.cpp",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -104,8 +104,8 @@ static_library("webos") {
 
   if (chip_mdns != "none") {
     sources += [
-      "DnssdImpl.cpp",
-      "DnssdImpl.h",
+      "../Linux/DnssdImpl.cpp",
+      "../Linux/DnssdImpl.h",
     ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
@@ -115,25 +115,6 @@ static_library("webos") {
       ":glib",
       ":luna-service",
     ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-      "OTARequestorDriverImpl.cpp",
-      "OTARequestorDriverImpl.h",
-    ]
-  }
-
-  if (chip_enable_openthread) {
-    sources += [
-      "GlibTypeDeleter.h",
-      "ThreadStackManagerImpl.cpp",
-      "ThreadStackManagerImpl.h",
-    ]
-
-    public_deps += [ "dbus/openthread" ]
   }
 
   print("### enable_wifi = ${chip_enable_wifi}")
