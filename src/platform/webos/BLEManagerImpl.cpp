@@ -68,8 +68,10 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode) {}
-return CHIP_ERROR_NOT_IMPLEMENTED;
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
@@ -102,8 +104,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-    return (connection != nullptr) ? connection->mMtu : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
