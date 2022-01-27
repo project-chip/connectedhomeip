@@ -26,21 +26,23 @@
 #include <lib/core/CHIPError.h>
 #include <list>
 
-class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
+using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
+using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+
+class ContentLauncherManager : public ContentLauncherDelegate
 {
 public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    void
-    HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
-                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
-                            responser) override;
-    void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                         const std::list<BrandingInformation> & brandingInformation,
-                         chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
-                             responser) override;
-    CHIP_ERROR HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder) override;
+    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper, const std::list<Parameter> & parameterList,
+                             bool autoplay, const CharSpan & data) override;
+    void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
+                         const CharSpan & displayString, const std::list<BrandingInformation> & brandingInformation) override;
+    CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
 private:
