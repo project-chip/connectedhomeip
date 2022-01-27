@@ -9431,6 +9431,8 @@ public:
     DataModel::List<const BatChargeFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9439,6 +9441,8 @@ public:
     DataModel::DecodableList<BatChargeFaultType> current;
     DataModel::DecodableList<BatChargeFaultType> previous;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace BatChargeFaultChangeType
@@ -9456,6 +9460,8 @@ public:
     DataModel::List<const BatFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9464,6 +9470,8 @@ public:
     DataModel::DecodableList<BatFaultType> current;
     DataModel::DecodableList<BatFaultType> previous;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace BatFaultChangeType
@@ -9481,6 +9489,8 @@ public:
     DataModel::List<const WiredFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9489,6 +9499,8 @@ public:
     DataModel::DecodableList<WiredFaultType> current;
     DataModel::DecodableList<WiredFaultType> previous;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace WiredFaultChangeType
