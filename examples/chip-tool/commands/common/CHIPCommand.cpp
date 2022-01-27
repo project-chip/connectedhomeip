@@ -203,9 +203,9 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
-        commissionerParams.controllerRCAC   = rcacSpan;
-        commissionerParams.controllerICAC   = icacSpan;
-        commissionerParams.controllerNOC    = nocSpan;
+        commissionerParams.controllerRCAC     = rcacSpan;
+        commissionerParams.controllerICAC     = icacSpan;
+        commissionerParams.controllerNOC      = nocSpan;
     }
 
     commissionerParams.storageDelegate                = &mCommissionerStorage;
