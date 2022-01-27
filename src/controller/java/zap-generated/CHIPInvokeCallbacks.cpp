@@ -663,10 +663,17 @@ void CHIPDoorLockClusterGetUserResponseCallback::CallbackFn(
             dataResponse.lastModifiedFabricIndex.Value(), lastModifiedFabricIndex);
     }
     jobject nextUserIndex;
-    std::string nextUserIndexClassName     = "java/lang/Integer";
-    std::string nextUserIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-        nextUserIndexClassName.c_str(), nextUserIndexCtorSignature.c_str(), dataResponse.nextUserIndex, nextUserIndex);
+    if (dataResponse.nextUserIndex.IsNull())
+    {
+        nextUserIndex = nullptr;
+    }
+    else
+    {
+        std::string nextUserIndexClassName     = "java/lang/Integer";
+        std::string nextUserIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            nextUserIndexClassName.c_str(), nextUserIndexCtorSignature.c_str(), dataResponse.nextUserIndex.Value(), nextUserIndex);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, userIndex, userName, userUniqueId, userStatus, userType, credentialRule,
                         credentials, creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);

@@ -1966,6 +1966,20 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readNumberOfPINUsersSupportedAttribute",
         readDoorLockNumberOfPINUsersSupportedAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockNumberOfRFIDUsersSupportedCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockNumberOfRFIDUsersSupportedAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readNumberOfRFIDUsersSupportedAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockNumberOfRFIDUsersSupportedCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readNumberOfRFIDUsersSupportedAttribute",
+        readDoorLockNumberOfRFIDUsersSupportedAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockMaxPINCodeLengthCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockMaxPINCodeLengthAttributeInteractionInfo =
@@ -1990,6 +2004,30 @@ public class ClusterReadMapping {
             readDoorLockMinPINCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMinPINCodeLengthAttribute", readDoorLockMinPINCodeLengthAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockMaxRFIDCodeLengthCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockMaxRFIDCodeLengthAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readMaxRFIDCodeLengthAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockMaxRFIDCodeLengthCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readMaxRFIDCodeLengthAttribute", readDoorLockMaxRFIDCodeLengthAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockMinRFIDCodeLengthCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockMinRFIDCodeLengthAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readMinRFIDCodeLengthAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockMinRFIDCodeLengthCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readMinRFIDCodeLengthAttribute", readDoorLockMinRFIDCodeLengthAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockLanguageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockLanguageAttributeInteractionInfo =
