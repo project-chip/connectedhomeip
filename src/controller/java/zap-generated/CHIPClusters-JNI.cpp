@@ -29523,8 +29523,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNetworkNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPOctetStringAttributeCallback, void (*)(CHIPOctetStringAttributeCallback *)> onSuccess(
-        Platform::New<CHIPOctetStringAttributeCallback>(callback, true), chip::Platform::Delete<CHIPOctetStringAttributeCallback>);
+    std::unique_ptr<CHIPCharStringAttributeCallback, void (*)(CHIPCharStringAttributeCallback *)> onSuccess(
+        Platform::New<CHIPCharStringAttributeCallback>(callback, true), chip::Platform::Delete<CHIPCharStringAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29548,7 +29548,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNetworkNameAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

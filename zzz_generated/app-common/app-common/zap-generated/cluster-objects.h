@@ -11922,6 +11922,15 @@ enum class ThreadConnectionStatus : uint8_t
     kNotConnected = 0x01,
 };
 
+// Bitmap for ThreadNetworkDiagnosticsFeature
+enum class ThreadNetworkDiagnosticsFeature : uint32_t
+{
+    kPacketCounts = 0x1,
+    kErrorCounts  = 0x2,
+    kMLECounts    = 0x4,
+    kMACCounts    = 0x8,
+};
+
 namespace Structs {
 namespace NeighborTable {
 enum class Fields
@@ -12143,9 +12152,9 @@ struct TypeInfo
 namespace NetworkName {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }

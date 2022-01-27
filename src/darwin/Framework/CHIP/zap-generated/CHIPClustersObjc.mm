@@ -22060,30 +22060,29 @@ using namespace chip::app::Clusters;
 }
 
 - (void)readAttributeNetworkNameWithCompletionHandler:(void (^)(
-                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPOctetStringAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)subscribeAttributeNetworkNameWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
+                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPOctetStringAttributeCallbackSubscriptionBridge(
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
