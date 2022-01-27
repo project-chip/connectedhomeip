@@ -647,7 +647,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
+            emberStatus = EMBER_ZCL_STATUS_UNSUPPORTED_READ;
         }
     }
 
