@@ -193,6 +193,6 @@ void cmd_otcli_init()
 #endif
 
     // Register the root otcli command with the top-level shell.
-    Engine::Root().RegisterCommands(&cmds_otcli_root, 1, nullptr);
+    Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
 #endif // CHIP_ENABLE_OPENTHREAD
 }

@@ -69,12 +69,12 @@ void OTAProviderCommands::Register()
           "Usage: OTAProvider delay <delay in seconds>" },
     };
 
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands), "OTAProvider");
+    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
 
     // Register the root `OTA Provider` command in the top-level shell.
     static const shell_command_t otaProviderCommand = { &OTAProviderHandler, "OTAProvider", "OTA Provider commands" };
 
-    Engine::Root().RegisterCommands(&otaProviderCommand, 1, nullptr);
+    Engine::Root().RegisterCommands(&otaProviderCommand, 1);
 }
 
 // Set Example OTA provider

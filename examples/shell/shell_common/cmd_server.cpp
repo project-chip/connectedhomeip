@@ -228,8 +228,8 @@ void cmd_app_server_init()
     std::atexit(CmdAppServerAtExit);
 
     // Register `server` subcommands with the local shell dispatcher.
-    sShellServerSubcommands.RegisterCommands(sServerSubCommands, ArraySize(sServerSubCommands), "server");
+    sShellServerSubcommands.RegisterCommands(sServerSubCommands, ArraySize(sServerSubCommands));
 
     // Register the root `server` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sServerComand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sServerComand, 1);
 }

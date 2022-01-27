@@ -61,7 +61,7 @@ static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
 static void RegisterSwitchCommands()
 {
     static const shell_command_t sSwitchCommand = { SwitchCommandHandler, "switch", "Switch commands. Usage: switch [on|off]" };
-    Engine::Root().RegisterCommands(&sSwitchCommand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sSwitchCommand, 1);
     return;
 }
 #endif // defined(ENABLE_CHIP_SHELL)

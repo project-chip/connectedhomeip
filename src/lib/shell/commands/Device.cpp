@@ -65,10 +65,10 @@ void RegisterDeviceCommands()
     static const shell_command_t sDeviceComand = { &DeviceHandler, "device", "Device management commands" };
 
     // Register `device` subcommands with the local shell dispatcher.
-    sShellDeviceSubcommands.RegisterCommands(sDeviceSubCommands, ArraySize(sDeviceSubCommands), "device");
+    sShellDeviceSubcommands.RegisterCommands(sDeviceSubCommands, ArraySize(sDeviceSubCommands));
 
     // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1, nullptr);
+    Engine::Root().RegisterCommands(&sDeviceComand, 1);
 }
 
 } // namespace Shell
