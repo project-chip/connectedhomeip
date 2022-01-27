@@ -584,7 +584,9 @@ public:
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
                                        DeviceProxy * proxy);
 
-    void CommissioningStageComplete(CHIP_ERROR err);
+    void
+    CommissioningStageComplete(CHIP_ERROR err,
+                               CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
 
 #if CONFIG_NETWORK_LAYER_BLE
     /**
