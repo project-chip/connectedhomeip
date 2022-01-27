@@ -34,9 +34,12 @@ public:
         AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}},
-          {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
-          {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
-          {{else}}&{{>field}}
+          {{~#if isNullable}}&{{>field}}
+          {{else}}
+            {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
+            {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
+            {{else}}&{{>field}}
+            {{/if~}}
           {{/if~}}
         );
         {{/if}}
@@ -115,6 +118,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         {{#chip_cluster_commands}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
@@ -125,6 +129,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_server_cluster_attributes}}
         make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id), //
         {{/chip_server_cluster_attributes}}
+        make_unique<WriteAttribute>(Id), //
         {{#chip_server_cluster_attributes}}
         {{! TODO: Various types (floats, structs) not supported here. }}
         {{#unless (isStrEqual chipCallback.name "Unsupported")}}
@@ -161,7 +166,9 @@ void registerClusterAny(Commands & commands)
     const char * clusterName = "Any";
 
     commands_list clusterCommands = {
+        make_unique<ClusterCommand>(),  //
         make_unique<ReadAttribute>(),   //
+        make_unique<WriteAttribute>(),  //
         make_unique<SubscribeAttribute>(), //
         make_unique<ReadEvent>(),       //
         make_unique<SubscribeEvent>(),     //

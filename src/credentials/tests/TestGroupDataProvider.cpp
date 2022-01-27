@@ -1054,44 +1054,65 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->AddEndpoint(kFabric2, kGroup3, kEndpointId3));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->AddEndpoint(kFabric2, kGroup3, kEndpointId4));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 0, kGroup3Keyset0));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 1, kGroup3Keyset1));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 2, kGroup3Keyset2));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 3, kGroup3Keyset3));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 4, kGroup1Keyset0));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 5, kGroup1Keyset1));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 6, kGroup1Keyset2));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 7, kGroup1Keyset3));
-
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 0, kGroup2Keyset0));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 1, kGroup2Keyset1));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 2, kGroup2Keyset2));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 3, kGroup2Keyset3));
-
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kKeySet0));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kKeySet1));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kKeySet2));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kKeySet3));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet0));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet3));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet1));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet3));
 
-    const uint8_t kMessage[] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9 };
-    const uint8_t nonce[13]  = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18, 0x1a, 0x1b, 0x1c };
-    const uint8_t aad[40]    = { 0x0a, 0x1a, 0x2a, 0x3a, 0x4a, 0x5a, 0x6a, 0x7a, 0x8a, 0x9a, 0x0b, 0x1b, 0x2b, 0x3b,
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 0, kGroup1Keyset0));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 1, kGroup1Keyset2));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 2, kGroup3Keyset0));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 3, kGroup3Keyset2));
+
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 0, kGroup2Keyset1));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 1, kGroup2Keyset3));
+
+    const size_t kMessageLength            = 10;
+    const uint8_t kMessage[kMessageLength] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9 };
+    const uint8_t nonce[13]                = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18, 0x1a, 0x1b, 0x1c };
+    const uint8_t aad[40]                  = { 0x0a, 0x1a, 0x2a, 0x3a, 0x4a, 0x5a, 0x6a, 0x7a, 0x8a, 0x9a, 0x0b, 0x1b, 0x2b, 0x3b,
                               0x4b, 0x5b, 0x6b, 0x7b, 0x8b, 0x9b, 0x0c, 0x1c, 0x2c, 0x3c, 0x4c, 0x5c, 0x6c, 0x7c,
                               0x8c, 0x9c, 0x0d, 0x1d, 0x2d, 0x3d, 0x4d, 0x5d, 0x6d, 0x7d, 0x8d, 0x9d };
-    uint8_t mic[16]          = {
+    uint8_t mic[16]                        = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     };
-    uint8_t buffer[32];
 
-    std::set<std::pair<FabricIndex, GroupId>> expected = { { kFabric1, kGroup1 }, { kFabric1, kGroup3 }, { kFabric2, kGroup2 } };
+    uint8_t ciphertext_buffer[kMessageLength];
+    uint8_t plaintext_buffer[kMessageLength];
+    MutableByteSpan ciphertext(ciphertext_buffer, sizeof(ciphertext_buffer));
+    MutableByteSpan plaintext(plaintext_buffer, sizeof(plaintext_buffer));
+    MutableByteSpan tag(mic, sizeof(mic));
 
-    const uint16_t kSessionId = 0xbc66;
+    //
+    // Encrypt
+    //
+
+    // Load the plaintext to encrypt
+    memcpy(ciphertext_buffer, kMessage, sizeof(kMessage));
+
+    // Get the key context
+    Crypto::SymmetricKeyContext * key_context = provider->GetKeyContext(kFabric2, kGroup2);
+    NL_TEST_ASSERT(apSuite, nullptr != key_context);
+    uint16_t session_id = key_context->GetKeyHash();
+
+    // Encrypt the message
+    NL_TEST_ASSERT(apSuite,
+                   CHIP_NO_ERROR ==
+                       key_context->EncryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+
+    // The ciphertext must be different to the original message
+    NL_TEST_ASSERT(apSuite, memcmp(ciphertext.data(), kMessage, sizeof(kMessage)));
+    key_context->Release();
+
+    //
+    // Decrypt
+    //
+
+    const std::set<std::pair<FabricIndex, GroupId>> expected = { { kFabric2, kGroup2 } };
+
+    // Iterate all keys that matches the incoming session
     GroupSession session;
-    auto it      = provider->IterateGroupSessions(kSessionId);
+    auto it      = provider->IterateGroupSessions(session_id);
     size_t count = 0, total = 0;
 
     NL_TEST_ASSERT(apSuite, it);
@@ -1101,27 +1122,21 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
         NL_TEST_ASSERT(apSuite, expected.size() == total);
         while (it->Next(session))
         {
-            std::pair<FabricIndex, GroupId> result(session.fabric_index, session.group_id);
-            NL_TEST_ASSERT(apSuite, expected.count(result) > 0);
+            std::pair<FabricIndex, GroupId> found(session.fabric_index, session.group_id);
+            NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
             NL_TEST_ASSERT(apSuite, session.key != nullptr);
 
-            memcpy(buffer, kMessage, sizeof(kMessage));
-            MutableByteSpan message(buffer, sizeof(kMessage));
-            MutableByteSpan tag(mic, sizeof(mic));
+            // Load ciphertext to decrypt
+            memcpy(plaintext_buffer, ciphertext_buffer, sizeof(plaintext_buffer));
 
-            // Encrypt
+            // Decrypt de ciphertext
             NL_TEST_ASSERT(
                 apSuite,
                 CHIP_NO_ERROR ==
-                    session.key->EncryptMessage(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
-            NL_TEST_ASSERT(apSuite, memcmp(message.data(), kMessage, sizeof(kMessage)));
+                    session.key->DecryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
 
-            // Decrypt
-            NL_TEST_ASSERT(
-                apSuite,
-                CHIP_NO_ERROR ==
-                    session.key->DecryptMessage(message, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(message.data(), kMessage, sizeof(kMessage)));
+            // The new plaintext must match the original message
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(plaintext.data(), kMessage, sizeof(kMessage)));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == total);

@@ -113,9 +113,6 @@ struct ControllerInitParams
     ByteSpan controllerRCAC;
 
     uint16_t controllerVendorId;
-
-    FabricIndex fabricIndex = kMinValidFabricIndex;
-    FabricId fabricId       = kUndefinedFabricId;
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -220,7 +217,7 @@ public:
     virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
-        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
     }
 
@@ -234,7 +231,7 @@ public:
      */
     CHIP_ERROR UpdateDevice(NodeId deviceId)
     {
-        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
     }
 
@@ -311,6 +308,26 @@ public:
                                                    uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
+    /**
+     * @brief
+     *   Add a binding.
+     *
+     * @param[in] deviceId           The device Id.
+     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
+     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
+     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
+     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
+     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
+     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
+     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId, chip::NodeId bindingNodeId,
+                                         chip::GroupId bindingGroupId, chip::EndpointId bindingEndpointId,
+                                         chip::ClusterId bindingClusterId, Callback::Cancelable * onSuccessCallback,
+                                         Callback::Cancelable * onFailureCallback);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
@@ -351,9 +368,9 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    PeerId mLocalId    = PeerId();
-    FabricId mFabricId = kUndefinedFabricId;
-    FabricInfo * mFabricInfo;
+    PeerId mLocalId          = PeerId();
+    FabricId mFabricId       = kUndefinedFabricId;
+    FabricInfo * mFabricInfo = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -371,8 +388,6 @@ protected:
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     void PersistNextKeyId();
-
-    FabricIndex mFabricIndex = kMinValidFabricIndex;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -404,7 +419,10 @@ private:
 
     CHIP_ERROR OpenCommissioningWindowInternal();
 
-    PeerId GetPeerIdWithCommissioningWindowOpen() { return mFabricInfo->GetPeerIdForNode(mDeviceWithCommissioningWindowOpen); }
+    PeerId GetPeerIdWithCommissioningWindowOpen()
+    {
+        return mFabricInfo ? mFabricInfo->GetPeerIdForNode(mDeviceWithCommissioningWindowOpen) : PeerId();
+    }
 
     // TODO - Support opening commissioning window simultaneously on multiple devices
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
@@ -433,7 +451,6 @@ private:
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
-                                      public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
 #endif
                                       public SessionEstablishmentDelegate
 {
@@ -643,17 +660,6 @@ public:
      *
      */
     void FindCommissionableNode(char * instanceName) override;
-
-    /**
-     * @brief
-     *   Called when a UDC message has been received and corresponding nodeData has been found.
-     * It is expected that the implementer will prompt the user to confirm their intention to
-     * commission the given node, and provide the setup code to allow commissioning to proceed.
-     *
-     * @param nodeData DNS-SD node information for the client requesting commissioning
-     *
-     */
-    void OnUserDirectedCommissioningRequest(UDCClientState state) override;
 
     /**
      * @brief
