@@ -156,6 +156,10 @@ if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
     set_compiler_property(PROPERTY debug -g0)
 endif()
 
+# Determine if ccache should be used
+
+get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
+
 # Find required programs
 
 find_program(GN_EXECUTABLE gn)
@@ -228,6 +232,10 @@ endif()
 
 if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
     chip_gn_arg_string("symbol_level" "0")
+endif()
+
+if (CHIP_COMPILER_LAUNCHER)
+    chip_gn_arg_string("pw_command_launcher" ${CHIP_COMPILER_LAUNCHER})
 endif()
 
 if (CONFIG_CHIP_PW_RPC)
