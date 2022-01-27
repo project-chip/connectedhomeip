@@ -120,7 +120,7 @@ namespace DeviceLayer {
                 __block NSError * fetchError = nil;
                 __block NSArray * result;
                 [gContext performBlockAndWait:^{
-                  result = [gContext executeFetchRequest:request error:&fetchError];
+                    result = [gContext executeFetchRequest:request error:&fetchError];
                 }];
 
                 if (error != nil) {
