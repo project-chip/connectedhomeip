@@ -82,6 +82,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
                ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/unit-localization-server/unit-localization-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
@@ -108,11 +109,6 @@ target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-e
 
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
     target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)
-endif()
-
-if("capsense" IN_LIST MBED_TARGET_LABELS)
-    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ./capsense_build)
-    target_link_libraries(${APP_TARGET} capsense)
 endif()
 
 mbed_set_post_build(${APP_TARGET})

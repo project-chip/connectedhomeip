@@ -3864,6 +3864,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _value = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -3975,6 +3986,17 @@ NS_ASSUME_NONNULL_BEGIN
         _arg2 = @(0);
 
         _arg3 = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
     }
     return self;
 }

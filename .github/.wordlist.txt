@@ -43,6 +43,7 @@ alloc
 Ameba
 amebad
 amebaiot
+announcementReason
 AnnounceOTAProvider
 APIs
 apk
@@ -783,6 +784,7 @@ pre
 preprocessor
 Presetup
 prj
+providerNodeId
 ProductID
 ProductLabel
 ProductName
@@ -846,6 +848,7 @@ RendezVousTest
 repo
 req
 Requestor
+Requestor's
 Requestors
 responder
 retargeting
@@ -1062,6 +1065,7 @@ VendorName
 vendorpayload
 venv
 Verifier
+Verifiers
 VID
 visualstudio
 vlatest

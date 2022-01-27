@@ -234,7 +234,7 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
-    initParams.ephemeralKeypair               = &ephemeralKey;
+    initParams.operationalKeypair             = &ephemeralKey;
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;

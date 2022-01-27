@@ -531,7 +531,7 @@ server cluster OperationalCredentials = 62 {
 
 server cluster SoftwareDiagnostics = 52 {
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   readonly attribute int64u currentHeapHighWatermark = 3;
@@ -570,6 +570,18 @@ server cluster TimeFormatLocalization = 44 {
   attribute HourFormat hourFormat = 0;
   attribute CalendarType activeCalendarType = 1;
   readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
+server cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -654,6 +666,7 @@ endpoint 0 {
   server  cluster OperationalCredentials;
   server  cluster SoftwareDiagnostics;
   server  cluster TimeFormatLocalization;
+  server  cluster UnitLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

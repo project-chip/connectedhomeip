@@ -58,6 +58,9 @@ constexpr uint32_t kPBKDFMaximumIterations = 100000;
 constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
 constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
 
+// Specifications section 5.1.1.6
+constexpr uint32_t kSetupPINCodeMaximumValue = 99999998;
+
 using namespace Crypto;
 
 constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;

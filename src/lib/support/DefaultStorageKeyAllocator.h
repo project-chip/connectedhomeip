@@ -37,8 +37,14 @@ public:
 
     const char * FabricTable(chip::FabricIndex fabric) { return Format("f/%x/t", fabric); }
 
+    // Access Control List
+
+    const char * AccessControlList() { return Format("acl"); }
+    const char * AccessControlEntry(size_t index) { return Format("acl/%zx", index); }
+
     // Group Data Provider
 
+    const char * FabricTable() { return Format("f/t"); }
     const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
     const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
     const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }

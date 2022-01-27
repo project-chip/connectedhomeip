@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -299,7 +299,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'c':
-        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName, chip::CharSpan(arg, strlen(arg)));
+        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName, chip::CharSpan::fromCharString(arg), false);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
