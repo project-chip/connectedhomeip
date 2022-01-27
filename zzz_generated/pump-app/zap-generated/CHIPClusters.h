@@ -30,5 +30,26 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
+    ~FlowMeasurementCluster() {}
+};
+
+class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+{
+public:
+    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
+    ~PressureMeasurementCluster() {}
+};
+
+class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+{
+public:
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
+    ~TemperatureMeasurementCluster() {}
+};
+
 } // namespace Controller
 } // namespace chip

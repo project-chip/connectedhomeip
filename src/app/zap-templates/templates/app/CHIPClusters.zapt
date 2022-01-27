@@ -14,17 +14,15 @@
 namespace chip {
 namespace Controller {
 
-{{#all_user_clusters_with_outgoing_commands}}
-{{#if (is_client clusterSide)}}
-class DLL_EXPORT {{asUpperCamelCase clusterName}}Cluster : public ClusterBase
+{{#chip_client_clusters}}
+class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 {
 public:
     {{asUpperCamelCase clusterName}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase clusterName}}::Id) {}
     ~{{asUpperCamelCase clusterName}}Cluster() {}
 };
 
-{{/if}}
-{{/all_user_clusters_with_outgoing_commands}}
+{{/chip_client_clusters}}
 } // namespace Controller
 } // namespace chip
 {{/if}}

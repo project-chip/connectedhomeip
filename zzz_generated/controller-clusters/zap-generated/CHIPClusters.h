@@ -30,6 +30,13 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT AccessControlCluster : public ClusterBase
+{
+public:
+    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
+    ~AccessControlCluster() {}
+};
+
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:
@@ -42,6 +49,13 @@ class DLL_EXPORT AdministratorCommissioningCluster : public ClusterBase
 public:
     AdministratorCommissioningCluster() : ClusterBase(app::Clusters::AdministratorCommissioning::Id) {}
     ~AdministratorCommissioningCluster() {}
+};
+
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
+    ~ApplicationBasicCluster() {}
 };
 
 class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
@@ -105,11 +119,25 @@ public:
     ~BindingCluster() {}
 };
 
+class DLL_EXPORT BooleanStateCluster : public ClusterBase
+{
+public:
+    BooleanStateCluster() : ClusterBase(app::Clusters::BooleanState::Id) {}
+    ~BooleanStateCluster() {}
+};
+
 class DLL_EXPORT BridgedActionsCluster : public ClusterBase
 {
 public:
     BridgedActionsCluster() : ClusterBase(app::Clusters::BridgedActions::Id) {}
     ~BridgedActionsCluster() {}
+};
+
+class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
+{
+public:
+    BridgedDeviceBasicCluster() : ClusterBase(app::Clusters::BridgedDeviceBasic::Id) {}
+    ~BridgedDeviceBasicCluster() {}
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
@@ -153,6 +181,13 @@ public:
 >>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 };
 
+class DLL_EXPORT DescriptorCluster : public ClusterBase
+{
+public:
+    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
+    ~DescriptorCluster() {}
+};
+
 class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
 {
 public:
@@ -187,6 +222,13 @@ public:
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
 };
 
+class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase
+{
+public:
+    ElectricalMeasurementCluster() : ClusterBase(app::Clusters::ElectricalMeasurement::Id) {}
+    ~ElectricalMeasurementCluster() {}
+};
+
 class DLL_EXPORT EthernetNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
@@ -194,11 +236,32 @@ public:
     ~EthernetNetworkDiagnosticsCluster() {}
 };
 
+class DLL_EXPORT FixedLabelCluster : public ClusterBase
+{
+public:
+    FixedLabelCluster() : ClusterBase(app::Clusters::FixedLabel::Id) {}
+    ~FixedLabelCluster() {}
+};
+
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
+    ~FlowMeasurementCluster() {}
+};
+
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
     GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
     ~GeneralCommissioningCluster() {}
+};
+
+class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
+{
+public:
+    GeneralDiagnosticsCluster() : ClusterBase(app::Clusters::GeneralDiagnostics::Id) {}
+    ~GeneralDiagnosticsCluster() {}
 };
 
 class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
@@ -254,6 +317,13 @@ public:
     ~IdentifyCluster() {}
 };
 
+class DLL_EXPORT IlluminanceMeasurementCluster : public ClusterBase
+{
+public:
+    IlluminanceMeasurementCluster() : ClusterBase(app::Clusters::IlluminanceMeasurement::Id) {}
+    ~IlluminanceMeasurementCluster() {}
+};
+
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
 {
 public:
@@ -266,6 +336,13 @@ class DLL_EXPORT LevelControlCluster : public ClusterBase
 public:
     LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
     ~LevelControlCluster() {}
+};
+
+class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
+{
+public:
+    LocalizationConfigurationCluster() : ClusterBase(app::Clusters::LocalizationConfiguration::Id) {}
+    ~LocalizationConfigurationCluster() {}
 };
 
 class DLL_EXPORT LowPowerCluster : public ClusterBase
@@ -336,6 +413,13 @@ public:
     ~OtaSoftwareUpdateRequestorCluster() {}
 };
 
+class DLL_EXPORT OccupancySensingCluster : public ClusterBase
+{
+public:
+    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
+    ~OccupancySensingCluster() {}
+};
+
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
@@ -343,11 +427,53 @@ public:
     ~OnOffCluster() {}
 };
 
+class DLL_EXPORT OnOffSwitchConfigurationCluster : public ClusterBase
+{
+public:
+    OnOffSwitchConfigurationCluster() : ClusterBase(app::Clusters::OnOffSwitchConfiguration::Id) {}
+    ~OnOffSwitchConfigurationCluster() {}
+};
+
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
+};
+
+class DLL_EXPORT PowerSourceCluster : public ClusterBase
+{
+public:
+    PowerSourceCluster() : ClusterBase(app::Clusters::PowerSource::Id) {}
+    ~PowerSourceCluster() {}
+};
+
+class DLL_EXPORT PowerSourceConfigurationCluster : public ClusterBase
+{
+public:
+    PowerSourceConfigurationCluster() : ClusterBase(app::Clusters::PowerSourceConfiguration::Id) {}
+    ~PowerSourceConfigurationCluster() {}
+};
+
+class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+{
+public:
+    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
+    ~PressureMeasurementCluster() {}
+};
+
+class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
+{
+public:
+    PumpConfigurationAndControlCluster() : ClusterBase(app::Clusters::PumpConfigurationAndControl::Id) {}
+    ~PumpConfigurationAndControlCluster() {}
+};
+
+class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
+{
+public:
+    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
+    ~RelativeHumidityMeasurementCluster() {}
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase
@@ -384,11 +510,25 @@ public:
     ~SoftwareDiagnosticsCluster() {}
 };
 
+class DLL_EXPORT SwitchCluster : public ClusterBase
+{
+public:
+    SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
+    ~SwitchCluster() {}
+};
+
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 {
 public:
     TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
     ~TargetNavigatorCluster() {}
+};
+
+class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+{
+public:
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
+    ~TemperatureMeasurementCluster() {}
 };
 
 class DLL_EXPORT TestClusterCluster : public ClusterBase
@@ -458,6 +598,13 @@ public:
     CHIP_ERROR SetpointRaiseLower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t mode,
                                   int8_t amount);
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
+};
+
+class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
+{
+public:
+    ThermostatUserInterfaceConfigurationCluster() : ClusterBase(app::Clusters::ThermostatUserInterfaceConfiguration::Id) {}
+    ~ThermostatUserInterfaceConfigurationCluster() {}
 };
 
 class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase
