@@ -14,12 +14,13 @@
 # limitations under the License.
 
 from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command
+from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command, DataType
 from idl import matter_idl_types
 from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType
-from typing import Union, List
+from typing import Union, List, Set
 from stringcase import capitalcase
 
+import enum
 import logging
 
 
@@ -118,12 +119,149 @@ def ToBoxedJavaType(field: Field):
 def LowercaseFirst(name: str):
   return name[0].lower() + name[1:]
 
-# FIXME: handle non-boxed types!
-#   if (useBoxedTypes) {
-#     return 'jobject';
-#   }
-#   return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(this.chipType));
-# }
+class LookupContext:
+    """Ability to lookup enumerations and structure types"""
+
+    def __init__(self, idl: Idl, cluster: Cluster):
+        self.idl = idl
+        self.cluster = cluster
+
+
+    def all_enums(self):
+        """All enumerations, ordered by lookup prioroty."""
+        for e in self.cluster.enums:
+            yield e
+        for e in self.idl.enums:
+            yield e
+
+    def all_structs(self):
+        """All structs, ordered by lookup prioroty."""
+        for e in self.cluster.structs:
+            yield e
+        for e in self.idl.structs:
+            yield e
+
+    def is_enum_type(self, name: str):
+        return any(map(lambda e: e.name == name, self.all_enums()))
+
+    def is_struct_type(self, name: str):
+        return any(map(lambda s: s.name == name, self.all_structs()))
+
+def CreateContext(idl: Idl, cluster: Cluster):
+    return LookupContext(idl, cluster)
+
+
+class EncodableValueAttr(enum.Enum):
+    LIST     = enum.auto()
+    NULLABLE = enum.auto()
+    OPTIONAL = enum.auto()
+
+class EncodableValue:
+    """
+    Contains helpers for encoding values, specifically lookups
+    for optionality, lists and recursive data type lookups within
+    the IDL and cluster
+    """
+    def __init__(self, context: LookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+        self.context = context  # 
+        self.data_type = data_type
+        self.attrs = attrs
+
+    @property
+    def is_nullable(self):
+        return EncodableValueAttr.NULLABLE in self.attrs
+
+    @property
+    def is_optional(self):
+        return EncodableValueAttr.OPTIONAL in self.attrs
+    
+    @property
+    def is_list(self):
+        return EncodableValueAttr.LIST in self.attrs
+
+    @property
+    def is_octet_string(self):
+        return self.data_type.name.lower() == 'octet_string'
+
+    @property
+    def is_char_string(self):
+        return self.data_type.name.lower() == 'char_string'
+
+    @property
+    def is_struct(self):
+        return self.context.is_struct_type(self.data_type.name)
+
+    @property
+    def is_enum(self):
+        return self.context.is_enum_type(self.data_type.name)
+
+    @property
+    def is_bitmap(self):
+        return self.data_type.name in [
+           "bitmap8",
+           "bitmap16",
+           "bitmap24",
+           "bitmap32",
+           "bitmap64",
+        ]
+
+    def clone(self):
+        return EncodableValue(self.context, self.data_type, self.attrs)
+
+    def without_nullable(self):
+        result = self.clone()
+        result.attrs.remove(EncodableValueAttr.NULLABLE)   
+        return result
+
+    def without_optional(self):
+        result = self.clone()
+        result.attrs.remove(EncodableValueAttr.OPTIONAL)   
+        return result
+
+    def without_list(self):
+        result = self.clone()
+        result.attrs.remove(EncodableValueAttr.LIST)   
+        return result
+
+    @property
+    def java_type(self):
+        t = ParseDataType(self.data_type, self.context.all_enums())
+
+        if type(t) == FundamentalType:
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Error("Unknown fundamental type")
+        elif type(t) == BasicInteger:
+            if t.byte_count >= 4:
+               return "Long"
+            else:
+               return "Integer"
+        else:
+            return "Object"
+
+
+
+
+
+def EncodableValueFrom(field: Field, context: LookupContext):
+    attrs = set()
+
+    if field.is_optional:
+        attrs.add(EncodableValueAttr.OPTIONAL)
+
+    if field.is_nullable:
+        attrs.add(EncodableValueAttr.NULLABLE)
+
+    if field.is_list:
+        attrs.add(EncodableValueAttr.LIST)
+
+    return EncodableValue(context, field.data_type, attrs)
+
 
 
 class JavaGenerator(CodeGenerator):
@@ -141,6 +279,8 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
+        self.jinja_env.filters['encodable'] = EncodableValueFrom
+        self.jinja_env.filters['lookupContext'] = CreateContext
 
 
     def internal_render_all(self):
@@ -154,6 +294,7 @@ class JavaGenerator(CodeGenerator):
             template_path="java/ChipClustersCpp.jinja",
             output_file_name="jni/CHIPClusters.cpp",
             vars={
+                'idl': self.idl,
                 'clusters': self.idl.clusters,
                 'known_enums': known_enums,
             }

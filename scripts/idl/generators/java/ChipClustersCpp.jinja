@@ -1,3 +1,104 @@
+{%- macro encode_optional(target, source, depth, encodable) -%}
+  if ({{source}} != nullptr) {
+    jobject optionalValue_{{depth}};
+    chip::JniReferences::GetInstance().GetOptionalValue({{source}}, optionalValue_{{depth}});
+    auto & definedValue_{{depth}} = {{target}}.Emplace();
+    {{ encode_value(
+       "definedValue_{}".format(depth), 
+       "optionalValue_{}".format(depth), 
+       depth+1, 
+       encodable.without_optional()
+    )}}
+  }
+{%- endmacro %}    
+
+{%- macro encode_nullable(target, source, depth, encodable) -%}
+  if ({{source}} == nullptr) {
+    {{target}}.SetNull();
+  } else {
+    auto & nonNullValue_{{depth}} = {{target}}.SetNonNull();
+    {{encode_value("nonNullValue_{}".format(depth), source, depth+1, encodable.without_nullable())}}
+  }
+{%- endmacro %}    
+
+{%- macro encode_list(target, source, depth, encodable) -%}
+  {
+    using ListType_{{depth}} = std::remove_reference_t<decltype({{target}})>;
+    using ListMemberType_{{depth}} = ListMemberTypeGetter<ListType_{{depth}}>::Type;
+    jint {{source}}Size;
+    chip::JniReferences::GetInstance().GetArrayListSize({{source}}, {{source}}Size);
+    if ({{source}}Size != 0) {
+      auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}Size);
+      listFreer.add(listHolder_{{depth}});
+
+      for (size_t i_{{depth}} = 0; i_{{depth}} < static_cast<size_t>({{source}}Size); ++i_{{depth}}) {
+        jobject element_{{depth}};
+        chip::JniReferences::GetInstance().GetArrayListItem({{source}}, i_{{depth}}, element_{{depth}});
+        {{encode_value(
+           "listHolder_{}->mList[i_{}]".format(depth, depth),
+           "element_{}".format(depth),
+           depth+1, encodable.without_list()
+        )}}
+      }
+      {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}Size);
+    } else {
+      {{target}} = ListType_{{depth}}();
+    }
+  }
+{%- endmacro %}
+
+{%- macro encode_value(target, source, depth, encodable) %}
+    {%- if encodable.is_optional %}
+        {{encode_optional(target, source, depth, encodable)}}
+    {% elif encodable.is_nullable %}
+        {{encode_nullable(target, source, depth, encodable)}}
+    {% elif encodable.is_list %}
+        {{encode_list(target, source, depth, encodable)}}
+    {% elif encodable.is_octet_string %}
+        cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>({{source}})));
+        {{target}} = cleanupByteArrays.back()->byteSpan();
+    {% elif encodable.is_char_string %}
+        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>({{source}})));
+        {{target}} = cleanupStrings.back()->charSpan();
+    {% elif encodable.is_struct %}
+        // FIXME: encode {{ target }} = {{ source }} as a struct
+        {#
+          {{#zcl_struct_items_by_struct_name type}}
+          jobject {{../source}}_{{asLowerCamelCase label}}Item_{{../depth}};
+          chip::JniReferences::GetInstance().GetObjectField({{../source}}, "{{asLowerCamelCase label}}", "{{asJniSignature type null ../cluster true}}", {{../source}}_{{asLowerCamelCase label}}Item_{{../depth}});
+          {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "_" (asLowerCamelCase label) "Item_" ../depth) cluster=../cluster depth=(incrementDepth ../depth)}}
+          {{/zcl_struct_items_by_struct_name}}
+        #}
+    {% elif encodable.is_enum %}
+        // ENCODING {{ target }} = {{ source }} for enum {{ encodable.data_type }} 
+        {#
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+        #}
+    {% elif encodable.is_bitmap %}
+        // ENCODING {{ target }} = {{ source }} for bitmap {{ encodable.data_type }} 
+        {#
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+        #}
+    {% else %}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{encodable.java_type}}ToPrimitive({{source}}));
+    {% endif -%}
+    {#
+{{else}}
+  {{#if_is_struct type}}
+  {{else}}
+    {{#if_chip_enum type}}
+    {{else}}
+      {{#if_is_bitmap type}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+      {{else}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+      {{/if_is_bitmap}}
+    {{/if_chip_enum}}
+  {{/if_is_struct}}
+{{/if}}
+#}
+{% endmacro -%}
+
 #include "CHIPCallbackTypes.h"
 #include "CHIPInvokeCallbacks.h"
 #include "CHIPReadCallbacks.h"
@@ -66,11 +167,15 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
   {%- if command.input_param -%}
+  {%- set lookup = idl | lookupContext(cluster) -%}
   {%   for field in (cluster.structs | named(command.input_param)).fields %}
-    {#
-      {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=(asUpperCamelCase parent.parent.name) depth=0}} 
-    #}
-  {%   endfor %}
+    {{ encode_value(
+        "request." + (field.name | lowercaseFirst),
+        (field.name | lowercaseFirst), 
+        0, 
+        field | encodable(lookup)
+    )}}
+  {%   endfor -%}
   {% endif %}
 
   {% set callbackName = command | commandCallbackName(cluster) %}
