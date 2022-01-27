@@ -38,8 +38,8 @@ function throwErrorIfUndefined(item, errorMsg, conditions)
 
 function checkIsInsideClusterBlock(context, name)
 {
-  const clusterName = context.name ? context.name : context.clusterName;
-  const clusterSide = context.side ? context.side : context.clusterSide;
+  const clusterName = context.name;
+  const clusterSide = context.side;
   const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
   throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
 
@@ -273,7 +273,7 @@ function chip_cluster_command_arguments(options)
  */
 function chip_cluster_command_arguments_with_structs_expanded(options)
 {
-  const commandId = checkIsInsideCommandBlock(this, 'all_outgoing_commands_for_cluster');
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
   const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments_with_structs_expanded');
 
   const filter = command => command.id == commandId;
