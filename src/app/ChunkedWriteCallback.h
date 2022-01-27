@@ -38,7 +38,7 @@ public:
 
     void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
                     app::StatusIB status) override;
-    void OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
     void OnDone(app::WriteClient * apWriteClient) override;
 
 private:

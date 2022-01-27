@@ -52,9 +52,9 @@ void ChunkedWriteCallback::OnResponse(const app::WriteClient * apWriteClient, co
     // For the last status in the response, we will call the application callback in OnDone()
 }
 
-void ChunkedWriteCallback::OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError)
+void ChunkedWriteCallback::OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
 {
-    callback->OnError(apWriteClient, aStatus, aError);
+    callback->OnError(apWriteClient, aError);
 }
 
 void ChunkedWriteCallback::OnDone(app::WriteClient * apWriteClient)

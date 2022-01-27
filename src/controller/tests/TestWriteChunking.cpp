@@ -95,10 +95,7 @@ public:
         }
     }
 
-    void OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError) override
-    {
-        mErrorCount++;
-    }
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override { mErrorCount++; }
 
     void OnDone(app::WriteClient * apWriteClient) override { mOnDoneCount++; }
 

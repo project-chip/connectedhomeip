@@ -37150,7 +37150,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000472_WriteAttribute
+- (void)testSendClusterTestCluster_000474_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute that returns general status on write"];
 
@@ -37172,7 +37172,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000473_WriteAttribute
+- (void)testSendClusterTestCluster_000475_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write attribute that returns cluster-specific status on write"];
@@ -37194,7 +37194,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000474_ReadAttribute
+- (void)testSendClusterTestCluster_000476_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute that returns general status on read"];
 
@@ -37212,7 +37212,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000475_ReadAttribute
+- (void)testSendClusterTestCluster_000477_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read attribute that returns cluster-specific status on read"];
