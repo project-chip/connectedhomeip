@@ -97,6 +97,8 @@ GENERATED_FUNCTION_ARRAYS
 constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
+// Not const, because these need to mutate.
+DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #define endpointNumber(x) fixedEndpoints[x]
@@ -131,15 +133,34 @@ void emberAfEndpointConfigure(void)
     uint8_t fixedNetworks[]             = FIXED_NETWORKS;
 #endif
 
-    emberEndpointCount = FIXED_ENDPOINT_COUNT;
+#if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
+    // Initialize our data version storage.  If
+    // ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT == 0, gcc complains about a memset
+    // with size equal to number of elements without multiplication by element
+    // size, because the sizeof() is also 0 in that case...
+    if (Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(fixedEndpointDataVersions), sizeof(fixedEndpointDataVersions)) !=
+        CHIP_NO_ERROR)
+    {
+        // Now what?  At least 0-init it.
+        memset(fixedEndpointDataVersions, 0, sizeof(fixedEndpointDataVersions));
+    }
+#endif // ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
+
+    emberEndpointCount                = FIXED_ENDPOINT_COUNT;
+    DataVersion * currentDataVersions = fixedEndpointDataVersions;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
         emAfEndpoints[ep].endpoint      = endpointNumber(ep);
         emAfEndpoints[ep].deviceId      = endpointDeviceId(ep);
         emAfEndpoints[ep].deviceVersion = endpointDeviceVersion(ep);
         emAfEndpoints[ep].endpointType  = endpointTypeMacro(ep);
+        emAfEndpoints[ep].dataVersions  = currentDataVersions;
         emAfEndpoints[ep].networkIndex  = endpointNetworkIndex(ep);
         emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
+
+        // Increment currentDataVersions by 1 (slot) for every server cluster
+        // this endpoint has.
+        currentDataVersions += emberAfClusterCountByIndex(ep, /* server = */ true);
     }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
@@ -176,7 +197,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 }
 
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
-                                        uint8_t deviceVersion)
+                                        uint8_t deviceVersion, DataVersion * dataVersionStorage)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -202,11 +223,26 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceId      = deviceId;
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
+    emAfEndpoints[index].dataVersions  = dataVersionStorage;
     emAfEndpoints[index].networkIndex  = 0;
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
+
+    // Initialize the data versions, if we have space.
+    if (dataVersionStorage)
+    {
+        size_t dataSize = sizeof(DataVersion) * emberAfClusterCountByIndex(index, /* server = */ true);
+        if (dataSize != 0)
+        {
+            if (Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(dataVersionStorage), dataSize) != CHIP_NO_ERROR)
+            {
+                // Now what?  At least 0-init it.
+                memset(dataVersionStorage, 0, dataSize);
+            }
+        }
+    }
 
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
@@ -969,22 +1005,25 @@ EndpointId emberAfEndpointFromIndex(uint16_t index)
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    uint8_t i, c = 0;
-    EmberAfDefinedEndpoint * de;
-    EmberAfCluster * cluster;
-
     if (index == 0xFFFF)
     {
         return 0;
     }
-    de = &(emAfEndpoints[index]);
+
+    return emberAfClusterCountByIndex(index, server);
+}
+
+uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server)
+{
+    const EmberAfDefinedEndpoint * de = &(emAfEndpoints[endpointIndex]);
     if (de->endpointType == NULL)
     {
         return 0;
     }
-    for (i = 0; i < de->endpointType->clusterCount; i++)
+    uint8_t c = 0;
+    for (uint8_t i = 0; i < de->endpointType->clusterCount; i++)
     {
-        cluster = &(de->endpointType->cluster[i]);
+        auto * cluster = &(de->endpointType->cluster[i]);
         if (server && emberAfClusterIsServer(cluster))
         {
             c++;
@@ -1378,4 +1417,31 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
         return Optional<AttributeId>::Missing();
     }
     return Optional<AttributeId>(clusterObj->attributes[attributeIndex].attributeId);
+}
+
+DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::ClusterId clusterId)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpointId);
+    if (index == 0xFFFF)
+    {
+        // Unknown endpoint.
+        return nullptr;
+    }
+    const EmberAfDefinedEndpoint & ep = emAfEndpoints[index];
+    if (!ep.dataVersions)
+    {
+        // No storage provided.
+        return nullptr;
+    }
+
+    // This does a second walk over endpoints to find the right one, but
+    // probably worth it to avoid duplicating code.
+    auto clusterIndex = emberAfClusterIndex(endpointId, clusterId, CLUSTER_MASK_SERVER);
+    if (clusterIndex == 0xFF)
+    {
+        // No such cluster on this endpoint.
+        return nullptr;
+    }
+
+    return ep.dataVersions + clusterIndex;
 }

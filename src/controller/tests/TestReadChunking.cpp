@@ -202,7 +202,7 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, nullptr);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -275,7 +275,7 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, nullptr);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -349,7 +349,7 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, nullptr);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);

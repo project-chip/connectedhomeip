@@ -105,6 +105,11 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs), DECLARE_DYNAMIC_CLUS
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 
+DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
+
 /* REVISION definitions:
  */
 
@@ -113,7 +118,7 @@ DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
-CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType)
+CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType, DataVersion * dataVersionStorage)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -122,7 +127,7 @@ CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t de
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
+            ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT, dataVersionStorage);
             if (ret == EMBER_ZCL_STATUS_SUCCESS)
             {
                 ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
@@ -358,18 +363,18 @@ static void InitServer(intptr_t context)
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
-    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
-    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, gLight1DataVersions);
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, gLight2DataVersions);
+    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, gLight3DataVersions);
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
     RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, gLight4DataVersions);
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, gLight2DataVersions);
 }
 
 extern "C" void app_main()

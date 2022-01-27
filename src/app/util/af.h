@@ -1655,6 +1655,16 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
 
+/**
+ * Returns the pointer to the data version storage for the given endpoint and
+ * cluster.  Can return null in the following cases:
+ *
+ * 1) There is no such endpoint.
+ * 2) There is no such server cluster on the given endpoint.
+ * 3) No storage for a data version was provided for the endpoint.
+ */
+chip::DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::ClusterId clusterId);
+
 namespace chip {
 namespace app {
 

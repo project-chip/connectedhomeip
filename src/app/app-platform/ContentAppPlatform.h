@@ -72,7 +72,10 @@ public:
     // add apps to the platform.
     // This will assign the app to an endpoint (if it is not already added) and make it accessible via Matter
     // returns the global endpoint for this app, or 0 if an error occurred
-    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType);
+    //
+    // dataVersionStorage needs to point to enough memory to store all the data
+    // versions for the server clusters in the EmberAfEndpointType passed in.
+    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType, DataVersion * dataVersionStorage);
 
     // remove app from the platform.
     // returns the endpoint id where the app was, or 0 if app was not loaded
