@@ -25152,7 +25152,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 10000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(10000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000003_ReadAttribute
 {
@@ -25315,7 +25315,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000009_ReadAttribute
 {
@@ -25350,7 +25350,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 5000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 bool testSendClusterTest_TC_WNCV_3_1_000011_WaitForReport_Fulfilled = false;
 ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
@@ -25576,7 +25576,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000019_WaitForReport
 {
@@ -25610,7 +25610,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000021_ReadAttribute
 {
@@ -25740,7 +25740,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 10000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(10000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000003_ReadAttribute
 {
@@ -25903,7 +25903,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000009_ReadAttribute
 {
@@ -25938,7 +25938,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 5000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 bool testSendClusterTest_TC_WNCV_3_2_000011_WaitForReport_Fulfilled = false;
 ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
@@ -26164,7 +26164,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000019_WaitForReport
 {
@@ -26198,7 +26198,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000021_ReadAttribute
 {
