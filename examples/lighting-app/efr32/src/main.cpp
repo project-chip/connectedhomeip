@@ -40,6 +40,10 @@
 #include "sl_system_kernel.h"
 #include <app/server/Server.h>
 
+#ifdef EFR32_OTA_ENABLED
+#include "OTAConfig.h"
+#endif // EFR32_OTA_ENABLED
+
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
@@ -198,6 +202,10 @@ int main(void)
      * starting up a rsi task - which will initialize the SPI interface.
      */
 #endif
+#ifdef EFR32_OTA_ENABLED
+    OTAConfig otaObj;
+    otaObj.Init();
+#endif // EFR32_OTA_ENABLED
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();
