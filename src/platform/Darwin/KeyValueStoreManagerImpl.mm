@@ -117,7 +117,16 @@ namespace DeviceLayer {
                 }
                 request.predicate = [NSPredicate predicateWithFormat:@"key = %@", key];
 
-                NSArray * result = [gContext executeFetchRequest:request error:error];
+                __block NSError * fetchError = nil;
+                __block NSArray * result;
+                [gContext performBlockAndWait:^{
+                    result = [gContext executeFetchRequest:request error:&fetchError];
+                }];
+
+                if (error != nil) {
+                    *error = fetchError;
+                }
+
                 if (result == nil) {
                     return nullptr;
                 }
@@ -226,10 +235,14 @@ namespace DeviceLayer {
                 return CHIP_NO_ERROR;
             }
 
-            [gContext deleteObject:item];
+            __block BOOL success = NO;
+            __block NSError * error = nil;
+            [gContext performBlockAndWait:^{
+                [gContext deleteObject:item];
+                success = [gContext save:&error];
+            }];
 
-            NSError * error = nil;
-            if (![gContext save:&error]) {
+            if (!success) {
                 ChipLogError(DeviceLayer, "Error saving context: %s", error.localizedDescription.UTF8String);
                 return CHIP_ERROR_INTERNAL;
             }
@@ -246,13 +259,20 @@ namespace DeviceLayer {
             KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
             if (!item) {
                 item = [[KeyValueItem alloc] initWithContext:gContext key:[[NSString alloc] initWithUTF8String:key] value:data];
-                [gContext insertObject:item];
+                [gContext performBlockAndWait:^{
+                    [gContext insertObject:item];
+                }];
             } else {
                 item.value = data;
             }
 
-            NSError * error = nil;
-            if (![gContext save:&error]) {
+            __block BOOL success = NO;
+            __block NSError * error = nil;
+            [gContext performBlockAndWait:^{
+                success = [gContext save:&error];
+            }];
+
+            if (!success) {
                 ChipLogError(DeviceLayer, "Error saving context: %s", error.localizedDescription.UTF8String);
                 return CHIP_ERROR_INTERNAL;
             }
