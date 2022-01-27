@@ -43434,6 +43434,33 @@ public:
     }
 };
 
+class WriteTestClusterListLongOctetString : public ModelCommand
+{
+public:
+    WriteTestClusterListLongOctetString() : ModelCommand("write"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-long-octet-string");
+        AddArgument("attr-value", &mComplex);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListLongOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::ByteSpan> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
+};
+
 class ReportTestClusterListLongOctetString : public ModelCommand
 {
 public:
@@ -60298,6 +60325,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterRangeRestrictedInt16s>(),              //
         make_unique<ReportTestClusterRangeRestrictedInt16s>(),             //
         make_unique<ReadTestClusterListLongOctetString>(),                 //
+        make_unique<WriteTestClusterListLongOctetString>(),                //
         make_unique<ReportTestClusterListLongOctetString>(),               //
         make_unique<ReadTestClusterTimedWriteBoolean>(),                   //
         make_unique<WriteTestClusterTimedWriteBoolean>(),                  //
