@@ -300,7 +300,7 @@
             0x00, 0x00, 0x00, 0x60,                                                                                                \
                                                                                                                                    \
             /* 648 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x01, 0x03,                                                                                                \
+            0x00, 0x00, 0x01, 0x13,                                                                                                \
     }
 
 #else // !BIGENDIAN_CPU
@@ -580,7 +580,7 @@
             0x60, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 648 - FeatureMap, */                                                                                                \
-            0x03, 0x01, 0x00, 0x00,                                                                                                \
+            0x13, 0x01, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
@@ -624,7 +624,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 214
+#define GENERATED_ATTRIBUTE_COUNT 216
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -897,6 +897,8 @@
             { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfTotalUsersSupported */                      \
             { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfPINUsersSupported */                        \
             { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfRFIDUsersSupported */                       \
+            { 0x00000014, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* NumberOfWeekDaySchedulesSupportedPerUser */         \
+            { 0x00000015, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* NumberOfYearDaySchedulesSupportedPerUser */         \
             { 0x00000017, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(8) },   /* MaxPINCodeLength */                                 \
             { 0x00000018, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(6) },   /* MinPINCodeLength */                                 \
             { 0x00000019, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(20) },  /* MaxRFIDCodeLength */                                \
@@ -1017,8 +1019,8 @@
             }, /* Endpoint: 1, Cluster: Power Source (server) */                                                                   \
             { 0x00000101,                                                                                                          \
               ZAP_ATTRIBUTE_INDEX(191),                                                                                            \
-              23,                                                                                                                  \
-              37,                                                                                                                  \
+              25,                                                                                                                  \
+              39,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) |                                            \
                   ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
@@ -1029,7 +1031,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 18, 905 }, { ZAP_CLUSTER_INDEX(18), 3, 170 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 18, 905 }, { ZAP_CLUSTER_INDEX(18), 3, 172 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1039,7 +1041,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1075)
+#define ATTRIBUTE_MAX_SIZE (1077)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

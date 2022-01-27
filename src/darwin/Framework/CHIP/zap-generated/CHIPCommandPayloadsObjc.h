@@ -957,11 +957,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSNumber * _Nonnull daysMask;
-@property (strong, nonatomic) NSNumber * _Nonnull startHour;
-@property (strong, nonatomic) NSNumber * _Nonnull startMinute;
-@property (strong, nonatomic) NSNumber * _Nonnull endHour;
-@property (strong, nonatomic) NSNumber * _Nonnull endMinute;
+@property (strong, nonatomic) NSNumber * _Nullable daysMask;
+@property (strong, nonatomic) NSNumber * _Nullable startHour;
+@property (strong, nonatomic) NSNumber * _Nullable startMinute;
+@property (strong, nonatomic) NSNumber * _Nullable endHour;
+@property (strong, nonatomic) NSNumber * _Nullable endMinute;
 - (instancetype)init;
 @end
 
@@ -989,8 +989,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
-@property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
+@property (strong, nonatomic) NSNumber * _Nullable localStartTime;
+@property (strong, nonatomic) NSNumber * _Nullable localEndTime;
 - (instancetype)init;
 @end
 
@@ -1016,9 +1016,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDoorLockClusterGetHolidayScheduleResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
-@property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
-@property (strong, nonatomic) NSNumber * _Nonnull operatingMode;
+@property (strong, nonatomic) NSNumber * _Nullable localStartTime;
+@property (strong, nonatomic) NSNumber * _Nullable localEndTime;
+@property (strong, nonatomic) NSNumber * _Nullable operatingMode;
 - (instancetype)init;
 @end
 
