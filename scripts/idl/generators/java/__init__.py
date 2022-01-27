@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute
+from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command
 from idl import matter_idl_types
 from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType
 from typing import Union, List
@@ -75,6 +75,11 @@ def CallbackName(attr: Attribute, cluster: Cluster, known_enum_types: List[matte
         capitalcase(attr.definition.name)
     )
 
+def CommandCallbackName(command: Command, cluster: Cluster):
+  if command.output_param.lower() == 'DefaultSuccess':
+    return 'DefaultSuccess'
+  return '{}Cluster{}'.format(cluster.name, command.output_param)
+
 
 def attributesWithSupportedCallback(attrs, known_enum_types: List[matter_idl_types.Enum]):
     for attr in attrs:
@@ -131,6 +136,7 @@ class JavaGenerator(CodeGenerator):
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
+        self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
         self.jinja_env.filters['clientClustersOnly'] = ClientClustersOnly
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType

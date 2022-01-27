@@ -83,6 +83,10 @@ class Attribute:
     def is_global(self):
         return AttributeTag.GLOBAL in self.tags
 
+    @property
+    def is_subscribable(self):
+        return AttributeTag.NOSUBSCRIBE not in self.tags
+
 
 @dataclass
 class Struct:

@@ -73,80 +73,61 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
   {%   endfor %}
   {% endif %}
 
-  {#
-    {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name false}}Cluster{{asUpperCamelCase responseName false}}{{else}}DefaultSuccess{{/if}}{{/inline}}
-
-    std::unique_ptr<CHIP{{>callbackName}}Callback, void (*)(CHIP{{>callbackName}}Callback *)> onSuccess(
-        Platform::New<CHIP{{>callbackName}}Callback>(callback), Platform::Delete<CHIP{{>callbackName}}Callback>);
+  {% set callbackName = command | commandCallbackName(cluster) %}
+    std::unique_ptr<CHIP{{callbackName}}Callback, void (*)(CHIP{{callbackName}}Callback *)> onSuccess(
+        Platform::New<CHIP{{callbackName}}Callback>(callback), Platform::Delete<CHIP{{callbackName}}Callback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-  #}
     VerifyOrReturn(onSuccess.get() != nullptr, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
     VerifyOrReturn(onFailure.get() != nullptr, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
 
     cppCluster = reinterpret_cast<{{cluster.name | capitalcase}}Cluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-  {#
-    auto successFn = chip::Callback::Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(onSuccess->Cancel());
-  #}
+    auto successFn = chip::Callback::Callback<CHIP{{callbackName}}CallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-  {#
-    {{#if mustUseTimedInvoke}}
+  {% if command.is_timed_invoke %}
     err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall, chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    {{else}}
+  {% else %}
     if (timedInvokeTimeoutMs == nullptr) {
         err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     } else {
         err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall, chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     }
-    {{/if}}
-    #}
+  {% endif %}
     VerifyOrReturn(err == CHIP_NO_ERROR, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command", CHIP_ERROR_INCORRECT_STATE));
 
     onSuccess.release();
     onFailure.release();
 }
-{% endfor %}
 
+{%-  for attr in cluster.attributes if attr.is_subscribable %}
 
-{#
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
-{{#if isReportableAttribute}}
-JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    {{~#*inline "callbackName"~}}
-    {{~#if_in_global_responses~}}
-    CHIP{{chipCallback.name}}AttributeCallback
-    {{~else~}}
-    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback
-    {{~/if_in_global_responses~}}
-    {{~/inline}}
+    {%- set callbackName = attr | callbackName(cluster, known_enums) %}
 
-    std::unique_ptr<{{>callbackName}}, void (*)({{>callbackName}} *)> onSuccess(Platform::New<{{>callbackName}}>(callback, true), chip::Platform::Delete<{{>callbackName}}>);
+    std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(Platform::New<{{callbackName}}>(callback, true), chip::Platform::Delete<{{callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onFailure.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    {{cluster.name}}Cluster * cppCluster = reinterpret_cast<{{cluster.name}}Cluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-    auto successFn = chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    using TypeInfo = chip::app::Clusters::{{cluster.name}}::Attributes::{{attr.name}}::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIP{{cluster.name}}Cluster{{attr.name}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval), {{>callbackName}}::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval), {{callbackName}}::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
 }
-{{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
-#}
+{%  endfor %}
+{% endfor %}
 {%endfor%}
