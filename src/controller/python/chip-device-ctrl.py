@@ -328,7 +328,8 @@ class DeviceMgrCmd(Cmd):
         Set the level of Chip logging output.
         """
 
-        # warnings.warn("This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
+        warnings.warn(
+            "This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -376,7 +377,8 @@ class DeviceMgrCmd(Cmd):
         setup-payload parse-qr <qr-code-payload>
         """
 
-        # warnings.warn("This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
+        warnings.warn(
+            "This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
 
         try:
             arglist = shlex.split(line)
@@ -594,7 +596,8 @@ class DeviceMgrCmd(Cmd):
               for connection)
         """
 
-        #warnings.warn("This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
+        warnings.warn(
+            "This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
 
         try:
             args = shlex.split(line)

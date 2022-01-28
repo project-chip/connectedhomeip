@@ -250,10 +250,10 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
 {
     static uint16_t sFabricIndex = 1;
 
-    *outDevCtrl = new chip::Controller::DeviceCommissioner();
-    VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
-
     ChipLogDetail(Controller, "Creating New Device Controller");
+
+    auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
+    VerifyOrReturnError(devCtrl.get() != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     if (localDeviceId == chip::kUndefinedNodeId)
     {
@@ -306,8 +306,10 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.fabricIndex                    = (uint8_t) sFabricIndex;
     initParams.fabricId                       = sFabricIndex++;
 
-    err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
+    err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    *outDevCtrl = devCtrl.release();
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -316,6 +318,7 @@ ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Cont
 {
     if (devCtrl != NULL)
     {
+        delete devCtrl->GetOperationalCredentialsDelegate();
         devCtrl->Shutdown();
         delete devCtrl;
     }

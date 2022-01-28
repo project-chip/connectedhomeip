@@ -301,6 +301,18 @@ class ChipDeviceController():
             return False
         return self._ChipStack.commissioningEventRes == 0
 
+    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes):
+        ''' Commissions a Thread device over BLE
+        '''
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        return self.ConnectBLE(discriminator, setupPinCode, nodeId)
+
+    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid, credentials):
+        ''' Commissions a WiFi device over BLE
+        '''
+        self.SetWiFiCredentials(ssid, credentials)
+        return self.ConnectBLE(discriminator, setupPinCode, nodeId)
+
     def SetWiFiCredentials(self, ssid, credentials):
         self.CheckIsActive()
 

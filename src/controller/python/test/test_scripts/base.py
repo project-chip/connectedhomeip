@@ -104,7 +104,7 @@ class TestResult:
 
 class BaseTestHelper:
     def __init__(self, nodeid: int):
-        self.chipStack = ChipStack()
+        self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
         self.devCtrl = self.fabricAdmin.NewController(nodeid)
@@ -177,8 +177,27 @@ class BaseTestHelper:
         self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
         devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
 
-        await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic)])
-        await devCtrl2.ReadAttribute(nodeid, [(Clusters.Basic)])
+        data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
+        data2 = await devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
+
+        # Read out noclist from each fabric, and each should contain two NOCs.
+        nocList1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+
+        if (len(nocList1) != 2 or len(nocList2) != 2):
+            self.logger.error("Got back invalid nocList")
+            return False
+
+        data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
+        data2 = await devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
+
+        # Read out current fabric from each fabric, and both should be different.
+        currentFabric1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        currentFabric2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        if (currentFabric1 == currentFabric2):
+            self.logger.error(
+                "Got back fabric indices that match for two different fabrics!")
+            return False
 
         devCtrl2.Shutdown()
         fabricAdmin2.Shutdown()

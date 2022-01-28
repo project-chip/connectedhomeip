@@ -18,12 +18,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Implementation of the native methods expected by the Python
- *      version of Chip Device Manager.
- *
- */
 #include <type_traits>
 
 #include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"

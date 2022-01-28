@@ -74,21 +74,18 @@ class FabricAdmin:
         ''' Allocate the next un-used fabric index.
         '''
         nextFabricIndex = 1
-        while (True):
-            if (nextFabricIndex in FabricAdmin.activeFabricIndexList):
-                nextFabricIndex = nextFabricIndex + 1
-            else:
-                return nextFabricIndex
+        while nextFabricIndex in FabricAdmin.activeFabricIndexList:
+            nextFabricIndex = nextFabricIndex + 1
+        return nextFabricIndex
 
     def AllocateNextFabricId(self):
         ''' Allocate the next un-used fabric ID.
         '''
         nextFabricId = 1
-        while (True):
-            if (nextFabricId in FabricAdmin.activeFabricIdList):
-                nextFabricId = nextFabricId + 1
-            else:
-                return nextFabricId
+
+        while nextFabricId in FabricAdmin.activeFabricIdList:
+            nextFabricId = nextFabricId + 1
+        return nextFabricId
 
     def __init__(self, rcac: bytes = None, icac: bytes = None, fabricIndex: int = None, fabricId: int = None):
         ''' Creates a valid FabricAdmin object with valid RCAC/ICAC, and registers itself as an OperationalCredentialsDelegate

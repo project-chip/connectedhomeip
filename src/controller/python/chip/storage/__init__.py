@@ -69,8 +69,7 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
 
 @_SyncDeleteKeyValueCbFunct
 def _OnSyncDeleteKeyValueCb(storageObj, key):
-    print("OnSyncDeleteKeyValue")
-    storageObj.SetKey(key, None)
+    storageObj.SetSdkKey(key.decode("utf-8"), None)
 
 
 class PersistentStorage:

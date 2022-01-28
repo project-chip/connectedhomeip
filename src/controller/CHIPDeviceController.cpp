@@ -339,7 +339,6 @@ void DeviceController::PersistNextKeyId()
     if (mStorageDelegate != nullptr && mState == State::Initialized)
     {
         uint16_t nextKeyID = mIDAllocator.Peek();
-        printf("PersistNextKey %d\n", nextKeyID);
         mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &nextKeyID, sizeof(nextKeyID));
     }
 }

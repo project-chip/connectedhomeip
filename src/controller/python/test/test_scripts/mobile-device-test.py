@@ -80,8 +80,8 @@ def main():
     FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
               "Failed to discover any devices.")
 
-    FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
-              "Failed to finish network commissioning")
+    # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
+    #           "Failed to finish network commissioning")
 
     logger.info("Testing key exchange")
     FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
@@ -100,7 +100,7 @@ def main():
     FailIfNot(test.TestResolve(nodeid=1),
               "Failed to resolve nodeid")
 
-    # Still test network commissioning
+    Still test network commissioning
     logger.info("Testing network commissioning")
     FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=1).run()),
               "Failed to finish network commissioning")
