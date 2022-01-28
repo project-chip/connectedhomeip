@@ -69,14 +69,14 @@ tests:
       attribute: "location"
       groupId: "1"
       arguments:
-          value: "us"
+          value: "US"
 
       # Test Pair 1 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
       attribute: "location"
       response:
-          value: "us"
+          value: "US"
 
     # Test Pair 2 : Sends a Group Write Attribute
     - label: "Restore initial location value"

@@ -40911,7 +40911,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     id locationArgument;
-    locationArgument = @"us";
+    locationArgument = @"US";
     [cluster writeAttributeLocationWithValue:locationArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write location Error: %@", err);
@@ -40939,7 +40939,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@"us"]);
+            XCTAssertTrue([actualValue isEqualToString:@"US"]);
         }
 
         [expectation fulfill];
