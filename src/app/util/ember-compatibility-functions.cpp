@@ -364,8 +364,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     // Check attribute existence. This includes attributes with registered metadata, but also specially handled
     // mandatory global attributes (which just check for cluster on endpoint).
 
-    EmberAfCluster * attributeCluster            = nullptr;
-    EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {

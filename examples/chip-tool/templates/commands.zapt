@@ -33,15 +33,7 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}},
-          {{~#if isNullable}}&{{>field}}
-          {{else}}
-            {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
-            {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
-            {{else}}&{{>field}}
-            {{/if~}}
-          {{/if~}}
-        );
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &{{>field}});
         {{/if}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();

@@ -6897,9 +6897,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readNetworkNameAttribute((ChipClusters.OctetStringAttributeCallback) callback);
+                  .readNetworkNameAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readThreadNetworkDiagnosticsNetworkNameCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readNetworkNameAttribute",

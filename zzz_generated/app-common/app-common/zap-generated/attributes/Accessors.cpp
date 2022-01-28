@@ -8717,7 +8717,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace NetworkName {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status =
@@ -8734,7 +8734,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
     value.reduce_size(length);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
@@ -8742,7 +8742,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
     return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, zclString,
-                                       ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace NetworkName

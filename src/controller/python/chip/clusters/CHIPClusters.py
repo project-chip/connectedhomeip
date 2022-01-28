@@ -5024,7 +5024,7 @@ class ChipClusters:
                 0x00000002: {
                     "attributeName": "NetworkName",
                     "attributeId": 0x00000002,
-                    "type": "bytes",
+                    "type": "str",
                     "reportable": True,
                 },
                 0x00000003: {

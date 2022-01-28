@@ -222,9 +222,9 @@ class BaseTestHelper:
     def TestReadBasicAttributes(self, nodeid: int, endpoint: int, group: int):
         basic_cluster_attrs = {
             "VendorName": "TEST_VENDOR",
-            "VendorID": 9050,
+            "VendorID": 0xFFF1,
             "ProductName": "TEST_PRODUCT",
-            "ProductID": 65279,
+            "ProductID": 0x8000,
             "NodeLabel": "Test",
             "Location": "XX",
             "HardwareVersion": 0,
