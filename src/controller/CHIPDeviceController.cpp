@@ -1595,7 +1595,7 @@ void DescriptorClusterPartsCallback(void * context, const chip::app::DataModel::
     }
     CommissioningDelegate::CommissioningReport report;
     report.Set<EndpointParts>(parts);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+    commissioner->CommissioningStageComplete(iter.GetStatus(), report);
 }
 
 void DescriptorClusterServerCallback(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & data)
@@ -1629,7 +1629,7 @@ void DescriptorClusterServerCallback(void * context, const chip::app::DataModel:
     bool isCommissionable = hasGeneralCommissioning && hasBasic && hasOperationalCredentials;
     CommissioningDelegate::CommissioningReport report;
     report.Set<EndpointCommissioningInfo>(EndpointCommissioningInfo(isCommissionable, hasNetworkCommissioning));
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+    commissioner->CommissioningStageComplete(iter.GetStatus(), report);
 }
 
 void BasicVendorCallback(void * context, VendorId vendorId)
