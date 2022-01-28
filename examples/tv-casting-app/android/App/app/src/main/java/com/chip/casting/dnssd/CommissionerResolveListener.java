@@ -84,7 +84,10 @@ public class CommissionerResolveListener implements NsdManager.ResolveListener {
   public String getCommissionerButtonText(DiscoveredNodeData commmissioner) {
     String main = commmissioner.getDeviceName() != null ? commmissioner.getDeviceName() : "";
     String aux =
-        "" + (commmissioner.getProductId() > 0 ? "Product ID: " + commmissioner.getProductId() : "");
+        ""
+            + (commmissioner.getProductId() > 0
+                ? "Product ID: " + commmissioner.getProductId()
+                : "");
     aux +=
         commmissioner.getDeviceType() > 0
             ? (aux.isEmpty() ? "" : " ") + "Device Type: " + commmissioner.getDeviceType()
