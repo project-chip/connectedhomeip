@@ -1617,6 +1617,20 @@ void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, E
     base.SetCommandTimeout(timeout);
 }
 
+void OnFeatureMapSuccess(void * context, uint32_t value)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<FeatureMap>(value);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void AttributeReadFailure(void * context, CHIP_ERROR status)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(status);
+}
+
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
@@ -1642,6 +1656,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // TODO: should get the endpoint information from the descriptor cluster.
         SetupCluster(genCom, proxy, endpoint, timeout);
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
+    }
+    break;
+    case CommissioningStage::kGetNetworkTechnology: {
+        ChipLogProgress(Controller, "Sending request for network cluster feature map");
+        NetworkCommissioningCluster netCom;
+        // TODO: swap to given endpoint once that PR is merged
+        netCom.Associate(proxy, 0);
+        netCom.ReadAttribute<app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(this, OnFeatureMapSuccess,
+                                                                                                    AttributeReadFailure);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
