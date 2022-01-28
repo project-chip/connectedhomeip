@@ -207,8 +207,6 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    // Command takes no arguments.
-
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -223,8 +221,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR OnOffCluster::OffWithEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t effectId, uint8_t effectVariant)
+CHIP_ERROR OnOffCluster::OffWithEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -245,12 +242,6 @@ CHIP_ERROR OnOffCluster::OffWithEffect(Callback::Cancelable * onSuccessCallback,
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // effectId: onOffEffectIdentifier
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), effectId));
-    // effectVariant: onOffDelayedAllOffEffectVariant
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), effectVariant));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -288,8 +279,6 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    // Command takes no arguments.
-
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -326,8 +315,6 @@ CHIP_ERROR OnOffCluster::OnWithRecallGlobalScene(Callback::Cancelable * onSucces
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    // Command takes no arguments.
-
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -342,8 +329,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR OnOffCluster::OnWithTimedOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime)
+CHIP_ERROR OnOffCluster::OnWithTimedOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -364,14 +350,6 @@ CHIP_ERROR OnOffCluster::OnWithTimedOff(Callback::Cancelable * onSuccessCallback
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // onOffControl: onOffControl
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), onOffControl));
-    // onTime: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), onTime));
-    // offWaitTime: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), offWaitTime));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -408,8 +386,6 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
