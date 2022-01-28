@@ -644,8 +644,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mNOCResponseCallback(OnOperationalCertificateAddResponse, this),
-    mRootCertResponseCallback(OnRootCertSuccessResponse, this), mOnCertFailureCallback(OnAddNOCFailureResponse, this),
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
     mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
@@ -1254,13 +1253,16 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
                                                           const NodeId adminSubject)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
+    OperationalCredentials::Commands::AddNOC::Type request;
+    request.NOCValue      = nocCertBuf;
+    request.ICACValue     = chip::Optional<ByteSpan>(icaCertBuf);
+    request.IPKValue      = ipk;
+    request.caseAdminNode = adminSubject;
+    request.adminVendorId = mVendorId;
 
-    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ipk, adminSubject, mVendorId));
+    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(mDeviceBeingCommissioned, request,
+                                                                    OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1294,19 +1296,17 @@ CHIP_ERROR DeviceCommissioner::ConvertFromNodeOperationalCertStatus(uint8_t err)
     return CHIP_ERROR_CERT_LOAD_FAILED;
 }
 
-void DeviceCommissioner::OnAddNOCFailureResponse(void * context, uint8_t status)
+void DeviceCommissioner::OnAddNOCFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: 0x%02x", status);
+    ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->mOnCertFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+    commissioner->CommissioningStageComplete(error);
 }
 
-void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex,
-                                                             CharSpan DebugText)
+void DeviceCommissioner::OnOperationalCertificateAddResponse(
+    void * context, const OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
-    ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", StatusCode);
+    ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", data.statusCode);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CHIP_ERROR err                   = CHIP_NO_ERROR;
@@ -1314,11 +1314,9 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    commissioner->mOnCertFailureCallback.Cancel();
-
     VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = ConvertFromNodeOperationalCertStatus(StatusCode);
+    err = ConvertFromNodeOperationalCertStatus(data.statusCode);
     SuccessOrExit(err);
 
     device = commissioner->mDeviceBeingCommissioned;

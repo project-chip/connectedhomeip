@@ -772,9 +772,11 @@ private:
         void * context, const app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
 
     /* Callback when adding operational certs to device results in failure */
-    static void OnAddNOCFailureResponse(void * context, uint8_t status);
+    static void OnAddNOCFailureResponse(void * context, CHIP_ERROR errro);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, CharSpan DebugText);
+    static void
+    OnOperationalCertificateAddResponse(void * context,
+                                        const app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
@@ -833,9 +835,7 @@ private:
 
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
-    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
