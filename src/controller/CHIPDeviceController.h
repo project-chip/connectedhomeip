@@ -833,7 +833,7 @@ private:
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
-        &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used
+        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
 };
