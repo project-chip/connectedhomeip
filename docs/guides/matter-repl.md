@@ -13,7 +13,7 @@ You can interact with the REPL in a one of three ways:
 3. Through a cloud-hosted REPL Playground that has pre-built versions of the
    REPL that can be interacted with through a browser.
 
-This guide provides intructions on how to utilize its various features.
+This guide provides instructions on how to utilize its various features.
 
 ###
 
@@ -52,7 +52,7 @@ virtual environment.
 ## REPL Playground
 
 The REPL playground is a Jupyter Lab instance that allows you to interact with
-the REPL from a web browser (or a Jupter Notebook client of your choice!). It
+the REPL from a web browser (or a Jupyter Notebook client of your choice!). It
 contains the entire REPL encapsulated as an IPython kernel.
 
 ### Locally Hosted

@@ -73,10 +73,10 @@ def _OnSyncDeleteKeyValueCb(storageObj, key):
 
 
 class PersistentStorage:
-    _handle = chip.native.GetLibraryHandle()
 
     def __init__(self, path: str):
         self._path = path
+        self._handle = chip.native.GetLibraryHandle()
 
         try:
             self._file = open(path, 'r')
