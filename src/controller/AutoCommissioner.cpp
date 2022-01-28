@@ -29,6 +29,7 @@ AutoCommissioner::~AutoCommissioner()
 {
     ReleaseDAC();
     ReleasePAI();
+    SetCommissioningParameters(CommissioningParameters());
 }
 
 void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate)
