@@ -20,6 +20,7 @@
 #include "OTAConfig.h"
 
 #include "platform/bootloader/api/application_properties.h"
+#include <app/server/Server.h>
 
 // Header used for building the image GBL file
 #define APP_PROPERTIES_VERSION 1
