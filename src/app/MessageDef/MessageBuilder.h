@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 
 #pragma once
 
-/**
- * CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION
- *
- * A monothonic number identifying the interaction model revision.
- */
-#ifndef CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION
-#define CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION 1
-#endif
+#include "StructBuilder.h"
+#include <app/util/basic-types.h>
+#include <app/InteractionModelRevision.h>
 
-constexpr uint8_t kInteractionModelRevisionTag = 0xFF;
+namespace chip {
+namespace app {
+class MessageBuilder : public StructBuilder
+{
+public:
+    CHIP_ERROR EncodeInteractionModelRevision();
+};
+} // namespace app
+} // namespace chip

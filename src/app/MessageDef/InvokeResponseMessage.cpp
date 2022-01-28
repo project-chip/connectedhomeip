@@ -69,9 +69,9 @@ CHIP_ERROR InvokeResponseMessage::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
-        case to_underlying(Tag::kInteractionModelRevision):
+        case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(
-                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
+                MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -84,8 +84,7 @@ CHIP_ERROR InvokeResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kInvokeResponses)) |
-            (1 << to_underlying(Tag::kInteractionModelRevision));
+        const int RequiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kInvokeResponses));
 
         if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -116,12 +115,6 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponseIBs::
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-InvokeResponseMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
-{
-    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
-}
-
 InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     if (mError == CHIP_NO_ERROR)
@@ -144,7 +137,7 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::EndOfInvokeResp
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+        mError = MessageBuilder::EncodeInteractionModelRevision();
     }
     if (mError == CHIP_NO_ERROR)
     {

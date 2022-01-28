@@ -25,8 +25,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "InvokeResponseIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 
 namespace chip {
 namespace app {
@@ -35,10 +35,9 @@ enum class Tag : uint8_t
 {
     kSuppressResponse         = 0,
     kInvokeResponses          = 1,
-    kInteractionModelRevision = 2,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -75,11 +74,9 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetInvokeResponses(InvokeResponseIBs::Parser * const apInvokeResponses) const;
-
-    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**

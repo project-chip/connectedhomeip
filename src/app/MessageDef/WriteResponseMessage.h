@@ -18,8 +18,8 @@
 #pragma once
 
 #include "AttributeStatusIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -32,10 +32,9 @@ namespace WriteResponseMessage {
 enum class Tag : uint8_t
 {
     kWriteResponses           = 0,
-    kInteractionModelRevision = 1,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
     /**
@@ -60,10 +59,9 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetWriteResponses(AttributeStatusIBs::Parser * const apWriteResponses) const;
-    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**

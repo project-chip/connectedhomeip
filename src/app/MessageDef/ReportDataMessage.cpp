@@ -122,9 +122,9 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case to_underlying(Tag::kInteractionModelRevision):
+        case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(
-                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
+                MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -137,16 +137,7 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kInteractionModelRevision));
-
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_REPORT_DATA_MESSAGE;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
@@ -180,11 +171,6 @@ CHIP_ERROR ReportDataMessage::Parser::GetEventReports(EventReportIBs::Parser * c
 CHIP_ERROR ReportDataMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
     return GetSimpleValue(to_underlying(Tag::kMoreChunkedMessages), TLV::kTLVType_Boolean, apMoreChunkedMessages);
-}
-
-CHIP_ERROR ReportDataMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
-{
-    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
 }
 
 ReportDataMessage::Builder & ReportDataMessage::Builder::SuppressResponse(const bool aSuppressResponse)
@@ -241,7 +227,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::EndOfReportDataMessage(
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+        mError = MessageBuilder::EncodeInteractionModelRevision();
     }
     if (mError == CHIP_NO_ERROR)
     {

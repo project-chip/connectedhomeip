@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -33,10 +33,9 @@ namespace StatusResponseMessage {
 enum class Tag : uint8_t
 {
     kStatus                   = 0,
-    kInteractionModelRevision = 1,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -63,11 +62,9 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetStatus(Protocols::InteractionModel::Status & aStatus) const;
-
-    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     StatusResponseMessage::Builder & Status(const Protocols::InteractionModel::Status aStatus);

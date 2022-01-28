@@ -108,9 +108,9 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case to_underlying(Tag::kInteractionModelRevision):
+        case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(
-                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
+                MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -124,7 +124,7 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         const int RequiredFields =
-            (1 << to_underlying(Tag::kIsFabricFiltered)) | (1 << to_underlying(Tag::kInteractionModelRevision));
+            (1 << to_underlying(Tag::kIsFabricFiltered));
 
         if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -172,12 +172,6 @@ CHIP_ERROR ReadRequestMessage::Parser::GetEventFilters(EventFilterIBs::Parser * 
 CHIP_ERROR ReadRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
 {
     return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
-}
-
-CHIP_ERROR
-ReadRequestMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
-{
-    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
 }
 
 AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributeRequests()
@@ -234,7 +228,7 @@ ReadRequestMessage::Builder & ReadRequestMessage::Builder::EndOfReadRequestMessa
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+        mError = MessageBuilder::EncodeInteractionModelRevision();
     }
     if (mError == CHIP_NO_ERROR)
     {

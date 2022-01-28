@@ -24,13 +24,12 @@
 #pragma once
 
 #include <algorithm>
-#include <app/AppBuildConfig.h>
-#include <app/util/basic-types.h>
 #include <inttypes.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/support/CodeUtils.h>
 #include <stdarg.h>
 #include <stdio.h>
+
+#include <app/AppBuildConfig.h>
+
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
@@ -64,11 +63,5 @@ void DecreaseDepth();
 #define PRETTY_PRINT_INCDEPTH()
 #define PRETTY_PRINT_DECDEPTH()
 #endif
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR CheckInteractionModelRevision(int & aTagPresenceMask, uint8_t aTag, TLV::TLVReader & aReader);
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-
-CHIP_ERROR EncodeInteractionModelRevision(uint8_t aTag, TLV::TLVWriter * apWriter);
-} // namespace app
-} // namespace chip
+}; // namespace app
+}; // namespace chip

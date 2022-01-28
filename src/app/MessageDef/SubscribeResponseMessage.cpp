@@ -75,9 +75,9 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case to_underlying(Tag::kInteractionModelRevision):
+        case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(
-                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
+                MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -90,8 +90,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         const uint16_t RequiredFields = (1 << to_underlying(Tag::kSubscriptionId)) |
-            (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds)) |
-            (1 << to_underlying(Tag::kInteractionModelRevision));
+            (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
 
         if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -120,12 +119,6 @@ CHIP_ERROR SubscribeResponseMessage::Parser::GetMinIntervalFloorSeconds(uint16_t
 CHIP_ERROR SubscribeResponseMessage::Parser::GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const
 {
     return GetUnsignedInteger(to_underlying(Tag::kMaxIntervalCeilingSeconds), apMaxIntervalCeilingSeconds);
-}
-
-CHIP_ERROR
-SubscribeResponseMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
-{
-    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
 }
 
 SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const uint64_t aSubscribeId)
@@ -161,7 +154,7 @@ SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::EndOfSubs
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+        mError = MessageBuilder::EncodeInteractionModelRevision();
     }
     if (mError == CHIP_NO_ERROR)
     {

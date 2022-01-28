@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -15,15 +14,18 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "MessageBuilder.h"
 
-/**
- * CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION
- *
- * A monothonic number identifying the interaction model revision.
- */
-#ifndef CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION
-#define CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION 1
-#endif
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-constexpr uint8_t kInteractionModelRevisionTag = 0xFF;
+namespace chip {
+namespace app {
+CHIP_ERROR MessageBuilder::EncodeInteractionModelRevision()
+{
+    ReturnErrorOnFailure(mpWriter->Put(TLV::ContextTag(kInteractionModelRevisionTag), static_cast<InteractionModelRevision>(CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION)));
+    return CHIP_NO_ERROR;
+}
+} // namespace app
+} // namespace chip
