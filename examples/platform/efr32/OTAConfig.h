@@ -31,11 +31,9 @@ public:
     void Init();
 
 private:
-
     // Global OTA objects
     chip::OTARequestor gRequestorCore;
     chip::DeviceLayer::GenericOTARequestorDriver gRequestorUser;
     chip::BDXDownloader gDownloader;
     chip::OTAImageProcessorImpl gImageProcessor;
-
 };

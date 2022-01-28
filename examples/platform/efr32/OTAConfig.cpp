@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include "OTAConfig.h"
 
 #include "platform/bootloader/api/application_properties.h"
@@ -60,7 +59,6 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
       .productId = APP_PROPERTIES_ID,
     },
 };
-
 
 void OTAConfig::Init()
 {
