@@ -3742,13 +3742,13 @@ tests:
           # here yet.
           error: FAILURE
 
-    - label: "read ClientGeneratedCommandList attribure"
+    - label: "read ClientGeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "ClientGeneratedCommandList"
       response:
           value: [0, 1, 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20]
 
-    - label: "read ServerGeneratedCommandList attribure"
+    - label: "read ServerGeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "ServerGeneratedCommandList"
       response:

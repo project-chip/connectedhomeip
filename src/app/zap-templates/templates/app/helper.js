@@ -196,14 +196,16 @@ function chip_endpoint_generated_commands_list()
       }
     });
 
-    ret = ret.concat(`/* ${c.comment} */\\\n`);
+    if (clientGeneratedCommands.length > 0 || serverGeneratedCommands.length > 0) {
+      ret = ret.concat(`  /* ${c.comment} */\\\n`);
+    }
     if (clientGeneratedCommands.length > 0) {
       clientGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret = ret.concat(`/*   incoming_server */ ${clientGeneratedCommands.join(' , ')}, \\\n`);
+      ret = ret.concat(`  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\\n`);
     }
     if (serverGeneratedCommands.length > 0) {
       serverGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret = ret.concat(`/*   incoming_client */ ${serverGeneratedCommands.join(' , ')}, \\\n`);
+      ret = ret.concat(`  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\\n`);
     }
   })
   return ret.concat('}\n');
@@ -263,12 +265,12 @@ function chip_endpoint_cluster_list()
     let serverGeneratedCommandsListVal = "nullptr";
 
     if (clientGeneratedCommands > 0) {
-      clientGeneratedCommands++;
+      clientGeneratedCommands++; // Leaves space for the terminator
       clientGeneratedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands} )`;
     }
 
     if (serverGeneratedCommands > 0) {
-      serverGeneratedCommands++;
+      serverGeneratedCommands++; // Leaves space for the terminator
       serverGeneratedCommandsListVal = `ZAP_GENERATED_COMMANDS_INDEX( ${totalCommands + clientGeneratedCommands} )`;
     }
 

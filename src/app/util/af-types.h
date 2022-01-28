@@ -120,13 +120,13 @@ typedef struct
 
     /**
      * A list of client generated commands. A client generated command
-     * is a client to server command. Terminated by 0xFFFF_FFFF.
+     * is a client to server command. Can be nullptr or terminated by 0xFFFF_FFFF.
      */
     const chip::CommandId * clientGeneratedCommandList;
 
     /**
      * A list of server generated commands. A server generated command
-     * is a response to client command request. Terminated by 0xFFFF_FFFF.
+     * is a response to client command request. Can be nullptr or terminated by 0xFFFF_FFFF.
      */
     const chip::CommandId * serverGeneratedCommandList;
 } EmberAfCluster;
