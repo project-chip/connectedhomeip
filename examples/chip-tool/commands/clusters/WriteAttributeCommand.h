@@ -56,7 +56,7 @@ public:
     }
 
     /////////// WriteClient Callback Interface /////////
-    void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteAttributePath & path,
+    void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteDataAttributePath & path,
                     chip::app::StatusIB status) override
     {
         CHIP_ERROR error = status.ToChipError();
@@ -96,7 +96,7 @@ public:
 
         mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs);
 
-        ReturnErrorOnFailure(mWriteClient->EncodeAttributeWritePayload(attributePathParams, value));
+        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value));
         return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
     }
 

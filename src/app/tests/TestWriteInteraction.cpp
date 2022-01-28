@@ -89,20 +89,13 @@ public:
 void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConcreteDataAttributePath attributePathParams;
+    AttributePathParams attributePathParams;
+    bool attributeValue              = true;
     attributePathParams.mEndpointId  = 2;
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    err = aWriteClient.PrepareAttributeIB(attributePathParams);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataIBTLVWriter();
-
-    err = writer->PutBoolean(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), true);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = aWriteClient.FinishAttributeIB();
+    err = aWriteClient.EncodeAttribute(attributePathParams, attributeValue);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

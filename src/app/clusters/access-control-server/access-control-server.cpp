@@ -435,7 +435,7 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    FabricIndex accessingFabricIndex = aDecoder.GetAccessingFabricIndex();
+    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
     if (!aPath.IsListItemOperation())
     {
@@ -448,18 +448,11 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         size_t maxCount;
 
         AccessControl::EntryIterator it;
-        ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessFabricIndex));
-        for (it.Next() == CHIP_NO_ERROR)
+        AccessControl::Entry entry;
+        ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
+        if (it.Next(entry) == CHIP_NO_ERROR)
         {
             oldCount++;
-        }
-
-        while (oldCount > 0)
-        {
-            --oldCount;
-            ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
-            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                       AccessControlCluster::ChangeTypeEnum::kRemoved));
         }
 
         ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
@@ -467,6 +460,14 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
         VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
         VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) > maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+        while (oldCount > 0)
+        {
+            --oldCount;
+            ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
+            ReturnErrorOnFailure(
+                LogAccessControlEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
+        }
 
         auto iterator = list.begin();
         while (iterator.Next())
@@ -483,9 +484,9 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         AccessControlEntryCodec item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
 
-        ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
-        ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                   AccessControlCluster::ChangeTypeEnum::kAdded));
+        ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, item.entry, &accessingFabricIndex));
+        ReturnErrorOnFailure(
+            LogAccessControlEvent(item.entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
     }
     else
     {
