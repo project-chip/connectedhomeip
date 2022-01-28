@@ -31,8 +31,8 @@ public:
 
     bool InitEndpoint(chip::EndpointId endpointId);
 
-    bool Lock(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pin);
-    bool Unlock(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pin);
+    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin);
+    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin);
 
     bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,

@@ -403,31 +403,31 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
 
-typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to issue command to lock the door.
  *
  * @param endpointId ID of the endpoint which contains the lock.
- * @param pinCode PIN code that is used to lock the door. Could be absent if attribute RequirePINforRemoteOperation is not set or
- *                set to false.
+ * @param[in] pinCode PIN code that is used to lock the door. Could be absent if attribute RequirePINforRemoteOperation is not set
+ * or set to false.
  *
  * @return true if the door was locked, false in case of any failure.
  */
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to issue command to unlock the door.
  *
  * @param endpointId ID of the endpoint which contains the lock.
- * @param pinCode PIN code that is used to unllock the door. Could be absent if attribute RequirePINforRemoteOperation is not set or
- *                set to false.
+ * @param[in[ pinCode PIN code that is used to unlock the door. Could be absent if attribute RequirePINforRemoteOperation is not set
+ * or set to false.
  *
  * @return true if the door was unlocked, false in case of any failure.
  */
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode);
 
-bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode,
+bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                                          uint16_t timeout);
 
 // =============================================================================
