@@ -72,6 +72,7 @@ protected:
     static void OnIconTimeout(WindowApp::Timer & timer);
 
 private:
+    void DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute);
     TaskHandle_t mHandle = nullptr;
     QueueHandle_t mQueue = nullptr;
     LEDWidget mStatusLED;
