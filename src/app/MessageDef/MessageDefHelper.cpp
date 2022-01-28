@@ -24,12 +24,12 @@
 #include "MessageDefHelper.h"
 #include <algorithm>
 #include <app/AppBuildConfig.h>
+#include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
 #include <inttypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <app/InteractionModelRevision.h>
 
 namespace chip {
 namespace app {
@@ -115,7 +115,7 @@ CHIP_ERROR CheckInteractionModelRevision(int & aTagPresenceMask, uint8_t aTag, T
 CHIP_ERROR EncodeInteractionModelRevision(uint8_t aTag, TLV::TLVWriter * apWriter)
 {
     InteractionModelRevision revision = 0;
-    revision = static_cast<InteractionModelRevision>(CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION);
+    revision                          = static_cast<InteractionModelRevision>(CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION);
     ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(aTag), revision));
     return CHIP_NO_ERROR;
 }
