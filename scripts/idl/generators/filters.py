@@ -14,25 +14,6 @@
 
 import logging
 import stringcase
-import enum
-
-from .types import ParseDataType, BasicInteger, BasicString, FundamentalType, IdlType
-
-
-def filter_IsBasicInteger(type) -> bool:
-    return type(type) == BasicInteger
-
-
-def filter_IsBasicString(type) -> bool:
-    return type(type) == BasicString
-
-
-def filter_IsFundamentalType(type) -> bool:
-    return type(type) == FundamentalType
-
-
-def filter_IsIdlType(type) -> bool:
-    return type(type) == IdlType
 
 
 def RegisterCommonFilters(filtermap):
@@ -47,10 +28,3 @@ def RegisterCommonFilters(filtermap):
     filtermap['pascalcase'] = stringcase.pascalcase
     filtermap['snakecase'] = stringcase.snakecase
     filtermap['spinalcase'] = stringcase.spinalcase
-
-    # type conversion is generally very used
-    filtermap['parseDataType'] = ParseDataType
-    filtermap['isBasicInteger'] = filter_IsBasicInteger
-    filtermap['isBasicString'] = filter_IsBasicString
-    filtermap['isFundamentalType'] = filter_IsFundamentalType
-    filtermap['isIdlType'] = filter_IsIdlType

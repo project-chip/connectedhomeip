@@ -16,7 +16,7 @@
 from idl.generators import CodeGenerator, GeneratorStorage
 from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command, DataType
 from idl import matter_idl_types
-from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType
+from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext
 from typing import Union, List, Set
 from stringcase import capitalcase
 
@@ -24,7 +24,7 @@ import enum
 import logging
 
 
-def FieldToGlobalName(field: Field, known_enum_types: List[matter_idl_types.Enum]) -> Union[str, None]:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
     """Global names are used for generic callbacks shared across
     all clusters (e.g. for bool/float/uint32 and similar)
     """
@@ -34,7 +34,7 @@ def FieldToGlobalName(field: Field, known_enum_types: List[matter_idl_types.Enum
     if FieldAttribute.NULLABLE in field.attributes:
         return None
 
-    actual = ParseDataType(field.data_type, known_enum_types)
+    actual = ParseDataType(field.data_type, context)
     if type(actual) == IdlEnumType:
         actual = actual.base_type
 
@@ -65,8 +65,8 @@ def FieldToGlobalName(field: Field, known_enum_types: List[matter_idl_types.Enum
     return None
 
 
-def CallbackName(attr: Attribute, cluster: Cluster, known_enum_types: List[matter_idl_types.Enum]) -> str:
-    global_name = FieldToGlobalName(attr.definition, known_enum_types)
+def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) -> str:
+    global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
         return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
@@ -82,13 +82,12 @@ def CommandCallbackName(command: Command, cluster: Cluster):
   return '{}Cluster{}'.format(cluster.name, command.output_param)
 
 
-def attributesWithSupportedCallback(attrs, known_enum_types: List[matter_idl_types.Enum]):
+def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
     for attr in attrs:
         # Attributes will be generated for all types
         # except non-list structures
         if not attr.definition.is_list:
-            underlying = ParseDataType(
-                attr.definition.data_type, known_enum_types)
+            underlying = ParseDataType(attr.definition.data_type, context)
             if type(underlying) == IdlType:
                 continue
 
@@ -122,38 +121,6 @@ def LowercaseFirst(name: str):
         return name
     return name[0].lower() + name[1:]
 
-class LookupContext:
-    """Ability to lookup enumerations and structure types"""
-
-    def __init__(self, idl: Idl, cluster: Cluster):
-        self.idl = idl
-        self.cluster = cluster
-
-
-    def all_enums(self):
-        """All enumerations, ordered by lookup prioroty."""
-        for e in self.cluster.enums:
-            yield e
-        for e in self.idl.enums:
-            yield e
-
-    def all_structs(self):
-        """All structs, ordered by lookup prioroty."""
-        for e in self.cluster.structs:
-            yield e
-        for e in self.idl.structs:
-            yield e
-
-    def is_enum_type(self, name: str):
-        return any(map(lambda e: e.name == name, self.all_enums()))
-
-    def is_struct_type(self, name: str):
-        return any(map(lambda s: s.name == name, self.all_structs()))
-
-def CreateContext(idl: Idl, cluster: Cluster):
-    return LookupContext(idl, cluster)
-
-
 class EncodableValueAttr(enum.Enum):
     LIST     = enum.auto()
     NULLABLE = enum.auto()
@@ -165,7 +132,7 @@ class EncodableValue:
     for optionality, lists and recursive data type lookups within
     the IDL and cluster
     """
-    def __init__(self, context: LookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
         self.context = context  # 
         self.data_type = data_type
         self.attrs = attrs
@@ -206,7 +173,7 @@ class EncodableValue:
            "bitmap24",
            "bitmap32",
            "bitmap64",
-        ]
+        ] or self.context.is_bitmap_type(self.data_type.name)
 
     def clone(self):
         return EncodableValue(self.context, self.data_type, self.attrs)
@@ -297,12 +264,14 @@ class EncodableValue:
                 return "Ljava/lang/String;"
         elif type(t) == IdlEnumType:
             return "Ljava/lang/Integer;"
+        elif type(t) == IdlBitmapType:
+            return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
 
 
-def EncodableValueFrom(field: Field, context: LookupContext):
+def EncodableValueFrom(field: Field, context: TypeLookupContext):
     attrs = set()
 
     if field.is_optional:
@@ -316,6 +285,9 @@ def EncodableValueFrom(field: Field, context: LookupContext):
 
     return EncodableValue(context, field.data_type, attrs)
 
+
+def CreateLookupContext(idl: Idl, cluster: Cluster):
+    return TypeLookupContext(idl, cluster)
 
 
 class JavaGenerator(CodeGenerator):
@@ -334,14 +306,10 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
-        self.jinja_env.filters['lookupContext'] = CreateContext
+        self.jinja_env.filters['createLookupContext'] = CreateLookupContext
 
 
     def internal_render_all(self):
-        known_enums = self.idl.enums[:]
-        for cluster in self.idl.clusters:
-            known_enums.extend(cluster.enums)
-
         # Single generation for compatibility check
         # Split expected in a future PR
         self.internal_render_one_output(
@@ -350,7 +318,6 @@ class JavaGenerator(CodeGenerator):
             vars={
                 'idl': self.idl,
                 'clusters': self.idl.clusters,
-                'known_enums': known_enums,
             }
         )
 
@@ -365,6 +332,6 @@ class JavaGenerator(CodeGenerator):
                 output_file_name="jni/%sClient-ReadImpl.cpp" % cluster.name,
                 vars={
                     'cluster': cluster,
-                    'known_enums': known_enums,
+                    'typeLookup': TypeLookupContext(self.idl, cluster),
                 }
             )

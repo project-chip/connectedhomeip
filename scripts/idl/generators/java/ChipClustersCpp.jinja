@@ -4,13 +4,13 @@
     chip::JniReferences::GetInstance().GetOptionalValue({{source}}, optionalValue_{{depth}});
     auto & definedValue_{{depth}} = {{target}}.Emplace();
     {{ encode_value(
-       "definedValue_{}".format(depth), 
-       "optionalValue_{}".format(depth), 
-       depth+1, 
+       "definedValue_{}".format(depth),
+       "optionalValue_{}".format(depth),
+       depth+1,
        encodable.without_optional()
     )}}
   }
-{%- endmacro %}    
+{%- endmacro %}
 
 {%- macro encode_nullable(target, source, depth, encodable) -%}
   if ({{source}} == nullptr) {
@@ -19,7 +19,7 @@
     auto & nonNullValue_{{depth}} = {{target}}.SetNonNull();
     {{encode_value("nonNullValue_{}".format(depth), source, depth+1, encodable.without_nullable())}}
   }
-{%- endmacro %}    
+{%- endmacro %}
 
 {%- macro encode_list(target, source, depth, encodable) -%}
   {
@@ -123,6 +123,8 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 
 {% for cluster in clusters | clientClustersOnly -%}
 
+{% set typeLookup = idl | createLookupContext(cluster) %}
+
 JNI_METHOD(jlong, {{cluster.name | capitalcase}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -153,13 +155,12 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
   {%- if command.input_param -%}
-  {%- set lookup = idl | lookupContext(cluster) -%}
   {%-   for field in (cluster.structs | named(command.input_param)).fields -%}
     {{ encode_value(
         "request." + (field.name | lowercaseFirst),
         (field.name | lowercaseFirst), 
         0, 
-        field | asEncodable(lookup)
+        field | asEncodable(typeLookup)
     )}}
   {%-   endfor -%}
   {% endif %}
@@ -199,7 +200,7 @@ JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capi
 {
     chip::DeviceLayer::StackLock lock;
 
-    {%- set callbackName = attr | callbackName(cluster, known_enums) -%}
+    {%- set callbackName = attr | callbackName(cluster, typeLookup) -%}
 
     std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(Platform::New<{{callbackName}}>(callback, true), chip::Platform::Delete<{{callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));

@@ -18,7 +18,7 @@ import enum
 from idl.matter_idl_types import DataType
 from idl import matter_idl_types  # to explicitly say 'Enum'
 
-from typing import Union, List
+from typing import Union, List, Optional
 from dataclasses import dataclass
 
 
@@ -100,6 +100,19 @@ class IdlEnumType:
     def bits(self):
         return base_type.bits()
 
+@dataclass
+class IdlBitmapType:
+    idl_name: str
+    base_type: BasicInteger
+
+    @property
+    def byte_count(self):
+        return base_type.byte_count()
+
+    @property
+    def bits(self):
+        return base_type.bits()
+
 
 @dataclass
 class IdlType:
@@ -159,8 +172,77 @@ __CHIP_SIZED_TYPES__ = {
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=True),
 }
 
+class TypeLookupContext:
+    """
+    Handles type lookups within a scope.
 
-def ParseDataType(data_type: DataType, known_enum_types: List[matter_idl_types.Enum]) -> Union[BasicInteger, BasicString, FundamentalType, IdlType]:
+    Generally when looking for a struct/enum, the lookup will be first done
+    at a cluster level, then at a global level.
+    """
+
+    def __init__(self, idl: matter_idl_types.Idl, cluster: Optional[matter_idl_types.Cluster]):
+        self.idl = idl
+        self.cluster = cluster
+
+    def find_enum(self, name) -> Optional[matter_idl_types.Enum]:
+        if self.cluster:
+            for e in self.cluster.enums:
+                if e.name == name:
+                    return e
+
+        for e in self.idl.enums:
+            if e.name == name:
+                return e
+
+        return None
+
+    def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
+        for s in self.all_structs():
+            if s.name == name:
+                return s
+                    
+        return None
+
+    def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
+        for s in self.all_bitmaps():
+            if s.name == name:
+               return s
+                    
+        return None
+
+    def all_enums(self):
+        """All enumerations, ordered by lookup prioroty."""
+        if self.cluster:
+            for e in self.cluster.enums:
+                yield e
+        for e in self.idl.enums:
+            yield e
+
+    def all_bitmaps(self):
+        """All structs, ordered by lookup prioroty."""
+        if self.cluster:
+            for b in self.cluster.bitmaps:
+                yield b
+
+    def all_structs(self):
+        """All structs, ordered by lookup prioroty."""
+        if self.cluster:
+            for e in self.cluster.structs:
+                yield e
+        for e in self.idl.structs:
+            yield e
+
+    def is_enum_type(self, name: str):
+        return any(map(lambda e: e.name == name, self.all_enums()))
+
+    def is_struct_type(self, name: str):
+        return any(map(lambda s: s.name == name, self.all_structs()))
+
+    def is_bitmap_type(self, name: str):
+        return any(map(lambda s: s.name == name, self.idl.bitmaps))
+
+
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType]:
     """
     Match the given string name to a potentially known type
     """
@@ -182,10 +264,18 @@ def ParseDataType(data_type: DataType, known_enum_types: List[matter_idl_types.E
     if int_type is not None:
         return int_type
 
-    # All fast checks done, now check against known enumerations
-    for e in known_enum_types:
-        if e.name == data_type.name:
-            # Valid enum found. it MUST be based on a valid data type
-            return IdlEnumType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
+    # All fast checks done, now check against known data types
+    e = lookup.find_enum(data_type.name)
+    if e:
+        # Valid enum found. it MUST be based on a valid data type
+        return IdlEnumType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
+
+    b = lookup.find_bitmap(data_type.name)
+    if b:
+        # Valid enum found. it MUST be based on a valid data type
+        return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
+
+    if lookup.find_struct(data_type.name):
+        logging.warn("Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return IdlType(idl_name=data_type.name)
