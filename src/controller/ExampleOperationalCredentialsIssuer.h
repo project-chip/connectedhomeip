@@ -49,7 +49,7 @@ public:
     // needed given the interactions of this object with persistent storage. Consequently, the index is used to scope the entries
     // read/written to/from storage.
     //
-    // It is recommended that this index track the fabric index within which this issuer is operating in.
+    // It is recommended that this index track the fabric index within which this issuer is operating.
     //
     ExampleOperationalCredentialsIssuer(uint32_t index = 0) { mIndex = index; }
     virtual ~ExampleOperationalCredentialsIssuer() {}

@@ -245,85 +245,6 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     return CHIP_NO_ERROR.AsInteger();
 }
 
-ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                                   chip::NodeId localDeviceId)
-{
-    static uint16_t sFabricIndex = 1;
-
-    ChipLogDetail(Controller, "Creating New Device Controller");
-
-    auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
-    VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
-
-    if (localDeviceId == chip::kUndefinedNodeId)
-    {
-        localDeviceId = kDefaultLocalDeviceId;
-    }
-
-    // Initialize device attestation verifier
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
-
-    auto operationalCredentialsIssuer = std::make_unique<chip::Controller::ExampleOperationalCredentialsIssuer>(sFabricIndex);
-    VerifyOrReturnError(operationalCredentialsIssuer != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
-
-    ChipLogProgress(Controller, "Issuing example operational credentials to the controller...");
-
-    CHIP_ERROR err = operationalCredentialsIssuer->Initialize(*sStorageAdapter);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-    chip::Crypto::P256Keypair ephemeralKey;
-    err = ephemeralKey.Initialize();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
-    MutableByteSpan nocSpan(noc.Get(), kMaxCHIPDERCertLength);
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    ReturnErrorCodeIf(!icac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
-    MutableByteSpan icacSpan(icac.Get(), kMaxCHIPDERCertLength);
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-    ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
-    MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
-
-    err = operationalCredentialsIssuer->GenerateNOCChainAfterValidation(localDeviceId, sFabricIndex, ephemeralKey.Pubkey(),
-                                                                        rcacSpan, icacSpan, nocSpan);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-    SetupParams initParams;
-    initParams.storageDelegate                = sStorageAdapter;
-    initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
-    initParams.pairingDelegate                = &sPairingDelegate;
-    initParams.operationalCredentialsDelegate = operationalCredentialsIssuer.get();
-    initParams.operationalKeypair             = &ephemeralKey;
-    initParams.controllerRCAC                 = rcacSpan;
-    initParams.controllerICAC                 = icacSpan;
-    initParams.controllerNOC                  = nocSpan;
-
-    err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-    *outDevCtrl = devCtrl.release();
-    operationalCredentialsIssuer.release();
-
-    return CHIP_NO_ERROR.AsInteger();
-}
-
-ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
-{
-    if (devCtrl != NULL)
-    {
-        delete devCtrl->GetOperationalCredentialsDelegate();
-        devCtrl->Shutdown();
-        delete devCtrl;
-    }
-
-    return CHIP_NO_ERROR.AsInteger();
-}
-
 ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl,
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
                                                                  uint16_t * outPort)
@@ -636,6 +557,11 @@ exit:
 
 ChipError::StorageType pychip_Stack_Shutdown()
 {
+    //
+    // There is the symmetric call to match the Retain called at stack initialization
+    // time.
+    //
+    DeviceControllerFactory::GetInstance().ReleaseSystemState();
     return CHIP_NO_ERROR.AsInteger();
 }
 

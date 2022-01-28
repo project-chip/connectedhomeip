@@ -931,8 +931,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mCommissioningStage = kSecurePairing;
-
     if (mCommissioningStage != CommissioningStage::kSecurePairing)
     {
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
@@ -1449,7 +1447,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState)
 {
-    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD

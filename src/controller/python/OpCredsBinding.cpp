@@ -172,4 +172,15 @@ void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
 {
     Platform::Delete(context);
 }
+
+ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    if (devCtrl != NULL)
+    {
+        devCtrl->Shutdown();
+        delete devCtrl;
+    }
+
+    return CHIP_NO_ERROR.AsInteger();
+}
 }

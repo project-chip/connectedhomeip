@@ -113,6 +113,15 @@ public:
     //
     void RetainSystemState() { (void) mSystemState->Retain(); }
 
+    //
+    // To initiate shutdown of the stack upon termination of all resident controllers in the
+    // system, invoke this method to decrement the refcount on the system state and consequently,
+    // shut-down the stack.
+    //
+    // This should only be invoked if a matching call to RetainSystemState() was called prior.
+    //
+    void ReleaseSystemState() { mSystemState->Release(); }
+
 private:
     DeviceControllerFactory(){};
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);

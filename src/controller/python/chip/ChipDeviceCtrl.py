@@ -808,10 +808,6 @@ class ChipDeviceController():
         if self._dmLib is None:
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
-            self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [
-                POINTER(c_void_p), c_uint64]
-            self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
-
             self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_uint32

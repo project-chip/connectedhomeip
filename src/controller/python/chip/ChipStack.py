@@ -46,7 +46,6 @@ from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 
-
 __all__ = [
     "DeviceStatusStruct",
     "ChipStackException",
@@ -319,7 +318,7 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        self._ChipStack.Call(lambda: self._dmLib.pychip_Stack_Shutdown())
+        self.Call(lambda: self._ChipStackLib.pychip_Stack_Shutdown())
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None
