@@ -282,8 +282,9 @@ class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
-                                         EndpointParts, EndpointCommissioningInfo, BasicVendor, BasicProduct, BasicSoftware, FeatureMap>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, EndpointParts,
+                  EndpointCommissioningInfo, BasicVendor, BasicProduct, BasicSoftware, FeatureMap>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
