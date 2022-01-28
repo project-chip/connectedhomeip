@@ -88,6 +88,7 @@ using namespace chip::Inet;
 using namespace chip::System;
 using namespace chip::Transport;
 using namespace chip::Credentials;
+using namespace chip::app::Clusters;
 
 // For some applications those does not implement IMDelegate, the DeviceControllerInteractionModelDelegate will dispatch the
 // response to IMDefaultResponseCallback CHIPClientCallbacks, for the applications those implemented IMDelegate, this function will
@@ -107,9 +108,7 @@ using namespace chip::Protocols::UserDirectedCommissioning;
 
 constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
 
-DeviceController::DeviceController() :
-    mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
-    mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
+DeviceController::DeviceController()
 {
     mState                    = State::NotInitialized;
     mStorageDelegate          = nullptr;
@@ -379,7 +378,7 @@ void DeviceController::OnPIDReadResponse(void * context, uint16_t value)
 
     if (controller->OpenCommissioningWindowInternal() != CHIP_NO_ERROR)
     {
-        OnOpenPairingWindowFailureResponse(context, 0);
+        OnOpenPairingWindowFailureResponse(context, CHIP_NO_ERROR);
     }
 }
 
@@ -396,7 +395,7 @@ void DeviceController::OnVIDReadResponse(void * context, VendorId value)
     if (device == nullptr)
     {
         ChipLogError(Controller, "Could not find device for opening commissioning window");
-        OnOpenPairingWindowFailureResponse(context, 0);
+        OnOpenPairingWindowFailureResponse(context, CHIP_NO_ERROR);
         return;
     }
 
@@ -408,20 +407,17 @@ void DeviceController::OnVIDReadResponse(void * context, VendorId value)
                                                                                      OnVIDPIDReadFailureResponse) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Could not read PID for opening commissioning window");
-        OnOpenPairingWindowFailureResponse(context, 0);
+        OnOpenPairingWindowFailureResponse(context, CHIP_NO_ERROR);
     }
 }
 
 void DeviceController::OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Failed to read VID/PID for the device. error %" CHIP_ERROR_FORMAT, error.Format());
-    // TODO: The second arg here is wrong, but we need to fix the signature of
-    // OnOpenPairingWindowFailureResponse and how we send some commands to fix
-    // that.
-    OnOpenPairingWindowFailureResponse(context, to_underlying(app::StatusIB(error).mStatus));
+    OnOpenPairingWindowFailureResponse(context, error);
 }
 
-void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)
+void DeviceController::OnOpenPairingWindowSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
 {
     ChipLogProgress(Controller, "Successfully opened pairing window on the device");
     DeviceController * controller = static_cast<DeviceController *>(context);
@@ -433,17 +429,12 @@ void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)
     }
 }
 
-void DeviceController::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
+void DeviceController::OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
+    ChipLogError(Controller, "Failed to open pairing window on the device. Status %s", chip::ErrorStr(error));
     DeviceController * controller = static_cast<DeviceController *>(context);
     if (controller->mCommissioningWindowCallback != nullptr)
     {
-        CHIP_ERROR error = CHIP_ERROR_INVALID_PASE_PARAMETER;
-        if (status == EmberAfStatusCode::EMBER_ZCL_STATUS_CODE_BUSY)
-        {
-            error = CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS;
-        }
         controller->mCommissioningWindowCallback->mCall(controller->mCommissioningWindowCallback->mContext,
                                                         controller->mDeviceWithCommissioningWindowOpen, error, SetupPayload());
     }
@@ -520,9 +511,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, kAdministratorCommissioningClusterEndpoint);
 
-    Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
-
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
         ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
@@ -538,9 +526,16 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
         memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
         memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
 
-        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
-            successCallback, failureCallback, mCommissioningWindowTimeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
-            mSetupPayload.discriminator, mCommissioningWindowIteration, salt, mPAKEVerifierID++));
+        AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
+        request.commissioningTimeout = mCommissioningWindowTimeout;
+        request.PAKEVerifier         = ByteSpan(serializedVerifier);
+        request.discriminator        = mSetupPayload.discriminator;
+        request.iterations           = mCommissioningWindowIteration;
+        request.salt                 = salt;
+        request.passcodeID           = mPAKEVerifierID++;
+
+        ReturnErrorOnFailure(
+            cluster.InvokeCommand(request, this, OnOpenPairingWindowSuccessResponse, OnOpenPairingWindowFailureResponse));
 
         char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength];
 
@@ -554,7 +549,10 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     }
     else
     {
-        ReturnErrorOnFailure(cluster.OpenBasicCommissioningWindow(successCallback, failureCallback, mCommissioningWindowTimeout));
+        AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
+        request.commissioningTimeout = mCommissioningWindowTimeout;
+        ReturnErrorOnFailure(
+            cluster.InvokeCommand(request, this, OnOpenPairingWindowSuccessResponse, OnOpenPairingWindowFailureResponse));
     }
 
     return CHIP_NO_ERROR;

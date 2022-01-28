@@ -410,9 +410,6 @@ protected:
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
 
-    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
-    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
-
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
     static void OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error);
@@ -435,8 +432,8 @@ private:
 
     CommissioningWindowOption mCommissioningWindowOption;
 
-    static void OnOpenPairingWindowSuccessResponse(void * context);
-    static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
+    static void OnOpenPairingWindowSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
+    static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
     uint16_t mPAKEVerifierID = 1;
@@ -811,6 +808,18 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
+
+    template <typename ClusterObjectT, typename RequestObjectT>
+    CHIP_ERROR SendCommand(DeviceProxy * device, RequestObjectT request,
+                           CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                           CommandResponseFailureCallback failureCb)
+    {
+        ClusterObjectT cluster;
+        cluster.Associate(device, 0);
+
+        ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
+        return CHIP_NO_ERROR;
+    }
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
