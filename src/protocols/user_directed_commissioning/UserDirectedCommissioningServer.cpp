@@ -149,7 +149,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
         client->SetVendorId(nodeData.vendorId);
         client->SetProductId(nodeData.productId);
         client->SetDeviceName(nodeData.deviceName);
-        client->SetRotatingId(nodeData.rotatingId);
+        client->SetRotatingId(nodeData.rotatingId, nodeData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)

@@ -41,26 +41,32 @@ void LogStatus(uint8_t status)
     case EMBER_ZCL_STATUS_FAILURE:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_FAILURE (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_NOT_AUTHORIZED:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_NOT_AUTHORIZED (0x%02x)", status);
+    case EMBER_ZCL_STATUS_INVALID_SUBSCRIPTION:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_SUBSCRIPTION (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_MALFORMED_COMMAND:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_MALFORMED_COMMAND (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_UNSUP_COMMAND:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND (0x%02x)", status);
+    case EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATED82:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED82 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATED83:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED83 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATED84:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED84 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_INVALID_FIELD:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_FIELD (0x%02x)", status);
+    case EMBER_ZCL_STATUS_INVALID_COMMAND:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_COMMAND (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE (0x%02x)", status);
@@ -68,11 +74,11 @@ void LogStatus(uint8_t status)
     case EMBER_ZCL_STATUS_INVALID_VALUE:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_VALUE (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_READ_ONLY:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_READ_ONLY (0x%02x)", status);
+    case EMBER_ZCL_STATUS_UNSUPPORTED_WRITE:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_WRITE (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_INSUFFICIENT_SPACE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INSUFFICIENT_SPACE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_DUPLICATE_EXISTS:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DUPLICATE_EXISTS (0x%02x)", status);
@@ -86,56 +92,71 @@ void LogStatus(uint8_t status)
     case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_DATA_TYPE (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_INVALID_SELECTOR:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_SELECTOR (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATED8E:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED8E (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_WRITE_ONLY:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_WRITE_ONLY (0x%02x)", status);
+    case EMBER_ZCL_STATUS_UNSUPPORTED_READ:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_READ (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATED90:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED90 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEFINED_OUT_Of_BAND (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATED91:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED91 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_ACTION_DENIED:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_ACTION_DENIED (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DATA_VERSION_MISMATCH:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DATA_VERSION_MISMATCH (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DEPRECATED93:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATED93 (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_TIMEOUT:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_TIMEOUT (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_ABORT:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_ABORT (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESERVED95:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESERVED95 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_INVALID_IMAGE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_INVALID_IMAGE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESERVED96:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESERVED96 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_WAIT_FOR_DATA:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_WAIT_FOR_DATA (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESERVED97:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESERVED97 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESERVED98:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESERVED98 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESERVED99:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESERVED99 (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_HARDWARE_FAILURE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_HARDWARE_FAILURE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_RESERVED9A:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_RESERVED9A (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_SOFTWARE_FAILURE:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_SOFTWARE_FAILURE (0x%02x)", status);
+    case EMBER_ZCL_STATUS_BUSY:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_BUSY (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DEPRECATEDC0:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATEDC0 (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DEPRECATEDC1:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATEDC1 (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER (0x%02x)", status);
         break;
-    case EMBER_ZCL_STATUS_LIMIT_REACHED:
-        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_LIMIT_REACHED (0x%02x)", status);
+    case EMBER_ZCL_STATUS_DEPRECATEDC4:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_DEPRECATEDC4 (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NO_UPSTREAM_SUBSCRIPTION:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_NO_UPSTREAM_SUBSCRIPTION (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION (0x%02x)", status);
         break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_EVENT:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_EVENT (0x%02x)", status);
+        break;
     default:
-        ChipLogError(Zcl, "Unknow status: 0x%02x", status);
+        ChipLogError(Zcl, "Unknown status: 0x%02x", status);
         break;
     }
 }
@@ -180,7 +201,7 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
     case Protocols::InteractionModel::Status::UnsupportedAttribute:
         ChipLogProgress(Zcl, "  status: UnsupportedAttribute   (0x%02" PRIx8 ")", to_underlying(status));
         break;
-    case Protocols::InteractionModel::Status::InvalidValue:
+    case Protocols::InteractionModel::Status::ConstraintError:
         ChipLogProgress(Zcl, "  status: InvalidValue           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedWrite:
@@ -213,8 +234,8 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
     case Protocols::InteractionModel::Status::Deprecated91:
         ChipLogProgress(Zcl, "  status: Deprecated91           (0x%02" PRIx8 ")", to_underlying(status));
         break;
-    case Protocols::InteractionModel::Status::Reserved92:
-        ChipLogProgress(Zcl, "  status: Reserved92             (0x%02" PRIx8 ")", to_underlying(status));
+    case Protocols::InteractionModel::Status::DataVersionMismatch:
+        ChipLogProgress(Zcl, "  status: DataVersionMismatch    (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated93:
         ChipLogProgress(Zcl, "  status: Deprecated93           (0x%02" PRIx8 ")", to_underlying(status));
@@ -240,9 +261,6 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
     case Protocols::InteractionModel::Status::Reserved9a:
         ChipLogProgress(Zcl, "  status: Reserved9a             (0x%02" PRIx8 ")", to_underlying(status));
         break;
-    case Protocols::InteractionModel::Status::ConstraintError:
-        ChipLogProgress(Zcl, "  status: ConstraintError        (0x%02" PRIx8 ")", to_underlying(status));
-        break;
     case Protocols::InteractionModel::Status::Busy:
         ChipLogProgress(Zcl, "  status: Busy                   (0x%02" PRIx8 ")", to_underlying(status));
         break;
@@ -266,6 +284,9 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
         break;
     case Protocols::InteractionModel::Status::NeedsTimedInteraction:
         ChipLogProgress(Zcl, "  status: NeedsTimedInteraction  (0x%02" PRIx8 ")", to_underlying(status));
+        break;
+    case Protocols::InteractionModel::Status::UnsupportedEvent:
+        ChipLogProgress(Zcl, "  status: UnsupportedEvent       (0x%02" PRIx8 ")", to_underlying(status));
         break;
     default:
         ChipLogError(Zcl, "Unknown status: 0x%02" PRIx8, to_underlying(status));

@@ -2669,7 +2669,7 @@ exit:
 
 CHIP_ERROR DoorLockCluster::SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex,
-                                          chip::ByteSpan credentialData, uint16_t userIndex, uint8_t userStatus)
+                                          chip::ByteSpan credentialData, uint16_t userIndex, uint8_t userStatus, uint8_t userType)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2704,6 +2704,8 @@ CHIP_ERROR DoorLockCluster::SetCredential(Callback::Cancelable * onSuccessCallba
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
     // userStatus: dlUserStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
+    // userType: dlUserType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
 
     SuccessOrExit(err = sender->FinishCommand());
 

@@ -26,12 +26,34 @@
 class WriteAttribute : public ModelCommand, public chip::app::WriteClient::Callback
 {
 public:
+    WriteAttribute() : ModelCommand("write-by-id")
+    {
+        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
+        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("attribute-value", &mAttributeValue);
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        ModelCommand::AddArguments();
+    }
+
+    WriteAttribute(chip::ClusterId clusterId) : ModelCommand("write-by-id"), mClusterId(clusterId)
+    {
+        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("attribute-value", &mAttributeValue);
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        ModelCommand::AddArguments();
+    }
+
     WriteAttribute(const char * attributeName) : ModelCommand("write")
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
     ~WriteAttribute() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, mAttributeValue);
+    }
 
     /////////// WriteClient Callback Interface /////////
     void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteAttributePath & path,
@@ -79,7 +101,10 @@ public:
     }
 
 private:
+    chip::ClusterId mClusterId;
+    chip::AttributeId mAttributeId;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
 
+    CustomArgument mAttributeValue;
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
 };
