@@ -339,7 +339,7 @@ public:
         mTriedDecode = true;
         // TODO: We may want to reject kUndefinedFabricIndex for writing fabric scoped data. mAccessingFabricIndex will be
         // kUndefinedFabricIndex on PASE sessions.
-        return DataModel::Decode(mReader, aArg, MakeOptional(mAccessingFabricIndex));
+        return DataModel::Decode(mReader, aArg, MakeOptional(mSubjectDescriptor.mAccessingFabricIndex));
     }
 
     bool TriedDecode() const { return mTriedDecode; }
