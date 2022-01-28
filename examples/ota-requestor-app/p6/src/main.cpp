@@ -39,11 +39,6 @@
 #include "init_p6Platform.h"
 #include <app/server/Server.h>
 
-extern "C"
-{
-#include "cy_smif_psoc6.h"
-}
-
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
@@ -88,8 +83,6 @@ int main(void)
     cyhal_wdt_t wdt_obj;
     cyhal_wdt_init(&wdt_obj, cyhal_wdt_get_max_timeout_ms());
     cyhal_wdt_free(&wdt_obj);
-
-    psoc6_qspi_init();
 
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
