@@ -40,6 +40,16 @@ typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback)(void
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
     void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
     chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t status, uint8_t capacity, uint16_t groupId,
+                                                                uint8_t sceneCount,
+                                                                /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+typedef void (*ScenesClusterRemoveAllScenesResponseCallback)(void * context, uint8_t status, uint16_t groupId);
+typedef void (*ScenesClusterRemoveSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                       uint16_t transitionTime, chip::CharSpan sceneName,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 // List specific responses
 void GroupsClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
