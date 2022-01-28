@@ -22,7 +22,7 @@ config:
 tests:
     - label: "Wait for Arm Fail Safe"
       wait: "ArmFailSafe"
-      cluster: "General Commissioning" 
+      cluster: "General Commissioning"
 
     - label: "Wait for Set Regulatory Config"
       wait: "SetRegulatoryConfig"
