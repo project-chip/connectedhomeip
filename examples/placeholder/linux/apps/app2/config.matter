@@ -133,6 +133,46 @@ server cluster Descriptor = 29 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+client cluster GeneralCommissioning = 48 {
+  enum GeneralCommissioningError : ENUM8 {
+    kOk = 0;
+    kValueOutsideRange = 1;
+    kInvalidAuthentication = 2;
+    kNotCommissioning = 3;
+  }
+
+  enum RegulatoryLocationType : ENUM8 {
+    kIndoor = 0;
+    kOutdoor = 1;
+    kIndoorOutdoor = 2;
+  }
+
+  struct BasicCommissioningInfoType {
+    INT32U failSafeExpiryLengthMs = 0;
+  }
+
+  attribute int64u breadcrumb = 0;
+  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct ArmFailSafeRequest {
+    INT16U expiryLengthSeconds = 0;
+    INT64U breadcrumb = 1;
+    INT32U timeoutMs = 2;
+  }
+
+  request struct SetRegulatoryConfigRequest {
+    RegulatoryLocationType location = 0;
+    CHAR_STRING countryCode = 1;
+    INT64U breadcrumb = 2;
+    INT32U timeoutMs = 3;
+  }
+
+  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+}
+
 server cluster GeneralCommissioning = 48 {
   enum GeneralCommissioningError : ENUM8 {
     kOk = 0;
@@ -794,6 +834,7 @@ server cluster TemperatureMeasurement = 1026 {
 endpoint 0 {
   server  cluster Basic;
   server  cluster Descriptor;
+  binding cluster GeneralCommissioning;
   server  cluster GeneralCommissioning;
   server  cluster NetworkCommissioning;
   binding cluster OperationalCredentials;
