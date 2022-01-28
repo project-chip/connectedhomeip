@@ -100,7 +100,7 @@ def main():
     FailIfNot(test.TestResolve(nodeid=1),
               "Failed to resolve nodeid")
 
-    Still test network commissioning
+    # Still test network commissioning
     logger.info("Testing network commissioning")
     FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=1).run()),
               "Failed to finish network commissioning")
