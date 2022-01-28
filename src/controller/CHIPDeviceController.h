@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <app/AttributeCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
@@ -215,7 +216,7 @@ public:
      *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
     virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                          chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
@@ -452,7 +453,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
-                                      public SessionEstablishmentDelegate
+                                      public SessionEstablishmentDelegate, public app::AttributeCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -553,8 +554,8 @@ public:
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
 
     /**
      * @brief
@@ -681,6 +682,9 @@ public:
 #endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+
+    // ReadClient::Callback impl
+    void OnDone() override;
 
 private:
     DevicePairingDelegate * mPairingDelegate;
@@ -813,31 +817,34 @@ private:
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
     // Cluster callbacks for advancing commissioning flows
-    Callback::Callback<BasicSuccessCallback> mSuccess;
-    Callback::Callback<BasicFailureCallback> mFailure;
+    chip::Callback::Callback<BasicSuccessCallback> mSuccess;
+    chip::Callback::Callback<BasicFailureCallback> mFailure;
 
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
-    Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
-    Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertificateChainFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
+    chip::Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
+    chip::Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
+    chip::Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
+    chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
+    chip::Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
+    chip::Callback::Callback<DefaultFailureCallback> mOnCertificateChainFailureCallback;
+    chip::Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
+    chip::Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
+    chip::Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
+    chip::Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
-    Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
-    Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
+    chip::Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
 
-    Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+    chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mCommissioningDelegate = nullptr;
+
+    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
 } // namespace Controller

@@ -31,13 +31,11 @@ enum CommissioningStage : uint8_t
     kReadVendorId,
     kReadProductId,
     kReadSoftwareVersion,
-    kGetPartsList,
-    kCheckEndpointIsCommissionable,
+    kGetNetworkTechnology,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
-    kGetNetworkTechnology,
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -239,22 +237,6 @@ struct OperationalNodeFoundData
     OperationalDeviceProxy * operationalProxy;
 };
 
-struct EndpointParts
-{
-    EndpointParts() : numEndpoints(0) {}
-    // TODO: I don't think this is specified anywhere in the spec
-    // Is 10 reasonable? This is just to find the network commissioning clusters
-    static constexpr size_t kMaxEndpoints = 10;
-    EndpointId endpoints[kMaxEndpoints];
-    size_t numEndpoints;
-};
-struct EndpointCommissioningInfo
-{
-    EndpointCommissioningInfo(bool commissionable, bool network) : isCommissionable(commissionable), hasNetworkCluster(network) {}
-    bool isCommissionable  = false;
-    bool hasNetworkCluster = false;
-};
-
 struct BasicVendor
 {
     BasicVendor(VendorId id) : vendorId(id) {}
@@ -272,10 +254,12 @@ struct BasicSoftware
     BasicSoftware(uint32_t version) : softwareVersion(version) {}
     uint32_t softwareVersion;
 };
-struct FeatureMap
+
+struct NetworkClusters
 {
-    FeatureMap(uint32_t featureBitmap) : features(featureBitmap) {}
-    uint32_t features;
+    EndpointId wifi = kInvalidEndpointId;
+    EndpointId thread = kInvalidEndpointId;
+    EndpointId eth = kInvalidEndpointId;
 };
 
 class CommissioningDelegate
@@ -283,8 +267,8 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     struct CommissioningReport
-        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, EndpointParts,
-                  EndpointCommissioningInfo, BasicVendor, BasicProduct, BasicSoftware, FeatureMap>
+        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
+                  BasicVendor, BasicProduct, BasicSoftware, NetworkClusters>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

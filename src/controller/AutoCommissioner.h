@@ -51,15 +51,13 @@ private:
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
     Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
-    bool NetworkClusterUseable();
+    EndpointId GetEndpoint(const CommissioningStage & stage);
 
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy                 = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
     CommissioningParameters mParams                                  = CommissioningParameters();
-    EndpointParts mAllEndpoints;
-    EndpointId mEndpoint;
     VendorId mVendorId;
     uint16_t mProductId;
     uint32_t mSoftwareVersion;
@@ -68,12 +66,8 @@ private:
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
 
-    // We only commission one network endpoint even if the device and the parameters are capable of setting up > 1.
-    // This is sufficient to get the device onto the network. Additional network setup can be done after commissioning
-    // if required.
     bool mNeedsNetworkSetup = false;
-    BitFlags<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> mNetworkTechnology;
-    EndpointId mNetworkEndpoint = 0xFFFF;
+    NetworkClusters mNetworkEndpoints;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;

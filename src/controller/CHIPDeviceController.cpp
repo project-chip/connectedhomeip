@@ -36,6 +36,8 @@
 #include <controller/CHIPDeviceController.h>
 
 #include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
 #if CONFIG_DEVICE_LAYER
@@ -460,7 +462,7 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 
 CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration,
                                                                  uint16_t discriminator, uint8_t option,
-                                                                 Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                                 chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                                  bool readVIDPIDAttributes)
 {
     mSetupPayload = SetupPayload();
@@ -520,8 +522,8 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, kAdministratorCommissioningClusterEndpoint);
 
-    Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
+    chip::Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
+    chip::Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
@@ -563,8 +565,8 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 CHIP_ERROR DeviceController::CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId,
                                                        chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
                                                        chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                                                       Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+                                                       chip::Callback::Cancelable * onSuccessCallback,
+                                                       chip::Callback::Cancelable * onFailureCallback)
 {
     PeerId peerId;
     peerId.SetNodeId(deviceId);
@@ -781,8 +783,8 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
+                                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     return DeviceController::GetConnectedDevice(deviceId, onConnection, onFailure);
 }
@@ -1054,8 +1056,8 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mCertificateChainResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCertificateChainFailureCallback.Cancel();
+    chip::Callback::Cancelable * successCallback = mCertificateChainResponseCallback.Cancel();
+    chip::Callback::Cancelable * failureCallback = mOnCertificateChainFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.CertificateChainRequest(successCallback, failureCallback, certificateType));
     return CHIP_NO_ERROR;
@@ -1092,8 +1094,8 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * devic
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mAttestationResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnAttestationFailureCallback.Cancel();
+    chip::Callback::Cancelable * successCallback = mAttestationResponseCallback.Cancel();
+    chip::Callback::Cancelable * failureCallback = mOnAttestationFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.AttestationRequest(successCallback, failureCallback, attestationNonce));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
@@ -1182,8 +1184,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
+    chip::Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
+    chip::Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, csrNonce));
 
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
@@ -1281,8 +1283,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
+    chip::Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
+    chip::Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ipk, adminSubject, mVendorId));
 
@@ -1368,8 +1370,8 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
+    chip::Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
+    chip::Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.AddTrustedRootCertificate(successCallback, failureCallback, rcac));
 
@@ -1617,54 +1619,6 @@ void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, E
     base.SetCommandTimeout(timeout);
 }
 
-void DescriptorClusterPartsCallback(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & data)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    EndpointParts parts;
-    auto iter = data.begin();
-    while (iter.Next() && parts.numEndpoints < parts.kMaxEndpoints)
-    {
-        parts.endpoints[parts.numEndpoints++] = iter.GetValue();
-    }
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<EndpointParts>(parts);
-    commissioner->CommissioningStageComplete(iter.GetStatus(), report);
-}
-
-void DescriptorClusterServerCallback(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & data)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-
-    bool hasGeneralCommissioning   = false;
-    bool hasNetworkCommissioning   = false;
-    bool hasBasic                  = false;
-    bool hasOperationalCredentials = false;
-
-    auto iter = data.begin();
-    while (iter.Next())
-    {
-        switch (iter.GetValue())
-        {
-        case app::Clusters::GeneralCommissioning::Id:
-            hasGeneralCommissioning = true;
-            break;
-        case app::Clusters::NetworkCommissioning::Id:
-            hasNetworkCommissioning = true;
-            break;
-        case app::Clusters::Basic::Id:
-            hasBasic = true;
-            break;
-        case app::Clusters::OperationalCredentials::Id:
-            hasOperationalCredentials = true;
-            break;
-        }
-    }
-    bool isCommissionable = hasGeneralCommissioning && hasBasic && hasOperationalCredentials;
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<EndpointCommissioningInfo>(EndpointCommissioningInfo(isCommissionable, hasNetworkCommissioning));
-    commissioner->CommissioningStageComplete(iter.GetStatus(), report);
-}
-
 void BasicVendorCallback(void * context, VendorId vendorId)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1688,18 +1642,48 @@ void BasicSoftwareCallback(void * context, uint32_t softwareVersion)
     report.Set<BasicSoftware>(softwareVersion);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
-void OnFeatureMapSuccess(void * context, uint32_t value)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<FeatureMap>(value);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-}
 
 void AttributeReadFailure(void * context, CHIP_ERROR status)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(status);
+}
+
+void DeviceCommissioner::OnDone() {
+    NetworkClusters clusters;
+
+    CHIP_ERROR err = mAttributeCache->ForEachAttribute(app::Clusters::NetworkCommissioning::Id, [this, &clusters](const app::ConcreteAttributePath & path) {
+        if (path.mAttributeId != app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id) {
+            return CHIP_NO_ERROR;
+        }
+        TLV::TLVReader reader;
+        if (this->mAttributeCache->Get(path, reader) == CHIP_NO_ERROR) {
+            uint32_t flags = 0;
+            BitFlags<app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> features;
+            if (app::DataModel::Decode(reader, flags) == CHIP_NO_ERROR) {
+                features.SetRaw(flags);
+                if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface)) {
+                    clusters.wifi = path.mEndpointId;
+                } else if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface)) {
+                    clusters.thread = path.mEndpointId;
+                } else if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface)) {
+                    clusters.eth = path.mEndpointId;
+                }
+                else {
+                    // TODO: Gross workaroud for the empty feature map on all clusters. Remove.
+                    clusters.thread = path.mEndpointId;
+                }
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Controller, "Error parsing Network commissioning features");
+    }
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<NetworkClusters>(clusters);
+    CommissioningStageComplete(err, report);
 }
 
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
@@ -1744,21 +1728,26 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                                                                AttributeReadFailure);
     }
     break;
-
-    case CommissioningStage::kGetPartsList: {
-        ChipLogProgress(Controller, "Reading descriptor cluster parts list");
-        DescriptorCluster desc;
-        SetupCluster(desc, proxy, endpoint, timeout);
-        desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(this, DescriptorClusterPartsCallback,
-                                                                                             AttributeReadFailure);
-    }
-    break;
-    case CommissioningStage::kCheckEndpointIsCommissionable: {
-        ChipLogProgress(Controller, "Reading descriptor cluster server list for endpoint %u", endpoint);
-        DescriptorCluster desc;
-        SetupCluster(desc, proxy, endpoint, timeout);
-        desc.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(this, DescriptorClusterServerCallback,
-                                                                                              AttributeReadFailure);
+    case CommissioningStage::kGetNetworkTechnology: {
+        ChipLogProgress(Controller, "Sending request for network cluster feature map");
+        app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+        app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
+        app::AttributePathParams paramList[1];
+        paramList[0] = app::AttributePathParams(endpoint, app::Clusters::NetworkCommissioning::Id, app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
+        readParams.mpAttributePathParamsList = paramList;
+        readParams.mAttributePathParamsListSize = 1;
+        if (timeout.HasValue()) {
+            readParams.mTimeout = timeout.Value();
+        }
+        mAttributeCache = Platform::MakeUnique<app::AttributeCache>(*this);
+        mReadClient = chip::Platform::MakeUnique<app::ReadClient>(engine, proxy->GetExchangeManager(), mAttributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+        CHIP_ERROR err = mReadClient->SendRequest(readParams);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(Controller, "Failed to send read request for networking clusters");
+            CommissioningStageComplete(err);
+            return;
+        }
+        return;
     }
     break;
     case CommissioningStage::kArmFailsafe: {
@@ -1766,15 +1755,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         GeneralCommissioningCluster genCom;
         SetupCluster(genCom, proxy, endpoint, timeout);
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
-    }
-    break;
-    case CommissioningStage::kGetNetworkTechnology: {
-        ChipLogProgress(Controller, "Sending request for network cluster feature map on endpoint %u", endpoint);
-        NetworkCommissioningCluster netCom;
-        // TODO: swap to given endpoint once that PR is merged
-        netCom.Associate(proxy, 0);
-        netCom.ReadAttribute<app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(this, OnFeatureMapSuccess,
-                                                                                                    AttributeReadFailure);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
