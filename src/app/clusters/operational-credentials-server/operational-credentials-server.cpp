@@ -67,12 +67,15 @@ constexpr uint8_t kPAICertificate = 2;
 class OpCred_P256Keypair : public Crypto::P256KeypairHSM
 {
 public:
-    OpCred_P256Keypair() { SetKeyId(CASE_OPS_KEY); provisioned_key = true;}
+    OpCred_P256Keypair()
+    {
+        SetKeyId(CASE_OPS_KEY);
+        provisioned_key = true;
+    }
 };
 #else
 using OpCred_P256Keypair = Crypto::P256Keypair;
 #endif
-
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricIndex, NodeId subject)
 {
