@@ -127,7 +127,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         auto groupSession = sessionHandle->AsGroupSession();
         auto * groups = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
-        
+
         // TODO : #11911
         // For now, just set the packetHeader with the correct data.
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
