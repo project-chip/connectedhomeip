@@ -30,6 +30,7 @@
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
+constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
@@ -48,9 +49,10 @@ CHIP_ERROR CHIPCommand::Run()
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricStorage = &mFabricStorage;
-    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerIndex());
+    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId));
@@ -65,6 +67,7 @@ CHIP_ERROR CHIPCommand::Run()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityNull));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
@@ -99,7 +102,8 @@ void CHIPCommand::StopTracing()
 void CHIPCommand::SetIdentity(const char * identity)
 {
     std::string name = std::string(identity);
-    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0)
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
+        name.compare(kIdentityNull) != 0)
     {
         ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
                      kIdentityBeta, kIdentityGamma);
@@ -112,7 +116,8 @@ void CHIPCommand::SetIdentity(const char * identity)
 std::string CHIPCommand::GetIdentity()
 {
     std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
-    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0)
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
+        name.compare(kIdentityNull) != 0)
     {
         ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
                      kIdentityBeta, kIdentityGamma);
@@ -122,27 +127,34 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
-uint16_t CHIPCommand::CurrentCommissionerIndex()
+chip::FabricId CHIPCommand::CurrentCommissionerId()
 {
-    uint16_t index = 0;
+    chip::FabricId id;
 
     std::string name = GetIdentity();
     if (name.compare(kIdentityAlpha) == 0)
     {
-        index = kIdentityAlphaFabricId;
+        id = kIdentityAlphaFabricId;
     }
     else if (name.compare(kIdentityBeta) == 0)
     {
-        index = kIdentityBetaFabricId;
+        id = kIdentityBetaFabricId;
     }
     else if (name.compare(kIdentityGamma) == 0)
     {
-        index = kIdentityGammaFabricId;
+        id = kIdentityGammaFabricId;
+    }
+    else if (name.compare(kIdentityNull) == 0)
+    {
+        id = kIdentityNullFabricId;
+    }
+    else
+    {
+        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
+                           kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     }
 
-    VerifyOrDieWithMsg(index != 0, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
-                       kIdentityAlpha, kIdentityBeta, kIdentityGamma);
-    return index;
+    return id;
 }
 
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
@@ -172,28 +184,32 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
 
-    chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
-    chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-    chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-
     chip::Crypto::P256Keypair ephemeralKey;
-    ReturnLogErrorOnFailure(ephemeralKey.Initialize());
 
-    // TODO - OpCreds should only be generated for pairing command
-    //        store the credentials in persistent storage, and
-    //        generate when not available in the storage.
-    ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
-    ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
-    ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
-                                                                        ephemeralKey, rcacSpan, icacSpan, nocSpan));
+    if (fabricId != chip::kUndefinedFabricId)
+    {
+
+        // TODO - OpCreds should only be generated for pairing command
+        //        store the credentials in persistent storage, and
+        //        generate when not available in the storage.
+        ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
+        ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
+
+        chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
+        ReturnLogErrorOnFailure(ephemeralKey.Initialize());
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
+                                                                            ephemeralKey, rcacSpan, icacSpan, nocSpan));
+        commissionerParams.operationalKeypair = &ephemeralKey;
+        commissionerParams.controllerRCAC     = rcacSpan;
+        commissionerParams.controllerICAC     = icacSpan;
+        commissionerParams.controllerNOC      = nocSpan;
+    }
 
     commissionerParams.storageDelegate                = &mCommissionerStorage;
-    commissionerParams.fabricIndex                    = static_cast<chip::FabricIndex>(fabricId);
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
-    commissionerParams.ephemeralKeypair               = &ephemeralKey;
-    commissionerParams.controllerRCAC                 = rcacSpan;
-    commissionerParams.controllerICAC                 = icacSpan;
-    commissionerParams.controllerNOC                  = nocSpan;
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));

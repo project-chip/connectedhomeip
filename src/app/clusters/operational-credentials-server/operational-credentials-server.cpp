@@ -112,8 +112,15 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
 
             if (accessingFabricIndex == fabricInfo.GetFabricIndex())
             {
+                ByteSpan icac;
+
                 ReturnErrorOnFailure(fabricInfo.GetNOCCert(noc.noc));
-                ReturnErrorOnFailure(fabricInfo.GetICACert(noc.icac));
+                ReturnErrorOnFailure(fabricInfo.GetICACert(icac));
+
+                if (!icac.empty())
+                {
+                    noc.icac.SetNonNull(icac);
+                }
             }
 
             ReturnErrorOnFailure(encoder.Encode(noc));
@@ -717,7 +724,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         }
 
         keypair.Initialize();
-        SuccessOrExit(err = gFabricBeingCommissioned.SetEphemeralKey(&keypair));
+        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key
         VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);

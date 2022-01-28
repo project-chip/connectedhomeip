@@ -1166,7 +1166,7 @@ public class ClusterInfoMapping {
         @Nullable ArrayList<ChipStructs.DoorLockClusterDlCredential> credentials,
         @Nullable Integer creatorFabricIndex,
         @Nullable Integer lastModifiedFabricIndex,
-        Integer nextUserIndex) {
+        @Nullable Integer nextUserIndex) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo userIndexResponseValue = new CommandResponseInfo("userIndex", "Integer");
       responseValues.put(userIndexResponseValue, userIndex);
@@ -6302,6 +6302,11 @@ public class ClusterInfoMapping {
     doorLocksetCredentialCommandParams.put(
         "userStatus", doorLocksetCredentialuserStatusCommandParameterInfo);
 
+    CommandParameterInfo doorLocksetCredentialuserTypeCommandParameterInfo =
+        new CommandParameterInfo("userType", Integer.class);
+    doorLocksetCredentialCommandParams.put(
+        "userType", doorLocksetCredentialuserTypeCommandParameterInfo);
+
     InteractionInfo doorLocksetCredentialInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -6312,7 +6317,8 @@ public class ClusterInfoMapping {
                       (ChipStructs.DoorLockClusterDlCredential) commandArguments.get("credential"),
                       (byte[]) commandArguments.get("credentialData"),
                       (Integer) commandArguments.get("userIndex"),
-                      (Integer) commandArguments.get("userStatus"));
+                      (Integer) commandArguments.get("userStatus"),
+                      (Integer) commandArguments.get("userType"));
             },
             () -> new DelegatedSetCredentialResponseCallback(),
             doorLocksetCredentialCommandParams);

@@ -337,6 +337,23 @@ function chip_client_has_list_attributes(options)
 }
 
 /**
+ * Returns if a given server cluster has any reportable attribute
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_has_reportable_attributes(options)
+{
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_reportable_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
+
+  const filter = attribute => attribute.isReportableAttribute;
+  return attributes.then(items => items.find(filter));
+}
+
+/**
  * Creates block iterator over the server side cluster attributes
  * for a given cluster.
  *
@@ -470,6 +487,7 @@ exports.chip_attribute_list_entryTypes                       = chip_attribute_li
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
 exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
+exports.chip_server_has_reportable_attributes                = chip_server_has_reportable_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;

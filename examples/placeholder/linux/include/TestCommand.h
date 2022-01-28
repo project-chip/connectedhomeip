@@ -66,6 +66,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    static void ScheduleNextTest(intptr_t context)
+    {
+        TestCommand * command = reinterpret_cast<TestCommand *>(context);
+        command->isRunning    = true;
+        command->NextTest();
+        chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, context);
+    }
+
     CHIP_ERROR WaitForCommissioning()
     {
         isRunning = false;
@@ -78,11 +86,7 @@ public:
         {
         case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
             ChipLogProgress(chipTool, "Commissioning complete");
-
-            TestCommand * command = reinterpret_cast<TestCommand *>(arg);
-            command->isRunning    = true;
-            command->NextTest();
-            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, arg);
             break;
         }
     }

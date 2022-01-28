@@ -6616,6 +6616,8 @@ public:
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
 
+    auto GetFabricIndex() const { return adminFabricIndex; }
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -6659,6 +6661,8 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
+
+    auto GetFabricIndex() const { return adminFabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -14691,7 +14695,7 @@ struct Type
 public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
-    chip::ByteSpan icac;
+    DataModel::Nullable<chip::ByteSpan> icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16583,12 +16587,6 @@ enum class DlDataOperationType : uint8_t
     kClear  = 0x01,
     kModify = 0x02,
 };
-// Enum for DlDoorLockStatus
-enum class DlDoorLockStatus : uint8_t
-{
-    kDuplicate = 0x02,
-    kOccupied  = 0x03,
-};
 // Enum for DlDoorState
 enum class DlDoorState : uint8_t
 {
@@ -16941,6 +16939,21 @@ enum class DoorLockDayOfWeek : uint8_t
     kThursday  = 0x10,
     kFriday    = 0x20,
     kSaturday  = 0x40,
+};
+
+// Bitmap for DoorLockFeature
+enum class DoorLockFeature : uint32_t
+{
+    kPINCredentials     = 0x1,
+    kRFIDCredentials    = 0x2,
+    kFingerCredentials  = 0x4,
+    kLogging            = 0x8,
+    kAccessSchedules    = 0x10,
+    kDoorPositionSensor = 0x20,
+    kFaceCredentials    = 0x40,
+    kCredentialsOTA     = 0x80,
+    kUsersManagement    = 0x100,
+    kNotifications      = 0x200,
 };
 
 namespace Structs {
@@ -17389,9 +17402,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -17407,9 +17420,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -18244,9 +18257,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan rfidCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -18262,9 +18275,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan rfidCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -18425,9 +18438,9 @@ public:
     uint16_t userIndex                = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
     DataModel::Nullable<uint32_t> userUniqueId;
-    DlUserStatus userStatus         = static_cast<DlUserStatus>(0);
-    DlUserType userType             = static_cast<DlUserType>(0);
-    DlCredentialRule credentialRule = static_cast<DlCredentialRule>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18446,9 +18459,9 @@ public:
     uint16_t userIndex                = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
     DataModel::Nullable<uint32_t> userUniqueId;
-    DlUserStatus userStatus         = static_cast<DlUserStatus>(0);
-    DlUserType userType             = static_cast<DlUserType>(0);
-    DlCredentialRule credentialRule = static_cast<DlCredentialRule>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetUser
@@ -18515,7 +18528,7 @@ public:
     DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>> credentials;
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
-    uint16_t nextUserIndex = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> nextUserIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18539,7 +18552,7 @@ public:
     DataModel::Nullable<DataModel::DecodableList<Structs::DlCredential::DecodableType>> credentials;
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
-    uint16_t nextUserIndex = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> nextUserIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetUserResponse
@@ -18683,6 +18696,7 @@ enum class Fields
     kCredentialData = 2,
     kUserIndex      = 3,
     kUserStatus     = 4,
+    kUserType       = 5,
 };
 
 struct Type
@@ -18695,8 +18709,9 @@ public:
     DlDataOperationType operationType = static_cast<DlDataOperationType>(0);
     Structs::DlCredential::Type credential;
     chip::ByteSpan credentialData;
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18714,8 +18729,9 @@ public:
     DlDataOperationType operationType = static_cast<DlDataOperationType>(0);
     Structs::DlCredential::DecodableType credential;
     chip::ByteSpan credentialData;
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCredential
@@ -18840,7 +18856,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    Structs::DlCredential::Type credential;
+    DataModel::Nullable<Structs::DlCredential::Type> credential;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18855,7 +18871,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    Structs::DlCredential::DecodableType credential;
+    DataModel::Nullable<Structs::DlCredential::DecodableType> credential;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearCredential
@@ -34065,6 +34081,11 @@ struct Type;
 struct DecodableType;
 } // namespace TestNestedStructListArgumentRequest
 
+namespace TestEmitTestFabricScopedEventResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestEmitTestFabricScopedEventResponse
+
 namespace TestListNestedStructListArgumentRequest {
 struct Type;
 struct DecodableType;
@@ -34109,6 +34130,11 @@ namespace TestEmitTestEventRequest {
 struct Type;
 struct DecodableType;
 } // namespace TestEmitTestEventRequest
+
+namespace TestEmitTestFabricScopedEventRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestEmitTestFabricScopedEventRequest
 
 } // namespace Commands
 
@@ -34959,6 +34985,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestNestedStructListArgumentRequest
+namespace TestEmitTestFabricScopedEventResponse {
+enum class Fields
+{
+    kValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestEmitTestFabricScopedEventResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    uint64_t value = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestEmitTestFabricScopedEventResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    uint64_t value = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEmitTestFabricScopedEventResponse
 namespace TestListNestedStructListArgumentRequest {
 enum class Fields
 {
@@ -35285,6 +35343,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEmitTestEventRequest
+namespace TestEmitTestFabricScopedEventRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestEmitTestFabricScopedEventRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestEmitTestFabricScopedEventRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEmitTestFabricScopedEventRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -36454,6 +36544,40 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace TestEvent
+namespace TestFabricScopedEvent {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kArg1 = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TestFabricScopedEvent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return arg1; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TestFabricScopedEvent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TestFabricScopedEvent
 } // namespace Events
 } // namespace TestCluster
 namespace Messaging {

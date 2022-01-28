@@ -77,7 +77,11 @@
   {{#first}}
 
   {{/first}}
-  command {{asUpperCamelCase name}}(
+  {{#if mustUseTimedInvoke}}
+  timed command
+  {{~else}}
+  command
+  {{~/if}} {{asUpperCamelCase name}}(
     {{~#if arguments~}}
        {{asUpperCamelCase name}}Request
     {{~/if~}}

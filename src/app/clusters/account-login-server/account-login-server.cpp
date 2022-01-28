@@ -29,14 +29,20 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using chip::app::Clusters::AccountLogin::Delegate;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
-
-using chip::app::Clusters::AccountLogin::Delegate;
 
 namespace {
 
@@ -44,8 +50,18 @@ Delegate * gDelegateTable[EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT] 
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::AccountLogin::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
+    {
+        ChipLogError(Zcl, "AccountLogin returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetAccountLoginDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "AccountLogin NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, AccountLogin::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -66,8 +82,9 @@ namespace AccountLogin {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::AccountLogin::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, AccountLogin::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -91,14 +108,13 @@ bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * 
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EndpointId endpoint          = commandPath.mEndpointId;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+    app::CommandResponseHelper<Commands::GetSetupPINResponse::Type> responder(command, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Commands::GetSetupPINResponse::Type response = delegate->HandleGetSetupPin(tempAccountIdentifier);
-        err                                          = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleGetSetupPin(responder, tempAccountIdentifier);
     }
 
 exit:

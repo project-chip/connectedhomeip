@@ -36,7 +36,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 3;
+const uint16_t kTimeoutInSeconds = 5;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -319,6 +319,25 @@ CHIPDevice * GetConnectedDevice(void)
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedShortValue], 1U);
         }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_BI_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBinaryInputBasic * cluster = [[CHIPTestBinaryInputBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -900,6 +919,25 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_BOOL_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_BOOL_2_1_000000_WaitForCommissionee
 {
@@ -1100,6 +1138,25 @@ CHIPDevice * GetConnectedDevice(void)
                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -8722,7 +8779,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_1_000023_ReadAttribute
 {
@@ -10475,6 +10532,25 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_EMR_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestElectricalMeasurement * cluster = [[CHIPTestElectricalMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_ETHDIAG_1_1_000000_WaitForCommissionee
 {
@@ -10541,6 +10617,25 @@ CHIPDevice * GetConnectedDevice(void)
                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_FLW_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11011,6 +11106,27 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_ILL_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_LVL_1_1_000000_WaitForCommissionee
 {
@@ -11112,6 +11228,25 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_LVL_1_1_000005_ReadAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_1_1_000006_ReadAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -11129,7 +11264,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_1_1_000006_WriteAttribute
+- (void)testSendClusterTest_TC_LVL_1_1_000007_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to optional global attribute: FeatureMap"];
@@ -11191,7 +11326,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000003_ReadAttribute
 {
@@ -11953,7 +12088,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000006_ReadAttribute
 {
@@ -12010,7 +12145,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 200);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(200 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000009_ReadAttribute
 {
@@ -12091,7 +12226,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000013_ReadAttribute
 {
@@ -12148,7 +12283,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTest_TC_LVL_4_1_000000_WaitForCommissionee
@@ -12238,7 +12373,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000005_ReadAttribute
 {
@@ -12319,7 +12454,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000009_ReadAttribute
 {
@@ -12431,7 +12566,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000014_ReadAttribute
 {
@@ -12490,7 +12625,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTest_TC_LVL_5_1_000000_WaitForCommissionee
@@ -12552,7 +12687,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000004_ReadAttribute
 {
@@ -12610,7 +12745,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000007_ReadAttribute
 {
@@ -12668,7 +12803,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000010_ReadAttribute
 {
@@ -12725,7 +12860,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000013_Off
 {
@@ -12805,7 +12940,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000004_ReadAttribute
 {
@@ -12870,7 +13005,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000007_Stop
 {
@@ -12958,7 +13093,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000011_Off
 {
@@ -13027,6 +13162,25 @@ CHIPDevice * GetConnectedDevice(void)
                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MC_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -13832,6 +13986,25 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_OCC_1_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_OCC_2_1_000000_WaitForCommissionee
 {
@@ -14240,6 +14413,25 @@ uint8_t currentTarget;
 }
 - (void)testSendClusterTest_TC_OO_1_1_000006_ReadAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_OO_1_1_000007_ReadAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -14262,7 +14454,7 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
 
@@ -14281,7 +14473,7 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000008_WriteAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000009_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to optional global attribute: FeatureMap"];
@@ -14303,7 +14495,7 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000009_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back optional global attribute: FeatureMap"];
 
@@ -15032,7 +15224,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000003_ReadAttribute
 {
@@ -15107,7 +15299,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000007_ReadAttribute
 {
@@ -15182,7 +15374,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000011_ReadAttribute
 {
@@ -16182,6 +16374,25 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_PRS_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_PRS_2_1_000000_WaitForCommissionee
 {
@@ -16447,6 +16658,27 @@ uint8_t currentTarget;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
 
@@ -18118,6 +18350,27 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_RH_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_RH_2_1_000000_WaitForCommissionee
 {
@@ -18621,7 +18874,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000016_UserPrompt
 {
@@ -18677,7 +18930,7 @@ uint8_t currentTarget;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000023_UserPrompt
 {
@@ -18907,6 +19160,27 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_TM_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_TM_2_1_000000_WaitForCommissionee
 {
@@ -19079,6 +19353,25 @@ uint8_t currentTarget;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Read the optional global attribute constraints: FeatureMap"];
@@ -22107,6 +22400,26 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_TSUIC_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostatUserInterfaceConfiguration * cluster =
+        [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_TSUIC_2_1_000000_WaitForCommissionee
 {
@@ -22822,6 +23135,27 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_WIFIDIAG_1_1_000000_WaitForCommissionee
 {
@@ -22989,6 +23323,25 @@ uint8_t currentTarget;
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000004_ReadAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute: AttributeList Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_1_1_000005_ReadAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -23019,7 +23372,7 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_1_1_000005_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_1_1_000006_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write the default value to optional global attribute: FeatureMap"];
@@ -23041,7 +23394,7 @@ uint8_t currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_1_1_000006_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_1_1_000007_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back global attribute: FeatureMap"];
 
@@ -40513,7 +40866,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTestDescriptorCluster_000000_WaitForCommissionee
@@ -40659,7 +41012,31 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000001_WriteAttribute
+- (void)testSendClusterTestBasicInformation_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read location"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read location Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertTrue([actualValue isEqualToString:@"XX"]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBasicInformation_000002_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write location"];
 
@@ -40669,7 +41046,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     id locationArgument;
-    locationArgument = @"us";
+    locationArgument = @"US";
     [cluster writeAttributeLocationWithValue:locationArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write location Error: %@", err);
@@ -40681,7 +41058,31 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000002_WriteAttribute
+- (void)testSendClusterTestBasicInformation_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back location"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read back location Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertTrue([actualValue isEqualToString:@"US"]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBasicInformation_000004_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Restore initial location value"];
 
@@ -40691,7 +41092,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     id locationArgument;
-    locationArgument = @"";
+    locationArgument = @"XX";
     [cluster writeAttributeLocationWithValue:locationArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Restore initial location value Error: %@", err);
@@ -40703,7 +41104,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000003_ReadAttribute
+- (void)testSendClusterTestBasicInformation_000005_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read AttributeList value"];
 
@@ -45453,6 +45854,31 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterDoorLockReadAttributeNumberOfRFIDUsersSupportedWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeNumberOfRFIDUsersSupportedWithCompletionHandler"];
+
+    [cluster readAttributeNumberOfRFIDUsersSupportedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock NumberOfRFIDUsersSupported Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterDoorLockReadAttributeMaxPINCodeLengthWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -45496,6 +45922,56 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     [cluster readAttributeMinPINCodeLengthWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"DoorLock MinPINCodeLength Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockReadAttributeMaxRFIDCodeLengthWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeMaxRFIDCodeLengthWithCompletionHandler"];
+
+    [cluster readAttributeMaxRFIDCodeLengthWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock MaxRFIDCodeLength Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockReadAttributeMinRFIDCodeLengthWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeMinRFIDCodeLengthWithCompletionHandler"];
+
+    [cluster readAttributeMinRFIDCodeLengthWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock MinRFIDCodeLength Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

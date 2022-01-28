@@ -249,6 +249,11 @@ function getTests()
     'TestSubscribe_OnOff',
   ];
 
+  const DoorLock = [
+    'DL_UsersAndCredentials',
+    'DL_LockUnlock',
+  ];
+
   const tests = [
     BinaryInput, //
     BooleanState, //
@@ -279,6 +284,7 @@ function getTests()
     Others, //
     SoftwareDiagnostics, //
     Subscriptions, //
+    DoorLock, //
   ];
   return tests.flat(1);
 }
