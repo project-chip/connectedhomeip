@@ -55,8 +55,7 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
             PRETTY_PRINT_DECDEPTH();
             break;
         case kInteractionModelRevisionTag:
-            ReturnErrorOnFailure(
-                MessageParser::CheckInteractionModelRevision(reader));
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -69,8 +68,7 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields =
-            (1 << to_underlying(Tag::kWriteResponses));
+        const int RequiredFields = (1 << to_underlying(Tag::kWriteResponses));
 
         if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {

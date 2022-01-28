@@ -112,8 +112,7 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kInteractionModelRevisionTag:
-            ReturnErrorOnFailure(
-                MessageParser::CheckInteractionModelRevision(reader));
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);

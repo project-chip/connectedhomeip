@@ -30,7 +30,7 @@ namespace app {
 namespace TimedRequestMessage {
 enum class Tag : uint8_t
 {
-    kTimeoutMs                = 0,
+    kTimeoutMs = 0,
 };
 
 class Parser : public MessageParser

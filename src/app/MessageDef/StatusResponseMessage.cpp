@@ -49,8 +49,7 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kInteractionModelRevisionTag:
-            ReturnErrorOnFailure(
-                MessageParser::CheckInteractionModelRevision(reader));
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);

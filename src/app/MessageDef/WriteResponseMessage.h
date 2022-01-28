@@ -31,7 +31,7 @@ namespace app {
 namespace WriteResponseMessage {
 enum class Tag : uint8_t
 {
-    kWriteResponses           = 0,
+    kWriteResponses = 0,
 };
 
 class Parser : public MessageParser
