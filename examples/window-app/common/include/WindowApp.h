@@ -79,11 +79,13 @@ public:
         TiltModeChange,
         LiftUp,
         LiftDown,
-        LiftChanged,
         TiltUp,
         TiltDown,
-        TiltChanged,
         StopMotion,
+
+        // Cover Attribute update events
+        AttributeChange,
+
         // Provisioning events
         ProvisionedStateChanged,
         ConnectivityStateChanged,
