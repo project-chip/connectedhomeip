@@ -550,7 +550,7 @@ public:
      *   receives the OnPairingComplete call.
      *
      *   PASE connections can only be established with nodes that have their commissioning
-     *   window open. The PASE connection will fail if this window is not open and the
+     *   window open. The PASE connection will fail if this window is not open and in that case
      *   OnPairingComplete will be called with an error.
      *
      * @param[in] remoteDeviceId        The remote device Id.
