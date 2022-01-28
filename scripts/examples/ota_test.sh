@@ -11,7 +11,7 @@ scripts/examples/gn_build_example.sh examples/chip-tool out/
 
 for i in {0..100}; do echo -n hello; done > image.bin
 
-./ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 my-firmware.bin my-firmware.ota
+./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 my-firmware.bin my-firmware.ota
 
 ./out/ota_provider_debug/chip-ota-provider-app -f my-firmware.ota | tee /tmp/ota/provider-log.txt  &
 provider_pid=$!
