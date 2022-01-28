@@ -44,6 +44,73 @@ static int chip_command_handler(int argc, char ** argv)
     return static_cast<int>(err.AsInteger());
 }
 
+void get_command_completion(const char * buf, linenoiseCompletions * lc)
+{
+    size_t len = strlen(buf);
+
+    // If there is a trailing space, remove it for completion lookup
+    bool trailing_space = false;
+    if (buf[len - 1] == ' ')
+    {
+        trailing_space = true;
+        memset((char *) &buf[len - 1], 0, 1);
+        len -= 1;
+    }
+
+    const char * matter_prefix = "matter";
+
+    // the commands are prefixed wit "matter"
+    if (len >= 6 && strncmp(buf, matter_prefix, 6) == 0)
+    {
+        // remove "matter " prefix for completion lookup as the command
+        // registeration in general are done without "matter" prefix
+        char * line = new char[len - strlen(matter_prefix) + trailing_space + 1];
+        strcpy((char *) line, &buf[7]);
+        cmd_completion_context context = cmd_completion_context(line);
+        CHIP_ERROR err_code            = Engine::GetCommandCompletions(&context);
+        if (err_code == CHIP_NO_ERROR)
+        {
+            for (size_t i = 0; i < context.cmdc; i++)
+            {
+
+                // example: "matter" + " " + "config" + " " + "productid" + " " + '\0'
+                char * cmd_completion = new char[strlen(matter_prefix) + 1 + strlen(context.ret_prefix) + 1 +
+                                                 strlen(context.cmdv[i]->cmd_name) + trailing_space + 1];
+
+                // Write "matter "
+                size_t pos = 0;
+                strncpy(&cmd_completion[pos], matter_prefix, strlen(matter_prefix) + 1);
+                pos += strlen(matter_prefix);
+                strncpy(&cmd_completion[pos], " ", 2);
+                pos += 1;
+
+                // Write "config "
+                strncpy(&cmd_completion[pos], context.ret_prefix, strlen(context.ret_prefix) + 1);
+                pos += strlen(context.ret_prefix);
+                if (strcmp(context.ret_prefix, "") != 0)
+                {
+                    strncpy(&cmd_completion[pos], " ", 2);
+                    pos += 1;
+                }
+
+                // write "productid"
+                strncpy(&cmd_completion[pos], context.cmdv[i]->cmd_name, strlen(context.cmdv[i]->cmd_name) + 1);
+                pos += strlen(context.cmdv[i]->cmd_name);
+
+                linenoiseAddCompletion(lc, cmd_completion);
+                free((char *) cmd_completion);
+            }
+        }
+        free((char *) line);
+    }
+    else
+    {
+        // When the command isn't prefixed with "matter", call the default esp
+        // get completion function to get the non-matter registered commands
+        return esp_console_get_completion(buf, lc);
+    }
+}
+
 int streamer_esp32_init(streamer_t * streamer)
 {
     fflush(stdout);
@@ -73,6 +140,7 @@ int streamer_esp32_init(streamer_t * streamer)
     ESP_ERROR_CHECK(esp_console_init(&console_config));
     linenoiseSetMultiLine(1);
     linenoiseHistorySetMaxLen(100);
+    linenoiseSetCompletionCallback(&get_command_completion);
 
     if (linenoiseProbe())
     {
