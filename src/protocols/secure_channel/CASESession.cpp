@@ -1123,21 +1123,22 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     tbsData3Signature.SetLength(decryptedDataTlvReader.GetLength());
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData3Signature, tbsData3Signature.Length()));
 
-    // TODO - Validate message signature prior to validating the received operational credentials.
-    //        The op cert check requires traversal of cert chain, that is a more expensive operation.
-    //        If message signature check fails, the cert chain check will be unnecessary, but with the
-    //        current flow of code, a malicious node can trigger a DoS style attack on the device.
-    //        The same change should be made in Sigma2 processing.
-    // Step 7 - Validate Signature
-    #ifdef ENABLE_HSM_EC_KEY
+// TODO - Validate message signature prior to validating the received operational credentials.
+//        The op cert check requires traversal of cert chain, that is a more expensive operation.
+//        If message signature check fails, the cert chain check will be unnecessary, but with the
+//        current flow of code, a malicious node can trigger a DoS style attack on the device.
+//        The same change should be made in Sigma2 processing.
+// Step 7 - Validate Signature
+#ifdef ENABLE_HSM_EC_KEY
     {
         P256PublicKeyHSM remoteCredentialHSM;
         memcpy(Uint8::to_uchar(remoteCredentialHSM), remoteCredential.Bytes(), remoteCredential.Length());
-        SuccessOrExit(err = remoteCredentialHSM.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
+        SuccessOrExit(
+            err = remoteCredentialHSM.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
     }
-    #else
+#else
     SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
-    #endif
+#endif
 
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
 
