@@ -51,7 +51,7 @@ class DataType:
 
 @dataclass
 class Field:
-    data_type: str
+    data_type: DataType
     code: int
     name: str
     is_list: bool = False

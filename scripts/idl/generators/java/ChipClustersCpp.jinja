@@ -191,7 +191,8 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
 }
 {% endfor %}
 
-{%-  for attr in cluster.attributes if attr.is_subscribable -%}
+{%- for attr in cluster.attributes if attr.is_subscribable -%}
+{%-   if attr | canGenerateSubscribe(typeLookup) -%}
 
 JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -219,5 +220,7 @@ JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capi
     onSuccess.release();
     onFailure.release();
 }
+
+{%-   endif -%}
 {% endfor %}
 {%endfor%}

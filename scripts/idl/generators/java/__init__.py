@@ -286,6 +286,14 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
 def CreateLookupContext(idl: Idl, cluster: Cluster):
     return TypeLookupContext(idl, cluster)
 
+def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext):
+    # For backwards compatibility, we do not subscribe to structs
+    # (although list of structs is ok ...)
+    if attr.definition.is_list:
+        return True
+
+    return not lookup.is_struct_type(attr.definition.data_type.name)
+
 
 class JavaGenerator(CodeGenerator):
     """
@@ -304,6 +312,7 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
+        self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
 
 
     def internal_render_all(self):
