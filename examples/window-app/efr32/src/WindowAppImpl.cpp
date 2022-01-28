@@ -235,6 +235,11 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
     }
 }
 
+void WindowAppImpl::PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    Instance().PostEvent(WindowApp::Event(WindowApp::EventId::AttributeChange, endpoint, attributeId));
+}
+
 void WindowAppImpl::ProcessEvents()
 {
     WindowApp::Event event = EventId::None;
