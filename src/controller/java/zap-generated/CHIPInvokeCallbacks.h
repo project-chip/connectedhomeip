@@ -127,6 +127,36 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPDoorLockClusterGetWeekDayScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPDoorLockClusterGetYearDayScheduleResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetYearDayScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPDoorLockClusterGetYearDayScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterSetCredentialResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>
 {
