@@ -50,6 +50,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':
   case 'PowerSourceConfiguration':
+  case 'UnitLocalization':
     return 0;
   }
   return 1;
@@ -132,7 +133,7 @@ async function asObjectiveCClass(type, cluster, options)
   let pkgId    = await templateUtil.ensureZclPackageId(this);
   let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
-  if ((this.isList || this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
+  if ((this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
     return 'NSArray';
   }
 

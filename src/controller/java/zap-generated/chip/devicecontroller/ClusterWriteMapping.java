@@ -2445,6 +2445,26 @@ public class ClusterWriteMapping {
         "writeActiveCalendarTypeAttribute",
         writeTimeFormatLocalizationActiveCalendarTypeAttributeInteractionInfo);
     writeAttributeMap.put("timeFormatLocalization", writeTimeFormatLocalizationInteractionInfo);
+    Map<String, InteractionInfo> writeUnitLocalizationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeUnitLocalizationTemperatureUnitCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitLocalizationtemperatureUnitCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeUnitLocalizationTemperatureUnitCommandParams.put(
+        "value", unitLocalizationtemperatureUnitCommandParameterInfo);
+    InteractionInfo writeUnitLocalizationTemperatureUnitAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .writeTemperatureUnitAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeUnitLocalizationTemperatureUnitCommandParams);
+    writeUnitLocalizationInteractionInfo.put(
+        "writeTemperatureUnitAttribute",
+        writeUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+    writeAttributeMap.put("unitLocalization", writeUnitLocalizationInteractionInfo);
     Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();

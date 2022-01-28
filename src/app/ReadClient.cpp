@@ -84,10 +84,10 @@ void ReadClient::Close(CHIP_ERROR aError)
 
     if (aError != CHIP_NO_ERROR)
     {
-        mpCallback.OnError(this, aError);
+        mpCallback.OnError(aError);
     }
 
-    mpCallback.OnDone(this);
+    mpCallback.OnDone();
 }
 
 const char * ReadClient::GetStateStr() const
@@ -404,7 +404,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 
         if (mIsInitialReport)
         {
-            mpCallback.OnReportBegin(this);
+            mpCallback.OnReportBegin();
             mIsInitialReport = false;
         }
 
@@ -413,7 +413,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 
         if (!mPendingMoreChunks)
         {
-            mpCallback.OnReportEnd(this);
+            mpCallback.OnReportEnd();
             mIsInitialReport = true;
         }
     }
@@ -510,7 +510,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
-            mpCallback.OnAttributeData(this, attributePath, nullptr, statusIB);
+            mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -526,7 +526,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
-            mpCallback.OnAttributeData(this, attributePath, &dataReader, statusIB);
+            mpCallback.OnAttributeData(attributePath, &dataReader, statusIB);
         }
     }
 
@@ -559,7 +559,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
         mEventMin       = header.mEventNumber + 1;
         ReturnErrorOnFailure(data.GetData(&dataReader));
 
-        mpCallback.OnEventData(this, header, &dataReader, nullptr);
+        mpCallback.OnEventData(header, &dataReader, nullptr);
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -635,7 +635,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnLogErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnLogErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
 
-    mpCallback.OnSubscriptionEstablished(this);
+    mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     MoveToState(ClientState::SubscriptionActive);
 

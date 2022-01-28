@@ -64,7 +64,7 @@ public:
         kMaxNodeLabelLength             = 32,
         kMaxLocationLength              = 2,
         kMaxHardwareVersionStringLength = 64,
-        kMaxSoftwareVersionLength       = 64,
+        kMaxSoftwareVersionStringLength = 64,
         kMaxManufacturingDateLength     = 16,
         kMaxPartNumberLength            = 32,
         kMaxProductURLLength            = 256,

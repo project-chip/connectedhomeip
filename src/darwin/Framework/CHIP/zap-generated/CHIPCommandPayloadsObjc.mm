@@ -1897,9 +1897,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
         _pin = [NSData data];
     }
@@ -2221,9 +2221,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
         _rfidCode = [NSData data];
     }
@@ -2283,11 +2283,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userUniqueId = nil;
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
-        _credentialRule = @(0);
+        _credentialRule = nil;
     }
     return self;
 }
@@ -2327,7 +2327,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _lastModifiedFabricIndex = nil;
 
-        _nextUserIndex = @(0);
+        _nextUserIndex = nil;
     }
     return self;
 }
@@ -2401,9 +2401,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentialData = [NSData data];
 
-        _userIndex = @(0);
+        _userIndex = nil;
 
-        _userStatus = @(0);
+        _userStatus = nil;
+
+        _userType = nil;
     }
     return self;
 }
@@ -2455,7 +2457,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _credential = [CHIPDoorLockClusterDlCredential new];
+        _credential = nil;
     }
     return self;
 }
@@ -3864,6 +3866,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _value = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -3975,6 +3988,17 @@ NS_ASSUME_NONNULL_BEGIN
         _arg2 = @(0);
 
         _arg3 = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
     }
     return self;
 }

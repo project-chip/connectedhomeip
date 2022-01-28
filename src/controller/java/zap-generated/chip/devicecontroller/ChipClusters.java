@@ -1136,20 +1136,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void mfgSpecificPing(DefaultClusterCallback callback) {
-      mfgSpecificPing(chipClusterPtr, callback, null);
-    }
-
-    public void mfgSpecificPing(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-
-      mfgSpecificPing(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    private native void mfgSpecificPing(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
     public interface VendorIDAttributeCallback {
       void onSuccess(Integer value);
 
@@ -4713,13 +4699,14 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void clearCredential(
-        DefaultClusterCallback callback, ChipStructs.DoorLockClusterDlCredential credential) {
+        DefaultClusterCallback callback,
+        @Nullable ChipStructs.DoorLockClusterDlCredential credential) {
       clearCredential(chipClusterPtr, callback, credential, null);
     }
 
     public void clearCredential(
         DefaultClusterCallback callback,
-        ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable ChipStructs.DoorLockClusterDlCredential credential,
         int timedInvokeTimeoutMs) {
       clearCredential(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
     }
@@ -4769,8 +4756,9 @@ public class ChipClusters {
         Integer operationType,
         ChipStructs.DoorLockClusterDlCredential credential,
         byte[] credentialData,
-        Integer userIndex,
-        Integer userStatus) {
+        @Nullable Integer userIndex,
+        @Nullable Integer userStatus,
+        @Nullable Integer userType) {
       setCredential(
           chipClusterPtr,
           callback,
@@ -4779,6 +4767,7 @@ public class ChipClusters {
           credentialData,
           userIndex,
           userStatus,
+          userType,
           null);
     }
 
@@ -4787,8 +4776,9 @@ public class ChipClusters {
         Integer operationType,
         ChipStructs.DoorLockClusterDlCredential credential,
         byte[] credentialData,
-        Integer userIndex,
-        Integer userStatus,
+        @Nullable Integer userIndex,
+        @Nullable Integer userStatus,
+        @Nullable Integer userType,
         int timedInvokeTimeoutMs) {
       setCredential(
           chipClusterPtr,
@@ -4798,6 +4788,7 @@ public class ChipClusters {
           credentialData,
           userIndex,
           userStatus,
+          userType,
           timedInvokeTimeoutMs);
     }
 
@@ -4807,9 +4798,9 @@ public class ChipClusters {
         Integer userIndex,
         @Nullable String userName,
         @Nullable Long userUniqueId,
-        Integer userStatus,
-        Integer userType,
-        Integer credentialRule) {
+        @Nullable Integer userStatus,
+        @Nullable Integer userType,
+        @Nullable Integer credentialRule) {
       setUser(
           chipClusterPtr,
           callback,
@@ -4829,9 +4820,9 @@ public class ChipClusters {
         Integer userIndex,
         @Nullable String userName,
         @Nullable Long userUniqueId,
-        Integer userStatus,
-        Integer userType,
-        Integer credentialRule,
+        @Nullable Integer userStatus,
+        @Nullable Integer userType,
+        @Nullable Integer credentialRule,
         int timedInvokeTimeoutMs) {
       setUser(
           chipClusterPtr,
@@ -4858,7 +4849,7 @@ public class ChipClusters {
     private native void clearCredential(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable ChipStructs.DoorLockClusterDlCredential credential,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void clearUser(
@@ -4891,8 +4882,9 @@ public class ChipClusters {
         Integer operationType,
         ChipStructs.DoorLockClusterDlCredential credential,
         byte[] credentialData,
-        Integer userIndex,
-        Integer userStatus,
+        @Nullable Integer userIndex,
+        @Nullable Integer userStatus,
+        @Nullable Integer userType,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void setUser(
@@ -4902,9 +4894,9 @@ public class ChipClusters {
         Integer userIndex,
         @Nullable String userName,
         @Nullable Long userUniqueId,
-        Integer userStatus,
-        Integer userType,
-        Integer credentialRule,
+        @Nullable Integer userStatus,
+        @Nullable Integer userType,
+        @Nullable Integer credentialRule,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void unlockDoor(
@@ -4933,7 +4925,7 @@ public class ChipClusters {
           @Nullable ArrayList<ChipStructs.DoorLockClusterDlCredential> credentials,
           @Nullable Integer creatorFabricIndex,
           @Nullable Integer lastModifiedFabricIndex,
-          Integer nextUserIndex);
+          @Nullable Integer nextUserIndex);
 
       void onError(Exception error);
     }
@@ -5025,6 +5017,16 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readNumberOfRFIDUsersSupportedAttribute(IntegerAttributeCallback callback) {
+      readNumberOfRFIDUsersSupportedAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfRFIDUsersSupportedAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfRFIDUsersSupportedAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readMaxPINCodeLengthAttribute(IntegerAttributeCallback callback) {
       readMaxPINCodeLengthAttribute(chipClusterPtr, callback);
     }
@@ -5041,6 +5043,24 @@ public class ChipClusters {
     public void subscribeMinPINCodeLengthAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeMinPINCodeLengthAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxRFIDCodeLengthAttribute(IntegerAttributeCallback callback) {
+      readMaxRFIDCodeLengthAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxRFIDCodeLengthAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxRFIDCodeLengthAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinRFIDCodeLengthAttribute(IntegerAttributeCallback callback) {
+      readMinRFIDCodeLengthAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinRFIDCodeLengthAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinRFIDCodeLengthAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readLanguageAttribute(CharStringAttributeCallback callback) {
@@ -5234,6 +5254,12 @@ public class ChipClusters {
     private native void subscribeNumberOfPINUsersSupportedAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
+    private native void readNumberOfRFIDUsersSupportedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfRFIDUsersSupportedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
     private native void readMaxPINCodeLengthAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5244,6 +5270,18 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeMinPINCodeLengthAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMaxRFIDCodeLengthAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMaxRFIDCodeLengthAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMinRFIDCodeLengthAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMinRFIDCodeLengthAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readLanguageAttribute(
@@ -17180,6 +17218,77 @@ public class ChipClusters {
         SupportedCalendarTypesAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class UnitLocalizationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 45L;
+
+    public UnitLocalizationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readTemperatureUnitAttribute(IntegerAttributeCallback callback) {
+      readTemperatureUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeTemperatureUnitAttribute(DefaultClusterCallback callback, Integer value) {
+      writeTemperatureUnitAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeTemperatureUnitAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeTemperatureUnitAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeTemperatureUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTemperatureUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readTemperatureUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeTemperatureUnitAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeTemperatureUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

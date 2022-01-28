@@ -51,7 +51,7 @@
         {{~/if~}}
       {{~/if~}}
     {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isList~}} [] {{~/if}} = {{code}};
+    {{~#if isArray~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
   {{#chip_cluster_commands}}
   {{#if arguments}}
@@ -77,7 +77,11 @@
   {{#first}}
 
   {{/first}}
-  command {{asUpperCamelCase name}}(
+  {{#if mustUseTimedInvoke}}
+  timed command
+  {{~else}}
+  command
+  {{~/if}} {{asUpperCamelCase name}}(
     {{~#if arguments~}}
        {{asUpperCamelCase name}}Request
     {{~/if~}}

@@ -61,6 +61,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     Transport::PeerAddress peerAddr;
     System::PacketBufferHandle buf =
         System::PacketBufferHandle::NewWithData(aData, aSize, /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
+    if (buf.IsNull())
+    {
+        // Too big; we couldn't represent this as a packetbuffer to start with.
+        return 0;
+    }
 
     // Ignoring the return value from OnMessageReceived, because we might be
     // passing it all sorts of garbage that will cause it to fail.

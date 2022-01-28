@@ -16,13 +16,12 @@
  */
 
 /**
- * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ * @file Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
  */
 
 #include "AppPlatformShellCommands.h"
 #include "ControllerShellCommands.h"
 #include <AppMain.h>
-#include <app/util/ContentAppPlatform.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -33,8 +32,15 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 using namespace ::chip::Controller;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::app::Clusters;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -58,24 +64,33 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
     }
     else
     {
-        ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(state->GetVendorId());
+        ContentApp * app = ContentAppPlatform::GetInstance().LoadContentAppByClient(state->GetVendorId(), state->GetProductId());
         if (app == nullptr)
         {
             streamer_printf(sout, "no app found for vendor id=%d \r\n", state->GetVendorId());
             return CHIP_ERROR_BAD_REQUEST;
         }
 
-        if (app->GetAccountLogin() == nullptr)
+        if (app->GetAccountLoginDelegate() == nullptr)
         {
             streamer_printf(sout, "no AccountLogin cluster for app with vendor id=%d \r\n", state->GetVendorId());
             return CHIP_ERROR_BAD_REQUEST;
         }
 
         char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
                                             sizeof(rotatingIdString));
 
-        uint32_t pincode = app->GetAccountLogin()->GetSetupPIN(rotatingIdString);
+        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+
+        static const size_t kSetupPinSize = 12;
+        char setupPin[kSetupPinSize];
+
+        app->GetAccountLoginDelegate()->GetSetupPin(setupPin, kSetupPinSize, rotatingIdSpan);
+        std::string pinString(setupPin);
+
+        char * eptr;
+        uint32_t pincode = (uint32_t) strtol(pinString.c_str(), &eptr, 10);
         if (pincode == 0)
         {
             streamer_printf(sout, "udc no pin returned for vendor id=%d rotating ID=%s \r\n", state->GetVendorId(),
@@ -91,11 +106,11 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "  help                       Usage: app <subcommand>\r\n");
-    streamer_printf(sout, "  add <vid>                  Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n");
-    streamer_printf(sout, "  remove <vid>               Remove app with given vendor ID [1, 2, 9050]. Usage: app remove 9050\r\n");
+    streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
+    streamer_printf(sout, "  add <vid> [<pid>]    Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n");
+    streamer_printf(sout, "  remove <endpoint>    Remove app at given endpoint [6, 7, etc]. Usage: app remove 6\r\n");
     streamer_printf(sout,
-                    "  setpin <vid> <pincode>     Set pincode for app with given vendor ID. Usage: app setpin 9050 34567890\r\n");
+                    "  setpin <endpoint> <pincode>  Set pincode for app with given endpoint ID. Usage: app setpin 6 34567890\r\n");
     streamer_printf(sout,
                     "  commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage: "
                     "app commission 0\r\n");
@@ -121,7 +136,12 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         char * eptr;
 
         uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
-        chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(vid);
+        uint16_t pid = 0;
+        if (argc >= 3)
+        {
+            pid = (uint16_t) strtol(argv[1], &eptr, 10);
+        }
+        ContentAppPlatform::GetInstance().LoadContentAppByClient(vid, pid);
 
         ChipLogProgress(DeviceLayer, "added app");
 
@@ -135,8 +155,14 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         }
         char * eptr;
 
-        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
-        chip::AppPlatform::AppPlatform::GetInstance().UnloadContentAppByVendorId(vid);
+        uint16_t endpoint = (uint16_t) strtol(argv[1], &eptr, 10);
+        ContentApp * app  = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+        if (app == nullptr)
+        {
+            ChipLogProgress(DeviceLayer, "app not found");
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+        ContentAppPlatform::GetInstance().RemoveContentApp(app);
 
         ChipLogProgress(DeviceLayer, "removed app");
 
@@ -150,20 +176,20 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         }
         char * eptr;
 
-        uint16_t vid     = (uint16_t) strtol(argv[1], &eptr, 10);
-        uint32_t pincode = (uint32_t) strtol(argv[2], &eptr, 10);
-        ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(vid);
+        uint16_t endpoint = (uint16_t) strtol(argv[1], &eptr, 10);
+        char * pincode    = argv[2];
+        ContentApp * app  = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
         if (app == nullptr)
         {
-            ChipLogProgress(DeviceLayer, "no app found for vendor id=%d ", vid);
+            ChipLogProgress(DeviceLayer, "app not found");
             return CHIP_ERROR_BAD_REQUEST;
         }
-        if (app->GetAccountLogin() == nullptr)
+        if (app->GetAccountLoginDelegate() == nullptr)
         {
-            ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d ", vid);
+            ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with endpoint id=%d ", endpoint);
             return CHIP_ERROR_BAD_REQUEST;
         }
-        app->GetAccountLogin()->SetSetupPIN(pincode);
+        app->GetAccountLoginDelegate()->SetSetupPin(pincode);
 
         ChipLogProgress(DeviceLayer, "set pin success");
 

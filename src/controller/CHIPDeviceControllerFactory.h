@@ -48,15 +48,12 @@ struct SetupParams
 
     /* The following keypair must correspond to the public key used for generating
     controllerNOC. It's used by controller to establish CASE sessions with devices */
-    Crypto::P256Keypair * ephemeralKeypair = nullptr;
+    Crypto::P256Keypair * operationalKeypair = nullptr;
 
     /* The following certificates must be in x509 DER format */
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
-
-    FabricIndex fabricIndex = kMinValidFabricIndex;
-    FabricId fabricId       = kUndefinedFabricId;
 
     uint16_t controllerVendorId;
 

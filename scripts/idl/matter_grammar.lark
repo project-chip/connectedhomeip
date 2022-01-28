@@ -15,7 +15,9 @@ attribute_tag: "readonly"i -> attr_readonly
 request_struct: "request"i struct
 response_struct: "response"i struct
 
-command: "command"i id "(" id? ")" ":" id "=" number ";"
+command_attribute: "timed"i -> timed_command
+command_attributes: command_attribute*
+command: command_attributes "command"i id "(" id? ")" ":" id "=" number ";"
 
 cluster: cluster_side "cluster"i id "=" number "{" (enum|event|attribute|struct|request_struct|response_struct|command)* "}"
 ?cluster_side: "server"i -> server_cluster
