@@ -42,6 +42,14 @@ public:
     {}
 };
 
+class PairQRCodePase : public PairingCommand
+{
+public:
+    PairQRCodePase(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("qrcode-paseonly", PairingMode::QRCodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
 class PairQRCodeWifi : public PairingCommand
 {
 public:
@@ -63,6 +71,14 @@ class PairManualCode : public PairingCommand
 public:
     PairManualCode(CredentialIssuerCommands * credsIssuerConfig) :
         PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
+class PairManualCodePase : public PairingCommand
+{
+public:
+    PairManualCodePase(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("manualcode-paseonly", PairingMode::ManualCodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
@@ -214,9 +230,11 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
     commands_list clusterCommands = {
         make_unique<Unpair>(credsIssuerConfig),
         make_unique<PairQRCode>(credsIssuerConfig),
+        make_unique<PairQRCodePase>(credsIssuerConfig),
         make_unique<PairQRCodeWifi>(credsIssuerConfig),
         make_unique<PairQRCodeThread>(credsIssuerConfig),
         make_unique<PairManualCode>(credsIssuerConfig),
+        make_unique<PairManualCodePase>(credsIssuerConfig),
         make_unique<PairManualCodeWifi>(credsIssuerConfig),
         make_unique<PairManualCodeThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),

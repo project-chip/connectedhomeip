@@ -32,6 +32,8 @@ enum class PairingMode
     None,
     QRCode,
     ManualCode,
+    QRCodePaseOnly,
+    ManualCodePaseOnly,
     Ble,
     SoftAP,
     Ethernet,
@@ -80,6 +82,8 @@ public:
             break;
         case PairingMode::QRCode:
         case PairingMode::ManualCode:
+        case PairingMode::QRCodePaseOnly:
+        case PairingMode::ManualCodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ble:
@@ -149,6 +153,7 @@ private:
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId);
+    CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
 
@@ -166,7 +171,4 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
-
-    chip::CommissioneeDeviceProxy * mDevice;
-    chip::EndpointId mEndpointId = 0;
 };

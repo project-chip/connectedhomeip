@@ -51,6 +51,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::ManualCode:
         err = PairWithCode(remoteId);
         break;
+    case PairingMode::QRCodePaseOnly:
+    case PairingMode::ManualCodePaseOnly:
+        err = PaseWithCode(remoteId);
+        break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
@@ -83,17 +87,15 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     return CommissioningParameters();
 }
 
+CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
+{
+    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
+}
+
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 {
-    if (mNetworkType == PairingNetworkType::None)
-    {
-        return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
-    }
-    else
-    {
-        CommissioningParameters commissioningParams = GetCommissioningParameters();
-        return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
-    }
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
@@ -158,6 +160,10 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
+        if (mPairingMode == PairingMode::QRCodePaseOnly || mPairingMode == PairingMode::ManualCodePaseOnly)
+        {
+            SetCommandExitStatus(err);
+        }
     }
     else
     {
