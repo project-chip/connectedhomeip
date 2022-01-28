@@ -241,15 +241,10 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
 {
-    switch (stage)
-    {
-    case CommissioningStage::kWiFiNetworkEnable:
-    case CommissioningStage::kThreadNetworkEnable:
-        return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
-    default:
-        // Use default timeout specified in the IM.
-        return NullOptional;
-    }
+    // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout. Using 30s everywhere for
+    // simplicity. 30s appears to be sufficient for long-running network commands (enable wifi and enable thread), but we may wish
+    // to increase the timeout for those commissioning stages at a later time.
+    return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
 }
 
 CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk,
