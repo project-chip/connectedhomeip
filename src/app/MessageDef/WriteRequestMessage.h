@@ -36,11 +36,12 @@ namespace app {
 namespace WriteRequestMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse    = 0,
-    kTimedRequest        = 1,
-    kWriteRequests       = 2,
-    kMoreChunkedMessages = 3,
-    kIsFabricFiltered    = 4,
+    kSuppressResponse         = 0,
+    kTimedRequest             = 1,
+    kWriteRequests            = 2,
+    kMoreChunkedMessages      = 3,
+    kIsFabricFiltered         = 4,
+    kInteractionModelRevision = 5,
 };
 
 class Parser : public StructParser
@@ -108,6 +109,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder

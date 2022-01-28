@@ -152,6 +152,10 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
+        case to_underlying(Tag::kInteractionModelRevision):
+            ReturnErrorOnFailure(
+                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
+            break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -164,7 +168,8 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) |
-            (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
+            (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds)) |
+            (1 << to_underlying(Tag::kInteractionModelRevision));
 
         if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -232,6 +237,12 @@ CHIP_ERROR SubscribeRequestMessage::Parser::GetIsProxy(bool * const apIsProxy) c
 CHIP_ERROR SubscribeRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
 {
     return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
+}
+
+CHIP_ERROR
+SubscribeRequestMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
 }
 
 SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::KeepSubscriptions(const bool aKeepSubscriptions)
@@ -321,7 +332,14 @@ SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsFabricFil
 
 SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::EndOfSubscribeRequestMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 } // namespace app

@@ -692,6 +692,15 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
         desc = "Malformed Interaction Model Data Version Filter IB";
         break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Status Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_REPORT_DATA_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Report Data Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Timed Request Message";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

@@ -30,7 +30,8 @@ namespace app {
 namespace TimedRequestMessage {
 enum class Tag : uint8_t
 {
-    kTimeoutMs = 0,
+    kTimeoutMs                = 0,
+    kInteractionModelRevision = 1,
 };
 
 class Parser : public StructParser
@@ -60,6 +61,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetTimeoutMs(uint16_t * const apTimeoutMs) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder

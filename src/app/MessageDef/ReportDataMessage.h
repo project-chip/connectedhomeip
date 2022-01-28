@@ -38,13 +38,14 @@
 namespace chip {
 namespace app {
 namespace ReportDataMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_SubscriptionId      = 0,
-    kCsTag_AttributeReportIBs  = 1,
-    kCsTag_EventReports        = 2,
-    kCsTag_MoreChunkedMessages = 3,
-    kCsTag_SuppressResponse    = 4,
+    kSubscriptionId           = 0,
+    kAttributeReportIBs       = 1,
+    kEventReports             = 2,
+    kMoreChunkedMessages      = 3,
+    kSuppressResponse         = 4,
+    kInteractionModelRevision = 5,
 };
 
 class Parser : public StructParser
@@ -119,6 +120,7 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder
@@ -179,7 +181,6 @@ private:
     AttributeReportIBs::Builder mAttributeReportIBsBuilder;
     EventReportIBs::Builder mEventReportsBuilder;
 };
-}; // namespace ReportDataMessage
-
-}; // namespace app
-}; // namespace chip
+} // namespace ReportDataMessage
+} // namespace app
+} // namespace chip

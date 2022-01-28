@@ -21,7 +21,8 @@
 #include "DataVersionFilterIBs.h"
 #include "EventFilterIBs.h"
 #include "EventPathIBs.h"
-
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -34,11 +35,12 @@ namespace app {
 namespace ReadRequestMessage {
 enum class Tag : uint8_t
 {
-    kAttributeRequests  = 0,
-    kDataVersionFilters = 1,
-    kEventRequests      = 2,
-    kEventFilters       = 3,
-    kIsFabricFiltered   = 4,
+    kAttributeRequests        = 0,
+    kDataVersionFilters       = 1,
+    kEventRequests            = 2,
+    kEventFilters             = 3,
+    kIsFabricFiltered         = 4,
+    kInteractionModelRevision = 5,
 };
 
 class Parser : public StructParser
@@ -60,7 +62,6 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
-
     /**
      *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
@@ -106,6 +107,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder

@@ -33,9 +33,10 @@ namespace app {
 namespace InvokeRequestMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse = 0,
-    kTimedRequest     = 1,
-    kInvokeRequests   = 2,
+    kSuppressResponse         = 0,
+    kTimedRequest             = 1,
+    kInvokeRequests           = 2,
+    kInteractionModelRevision = 3,
 };
 
 class Parser : public StructParser
@@ -83,6 +84,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder
@@ -122,6 +125,6 @@ public:
 private:
     InvokeRequests::Builder mInvokeRequests;
 };
-}; // namespace InvokeRequestMessage
-}; // namespace app
-}; // namespace chip
+} // namespace InvokeRequestMessage
+} // namespace app
+} // namespace chip

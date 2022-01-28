@@ -44,6 +44,7 @@ enum class Tag : uint8_t
     kEventFilters              = 6,
     kIsProxy                   = 7,
     kIsFabricFiltered          = 8,
+    kInteractionModelRevision  = 9,
 };
 
 class Parser : public StructParser
@@ -134,6 +135,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder
