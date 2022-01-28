@@ -161,6 +161,12 @@ class BaseTestHelper:
             return False
 
         #
+        # Shutting down controllers results in races where the resolver still delivers
+        # resolution results to a now destroyed controller. Add a sleep for now to work around
+        # it while #14555 is being resolved.
+        time.sleep(1)
+
+        #
         # Shut-down all the controllers (which will free them up as well as de-initialize the
         # stack as well.
         #
