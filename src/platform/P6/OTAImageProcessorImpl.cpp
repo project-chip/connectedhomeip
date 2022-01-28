@@ -22,6 +22,7 @@
 
 namespace chip {
 
+#ifdef CY_OTA
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
@@ -201,5 +202,6 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
 }
+#endif // CY_OTA
 
 } // namespace chip

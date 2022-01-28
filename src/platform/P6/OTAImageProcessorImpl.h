@@ -24,6 +24,7 @@
 
 #include <fstream>
 
+#ifdef CY_OTA
 extern "C"
 {
 #include "cy_smif_psoc6.h"
@@ -71,3 +72,4 @@ private:
 };
 
 } // namespace chip
+#endif
