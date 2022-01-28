@@ -51,7 +51,6 @@ constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.
 static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
-static constexpr CommandId kInvalidCommandId     = 0xFFFF'FFFF;
 static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
 static constexpr CommandId kInvalidCommandId     = 0xFFFF'FFFF;
 static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
