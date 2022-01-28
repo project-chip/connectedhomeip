@@ -41,7 +41,10 @@ public:
     virtual ~TestCommand() {}
 
     virtual void NextTest() = 0;
-    CHIP_ERROR WaitMS(chip::System::Clock::Timeout ms) {return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);}
+    CHIP_ERROR WaitMS(chip::System::Clock::Timeout ms)
+    {
+        return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
+    }
     CHIP_ERROR WaitForMs(uint16_t ms) { return WaitMS(chip::System::Clock::Milliseconds32(ms)); }
     void SetCommandExitStatus(CHIP_ERROR status)
     {
@@ -67,7 +70,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static void ScheduleNextTest(intptr_t context){
+    static void ScheduleNextTest(intptr_t context)
+    {
         TestCommand * command = reinterpret_cast<TestCommand *>(context);
         command->isRunning    = true;
         command->NextTest();
