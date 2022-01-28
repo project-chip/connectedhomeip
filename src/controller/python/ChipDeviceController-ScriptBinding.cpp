@@ -253,7 +253,7 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     ChipLogDetail(Controller, "Creating New Device Controller");
 
     auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
-    VerifyOrReturnError(devCtrl.get() != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
+    VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     if (localDeviceId == chip::kUndefinedNodeId)
     {
@@ -265,8 +265,7 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
-    chip::Controller::ExampleOperationalCredentialsIssuer * operationalCredentialsIssuer =
-        new chip::Controller::ExampleOperationalCredentialsIssuer(sFabricIndex);
+    auto operationalCredentialsIssuer = std::make_unique<chip::Controller::ExampleOperationalCredentialsIssuer>(sFabricIndex);
     VerifyOrReturnError(operationalCredentialsIssuer != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     ChipLogProgress(Controller, "Issuing example operational credentials to the controller...");
@@ -298,18 +297,17 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.storageDelegate                = sStorageAdapter;
     initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
-    initParams.operationalCredentialsDelegate = operationalCredentialsIssuer;
-    initParams.ephemeralKeypair               = &ephemeralKey;
+    initParams.operationalCredentialsDelegate = operationalCredentialsIssuer.get();
+    initParams.operationalKeypair             = &ephemeralKey;
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
-    initParams.fabricIndex                    = (uint8_t) sFabricIndex;
-    initParams.fabricId                       = sFabricIndex++;
 
     err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();
+    operationalCredentialsIssuer.release();
 
     return CHIP_NO_ERROR.AsInteger();
 }

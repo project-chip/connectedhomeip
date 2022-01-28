@@ -19,7 +19,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 3;
+const uint16_t kTimeoutInSeconds = 5;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;

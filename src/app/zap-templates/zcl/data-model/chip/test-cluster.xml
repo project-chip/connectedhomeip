@@ -392,6 +392,14 @@ limitations under the License.
       <arg name="arg3" type="BOOLEAN"/>
     </command>
 
+    <command source="client" code="0x15" name="TestEmitTestFabricScopedEventRequest"
+             optional="false" response="TestEmitTestFabricScopedEventResponse">
+      <description>
+        Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response.
+      </description>
+      <arg name="arg1" type="INT8U"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -506,7 +514,14 @@ limitations under the License.
 
     <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="false" disableDefaultResponse="true">
       <description>
-        Delivers the ID of an event in response to test command emitting events.
+        Delivers the ID of an event in response to test command emitting fabric scoped events.
+      </description>
+      <arg name="value" type="INT64U"/>
+    </command>
+
+    <command source="server" code="0x0B" name="TestEmitTestFabricScopedEventResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Delivers the ID of an event in response to test command emitting fabric scope events.
       </description>
       <arg name="value" type="INT64U"/>
     </command>
@@ -520,5 +535,11 @@ limitations under the License.
       <field id="5" name="arg5" type="SimpleStruct" array="true"/>
       <field id="6" name="arg6" type="SimpleEnum" array="true"/>
     </event>
+
+    <event code="0x0002" name="TestFabricScopedEvent" priority="info" side="server">
+      <description>Example test event</description>
+      <field id="1" name="arg1" type="fabric_idx"/>
+    </event>
+
   </cluster>
 </configurator>

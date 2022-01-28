@@ -128,7 +128,7 @@ public class ChipClusters {
     {{! NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to
           false. }}
     {{~#*inline "asJavaTypeForEntry"}}{{asJavaType type null parent.name forceNotList=true}}{{/inline~}}
-    {{#if isList}}
+    {{#if isArray}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{>asJavaTypeForEntry isArray=false}}> valueList);
         void onError(Exception ex);

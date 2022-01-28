@@ -40,6 +40,9 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
     // the implementation methods provided by this class.
     friend PlatformManager;
 
+public:
+    inline bool IsCurrentTask(void) { return wiced_rtos_is_current_thread(mThread) == WICED_SUCCESS; }
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
@@ -92,7 +95,7 @@ inline PlatformManager & PlatformMgr(void)
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * Chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the CYW30739 platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {

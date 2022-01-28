@@ -152,6 +152,7 @@ class TestParser(unittest.TestCase):
 
                 command WithoutArg(): DefaultSuccess = 123;
                 command InOutStuff(InParam): OutParam = 222;
+                timed command TimedCommand(InParam): DefaultSuccess = 0xab;
             }
         """)
         expected = Idl(clusters=[
@@ -170,6 +171,9 @@ class TestParser(unittest.TestCase):
                                 input_param=None, output_param="DefaultSuccess"),
                         Command(name="InOutStuff", code=222,
                                 input_param="InParam", output_param="OutParam"),
+                        Command(name="TimedCommand", code=0xab,
+                                input_param="InParam", output_param="DefaultSuccess",
+                                attributes=set([CommandAttribute.TIMED_INVOKE])),
                     ],
                     )])
         self.assertEqual(actual, expected)

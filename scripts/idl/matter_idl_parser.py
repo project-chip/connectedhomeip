@@ -100,6 +100,13 @@ class MatterIdlTransformer(Transformer):
     def endpoint_binding_to_cluster(self, _):
         return EndpointContentType.CLIENT_BINDING
 
+    def timed_command(self, _):
+        return CommandAttribute.TIMED_INVOKE
+
+    def command_attributes(self, attrs):
+        # List because attrs is a tuple
+        return set(list(attrs))
+
     def struct_field(self, args):
         # Last argument is the named_member, the rest
         # are attributes
@@ -114,12 +121,14 @@ class MatterIdlTransformer(Transformer):
         return ClusterSide.CLIENT
 
     def command(self, args):
-        # A command has 3 arguments if no input or
-        # 4 arguments if input parameter is available
+        # A command has 4 arguments if no input or
+        # 5 arguments if input parameter is available
         param_in = None
-        if len(args) > 3:
-            param_in = args[1]
-        return Command(name=args[0], input_param=param_in, output_param=args[-2], code=args[-1])
+        if len(args) > 4:
+            param_in = args[2]
+
+        return Command(
+            attributes=args[0], name=args[1], input_param=param_in, output_param=args[-2], code=args[-1])
 
     def event(self, args):
         return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )

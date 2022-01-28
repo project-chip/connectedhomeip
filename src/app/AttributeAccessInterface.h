@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -106,7 +107,7 @@ public:
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
-                                    aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex),
+                                    aArg.GetFabricIndex() == mAttributeValueEncoder.mAccessingFabricIndex,
                                 CHIP_NO_ERROR);
             return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
         }
@@ -311,8 +312,8 @@ private:
 class AttributeValueDecoder
 {
 public:
-    AttributeValueDecoder(TLV::TLVReader & aReader, FabricIndex aAccessingFabricIndex) :
-        mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
+    AttributeValueDecoder(TLV::TLVReader & aReader, const Access::SubjectDescriptor & aSubjectDescriptor) :
+        mReader(aReader), mSubjectDescriptor(aSubjectDescriptor)
     {}
 
     template <typename T>
@@ -327,12 +328,17 @@ public:
     /**
      * The accessing fabric index for this write interaction.
      */
-    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+    FabricIndex AccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+
+    /**
+     * The accessing subject descriptor for this write interaction.
+     */
+    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
 private:
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
-    const FabricIndex mAccessingFabricIndex;
+    const Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 class AttributeAccessInterface

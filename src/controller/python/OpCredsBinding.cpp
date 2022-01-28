@@ -123,8 +123,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
 
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
 
-    *outDevCtrl = new chip::Controller::DeviceCommissioner();
-    VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
+    auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
+    VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
@@ -155,15 +155,15 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = context->mAdapter.get();
-    initParams.ephemeralKeypair               = &ephemeralKey;
+    initParams.operationalKeypair             = &ephemeralKey;
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
-    initParams.fabricIndex                    = (uint8_t) fabricIndex;
-    initParams.fabricId                       = fabricId;
 
-    err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
+    err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    *outDevCtrl = devCtrl.release();
 
     return CHIP_NO_ERROR.AsInteger();
 }

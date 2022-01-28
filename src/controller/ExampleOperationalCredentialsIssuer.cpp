@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -106,10 +106,20 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                                                                                 MutableByteSpan & rcac, MutableByteSpan & icac,
                                                                                 MutableByteSpan & noc)
 {
+    ChipDN noc_dn;
+    // TODO: Is there a way to make this code less error-prone for consumers?
+    // The consumer doesn't need to know the exact OID value.
+    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
+    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
+    // TODO: Add support for the CASE Authenticated Tags attributes
+    ChipDN icac_dn;
+    icac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, mIntermediateIssuerId);
+    ChipDN rcac_dn;
+    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
+
     ChipLogProgress(Controller, "Generating NOC");
-    X509CertRequestParams noc_request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, nodeId };
-    ReturnErrorOnFailure(
-        NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey, mIntermediateIssuer, noc));
+    X509CertRequestParams noc_request = { 1, mNow, mNow + mValidity, noc_dn, icac_dn };
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, pubkey, mIntermediateIssuer, noc));
 
     uint16_t icacBufLen = static_cast<uint16_t>(std::min(icac.size(), static_cast<size_t>(UINT16_MAX)));
     CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -123,8 +133,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     else
     {
         ChipLogProgress(Controller, "Generating ICAC");
-        X509CertRequestParams icac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-        ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuerId, mIntermediateIssuer.Pubkey(), mIssuer, icac));
+        X509CertRequestParams icac_request = { 0, mNow, mNow + mValidity, icac_dn, rcac_dn };
+        ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuer.Pubkey(), mIssuer, icac));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
@@ -142,7 +152,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     else
     {
         ChipLogProgress(Controller, "Generating RCAC");
-        X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+        X509CertRequestParams rcac_request = { 0, mNow, mNow + mValidity, rcac_dn, rcac_dn };
         ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
@@ -207,7 +217,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
 
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan);
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, Optional<AesCcm128KeySpan>(),
+                        Optional<NodeId>());
     return CHIP_NO_ERROR;
 }
 

@@ -65,11 +65,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     CHIP_ERROR error = System::MapErrorZephyr(dfu_target_write(block.data(), block.size()));
 
     // Report the result back to the downloader asynchronously.
-    return DeviceLayer::SystemLayer().ScheduleLambda([this, error] {
+    return DeviceLayer::SystemLayer().ScheduleLambda([this, error, block] {
         if (error == CHIP_NO_ERROR)
+        {
+            mParams.downloadedBytes += block.size();
             mDownloader->FetchNextData();
+        }
         else
+        {
             mDownloader->EndDownload(error);
+        }
     });
 }
 

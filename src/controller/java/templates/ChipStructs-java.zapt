@@ -36,9 +36,7 @@ public {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asL
     {{#zcl_struct_items}}
     {{! TODO: Print more descriptive types for optional, nullable, array, and struct. }}
     output.append("\t{{asLowerCamelCase name}}: ");
-    {{#if isList}}
-    output.append({{asLowerCamelCase name}});
-    {{else if isArray}}
+    {{#if isArray}}
     output.append({{asLowerCamelCase name}});
     {{else if (isOctetString type)}}
     output.append(Arrays.toString({{asLowerCamelCase name}}));

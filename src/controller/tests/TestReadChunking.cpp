@@ -96,20 +96,20 @@ class TestReadCallback : public app::ReadClient::Callback
 {
 public:
     TestReadCallback() : mBufferedCallback(*this) {}
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
-                         TLV::TLVReader * apData, const app::StatusIB & aStatus) override;
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override;
 
-    void OnDone(app::ReadClient * apReadClient) override;
+    void OnDone() override;
 
-    void OnReportEnd(const app::ReadClient * apReadClient) override { mOnReportEnd = true; }
+    void OnReportEnd() override { mOnReportEnd = true; }
 
     uint32_t mAttributeCount = 0;
     bool mOnReportEnd        = false;
     app::BufferedReadCallback mBufferedCallback;
 };
 
-void TestReadCallback::OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
-                                       TLV::TLVReader * apData, const app::StatusIB & aStatus)
+void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                       const app::StatusIB & aStatus)
 {
     if (aPath.mAttributeId != kTestListAttribute)
     {
@@ -134,7 +134,7 @@ void TestReadCallback::OnAttributeData(const app::ReadClient * apReadClient, con
     mAttributeCount++;
 }
 
-void TestReadCallback::OnDone(app::ReadClient * apReadClient) {}
+void TestReadCallback::OnDone() {}
 
 class TestAttrAccess : public app::AttributeAccessInterface
 {

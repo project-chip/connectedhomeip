@@ -869,7 +869,7 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
     myStruct.b = true;
     myStruct.c = TestCluster::SimpleEnum::kValueB;
     myStruct.d = ByteSpan(structBytes);
-    myStruct.e = CharSpan(structStr, strlen(structStr));
+    myStruct.e = CharSpan::fromCharString(structStr);
     myStruct.f = TestCluster::SimpleBitmap(2);
 
     TestCluster::SimpleEnum enumListVals[] = { TestCluster::SimpleEnum::kValueA, TestCluster::SimpleEnum::kValueC };
@@ -879,7 +879,7 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
     {
         // str needs to live until we call DataModel::Encode.
         const char str[] = "abc";
-        CharSpan strSpan(str, strlen(str));
+        CharSpan strSpan = CharSpan::fromCharString(str);
         Encodable encodable;
         if (encodeNulls)
         {
@@ -961,7 +961,7 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
         else if (encodeValues)
         {
             const char str[] = "abc";
-            CharSpan strSpan(str, strlen(str));
+            CharSpan strSpan = CharSpan::fromCharString(str);
 
             NL_TEST_ASSERT(apSuite, !decodable.nullableInt.IsNull());
             NL_TEST_ASSERT(apSuite, decodable.nullableInt.Value() == 5);
