@@ -70,7 +70,7 @@ public:
     };
 
 public:
-    ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
+    ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
     void Init(chip::System::Layer * systemLayer);
@@ -168,7 +168,7 @@ public:
 #endif // CHIP_CONFIG_TEST
 
 private:
-    ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
+    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
 
     /* Placeholder function to run a function for all exchanges */
