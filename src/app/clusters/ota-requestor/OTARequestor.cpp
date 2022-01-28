@@ -588,7 +588,8 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
 
     VerifyOrReturnError(response.softwareVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(response.softwareVersionString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    update.softwareVersion = response.softwareVersion.Value();
+    update.softwareVersion    = response.softwareVersion.Value();
+    update.softwareVersionStr = response.softwareVersionString.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
