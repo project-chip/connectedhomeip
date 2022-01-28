@@ -1123,6 +1123,7 @@ exit:
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 // Groups Cluster Commands
+<<<<<<< HEAD
 CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    uint16_t groupId, chip::CharSpan groupName)
 =======
@@ -1134,6 +1135,51 @@ CHIP_ERROR DoorLockCluster::SetCredentialResponse(Callback::Cancelable * onSucce
 CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint8_t index, chip::CharSpan name)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+<<<<<<< HEAD
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+=======
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::AddGroup::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1142,6 +1188,177 @@ CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSucces
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
     (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::AddGroupIfIdentifying::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::GetGroupMembership::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::RemoveAllGroups::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::RemoveGroup::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::ViewGroup::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1406,6 +1623,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1418,6 +1636,10 @@ CHIP_ERROR GroupsCluster::AddGroupResponse(Callback::Cancelable * onSuccessCallb
 =======
 CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+// OnOff Cluster Commands
+CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1429,6 +1651,7 @@ CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Groups::Commands::RemoveGroup::Id,
@@ -1727,6 +1950,9 @@ CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCal
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PlayRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Off::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1736,8 +1962,11 @@ CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCal
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -1752,6 +1981,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1762,6 +1992,9 @@ CHIP_ERROR GroupsCluster::ViewGroupResponse(Callback::Cancelable * onSuccessCall
 =======
 CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1773,6 +2006,7 @@ CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::On::Id,
@@ -1782,6 +2016,9 @@ CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSucces
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PreviousRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::On::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1791,8 +2028,11 @@ CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSucces
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -1807,6 +2047,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1818,6 +2059,9 @@ CHIP_ERROR IasZoneCluster::ZoneEnrollRequest(Callback::Cancelable * onSuccessCal
 =======
 CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1829,6 +2073,7 @@ CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Toggle::Id,
@@ -1838,6 +2083,9 @@ CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessC
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::RewindRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Toggle::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1847,8 +2095,11 @@ CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessC
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -1863,6 +2114,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 // Scenes Cluster Commands
@@ -1878,6 +2130,10 @@ CHIP_ERROR IasZoneCluster::ZoneStatusChangeNotification(Callback::Cancelable * o
 CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint64_t position)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+// Scenes Cluster Commands
+CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1889,6 +2145,7 @@ CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::AddScene::Id,
@@ -1899,6 +2156,9 @@ CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCal
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SeekRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::AddScene::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1908,6 +2168,7 @@ CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCal
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
@@ -1940,6 +2201,8 @@ CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCal
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), position));
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -1954,6 +2217,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1967,6 +2231,9 @@ CHIP_ERROR IdentifyCluster::IdentifyQueryResponse(Callback::Cancelable * onSucce
 CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -1978,6 +2245,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSu
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::GetSceneMembership::Id,
@@ -1987,6 +2255,9 @@ CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSu
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipBackwardRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::GetSceneMembership::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -1996,6 +2267,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSu
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
@@ -2010,6 +2282,8 @@ CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSu
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), deltaPositionMilliseconds));
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -2024,6 +2298,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -2037,6 +2312,9 @@ CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCa
 CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2048,6 +2326,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RecallScene::Id,
@@ -2057,6 +2336,9 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipForwardRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RecallScene::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -2066,6 +2348,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
@@ -2084,6 +2367,8 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), deltaPositionMilliseconds));
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -2098,6 +2383,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -2111,6 +2397,9 @@ CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSu
 CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2122,6 +2411,7 @@ CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RemoveAllScenes::Id,
@@ -2131,6 +2421,9 @@ CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSucce
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StartOverRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RemoveAllScenes::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -2140,10 +2433,13 @@ CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSucce
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -2158,6 +2454,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -2169,6 +2466,9 @@ CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSucces
 =======
 CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2180,6 +2480,7 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RemoveScene::Id,
@@ -2189,6 +2490,9 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
 =======
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StopRequest::Id,
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::RemoveScene::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -2198,6 +2502,7 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
@@ -2215,6 +2520,8 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
     // Command takes no arguments.
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -2229,6 +2536,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -2243,6 +2551,9 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
                                                          Callback::Cancelable * onFailureCallback, uint8_t target,
                                                          chip::CharSpan data)
 >>>>>>> - Generation for outgoing commands which originate from the client side only.:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2254,6 +2565,7 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::StoreScene::Id,
@@ -2343,6 +2655,9 @@ CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuc
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::FastForwardRequest::Id,
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::StoreScene::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -2352,8 +2667,11 @@ CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuc
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -2368,7 +2686,11 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+=======
+CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2380,7 +2702,11 @@ CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::NextRequest::Id,
+=======
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Scenes::Commands::ViewScene::Id,
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -2390,6 +2716,7 @@ CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCal
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -3511,6 +3838,8 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
     // sceneId: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
 
+=======
+>>>>>>> Regening light switch app with the right content after rebasing from upstream master
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
