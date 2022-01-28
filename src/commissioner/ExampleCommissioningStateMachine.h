@@ -278,7 +278,7 @@ private:
         SuccessOrExit(err);
 
         fabric = state->GetFabric();
-        VerifyOrExit(fabric != nullptr, CHIP_ERROR_NOT_FOUND);
+        VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_NOT_FOUND);
         opCreds.mAdminSubject = adminSubject.ValueOr(fabric->GetPeerId().GetNodeId());
         {
             // TODO(#13825): If not passed by the signer, the commissioner should
