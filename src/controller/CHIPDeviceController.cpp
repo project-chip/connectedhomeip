@@ -1769,7 +1769,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kGetNetworkTechnology: {
-        ChipLogProgress(Controller, "Sending request for network cluster feature map");
+        ChipLogProgress(Controller, "Sending request for network cluster feature map on endpoint %u", endpoint);
         NetworkCommissioningCluster netCom;
         // TODO: swap to given endpoint once that PR is merged
         netCom.Associate(proxy, 0);

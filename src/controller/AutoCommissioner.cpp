@@ -96,12 +96,25 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     return CHIP_NO_ERROR;
 }
 
+bool AutoCommissioner::NetworkClusterUseable() {
+    return (mNetworkTechnology.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface) && mParams.GetWiFiCredentials().HasValue()) ||
+           (mNetworkTechnology.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface) && mParams.GetThreadOperationalDataset().HasValue());
+}
+
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     if (lastErr != CHIP_NO_ERROR)
     {
         return CommissioningStage::kCleanup;
     }
+
+    bool checkNetworkTechnology = false;
+    if (currentStage == CommissioningStage::kCheckEndpointIsCommissionable  && mNeedsNetworkSetup && mNetworkEndpoint == mEndpoint) {
+        // We found a networking cluster on the current endpoint, but have not yet checked the feature map to
+        // see what network technologies are supported.
+        checkNetworkTechnology = true;
+    }
+
     mEndpoint = 0;
     switch (currentStage)
     {
@@ -116,23 +129,28 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kGetPartsList:
         return CommissioningStage::kCheckEndpointIsCommissionable;
     case CommissioningStage::kCheckEndpointIsCommissionable:
-        if (mAllEndpoints.numEndpoints > 0)
-        {
-            // Cycle through the list of endpoints from the end, checking for network cluster.
-            mEndpoint = mAllEndpoints.endpoints[--mAllEndpoints.numEndpoints];
-            return CommissioningStage::kCheckEndpointIsCommissionable;
-        }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kArmFailsafe:
-        if (mNeedsNetworkSetup)
-        {
+        if (checkNetworkTechnology) {
             return CommissioningStage::kGetNetworkTechnology;
-        }
-        else
-        {
-            return CommissioningStage::kConfigRegulatory;
+        } else {
+            return CommissioningStage::kArmFailsafe;
         }
     case CommissioningStage::kGetNetworkTechnology:
+        if (mNeedsNetworkSetup && !NetworkClusterUseable()) {
+            if (mAllEndpoints.numEndpoints > 0)
+            {
+                // Cycle through the list of endpoints from the end, checking for network cluster.
+                mEndpoint = mAllEndpoints.endpoints[--mAllEndpoints.numEndpoints];
+                return CommissioningStage::kCheckEndpointIsCommissionable;
+            }
+            else {
+                ChipLogError(Controller, "Unable to find a suitable network commissioning cluster for the given parameters");
+                lastErr = CHIP_ERROR_INVALID_ARGUMENT;
+                return CommissioningStage::kCleanup;
+            }
+        } else {
+            return CommissioningStage::kArmFailsafe;
+        }
+    case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kSendPAICertificateRequest;
@@ -156,6 +174,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         if (mNeedsNetworkSetup)
         {
+            mEndpoint = mNetworkEndpoint;
             if (mParams.GetWiFiCredentials().HasValue() &&
                 mNetworkTechnology.Has(
                     chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
@@ -185,6 +204,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 #endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
+        mEndpoint = mNetworkEndpoint;
         if (mParams.GetThreadOperationalDataset().HasValue() &&
             mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
         {
@@ -195,6 +215,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
+        mEndpoint = mNetworkEndpoint;
         if (mParams.GetWiFiCredentials().HasValue() &&
             mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
         {
@@ -206,6 +227,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
 
     case CommissioningStage::kWiFiNetworkEnable:
+        mEndpoint = mNetworkEndpoint;
         if (mParams.GetThreadOperationalDataset().HasValue() &&
             mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
         {
@@ -216,6 +238,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
+        mEndpoint = mNetworkEndpoint;
         // TODO: I dont think this is to spec - not sure where we'd have a commissioner that doesn't have dnssd.
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         return CommissioningStage::kFindOperational;
@@ -340,7 +363,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             }
             if (report.Get<EndpointCommissioningInfo>().hasNetworkCluster)
             {
-                mNetworkEndpoints.endpoints[mNetworkEndpoints.numEndpoints++] = mEndpoint;
+                mNetworkEndpoint = mEndpoint;
             }
             break;
         case CommissioningStage::kGetNetworkTechnology:
@@ -402,7 +425,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mOperationalDeviceProxy  = nullptr;
             mParams                  = CommissioningParameters();
             mAllEndpoints            = EndpointParts();
-            mNetworkEndpoints        = EndpointParts();
+            mNetworkEndpoint         = 0;
             return CHIP_NO_ERROR;
         default:
             break;
