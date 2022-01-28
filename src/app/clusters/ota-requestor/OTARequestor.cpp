@@ -554,12 +554,13 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
     size_t codeLen = 0;
-    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen > 0))
+    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen == 2))
     {
         args.location.SetValue(CharSpan(location, codeLen));
     }
     else
     {
+        // Country code unavailable or invalid, use default
         args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
