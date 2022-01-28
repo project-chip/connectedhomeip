@@ -110,7 +110,7 @@ class Engine;
  *              or "dns resolve".
  *  enginev:    An array of the shells that have registered commands under the preifx.
  *  enginec:    The number of shells that have registered commands under the preifx.
- *  next:       The next shell in the list.
+ *  next:       The next shell map in the list.
  *
  */
 typedef struct shell_map
@@ -125,9 +125,10 @@ typedef struct shell_map
  * A context object for passing request and receiving results with GetCmdCompletion.
  *
  *  line_buf:           The user input command to request for completion. If the applications prepends
- *                      "matter " to all matter commands, please remove the "matter " prefix from the buffer.
+ *                      "matter " to all matter commands, please remove the "matter " prefix and only use
+ *                      the string after it.
  *  ret_prefix:         The returned command prefix (up until the last space, not included).
- *  cmdv:               The returned command completion candidates unter the prefix in "ret_prefix".
+ *  cmdv:               The returned command completion candidates under the prefix in "ret_prefix".
  *  cmdc:               The returned number of command completion candidates in cmdv.
  *
  * Initialization:

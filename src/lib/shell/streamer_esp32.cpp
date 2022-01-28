@@ -59,13 +59,14 @@ void get_command_completion(const char * buf, linenoiseCompletions * lc)
 
     const char * matter_prefix = "matter";
 
-    // the commands are prefixed wit "matter"
+    // the commands are prefixed with "matter"
     if (len >= 6 && strncmp(buf, matter_prefix, 6) == 0)
     {
         // remove "matter " prefix for completion lookup as the command
         // registeration in general are done without "matter" prefix
         char * line = new char[len - strlen(matter_prefix) + trailing_space + 1];
         strcpy((char *) line, &buf[7]);
+
         cmd_completion_context context = cmd_completion_context(line);
         CHIP_ERROR err_code            = Engine::GetCommandCompletions(&context);
         if (err_code == CHIP_NO_ERROR)
@@ -74,8 +75,8 @@ void get_command_completion(const char * buf, linenoiseCompletions * lc)
             {
 
                 // example: "matter" + " " + "config" + " " + "productid" + " " + '\0'
-                char * cmd_completion = new char[strlen(matter_prefix) + 1 + strlen(context.ret_prefix) + 1 +
-                                                 strlen(context.cmdv[i]->cmd_name) + trailing_space + 1];
+                char * cmd_completion =
+                    new char[strlen(matter_prefix) + 1 + strlen(context.ret_prefix) + 1 + strlen(context.cmdv[i]->cmd_name) + 1];
 
                 // Write "matter "
                 size_t pos = 0;
