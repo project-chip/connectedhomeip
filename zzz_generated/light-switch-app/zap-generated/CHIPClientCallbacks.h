@@ -30,6 +30,30 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
+<<<<<<< HEAD
+=======
+// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+// instead of IM status code.
+// #6308 should handle IM error code on the application side, either modify this function or remove this.
+
+// Cluster Specific Response Callbacks
+typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback)(void * context, uint8_t action,
+                                                                            uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
+    void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
+    chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t status, uint8_t capacity, uint16_t groupId,
+                                                                uint8_t sceneCount,
+                                                                /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+typedef void (*ScenesClusterRemoveAllScenesResponseCallback)(void * context, uint8_t status, uint16_t groupId);
+typedef void (*ScenesClusterRemoveSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                       uint16_t transitionTime, chip::CharSpan sceneName,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+
+>>>>>>> Cleaning up the typo in helper.js
 // List specific responses
 void GroupsClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                    chip::Callback::Cancelable * onFailureCallback);
