@@ -41,6 +41,7 @@ function checkIsInsideClusterBlock(context, name)
   const clusterName = context.name;
   const clusterSide = context.side;
   const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
+
   throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
 
   return { clusterName, clusterSide };
@@ -279,7 +280,10 @@ function chip_cluster_command_arguments_with_structs_expanded(options)
   const filter = command => command.id == commandId;
   return asBlocks.call(this, commands.then(items => {
     const item = items.find(filter);
-    return ((typeof item !== 'undefined') && (item.expandedArguments || item.arguments));
+    if (item === undefined) {
+      return [];
+    }
+    return item.expandedArguments || item.arguments;
   }),
       options);
 }

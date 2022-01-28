@@ -207,6 +207,8 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    // Command takes no arguments.
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -242,6 +244,8 @@ CHIP_ERROR OnOffCluster::OffWithEffect(Callback::Cancelable * onSuccessCallback,
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -279,6 +283,8 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    // Command takes no arguments.
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -314,6 +320,8 @@ CHIP_ERROR OnOffCluster::OnWithRecallGlobalScene(Callback::Cancelable * onSucces
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -351,6 +359,8 @@ CHIP_ERROR OnOffCluster::OnWithTimedOff(Callback::Cancelable * onSuccessCallback
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+    // Command takes no arguments.
+
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
@@ -386,6 +396,8 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 
