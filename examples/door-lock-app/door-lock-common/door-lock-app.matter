@@ -360,6 +360,8 @@ server cluster DoorLock = 257 {
   readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
   readonly attribute int16u numberOfRFIDUsersSupported = 19;
+  readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
+  readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
@@ -385,12 +387,32 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 0;
   }
 
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct ClearYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
   request struct GetCredentialStatusRequest {
     DlCredential credential = 0;
   }
 
   request struct GetUserRequest {
     INT16U userIndex = 0;
+  }
+
+  request struct GetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct GetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
   }
 
   request struct LockDoorRequest {
@@ -416,6 +438,23 @@ server cluster DoorLock = 257 {
     nullable DlCredentialRule credentialRule = 6;
   }
 
+  request struct SetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DlDaysMaskMap daysMask = 2;
+    INT8U startHour = 3;
+    INT8U startMinute = 4;
+    INT8U endHour = 5;
+    INT8U endMinute = 6;
+  }
+
+  request struct SetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    epoch_s localStartTime = 2;
+    epoch_s localEndTime = 3;
+  }
+
   request struct UnlockDoorRequest {
     optional OCTET_STRING pinCode = 0;
   }
@@ -439,6 +478,25 @@ server cluster DoorLock = 257 {
     nullable INT16U nextUserIndex = 9;
   }
 
+  response struct GetWeekDayScheduleResponse {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DlStatus status = 2;
+    optional DlDaysMaskMap daysMask = 3;
+    optional INT8U startHour = 4;
+    optional INT8U startMinute = 5;
+    optional INT8U endHour = 6;
+    optional INT8U endMinute = 7;
+  }
+
+  response struct GetYearDayScheduleResponse {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    DlStatus status = 2;
+    optional epoch_s localStartTime = 3;
+    optional epoch_s localEndTime = 4;
+  }
+
   response struct SetCredentialResponse {
     DlStatus status = 0;
     nullable INT16U userIndex = 1;
@@ -447,11 +505,17 @@ server cluster DoorLock = 257 {
 
   command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   command ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  command ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  command ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
   command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
   command GetUser(GetUserRequest): GetUserResponse = 27;
+  command GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  command GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
   command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
   command SetUser(SetUserRequest): DefaultSuccess = 26;
+  command SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  command SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
   command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
 }
 

@@ -8784,6 +8784,112 @@ JNI_METHOD(void, DoorLockCluster, clearUser)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, DoorLockCluster, clearWeekDaySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject weekDayIndex, jobject userIndex,
+ jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.weekDayIndex = static_cast<std::remove_reference_t<decltype(request.weekDayIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(weekDayIndex));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, clearYearDaySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject yearDayIndex, jobject userIndex,
+ jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.yearDayIndex = static_cast<std::remove_reference_t<decltype(request.yearDayIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(yearDayIndex));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, DoorLockCluster, getCredentialStatus)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credential, jobject timedInvokeTimeoutMs)
 {
@@ -8878,6 +8984,118 @@ JNI_METHOD(void, DoorLockCluster, getUser)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn = chip::Callback::Callback<CHIPDoorLockClusterGetUserResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, getWeekDaySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject weekDayIndex, jobject userIndex,
+ jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.weekDayIndex = static_cast<std::remove_reference_t<decltype(request.weekDayIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(weekDayIndex));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+
+    std::unique_ptr<CHIPDoorLockClusterGetWeekDayScheduleResponseCallback,
+                    void (*)(CHIPDoorLockClusterGetWeekDayScheduleResponseCallback *)>
+        onSuccess(Platform::New<CHIPDoorLockClusterGetWeekDayScheduleResponseCallback>(callback),
+                  Platform::Delete<CHIPDoorLockClusterGetWeekDayScheduleResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, getYearDaySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject yearDayIndex, jobject userIndex,
+ jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.yearDayIndex = static_cast<std::remove_reference_t<decltype(request.yearDayIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(yearDayIndex));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+
+    std::unique_ptr<CHIPDoorLockClusterGetYearDayScheduleResponseCallback,
+                    void (*)(CHIPDoorLockClusterGetYearDayScheduleResponseCallback *)>
+        onSuccess(Platform::New<CHIPDoorLockClusterGetYearDayScheduleResponseCallback>(callback),
+                  Platform::Delete<CHIPDoorLockClusterGetYearDayScheduleResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     if (timedInvokeTimeoutMs == nullptr)
@@ -9150,6 +9368,126 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, DoorLockCluster, setWeekDaySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject weekDayIndex, jobject userIndex, jobject daysMask,
+ jobject startHour, jobject startMinute, jobject endHour, jobject endMinute, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.weekDayIndex = static_cast<std::remove_reference_t<decltype(request.weekDayIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(weekDayIndex));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    request.daysMask = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(daysMask));
+    request.startHour = static_cast<std::remove_reference_t<decltype(request.startHour)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(startHour));
+    request.startMinute = static_cast<std::remove_reference_t<decltype(request.startMinute)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(startMinute));
+    request.endHour = static_cast<std::remove_reference_t<decltype(request.endHour)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endHour));
+    request.endMinute = static_cast<std::remove_reference_t<decltype(request.endMinute)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endMinute));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, setYearDaySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject yearDayIndex, jobject userIndex, jobject localStartTime,
+ jobject localEndTime, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.yearDayIndex = static_cast<std::remove_reference_t<decltype(request.yearDayIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(yearDayIndex));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    request.localStartTime = static_cast<std::remove_reference_t<decltype(request.localStartTime)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(localStartTime));
+    request.localEndTime = static_cast<std::remove_reference_t<decltype(request.localEndTime)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(localEndTime));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, DoorLockCluster, unlockDoor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject pinCode, jobject timedInvokeTimeoutMs)
 {
@@ -9162,6 +9500,64 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    if (pinCode != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(pinCode, optionalValue_0);
+        auto & definedValue_0 = request.pinCode.Emplace();
+        cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0)));
+        definedValue_0 = cleanupByteArrays.back()->byteSpan();
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timeout, jobject pinCode, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.timeout = static_cast<std::remove_reference_t<decltype(request.timeout)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(timeout));
     if (pinCode != nullptr)
     {
         jobject optionalValue_0;
@@ -9460,6 +9856,82 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfRFIDUsersSupportedAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterNumberOfWeekDaySchedulesSupportedPerUserAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterNumberOfYearDaySchedulesSupportedPerUserAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

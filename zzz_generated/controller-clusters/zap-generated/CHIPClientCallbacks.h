@@ -49,6 +49,11 @@ typedef void (*DoorLockClusterGetUserResponseCallback)(void * context, uint16_t 
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * credentials,
                                                        chip::FabricIndex creatorFabricIndex,
                                                        chip::FabricIndex lastModifiedFabricIndex, uint16_t nextUserIndex);
+typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallback)(void * context, uint8_t weekDayIndex, uint16_t userIndex,
+                                                                  uint8_t status, uint8_t daysMask, uint8_t startHour,
+                                                                  uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+typedef void (*DoorLockClusterGetYearDayScheduleResponseCallback)(void * context, uint8_t yearDayIndex, uint16_t userIndex,
+                                                                  uint8_t status, uint32_t localStartTime, uint32_t localEndTime);
 typedef void (*DoorLockClusterSetCredentialResponseCallback)(void * context, uint8_t status, uint16_t userIndex,
                                                              uint16_t nextCredentialIndex);
 typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
