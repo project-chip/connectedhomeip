@@ -26,6 +26,47 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
+
+#include <credentials/GroupDataProviderImpl.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+
+chip::TestPersistentStorageDelegate sDeviceStorage;
+chip::Credentials::GroupDataProviderImpl sGroupsProvider(sDeviceStorage);
+
+CHIP_ERROR GroupInit()
+{
+    ReturnErrorOnFailure(sGroupsProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
+
+    const chip::FabricIndex kFabric1 = 1;
+    const chip::GroupId kGroup1 = 0x1234;
+    const chip::GroupId kGroup2 = 0x0001;
+    const chip::KeysetId kKeySet1 = 0x0101;
+
+    const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1");
+    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(kFabric1, group1));
+    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(kFabric1, group1.group_id, 1));
+
+    const chip::Credentials::GroupDataProvider::GroupInfo group2(kGroup2, "Group #2");
+    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(kFabric1, group2));
+    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(kFabric1, group2.group_id, 0));
+
+    chip::Credentials::GroupDataProvider::KeySet keyset1(kKeySet1, chip::Credentials::GroupDataProvider::KeySet::SecurityPolicy::kStandard, 3);
+    const chip::Credentials::GroupDataProvider::EpochKey epoch_keys[] = {
+        { 0xaaaaaaaaaaaaaaaa, { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf } },
+        { 0xbbbbbbbbbbbbbbbb, { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf } },
+        { 0xcccccccccccccccc, { 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf } },
+    };
+    memcpy(keyset1.epoch_keys, epoch_keys, sizeof(epoch_keys));
+    ReturnErrorOnFailure(sGroupsProvider.SetKeySet(kFabric1, keyset1));
+
+    sGroupsProvider.SetGroupKeyAt(kFabric1, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
+    sGroupsProvider.SetGroupKeyAt(kFabric1, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet1));
+
+    return CHIP_NO_ERROR;
+}
+
+
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
     for (auto & command : commandsList)
@@ -43,6 +84,9 @@ int Commands::Run(int argc, char ** argv)
 
     err = mStorage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
+
+    err = GroupInit();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Group Data Provider failure: %s", chip::ErrorStr(err)));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 

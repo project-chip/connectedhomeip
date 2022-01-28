@@ -717,14 +717,17 @@ public class ChipStructs {
     }
   }
 
-  public static class GroupKeyManagementClusterGroupInfo {
+  public static class GroupKeyManagementClusterGroupInfoMapStruct {
     public Integer fabricIndex;
     public Integer groupId;
     public ArrayList<Object> endpoints;
-    public String groupName;
+    public Optional<String> groupName;
 
-    public GroupKeyManagementClusterGroupInfo(
-        Integer fabricIndex, Integer groupId, ArrayList<Object> endpoints, String groupName) {
+    public GroupKeyManagementClusterGroupInfoMapStruct(
+        Integer fabricIndex,
+        Integer groupId,
+        ArrayList<Object> endpoints,
+        Optional<String> groupName) {
       this.fabricIndex = fabricIndex;
       this.groupId = groupId;
       this.endpoints = endpoints;
@@ -734,7 +737,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupInfo {\n");
+      output.append("GroupKeyManagementClusterGroupInfoMapStruct {\n");
       output.append("\tfabricIndex: ");
       output.append(fabricIndex);
       output.append("\n");
@@ -752,12 +755,12 @@ public class ChipStructs {
     }
   }
 
-  public static class GroupKeyManagementClusterGroupKey {
+  public static class GroupKeyManagementClusterGroupKeyMapStruct {
     public Integer fabricIndex;
     public Integer groupId;
     public Integer groupKeySetID;
 
-    public GroupKeyManagementClusterGroupKey(
+    public GroupKeyManagementClusterGroupKeyMapStruct(
         Integer fabricIndex, Integer groupId, Integer groupKeySetID) {
       this.fabricIndex = fabricIndex;
       this.groupId = groupId;
@@ -767,7 +770,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupKey {\n");
+      output.append("GroupKeyManagementClusterGroupKeyMapStruct {\n");
       output.append("\tfabricIndex: ");
       output.append(fabricIndex);
       output.append("\n");
@@ -782,27 +785,27 @@ public class ChipStructs {
     }
   }
 
-  public static class GroupKeyManagementClusterGroupKeySet {
+  public static class GroupKeyManagementClusterGroupKeySetStruct {
     public Integer groupKeySetID;
-    public Integer securityPolicy;
-    public byte[] epochKey0;
-    public Long epochStartTime0;
-    public byte[] epochKey1;
-    public Long epochStartTime1;
-    public byte[] epochKey2;
-    public Long epochStartTime2;
+    public Integer groupKeySecurityPolicy;
+    public @Nullable byte[] epochKey0;
+    public @Nullable Long epochStartTime0;
+    public @Nullable byte[] epochKey1;
+    public @Nullable Long epochStartTime1;
+    public @Nullable byte[] epochKey2;
+    public @Nullable Long epochStartTime2;
 
-    public GroupKeyManagementClusterGroupKeySet(
+    public GroupKeyManagementClusterGroupKeySetStruct(
         Integer groupKeySetID,
-        Integer securityPolicy,
-        byte[] epochKey0,
-        Long epochStartTime0,
-        byte[] epochKey1,
-        Long epochStartTime1,
-        byte[] epochKey2,
-        Long epochStartTime2) {
+        Integer groupKeySecurityPolicy,
+        @Nullable byte[] epochKey0,
+        @Nullable Long epochStartTime0,
+        @Nullable byte[] epochKey1,
+        @Nullable Long epochStartTime1,
+        @Nullable byte[] epochKey2,
+        @Nullable Long epochStartTime2) {
       this.groupKeySetID = groupKeySetID;
-      this.securityPolicy = securityPolicy;
+      this.groupKeySecurityPolicy = groupKeySecurityPolicy;
       this.epochKey0 = epochKey0;
       this.epochStartTime0 = epochStartTime0;
       this.epochKey1 = epochKey1;
@@ -814,12 +817,12 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupKeySet {\n");
+      output.append("GroupKeyManagementClusterGroupKeySetStruct {\n");
       output.append("\tgroupKeySetID: ");
       output.append(groupKeySetID);
       output.append("\n");
-      output.append("\tsecurityPolicy: ");
-      output.append(securityPolicy);
+      output.append("\tgroupKeySecurityPolicy: ");
+      output.append(groupKeySecurityPolicy);
       output.append("\n");
       output.append("\tepochKey0: ");
       output.append(Arrays.toString(epochKey0));

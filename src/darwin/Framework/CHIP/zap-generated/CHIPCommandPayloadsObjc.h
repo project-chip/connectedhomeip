@@ -827,7 +827,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
-@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 - (instancetype)init;
 @end
 
@@ -837,7 +837,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
-@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 - (instancetype)init;
 @end
 

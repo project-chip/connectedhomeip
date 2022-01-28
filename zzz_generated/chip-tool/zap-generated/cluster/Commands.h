@@ -2957,7 +2957,31 @@ public:
 
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type> mComplex_GroupKeySet;
+    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type> mComplex_GroupKeySet;
+};
+
+class WriteGroupKeyManagementGroupKeyMap : public WriteAttribute
+{
+public:
+    WriteGroupKeyManagementGroupKeyMap() : WriteAttribute("GroupKeyMap"), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "group-key-map");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteGroupKeyManagementGroupKeyMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000003F, 0x00000000, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> mValue;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>>
+        mComplex;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9793,6 +9817,7 @@ void registerClusterGroupKeyManagement(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                         //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                     //
         make_unique<WriteAttribute>(Id),                                                                         //
+        make_unique<WriteGroupKeyManagementGroupKeyMap>(),                                                       //
         make_unique<SubscribeAttribute>(Id),                                                                     //
         make_unique<SubscribeAttribute>(Id, "group-key-map", Attributes::GroupKeyMap::Id),                       //
         make_unique<SubscribeAttribute>(Id, "group-table", Attributes::GroupTable::Id),                          //

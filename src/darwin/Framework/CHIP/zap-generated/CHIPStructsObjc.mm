@@ -512,7 +512,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupInfo
+@implementation CHIPGroupKeyManagementClusterGroupInfoMapStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -523,13 +523,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _endpoints = [NSArray array];
 
-        _groupName = @"";
+        _groupName = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupKey
+@implementation CHIPGroupKeyManagementClusterGroupKeyMapStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -544,26 +544,26 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupKeySet
+@implementation CHIPGroupKeyManagementClusterGroupKeySetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _groupKeySetID = @(0);
 
-        _securityPolicy = @(0);
+        _groupKeySecurityPolicy = @(0);
 
-        _epochKey0 = [NSData data];
+        _epochKey0 = nil;
 
-        _epochStartTime0 = @(0);
+        _epochStartTime0 = nil;
 
-        _epochKey1 = [NSData data];
+        _epochKey1 = nil;
 
-        _epochStartTime1 = @(0);
+        _epochStartTime1 = nil;
 
-        _epochKey2 = [NSData data];
+        _epochKey2 = nil;
 
-        _epochStartTime2 = @(0);
+        _epochStartTime2 = nil;
     }
     return self;
 }

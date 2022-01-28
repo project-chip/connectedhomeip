@@ -50,7 +50,7 @@ typedef int PacketHeaderFlags;
 
 namespace Header {
 
-enum class SessionType
+enum class SessionType : uint8_t
 {
     kUnicastSession = 0,
     kGroupSession   = 1,
@@ -289,6 +289,8 @@ public:
     PacketHeader & SetSessionType(Header::SessionType type)
     {
         mSessionType = type;
+        uint8_t typeMask = to_underlying(Header::kSessionTypeMask);
+        mSecFlags.SetRaw(static_cast<uint8_t>((mSecFlags.Raw() & ~typeMask) | (to_underlying(type) & typeMask)));
         return *this;
     }
 

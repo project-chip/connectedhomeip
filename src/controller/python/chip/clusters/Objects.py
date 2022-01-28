@@ -13050,8 +13050,8 @@ class GroupKeyManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="groupKeyMap", Tag=0x00000000, Type=typing.List[GroupKeyManagement.Structs.GroupKey]),
-                ClusterObjectFieldDescriptor(Label="groupTable", Tag=0x00000001, Type=typing.List[GroupKeyManagement.Structs.GroupInfo]),
+                ClusterObjectFieldDescriptor(Label="groupKeyMap", Tag=0x00000000, Type=typing.List[GroupKeyManagement.Structs.GroupKeyMapStruct]),
+                ClusterObjectFieldDescriptor(Label="groupTable", Tag=0x00000001, Type=typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct]),
                 ClusterObjectFieldDescriptor(Label="maxGroupsPerFabric", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="maxGroupKeysPerFabric", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -13059,8 +13059,8 @@ class GroupKeyManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    groupKeyMap: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = None
-    groupTable: 'typing.List[GroupKeyManagement.Structs.GroupInfo]' = None
+    groupKeyMap: 'typing.List[GroupKeyManagement.Structs.GroupKeyMapStruct]' = None
+    groupTable: 'typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct]' = None
     maxGroupsPerFabric: 'uint' = None
     maxGroupKeysPerFabric: 'uint' = None
     attributeList: 'typing.List[uint]' = None
@@ -13075,7 +13075,7 @@ class GroupKeyManagement(Cluster):
 
     class Structs:
         @dataclass
-        class GroupInfo(ClusterObject):
+        class GroupInfoMapStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -13083,16 +13083,16 @@ class GroupKeyManagement(Cluster):
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupId", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="endpoints", Tag=2, Type=typing.List[uint]),
-                            ClusterObjectFieldDescriptor(Label="groupName", Tag=3, Type=str),
+                            ClusterObjectFieldDescriptor(Label="groupName", Tag=3, Type=typing.Optional[str]),
                     ])
 
             fabricIndex: 'uint' = 0
             groupId: 'uint' = 0
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
-            groupName: 'str' = ""
+            groupName: 'typing.Optional[str]' = None
 
         @dataclass
-        class GroupKey(ClusterObject):
+        class GroupKeyMapStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -13107,29 +13107,29 @@ class GroupKeyManagement(Cluster):
             groupKeySetID: 'uint' = 0
 
         @dataclass
-        class GroupKeySet(ClusterObject):
+        class GroupKeySetStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="groupKeySetID", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="securityPolicy", Tag=1, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
-                            ClusterObjectFieldDescriptor(Label="epochKey0", Tag=2, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="epochStartTime0", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="epochKey1", Tag=4, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupKeySecurityPolicy", Tag=1, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
+                            ClusterObjectFieldDescriptor(Label="epochKey0", Tag=2, Type=typing.Union[Nullable, bytes]),
+                            ClusterObjectFieldDescriptor(Label="epochStartTime0", Tag=3, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="epochKey1", Tag=4, Type=typing.Union[Nullable, bytes]),
+                            ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=typing.Union[Nullable, bytes]),
+                            ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=typing.Union[Nullable, uint]),
                     ])
 
             groupKeySetID: 'uint' = 0
-            securityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = 0
-            epochKey0: 'bytes' = b""
-            epochStartTime0: 'uint' = 0
-            epochKey1: 'bytes' = b""
-            epochStartTime1: 'uint' = 0
-            epochKey2: 'bytes' = b""
-            epochStartTime2: 'uint' = 0
+            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = 0
+            epochKey0: 'typing.Union[Nullable, bytes]' = NullValue
+            epochStartTime0: 'typing.Union[Nullable, uint]' = NullValue
+            epochKey1: 'typing.Union[Nullable, bytes]' = NullValue
+            epochStartTime1: 'typing.Union[Nullable, uint]' = NullValue
+            epochKey2: 'typing.Union[Nullable, bytes]' = NullValue
+            epochStartTime2: 'typing.Union[Nullable, uint]' = NullValue
 
 
 
@@ -13144,10 +13144,10 @@ class GroupKeyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySet),
+                            ClusterObjectFieldDescriptor(Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySetStruct),
                     ])
 
-            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySet' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySet())
+            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySetStruct' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySetStruct())
 
         @dataclass
         class KeySetRead(ClusterCommand):
@@ -13174,10 +13174,10 @@ class GroupKeyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySet),
+                            ClusterObjectFieldDescriptor(Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySetStruct),
                     ])
 
-            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySet' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySet())
+            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySetStruct' = field(default_factory=lambda: GroupKeyManagement.Structs.GroupKeySetStruct())
 
         @dataclass
         class KeySetRemove(ClusterCommand):
@@ -13238,9 +13238,9 @@ class GroupKeyManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupKey])
+                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupKeyMapStruct])
 
-            value: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = field(default_factory=lambda: [])
+            value: 'typing.List[GroupKeyManagement.Structs.GroupKeyMapStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class GroupTable(ClusterAttributeDescriptor):
@@ -13254,9 +13254,9 @@ class GroupKeyManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct])
 
-            value: 'typing.List[GroupKeyManagement.Structs.GroupInfo]' = field(default_factory=lambda: [])
+            value: 'typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class MaxGroupsPerFabric(ClusterAttributeDescriptor):

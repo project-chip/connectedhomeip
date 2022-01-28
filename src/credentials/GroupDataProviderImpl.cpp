@@ -1596,6 +1596,9 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     keyset.policy     = in_keyset.policy;
     keyset.keys_count = in_keyset.num_keys_used;
     memset(keyset.operational_keys, 0x00, sizeof(keyset.operational_keys));
+    keyset.operational_keys[0].start_time = in_keyset.epoch_keys[0].start_time;
+    keyset.operational_keys[1].start_time = in_keyset.epoch_keys[1].start_time;
+    keyset.operational_keys[2].start_time = in_keyset.epoch_keys[2].start_time;
 
     // Store the operational keys and hash instead of the epoch keys
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
@@ -1638,8 +1641,11 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     out_keyset.keyset_id     = keyset.keyset_id;
     out_keyset.policy        = keyset.policy;
     out_keyset.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back
+    // Epoch keys are not read back, only the times
     memset(out_keyset.epoch_keys, 0x00, sizeof(out_keyset.epoch_keys));
+    out_keyset.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
+    out_keyset.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
+    out_keyset.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
     return CHIP_NO_ERROR;
 }
 
@@ -1793,7 +1799,7 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
             if (nullptr != key)
             {
                 return mKeyContexPool.CreateObject(*this, ByteSpan(key->value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES),
-                                                   key->hash);
+                                                   key->hash, true);
             }
         }
     }
@@ -1803,7 +1809,11 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
 void GroupDataProviderImpl::GroupKeyContext::Release()
 {
     memset(mKeyValue, 0, sizeof(mKeyValue));
-    mProvider.mKeyContexPool.ReleaseObject(this);
+    if(mAllocated)
+    {
+        mProvider.mKeyContexPool.ReleaseObject(this);
+        mAllocated = false;
+    }
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad,

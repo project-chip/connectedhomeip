@@ -3128,9 +3128,9 @@ exit:
 
 CHIP_ERROR GroupKeyManagementCluster::KeySetWrite(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint16_t groupKeySetID,
-                                                  uint8_t securityPolicy, chip::ByteSpan epochKey0, uint64_t epochStartTime0,
-                                                  chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2,
-                                                  uint64_t epochStartTime2)
+                                                  uint8_t groupKeySecurityPolicy, chip::ByteSpan epochKey0,
+                                                  uint64_t epochStartTime0, chip::ByteSpan epochKey1, uint64_t epochStartTime1,
+                                                  chip::ByteSpan epochKey2, uint64_t epochStartTime2)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3155,19 +3155,19 @@ CHIP_ERROR GroupKeyManagementCluster::KeySetWrite(Callback::Cancelable * onSucce
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // groupKeySetID: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
-    // securityPolicy: groupKeySecurityPolicy
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), securityPolicy));
+    // groupKeySecurityPolicy: groupKeySecurityPolicy
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySecurityPolicy));
     // epochKey0: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey0));
-    // epochStartTime0: int64u
+    // epochStartTime0: epochUs
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime0));
     // epochKey1: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey1));
-    // epochStartTime1: int64u
+    // epochStartTime1: epochUs
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime1));
     // epochKey2: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey2));
-    // epochStartTime2: int64u
+    // epochStartTime2: epochUs
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime2));
 
     SuccessOrExit(err = sender->FinishCommand());

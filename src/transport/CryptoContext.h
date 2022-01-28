@@ -39,6 +39,7 @@ public:
     ~CryptoContext();
     CryptoContext(CryptoContext &&)      = default;
     CryptoContext(const CryptoContext &) = default;
+    CryptoContext(Crypto::SymmetricKeyContext *context) : mKeyContext(context) {};
     CryptoContext & operator=(const CryptoContext &) = default;
     CryptoContext & operator=(CryptoContext &&) = default;
 
@@ -140,6 +141,7 @@ private:
 
     bool mKeyAvailable;
     CryptoKey mKeys[KeyUsage::kNumCryptoKeys];
+    Crypto::SymmetricKeyContext *mKeyContext = nullptr;
 
     static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 
