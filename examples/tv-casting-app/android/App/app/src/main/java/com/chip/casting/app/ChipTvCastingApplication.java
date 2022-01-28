@@ -1,4 +1,4 @@
-package com.chip.casting;
+package com.chip.casting.app;
 
 import android.app.Application;
 
