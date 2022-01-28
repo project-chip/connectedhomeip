@@ -42,10 +42,6 @@
 // ==================== Security Adaptations ====================
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
-// This platform uses mbedtls, but these defines don't seem to be used in source
-#define CHIP_CONFIG_USE_OPENSSL_ECC 0
-#define CHIP_CONFIG_USE_MICRO_ECC 1
-
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 0
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 1
