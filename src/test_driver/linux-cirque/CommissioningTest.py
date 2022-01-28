@@ -100,5 +100,6 @@ class TestCommissioner(CHIPVirtualHome):
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
+
 if __name__ == "__main__":
     sys.exit(TestCommissioner(DEVICE_CONFIG).run_test())

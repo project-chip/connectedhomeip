@@ -101,7 +101,7 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int, testCommissioner: bool=False):
+    def __init__(self, nodeid: int, testCommissioner: bool = False):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
             controllerNodeId=nodeid, useTestCommissioner=testCommissioner)
         self.logger = logger
