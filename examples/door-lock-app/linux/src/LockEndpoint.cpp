@@ -101,7 +101,9 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 
     if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
     {
-        ChipLogError(Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16 ",totalCredentials=%zu]",
+        ChipLogError(Zcl,
+                     "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16
+                     ",totalCredentials=%zu]",
                      mEndpointId, userIndex, adjustedUserIndex, totalCredentials);
         return false;
     }
