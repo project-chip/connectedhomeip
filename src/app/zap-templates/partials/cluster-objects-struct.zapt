@@ -21,8 +21,8 @@ namespace {{asUpperCamelCase name}} {
         {{/if}}
         {{/unless}}
         {{#if struct_is_fabric_scoped}}
-        bool MatchesFabricIndex(FabricIndex fabricIndex_) const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }} == fabricIndex_;
+        auto GetFabricIndex() const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }};
         }
         {{/if}}
     };

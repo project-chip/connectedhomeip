@@ -102,9 +102,9 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR_IM_STATUS_CODE_RECEIVED: An invoke response containing a status code denoting an error was received.
-         *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status
-         *                  code. Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
@@ -114,7 +114,7 @@ public:
          * @param[in] aStatusIB       The status code including IM status code and optional cluster status code
          * @param[in] aError          A system error code that conveys the overall error code.
          */
-        virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
+        virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
@@ -279,10 +279,9 @@ private:
     // Timed Request.  The caller is assumed to have already checked that our
     // exchange context member is the one the message came in on.
     //
-    // aStatusIB will be populated with the returned status if we can parse it
-    // successfully.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
-                                 StatusIB & aStatusIB);
+    // If the server returned an error status, that will be returned as an error
+    // value of CHIP_ERROR.
+    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.

@@ -118,7 +118,7 @@ static CHIP_ERROR InitCredentialSets()
 
     P256Keypair opKey;
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
-    ReturnErrorOnFailure(commissionerFabric.SetEphemeralKey(&opKey));
+    ReturnErrorOnFailure(commissionerFabric.SetOperationalKeypair(&opKey));
 
     ReturnErrorOnFailure(commissionerFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
     ReturnErrorOnFailure(commissionerFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
@@ -135,7 +135,7 @@ static CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
-    ReturnErrorOnFailure(deviceFabric.SetEphemeralKey(&opKey));
+    ReturnErrorOnFailure(deviceFabric.SetOperationalKeypair(&opKey));
 
     ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
     ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));

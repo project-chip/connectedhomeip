@@ -195,7 +195,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetProductName(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint16_t & softwareVer)
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 {
     CHIP_ERROR err;
     uint32_t u32SoftwareVer = 0;
@@ -203,11 +203,11 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint16_t & softwareVer)
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        softwareVer = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        softwareVer = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
     }
     else
     {
-        softwareVer = static_cast<uint16_t>(u32SoftwareVer);
+        softwareVer = u32SoftwareVer;
     }
 
     return CHIP_NO_ERROR;

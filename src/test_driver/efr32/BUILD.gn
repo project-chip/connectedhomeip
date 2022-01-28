@@ -113,8 +113,11 @@ efr32_executable("efr32_device_tests") {
 }
 
 group("efr32") {
+  deps = [ ":efr32_device_tests" ]
+}
+
+group("runner") {
   deps = [
-    ":efr32_device_tests",
     "${efr32_project_dir}/py:nl_test_runner.install",
     "${efr32_project_dir}/py:nl_test_runner_wheel",
   ]

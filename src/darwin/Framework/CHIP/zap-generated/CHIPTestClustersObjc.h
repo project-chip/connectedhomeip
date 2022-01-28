@@ -326,8 +326,12 @@ NS_ASSUME_NONNULL_BEGIN
                                          completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNumberOfPINUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfRFIDUsersSupportedWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMinRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1020,6 +1024,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
+ * Cluster Unit Localization
+ *
+ */
+@interface CHIPTestUnitLocalization : CHIPUnitLocalization
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

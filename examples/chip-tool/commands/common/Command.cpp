@@ -183,6 +183,16 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     Argument arg = mArgs.at(argIndex);
     switch (arg.type)
     {
+    case ArgumentType::Complex: {
+        auto complexArgument = static_cast<ComplexArgument *>(arg.value);
+        return CHIP_NO_ERROR == complexArgument->Parse(arg.name, argValue);
+    }
+
+    case ArgumentType::Custom: {
+        auto customArgument = static_cast<CustomArgument *>(arg.value);
+        return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
+    }
+
     case ArgumentType::Attribute: {
         if (arg.isOptional() || arg.isNullable())
         {
@@ -475,6 +485,28 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out, uint8
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
     arg.flags = flags;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, ComplexArgument * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Complex;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = 0;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, CustomArgument * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Custom;
+    arg.name  = name;
+    arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
+    arg.flags = 0;
 
     return AddArgumentToList(std::move(arg));
 }

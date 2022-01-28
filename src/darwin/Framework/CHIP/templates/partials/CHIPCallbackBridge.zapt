@@ -74,7 +74,7 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
       auto * response = [CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params new];
       {{#chip_cluster_response_arguments}}
       {
-        {{>decode_value target=(concat "response." (asStructPropertyName label)) source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
+        {{>decode_value target=(concat "response." (asStructPropertyName label)) source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, err); return;" depth=0}}
       }
       {{/chip_cluster_response_arguments}}
       DispatchSuccess(context, response);
@@ -85,7 +85,7 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
       {{/if}}
     {{else}}
     {{asObjectiveCType type ns}} objCValue;
-    {{>decode_value target="objCValue" source="value" cluster=ns errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
+    {{>decode_value target="objCValue" source="value" cluster=ns errorCode="OnFailureFn(context, err); return;" depth=0}}
     DispatchSuccess(context, objCValue);
     {{/if}}
 };

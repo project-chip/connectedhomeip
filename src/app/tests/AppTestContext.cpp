@@ -26,7 +26,7 @@ namespace Test {
 CHIP_ERROR AppContext::Init()
 {
     ReturnErrorOnFailure(Super::Init());
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), nullptr));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager()));
 
     return CHIP_NO_ERROR;
 }

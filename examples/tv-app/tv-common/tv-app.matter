@@ -22,9 +22,9 @@ server cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 0;
   }
 
-  command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
+  timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
   command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
-  command LogoutRequest(): DefaultSuccess = 3;
+  timed command LogoutRequest(): DefaultSuccess = 3;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -1333,7 +1333,7 @@ client cluster OperationalCredentials = 62 {
   struct NOCStruct {
     fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
-    OCTET_STRING icac = 2;
+    nullable OCTET_STRING icac = 2;
   }
 
   struct FabricDescriptor {
@@ -1431,7 +1431,7 @@ server cluster OperationalCredentials = 62 {
   struct NOCStruct {
     fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
-    OCTET_STRING icac = 2;
+    nullable OCTET_STRING icac = 2;
   }
 
   struct FabricDescriptor {
@@ -1540,7 +1540,7 @@ server cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   readonly attribute ThreadMetrics threadMetrics[] = 0;
@@ -1751,6 +1751,18 @@ server cluster TimeFormatLocalization = 44 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+server cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster UserLabel = 65 {
   attribute LabelStruct labelList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -1846,6 +1858,7 @@ endpoint 0 {
   server  cluster SoftwareDiagnostics;
   server  cluster ThreadNetworkDiagnostics;
   server  cluster TimeFormatLocalization;
+  server  cluster UnitLocalization;
   server  cluster UserLabel;
   server  cluster WiFiNetworkDiagnostics;
 }

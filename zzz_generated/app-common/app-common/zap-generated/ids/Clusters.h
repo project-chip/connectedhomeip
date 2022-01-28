@@ -97,6 +97,9 @@ static constexpr ClusterId Id = 0x0000002B;
 namespace TimeFormatLocalization {
 static constexpr ClusterId Id = 0x0000002C;
 } // namespace TimeFormatLocalization
+namespace UnitLocalization {
+static constexpr ClusterId Id = 0x0000002D;
+} // namespace UnitLocalization
 namespace PowerSourceConfiguration {
 static constexpr ClusterId Id = 0x0000002E;
 } // namespace PowerSourceConfiguration

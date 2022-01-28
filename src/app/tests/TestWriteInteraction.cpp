@@ -19,11 +19,13 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
@@ -76,7 +78,7 @@ public:
     {
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR chipError) override { mOnErrorCalled++; }
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
     int mOnSuccessCalled = 0;
@@ -107,12 +109,9 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
 void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    ConcreteAttributePath attributePath(2, 3, 4);
 
-    err = aWriteHandler.AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+    err = aWriteHandler.AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -273,7 +272,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             chip::app::InteractionModelDelegate IMdelegate;
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-            err                            = writeHandler.Init(&IMdelegate);
+            err                            = writeHandler.Init();
 
             GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
 
@@ -310,7 +309,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     writer.CopyElement(TLV::AnonymousTag(), aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
     return aWriteHandler->AddStatus(
-        AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
+        ConcreteAttributePath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
         Protocols::InteractionModel::Status::Success);
 }
 
@@ -326,7 +325,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -392,7 +391,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -419,6 +418,12 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
 namespace {
 
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+static chip::TestPersistentStorageDelegate sDelegate;
+static chip::Credentials::GroupDataProviderImpl sProvider(sDelegate, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -436,12 +441,47 @@ const nlTest sTests[] =
 // clang-format on
 
 // clang-format off
+
+/**
+ *  Set up the test suite.
+ */
+int Test_Setup(void * inContext)
+{
+    SetGroupDataProvider(&sProvider);
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
+
+
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int Test_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
+    if (nullptr != provider)
+    {
+        provider->Finish();
+    }
+
+
+    VerifyOrReturnError(TestContext::Finalize(inContext) == SUCCESS, FAILURE);
+
+
+    return SUCCESS;
+}
+
 nlTestSuite sSuite =
 {
     "TestWriteInteraction",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    &Test_Setup,
+    &Test_Teardown
 };
 // clang-format on
 

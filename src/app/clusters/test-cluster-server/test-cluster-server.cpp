@@ -134,6 +134,12 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
     }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
+    }
     default: {
         break;
     }
@@ -163,6 +169,12 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case NullableStruct::Id: {
         return WriteNullableStruct(aDecoder);
+    }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
     }
     default: {
         break;
@@ -553,6 +565,7 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
+
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestEmitTestEventRequest::DecodableType & commandData)
@@ -564,6 +577,22 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 
     // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
     Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
+
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+    commandObj->AddResponseData(commandPath, responseData);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
+{
+    Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
+    Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
 
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {

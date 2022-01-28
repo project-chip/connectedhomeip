@@ -52,6 +52,7 @@ public:
     void UpdateConfirmed(System::Clock::Seconds32 delay) override;
     void UpdateSuspended(System::Clock::Seconds32 delay) override;
     void UpdateDiscontinued() override;
+    void UpdateCancelled() override;
 
 private:
     void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action);

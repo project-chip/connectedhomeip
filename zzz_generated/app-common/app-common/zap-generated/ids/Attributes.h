@@ -1147,6 +1147,28 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TimeFormatLocalization
 
+namespace UnitLocalization {
+namespace Attributes {
+
+namespace TemperatureUnit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureUnit
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UnitLocalization
+
 namespace PowerSourceConfiguration {
 namespace Attributes {
 
@@ -5279,6 +5301,14 @@ static constexpr AttributeId Id = 0x0000002B;
 namespace TimedWriteBoolean {
 static constexpr AttributeId Id = 0x00000030;
 } // namespace TimedWriteBoolean
+
+namespace GeneralErrorBoolean {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace GeneralErrorBoolean
+
+namespace ClusterErrorBoolean {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace ClusterErrorBoolean
 
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;

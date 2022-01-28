@@ -761,7 +761,7 @@ void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_3.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -796,7 +796,7 @@ void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_3.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -807,7 +807,7 @@ void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -848,7 +848,7 @@ void CHIPAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * c
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -887,7 +887,7 @@ void CHIPAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -926,7 +926,7 @@ void CHIPAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -965,7 +965,7 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnS
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1004,7 +1004,7 @@ void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccess
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1043,7 +1043,7 @@ void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1082,7 +1082,7 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1122,7 +1122,7 @@ void CHIPApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessF
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1166,7 +1166,7 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1205,7 +1205,7 @@ void CHIPAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1244,7 +1244,7 @@ void CHIPBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1283,7 +1283,7 @@ void CHIPBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1322,7 +1322,7 @@ void CHIPBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1361,7 +1361,7 @@ void CHIPBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1400,7 +1400,7 @@ void CHIPBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1447,7 +1447,7 @@ void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void *
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1498,7 +1498,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_2.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -1508,7 +1508,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1547,7 +1547,7 @@ void CHIPBridgedActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1586,7 +1586,7 @@ void CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1636,7 +1636,7 @@ void CHIPChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * conte
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1675,7 +1675,7 @@ void CHIPChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1714,7 +1714,7 @@ void CHIPColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1753,7 +1753,7 @@ void CHIPContentLauncherAcceptHeaderListListAttributeCallbackBridge::OnSuccessFn
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1792,7 +1792,7 @@ void CHIPContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1833,7 +1833,7 @@ void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * con
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1872,7 +1872,7 @@ void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1911,7 +1911,7 @@ void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1950,7 +1950,7 @@ void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -1989,7 +1989,7 @@ void CHIPDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2028,7 +2028,7 @@ void CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2067,7 +2067,7 @@ void CHIPDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2106,7 +2106,7 @@ void CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSucces
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2145,7 +2145,7 @@ void CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnS
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2190,7 +2190,7 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2229,7 +2229,7 @@ void CHIPFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2268,7 +2268,7 @@ void CHIPFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2309,7 +2309,7 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBrid
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2349,7 +2349,7 @@ void CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccess
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2397,7 +2397,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2436,7 +2436,7 @@ void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSu
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2475,7 +2475,7 @@ void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSucce
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2514,7 +2514,7 @@ void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuc
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2553,7 +2553,7 @@ void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2595,7 +2595,7 @@ void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(v
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2642,7 +2642,7 @@ void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(vo
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_2.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -2655,7 +2655,7 @@ void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(vo
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2694,7 +2694,7 @@ void CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2733,7 +2733,7 @@ void CHIPGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2772,7 +2772,7 @@ void CHIPIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2811,7 +2811,7 @@ void CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSucce
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2850,7 +2850,7 @@ void CHIPKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2889,7 +2889,7 @@ void CHIPLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2928,7 +2928,7 @@ void CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::O
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -2967,7 +2967,7 @@ void CHIPLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3014,7 +3014,7 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3053,7 +3053,7 @@ void CHIPMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3092,7 +3092,7 @@ void CHIPMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3136,7 +3136,7 @@ void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void *
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3175,7 +3175,7 @@ void CHIPModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3217,7 +3217,7 @@ void CHIPNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(vo
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3256,7 +3256,7 @@ void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSu
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3299,7 +3299,7 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridg
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3339,7 +3339,7 @@ void CHIPOtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnS
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3378,7 +3378,7 @@ void CHIPOccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3417,7 +3417,7 @@ void CHIPOnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3456,7 +3456,7 @@ void CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSuc
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3493,13 +3493,17 @@ void CHIPOperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void
         newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
         newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
         newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
-        newElement_0.icac = [NSData dataWithBytes:entry_0.icac.data() length:entry_0.icac.size()];
+        if (entry_0.icac.IsNull()) {
+            newElement_0.icac = nil;
+        } else {
+            newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
+        }
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3547,7 +3551,7 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3586,7 +3590,7 @@ void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridg
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3626,7 +3630,7 @@ void CHIPOperationalCredentialsAttributeListListAttributeCallbackBridge::OnSucce
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3665,7 +3669,7 @@ void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3704,7 +3708,7 @@ void CHIPPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3743,7 +3747,7 @@ void CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3782,7 +3786,7 @@ void CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSuc
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3821,7 +3825,7 @@ void CHIPPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessF
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3860,7 +3864,7 @@ void CHIPPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::On
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3899,7 +3903,7 @@ void CHIPRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::On
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3938,7 +3942,7 @@ void CHIPScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -3985,7 +3989,7 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4024,7 +4028,7 @@ void CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessF
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4063,7 +4067,7 @@ void CHIPSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4106,7 +4110,7 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4145,7 +4149,7 @@ void CHIPTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4184,7 +4188,7 @@ void CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSucce
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4223,7 +4227,7 @@ void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4262,7 +4266,7 @@ void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4304,7 +4308,7 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4456,7 +4460,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_3.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -4474,7 +4478,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_3.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -4497,7 +4501,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                 { // Scope for the error so we will know what it's named
                     CHIP_ERROR err = iter_4.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                        OnFailureFn(context, err);
                         return;
                     }
                 }
@@ -4511,7 +4515,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4551,7 +4555,7 @@ void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4590,7 +4594,7 @@ void CHIPTestClusterAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4629,7 +4633,7 @@ void CHIPThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4668,7 +4672,7 @@ void CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackB
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4724,7 +4728,7 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4774,7 +4778,7 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSu
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4816,7 +4820,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4868,7 +4872,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4909,7 +4913,7 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBri
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4950,7 +4954,7 @@ void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuc
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -4989,7 +4993,7 @@ void CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -5035,7 +5039,7 @@ void CHIPUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -5074,7 +5078,7 @@ void CHIPWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -5113,7 +5117,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSucce
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -5152,7 +5156,7 @@ void CHIPWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(
     { // Scope for the error so we will know what it's named
         CHIP_ERROR err = iter_0.GetStatus();
         if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            OnFailureFn(context, err);
             return;
         }
     }
@@ -5342,7 +5346,7 @@ void CHIPDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_1.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -5364,7 +5368,11 @@ void CHIPDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
         }
     }
     {
-        response.nextUserIndex = [NSNumber numberWithUnsignedShort:data.nextUserIndex];
+        if (data.nextUserIndex.IsNull()) {
+            response.nextUserIndex = nil;
+        } else {
+            response.nextUserIndex = [NSNumber numberWithUnsignedShort:data.nextUserIndex.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -5454,7 +5462,7 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::On
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -5517,7 +5525,7 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -5651,7 +5659,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_1.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -5683,7 +5691,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
             { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_1.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    OnFailureFn(context, err);
                     return;
                 }
             }
@@ -5872,7 +5880,7 @@ void CHIPScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -5962,7 +5970,7 @@ void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -6063,7 +6071,7 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -6167,7 +6175,7 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
         { // Scope for the error so we will know what it's named
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                OnFailureFn(context, err);
                 return;
             }
         }
@@ -7551,6 +7559,474 @@ void CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscri
     void * context)
 {
     auto * self = static_cast<CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeFaultType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeLevel value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeState value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatFaultType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatReplaceability value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredCurrentType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredFaultType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -9062,58 +9538,6 @@ void CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSu
 void CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlDoorLockStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorLockStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

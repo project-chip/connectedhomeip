@@ -11,7 +11,7 @@ namespace {
 Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, uint32_t semanticTag)
 {
     Structs::ModeOptionStruct::Type option;
-    option.label       = CharSpan(label, strlen(label));
+    option.label       = CharSpan::fromCharString(label);
     option.mode        = mode;
     option.semanticTag = semanticTag;
     return option;

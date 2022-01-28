@@ -90,13 +90,13 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
             VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+            ConcreteAttributePath attributePath(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
+            aWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
         }
         else
         {
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
+            ConcreteAttributePath attributePath(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
+            aWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Failure);
         }
 
         return CHIP_NO_ERROR;
@@ -147,8 +147,9 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB status,
-                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
 
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
                                                                                                value, onSuccessCb, onFailureCb);
@@ -185,8 +186,7 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [apSuite, &onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB status,
-                                                      CHIP_ERROR aError) {
+    auto onFailureCb = [apSuite, &onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, attributePath != nullptr);
         onFailureCbInvoked = true;
     };
