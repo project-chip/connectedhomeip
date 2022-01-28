@@ -73,7 +73,8 @@ There are two commissioning modes supported by Ameba platform:
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1`
 
 3. Build and Flash
-4. The all-clusters example will run automatically after booting the Ameba board.
+4. The all-clusters example will run automatically after booting the Ameba
+   board.
 5. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 
@@ -89,7 +90,8 @@ There are two commissioning modes supported by Ameba platform:
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
 
 3. Build and Flash
-4. The all-clusters example will run automatically after booting the Ameba board.
+4. The all-clusters example will run automatically after booting the Ameba
+   board.
 5. Connect to AP using `ATW0, ATW1, ATWC` commands
 6. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)

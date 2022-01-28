@@ -38,8 +38,8 @@ The CHIP demo application is supported on
 
           $ ./scripts/build/build_examples.py --target ameba-amebad-lighting build
 
-    The output image files are stored in
-    `out/ameba-amebad-lighting/asdk/image` folder.
+    The output image files are stored in `out/ameba-amebad-lighting/asdk/image`
+    folder.
 
     The bootloader image files are stored in
     `out/ameba-amebad-lighting/asdk/bootloader` folder.

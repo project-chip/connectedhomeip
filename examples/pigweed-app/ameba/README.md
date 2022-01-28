@@ -72,8 +72,8 @@ Connect a USB-TTL Adapter as shown below
 Build the
 [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
-Reset Ameba board, then launch the chip-rpc console, where the Echo RPC
-commands can be invoked
+Reset Ameba board, then launch the chip-rpc console, where the Echo RPC commands
+can be invoked
 
         python -m pw_hdlc.rpc_console --device /dev/tty<USB-TTL port> -b 115200
 
