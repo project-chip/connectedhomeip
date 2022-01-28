@@ -281,8 +281,9 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(FabricIndex fabricId) override
+    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricId) override
     {
+        printf("OpCredsFabricTableDelegate::OnFabricDeletedFromStorage\n");
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
         fabricListChanged();
 
@@ -332,7 +333,7 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
 
     registerAttributeAccessOverride(&gAttrAccess);
 
-    Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 }
 
 namespace {

@@ -86,6 +86,8 @@ public:
 
     void ReleaseSession(PeerId peerId);
 
+    void ReleaseSessionForFabric(CompressedFabricId compressedFabricId);
+
     /**
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
      * on the fabric that was configured for the CASESessionManager object.
