@@ -4989,11 +4989,11 @@ NS_ASSUME_NONNULL_BEGIN
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNetworkNameWithCompletionHandler:(void (^)(
-                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNetworkNameWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
+                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePanIdWithMinInterval:(uint16_t)minInterval

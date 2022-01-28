@@ -6671,7 +6671,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("RoutingRole", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
-            chip::ByteSpan value;
+            chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkName", 1, value);
         }

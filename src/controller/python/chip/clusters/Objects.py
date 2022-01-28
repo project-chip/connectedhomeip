@@ -9651,7 +9651,7 @@ class ThreadNetworkDiagnostics(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="channel", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=bytes),
+                ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="meshLocalPrefix", Tag=0x00000005, Type=bytes),
@@ -9719,7 +9719,7 @@ class ThreadNetworkDiagnostics(Cluster):
 
     channel: 'uint' = None
     routingRole: 'uint' = None
-    networkName: 'bytes' = None
+    networkName: 'str' = None
     panId: 'uint' = None
     extendedPanId: 'uint' = None
     meshLocalPrefix: 'bytes' = None
@@ -9980,9 +9980,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bytes)
+                return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'bytes' = b""
+            value: 'str' = ""
 
         @dataclass
         class PanId(ClusterAttributeDescriptor):

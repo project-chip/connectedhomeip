@@ -52806,7 +52806,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"ThreadNetworkDiagnosticsReadAttributeNetworkNameWithCompletionHandler"];
 
-    [cluster readAttributeNetworkNameWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeNetworkNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"ThreadNetworkDiagnostics NetworkName Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];

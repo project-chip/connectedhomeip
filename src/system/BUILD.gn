@@ -142,6 +142,7 @@ static_library("system") {
     "SystemMutex.h",
     "SystemPacketBuffer.cpp",
     "SystemPacketBuffer.h",
+    "SystemPacketBufferInternal.h",
     "SystemStats.cpp",
     "SystemStats.h",
     "SystemTimer.cpp",

@@ -72,41 +72,6 @@
 #include CHIP_PLATFORM_CONFIG_INCLUDE
 #endif
 
-// Profile-specific Configuration Headers
-
-/**
- *  @def CHIP_CONFIG_USE_OPENSSL_ECC
- *
- *  @brief
- *    Use the OpenSSL implementation of the elliptic curve primitives
- *    for chip communication.
- *
- *    Note that this option is mutually exclusive with
- *    #CHIP_CONFIG_USE_MICRO_ECC.
- */
-#ifndef CHIP_CONFIG_USE_OPENSSL_ECC
-#define CHIP_CONFIG_USE_OPENSSL_ECC 1
-#endif // CHIP_CONFIG_USE_OPENSSL_ECC
-
-/**
- *  @def CHIP_CONFIG_USE_MICRO_ECC
- *
- *  @brief
- *    Use the Micro ECC implementation of the elliptic curve primitives
- *    for chip communication.
- *
- *    Note that this option is mutually exclusive with
- *    #CHIP_CONFIG_USE_OPENSSL_ECC.
- *
- */
-#ifndef CHIP_CONFIG_USE_MICRO_ECC
-#define CHIP_CONFIG_USE_MICRO_ECC 0
-#endif // CHIP_CONFIG_USE_MICRO_ECC
-
-#if CHIP_CONFIG_USE_MICRO_ECC && CHIP_CONFIG_USE_OPENSSL_ECC
-#error "Please assert one of either CHIP_CONFIG_USE_MICRO_ECC or CHIP_CONFIG_USE_OPENSSL_ECC, but not both."
-#endif // CHIP_CONFIG_USE_MICRO_ECC && CHIP_CONFIG_USE_OPENSSL_ECC
-
 /**
  *  @name chip Elliptic Curve Security Configuration
  *
@@ -327,25 +292,6 @@
 #if CHIP_CONFIG_SUPPORT_PASE_CONFIG5 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
 #error "Please assert CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1 when CHIP_CONFIG_SUPPORT_PASE_CONFIG5 is asserted"
 #endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG5 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-
-/**
- *  @def CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT
- *
- *  @brief
- *    Align payload on 4-byte boundary for PASE messages.
- *    Currently, payload alignment is required only when micro-ecc
- *    library is used and it is compiled with ARM assembly.
- *    If implementation guarantees that payload is always 4-byte
- *    aligned this option should stay deasserted to save code size.
- *
- */
-#ifndef CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT
-#if CHIP_CONFIG_USE_MICRO_ECC
-#define CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT 1
-#else
-#define CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT 0
-#endif // CHIP_CONFIG_USE_MICRO_ECC
-#endif // CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT
 
 /**
  *  @def CHIP_CONFIG_PASE_RATE_LIMITER_TIMEOUT

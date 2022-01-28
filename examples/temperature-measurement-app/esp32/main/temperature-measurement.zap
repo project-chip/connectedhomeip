@@ -988,7 +988,7 @@
               "reportableChange": 0
             },
             {
-              "name": "CalendarType",
+              "name": "ActiveCalendarType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -2769,9 +2769,9 @@
     },
     {
       "name": "MA-tempsensor",
-      "deviceTypeName": "MA-tempsensor",
-      "deviceTypeCode": 22,
-      "deviceTypeProfileId": 770,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "Power Configuration",

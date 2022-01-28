@@ -56,6 +56,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -1809,6 +1811,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -4557,6 +4561,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -4577,6 +4583,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -4605,6 +4613,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -6131,6 +6141,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -6444,6 +6456,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -6469,6 +6483,9 @@ public:
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -6481,6 +6498,10 @@ public:
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
 };
 
 } // namespace AccessControlEntry
@@ -6499,6 +6520,9 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -6609,6 +6633,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AccessControlEntryChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
@@ -6655,6 +6680,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AccessControlExtensionChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
@@ -7095,6 +7121,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -7118,6 +7146,8 @@ public:
     DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -7128,6 +7158,8 @@ public:
     EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace EndpointListStruct
@@ -7750,6 +7782,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID        = static_cast<uint16_t>(0);
     uint32_t invokeID        = static_cast<uint32_t>(0);
@@ -7789,6 +7822,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ActionFailed::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID        = static_cast<uint16_t>(0);
     uint32_t invokeID        = static_cast<uint32_t>(0);
@@ -8185,6 +8219,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StartUp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
 
@@ -8216,6 +8251,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8243,6 +8279,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8271,6 +8308,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     bool reachableNewValue = static_cast<bool>(0);
 
@@ -8663,6 +8701,9 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -8854,6 +8895,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<OTAUpdateStateEnum> previousState;
     OTAUpdateStateEnum newState = static_cast<OTAUpdateStateEnum>(0);
@@ -8893,6 +8935,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::VersionApplied::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint16_t productID       = static_cast<uint16_t>(0);
@@ -8930,6 +8973,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DownloadError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint64_t bytesDownloaded = static_cast<uint64_t>(0);
@@ -9402,6 +9446,8 @@ public:
     DataModel::List<const BatChargeFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9410,6 +9456,8 @@ public:
     DataModel::DecodableList<BatChargeFaultType> current;
     DataModel::DecodableList<BatChargeFaultType> previous;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace BatChargeFaultChangeType
@@ -9427,6 +9475,8 @@ public:
     DataModel::List<const BatFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9435,6 +9485,8 @@ public:
     DataModel::DecodableList<BatFaultType> current;
     DataModel::DecodableList<BatFaultType> previous;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace BatFaultChangeType
@@ -9452,6 +9504,8 @@ public:
     DataModel::List<const WiredFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9460,6 +9514,8 @@ public:
     DataModel::DecodableList<WiredFaultType> current;
     DataModel::DecodableList<WiredFaultType> previous;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace WiredFaultChangeType
@@ -9957,6 +10013,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -10375,6 +10433,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -10407,6 +10467,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -10435,6 +10497,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11272,6 +11336,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11454,6 +11520,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::HardwareFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const HardwareFaultType> current;
     DataModel::List<const HardwareFaultType> previous;
@@ -11489,6 +11556,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::RadioFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const RadioFaultType> current;
     DataModel::List<const RadioFaultType> previous;
@@ -11524,6 +11592,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const NetworkFaultType> current;
     DataModel::List<const NetworkFaultType> previous;
@@ -11558,6 +11627,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::BootReason::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     BootReasonType bootReason = static_cast<BootReasonType>(0);
 
@@ -11598,6 +11668,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11624,6 +11696,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11794,6 +11868,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::SoftwareFaultStruct::Type softwareFault;
 
@@ -11847,6 +11922,15 @@ enum class ThreadConnectionStatus : uint8_t
     kNotConnected = 0x01,
 };
 
+// Bitmap for ThreadNetworkDiagnosticsFeature
+enum class ThreadNetworkDiagnosticsFeature : uint32_t
+{
+    kPacketCounts = 0x1,
+    kErrorCounts  = 0x2,
+    kMLECounts    = 0x4,
+    kMACCounts    = 0x8,
+};
+
 namespace Structs {
 namespace NeighborTable {
 enum class Fields
@@ -11887,6 +11971,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11927,6 +12013,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11963,6 +12051,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11983,6 +12073,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -12060,9 +12152,9 @@ struct TypeInfo
 namespace NetworkName {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
@@ -12932,6 +13024,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     ThreadConnectionStatus connectionStatus = static_cast<ThreadConnectionStatus>(0);
 
@@ -13279,6 +13372,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Disconnection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t reasonCode = static_cast<uint16_t>(0);
 
@@ -13312,6 +13406,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     AssociationFailureCause associationFailure = static_cast<AssociationFailureCause>(0);
     uint16_t status                            = static_cast<uint16_t>(0);
@@ -13346,6 +13441,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     WiFiConnectionStatus connectionStatus = static_cast<WiFiConnectionStatus>(0);
 
@@ -14167,6 +14263,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SwitchLatched::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
@@ -14199,6 +14296,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::InitialPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
@@ -14231,6 +14329,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LongPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
@@ -14263,6 +14362,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ShortRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
 
@@ -14295,6 +14395,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LongRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
 
@@ -14328,6 +14429,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::MultiPressOngoing::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition                   = static_cast<uint8_t>(0);
     uint8_t currentNumberOfPressesCounted = static_cast<uint8_t>(0);
@@ -14363,6 +14465,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::MultiPressComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition                 = static_cast<uint8_t>(0);
     uint8_t totalNumberOfPressesCounted = static_cast<uint8_t>(0);
@@ -14676,6 +14779,9 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -14699,6 +14805,9 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -15386,6 +15495,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -15396,6 +15507,8 @@ public:
     DataModel::DecodableList<uint16_t> endpoints;
     chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace GroupInfo
@@ -15416,6 +15529,9 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -15449,6 +15565,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -16195,6 +16313,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     bool stateValue = static_cast<bool>(0);
 
@@ -16235,6 +16354,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -16255,6 +16376,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -16972,6 +17095,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -19535,6 +19660,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DoorLockAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlAlarmCode alarmCode = static_cast<DlAlarmCode>(0);
 
@@ -19567,6 +19693,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DoorStateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlDoorState doorState = static_cast<DlDoorState>(0);
 
@@ -19604,6 +19731,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19611,6 +19739,8 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19652,6 +19782,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19660,6 +19791,8 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19702,6 +19835,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
     DlDataOperationType dataOperationType = static_cast<DlDataOperationType>(0);
@@ -19710,6 +19844,8 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     DataModel::Nullable<uint16_t> dataIndex;
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21070,6 +21206,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SupplyVoltageLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21097,6 +21234,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SupplyVoltageHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21124,6 +21262,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PowerMissingPhase::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21151,6 +21290,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SystemPressureLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21178,6 +21318,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SystemPressureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21205,6 +21346,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DryRunning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21232,6 +21374,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::MotorTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21259,6 +21402,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PumpMotorFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21286,6 +21430,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ElectronicTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21313,6 +21458,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PumpBlocked::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21340,6 +21486,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SensorFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21367,6 +21514,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ElectronicNonFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21394,6 +21542,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ElectronicFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21421,6 +21570,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::GeneralFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21448,6 +21598,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Leakage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21475,6 +21626,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AirDetection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21502,6 +21654,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::TurbineOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -29541,6 +29694,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -30684,6 +30839,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -30708,6 +30865,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -30996,6 +31155,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -31209,6 +31370,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -31826,6 +31989,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32469,6 +32634,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32489,6 +32656,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32510,6 +32679,8 @@ public:
     DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -32519,6 +32690,8 @@ public:
     chip::CharSpan value;
     DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace Parameter
@@ -32534,6 +32707,8 @@ public:
     DataModel::List<const Structs::Parameter::Type> parameterList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -32541,6 +32716,8 @@ struct DecodableType
 public:
     DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace ContentSearch
@@ -32561,6 +32738,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32589,6 +32768,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32846,6 +33027,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33057,6 +33240,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33077,6 +33262,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33352,6 +33539,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33778,6 +33967,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33817,6 +34008,8 @@ public:
     Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -33835,6 +34028,8 @@ public:
     Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
     Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace NullablesAndOptionalsStruct
@@ -33855,6 +34050,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33884,6 +34081,8 @@ public:
     DataModel::List<const uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -33897,6 +34096,8 @@ public:
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace NestedStructList
@@ -33912,6 +34113,8 @@ public:
     DataModel::List<const Structs::NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -33919,6 +34122,8 @@ struct DecodableType
 public:
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace DoubleNestedStructList
@@ -33935,6 +34140,9 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
 };
 
@@ -33956,6 +34164,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -36516,6 +36726,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::TestEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t arg1    = static_cast<uint8_t>(0);
     SimpleEnum arg2 = static_cast<SimpleEnum>(0);
@@ -36558,6 +36769,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::TestFabricScopedEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
 

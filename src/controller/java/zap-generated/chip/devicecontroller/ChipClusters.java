@@ -16107,12 +16107,12 @@ public class ChipClusters {
       subscribeRoutingRoleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readNetworkNameAttribute(OctetStringAttributeCallback callback) {
+    public void readNetworkNameAttribute(CharStringAttributeCallback callback) {
       readNetworkNameAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeNetworkNameAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeNetworkNameAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -16704,11 +16704,11 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readNetworkNameAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
+        long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void subscribeNetworkNameAttribute(
         long chipClusterPtr,
-        OctetStringAttributeCallback callback,
+        CharStringAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
