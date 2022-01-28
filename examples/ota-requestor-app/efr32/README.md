@@ -80,7 +80,11 @@ See `examples/lighting-app/efr32/README.md`
 
 -   Build or download the Gecko Bootloader binary. Bootloader should be built
     with the Gecko SDK version 3.2.1 or earlier, type "external SPI" configured
-    with a single slot of at least 1000 KB. Using the commander tool upload the
+    with a single slot of at least 1000 KB. Pre-built binaries should be available in 
+
+           third_party/efr32_sdk/repo/platform/bootloader/sample-apps/bootloader-storage-spiflash-single
+
+-   Using the commander tool upload the
     bootloader to the device running the requestor application.
 
 -   Create a bootable image file:
