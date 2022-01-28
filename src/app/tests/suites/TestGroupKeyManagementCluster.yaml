@@ -158,8 +158,18 @@ tests:
       response:
           value:
               [
-                  { FabricIndex: 1, GroupId: 0x0011, endpoints: [1], GroupName: "Group #1" },
-                  { FabricIndex: 1, GroupId: 0x0012, endpoints: [1], GroupName: "Group #2" },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0011,
+                      endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0012,
+                      endpoints: [1],
+                      GroupName: "Group #2",
+                  },
               ]
 
     - label: "KeySet Remove 1"
