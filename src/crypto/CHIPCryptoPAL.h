@@ -1346,6 +1346,12 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 class SymmetricKeyContext
 {
 public:
+    /**
+     * @brief Returns the symmetric key hash
+     * @return Group Key Hash
+     */
+    virtual uint16_t GetKeyHash() = 0;
+
     virtual ~SymmetricKeyContext() = default;
     /**
      * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
@@ -1389,6 +1395,11 @@ public:
      */
     virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
                                       const ByteSpan & mic) const = 0;
+
+    /**
+     * @brief Release the dynamic memory used to allocate this instance of the SymmetricKeyContext
+     */
+    virtual void Release() = 0;
 };
 
 /**

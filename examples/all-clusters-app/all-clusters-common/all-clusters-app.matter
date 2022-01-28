@@ -756,11 +756,6 @@ server cluster DoorLock = 257 {
     kModify = 2;
   }
 
-  enum DlDoorLockStatus : ENUM8 {
-    kDuplicate = 2;
-    kOccupied = 3;
-  }
-
   enum DlDoorState : ENUM8 {
     kDoorOpen = 0;
     kDoorClosed = 1;
@@ -968,11 +963,14 @@ server cluster DoorLock = 257 {
   attribute int16u openPeriod = 6;
   readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
+  readonly attribute int16u numberOfRFIDUsersSupported = 19;
   readonly attribute int16u numberOfWeekDaySchedulesSupportedPerUser = 20;
   readonly attribute int16u numberOfYearDaySchedulesSupportedPerUser = 21;
   readonly attribute int16u numberOfHolidaySchedulesSupported = 22;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
+  readonly attribute int8u maxRFIDCodeLength = 25;
+  readonly attribute int8u minRFIDCodeLength = 26;
   readonly attribute bitmap8 credentialRulesSupport = 27;
   attribute char_string<3> language = 33;
   attribute int32u autoRelockTime = 35;
@@ -986,10 +984,11 @@ server cluster DoorLock = 257 {
   attribute int8u wrongCodeEntryLimit = 48;
   attribute int8u userCodeTemporaryDisableTime = 49;
   attribute boolean requirePINforRemoteOperation = 51;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct ClearCredentialRequest {
-    DlCredential credential = 0;
+    nullable DlCredential credential = 0;
   }
 
   request struct ClearUserRequest {
@@ -1012,8 +1011,9 @@ server cluster DoorLock = 257 {
     DlDataOperationType operationType = 0;
     DlCredential credential = 1;
     LONG_OCTET_STRING credentialData = 2;
-    INT16U userIndex = 3;
-    DlUserStatus userStatus = 4;
+    nullable INT16U userIndex = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
   }
 
   request struct SetUserRequest {
@@ -1021,9 +1021,9 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 1;
     nullable CHAR_STRING userName = 2;
     nullable INT32U userUniqueId = 3;
-    DlUserStatus userStatus = 4;
-    DlUserType userType = 5;
-    DlCredentialRule credentialRule = 6;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+    nullable DlCredentialRule credentialRule = 6;
   }
 
   request struct UnlockDoorRequest {
@@ -1046,7 +1046,7 @@ server cluster DoorLock = 257 {
     nullable DlCredential credentials[] = 6;
     nullable fabric_idx creatorFabricIndex = 7;
     nullable fabric_idx lastModifiedFabricIndex = 8;
-    INT16U nextUserIndex = 9;
+    nullable INT16U nextUserIndex = 9;
   }
 
   response struct SetCredentialResponse {
@@ -2086,7 +2086,7 @@ server cluster OperationalCredentials = 62 {
   struct NOCStruct {
     fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
-    OCTET_STRING icac = 2;
+    nullable OCTET_STRING icac = 2;
   }
 
   struct FabricDescriptor {
@@ -2936,7 +2936,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string<16> networkName = 2;
+  readonly attribute char_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
   readonly attribute octet_string<17> meshLocalPrefix = 5;

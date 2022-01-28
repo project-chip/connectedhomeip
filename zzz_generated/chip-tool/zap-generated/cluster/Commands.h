@@ -1309,13 +1309,9 @@ class ColorControlColorLoopSet : public ClusterCommand
 public:
     ColorControlColorLoopSet() : ClusterCommand("color-loop-set")
     {
-        AddArgument("UpdateFlags", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags> *>(
-                        &mRequest.updateFlags));
-        AddArgument("Action", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.action)> *>(&mRequest.action));
-        AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
+        AddArgument("UpdateFlags", 0, UINT8_MAX, &mRequest.updateFlags);
+        AddArgument("Action", 0, UINT8_MAX, &mRequest.action);
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
         AddArgument("Time", 0, UINT16_MAX, &mRequest.time);
         AddArgument("StartHue", 0, UINT16_MAX, &mRequest.startHue);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -1342,8 +1338,7 @@ class ColorControlEnhancedMoveHue : public ClusterCommand
 public:
     ColorControlEnhancedMoveHue() : ClusterCommand("enhanced-move-hue")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1370,8 +1365,7 @@ public:
     ColorControlEnhancedMoveToHue() : ClusterCommand("enhanced-move-to-hue")
     {
         AddArgument("EnhancedHue", 0, UINT16_MAX, &mRequest.enhancedHue);
-        AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1424,8 +1418,7 @@ class ColorControlEnhancedStepHue : public ClusterCommand
 public:
     ColorControlEnhancedStepHue() : ClusterCommand("enhanced-step-hue")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -1478,8 +1471,7 @@ class ColorControlMoveColorTemperature : public ClusterCommand
 public:
     ColorControlMoveColorTemperature() : ClusterCommand("move-color-temperature")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
         AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
         AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
@@ -1507,8 +1499,7 @@ class ColorControlMoveHue : public ClusterCommand
 public:
     ColorControlMoveHue() : ClusterCommand("move-hue")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1534,8 +1525,7 @@ class ColorControlMoveSaturation : public ClusterCommand
 public:
     ColorControlMoveSaturation() : ClusterCommand("move-saturation")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1615,8 +1605,7 @@ public:
     ColorControlMoveToHue() : ClusterCommand("move-to-hue")
     {
         AddArgument("Hue", 0, UINT8_MAX, &mRequest.hue);
-        AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1722,8 +1711,7 @@ class ColorControlStepColorTemperature : public ClusterCommand
 public:
     ColorControlStepColorTemperature() : ClusterCommand("step-color-temperature")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
@@ -1752,8 +1740,7 @@ class ColorControlStepHue : public ClusterCommand
 public:
     ColorControlStepHue() : ClusterCommand("step-hue")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -1780,8 +1767,7 @@ class ColorControlStepSaturation : public ClusterCommand
 public:
     ColorControlStepSaturation() : ClusterCommand("step-saturation")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -2224,10 +2210,8 @@ class DiagnosticLogsRetrieveLogsRequest : public ClusterCommand
 public:
     DiagnosticLogsRetrieveLogsRequest() : ClusterCommand("retrieve-logs-request")
     {
-        AddArgument("Intent", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.intent)> *>(&mRequest.intent));
-        AddArgument("RequestedProtocol", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.requestedProtocol)> *>(&mRequest.requestedProtocol));
+        AddArgument("Intent", 0, UINT8_MAX, &mRequest.intent);
+        AddArgument("RequestedProtocol", 0, UINT8_MAX, &mRequest.requestedProtocol);
         AddArgument("TransferFileDesignator", &mRequest.transferFileDesignator);
         ClusterCommand::AddArguments();
     }
@@ -2263,8 +2247,11 @@ private:
 | * DoorState                                                         | 0x0003 |
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
+| * NumberOfRFIDUsersSupported                                        | 0x0013 |
 | * MaxPINCodeLength                                                  | 0x0017 |
 | * MinPINCodeLength                                                  | 0x0018 |
+| * MaxRFIDCodeLength                                                 | 0x0019 |
+| * MinRFIDCodeLength                                                 | 0x001A |
 | * Language                                                          | 0x0021 |
 | * AutoRelockTime                                                    | 0x0023 |
 | * SoundVolume                                                       | 0x0024 |
@@ -2305,7 +2292,8 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::DlCredential::Type>>
+        mComplex_Credential;
 };
 
 /*
@@ -2409,13 +2397,12 @@ class DoorLockSetCredential : public ClusterCommand
 public:
     DoorLockSetCredential() : ClusterCommand("set-credential"), mComplex_Credential(&mRequest.credential)
     {
-        AddArgument("OperationType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        AddArgument("OperationType", 0, UINT8_MAX, &mRequest.operationType);
         AddArgument("Credential", &mComplex_Credential);
         AddArgument("CredentialData", &mRequest.credentialData);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
         ClusterCommand::AddArguments();
     }
 
@@ -2439,17 +2426,13 @@ class DoorLockSetUser : public ClusterCommand
 public:
     DoorLockSetUser() : ClusterCommand("set-user")
     {
-        AddArgument("OperationType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        AddArgument("OperationType", 0, UINT8_MAX, &mRequest.operationType);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserName", &mRequest.userName);
         AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("CredentialRule", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.credentialRule)> *>(&mRequest.credentialRule));
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
+        AddArgument("CredentialRule", 0, UINT8_MAX, &mRequest.credentialRule);
         ClusterCommand::AddArguments();
     }
 
@@ -2799,8 +2782,7 @@ class GeneralCommissioningSetRegulatoryConfig : public ClusterCommand
 public:
     GeneralCommissioningSetRegulatoryConfig() : ClusterCommand("set-regulatory-config")
     {
-        AddArgument("Location", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.location)> *>(&mRequest.location));
+        AddArgument("Location", 0, UINT8_MAX, &mRequest.location);
         AddArgument("CountryCode", &mRequest.countryCode);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
         AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
@@ -3201,10 +3183,8 @@ class IdentifyTriggerEffect : public ClusterCommand
 public:
     IdentifyTriggerEffect() : ClusterCommand("trigger-effect")
     {
-        AddArgument("EffectIdentifier", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectIdentifier)> *>(&mRequest.effectIdentifier));
-        AddArgument("EffectVariant", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant));
+        AddArgument("EffectIdentifier", 0, UINT8_MAX, &mRequest.effectIdentifier);
+        AddArgument("EffectVariant", 0, UINT8_MAX, &mRequest.effectVariant);
         ClusterCommand::AddArguments();
     }
 
@@ -3278,8 +3258,7 @@ class KeypadInputSendKeyRequest : public ClusterCommand
 public:
     KeypadInputSendKeyRequest() : ClusterCommand("send-key-request")
     {
-        AddArgument("KeyCode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.keyCode)> *>(&mRequest.keyCode));
+        AddArgument("KeyCode", 0, UINT8_MAX, &mRequest.keyCode);
         ClusterCommand::AddArguments();
     }
 
@@ -3337,8 +3316,7 @@ class LevelControlMove : public ClusterCommand
 public:
     LevelControlMove() : ClusterCommand("move")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
         AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
@@ -3414,8 +3392,7 @@ class LevelControlMoveWithOnOff : public ClusterCommand
 public:
     LevelControlMoveWithOnOff() : ClusterCommand("move-with-on-off")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         ClusterCommand::AddArguments();
     }
@@ -3439,8 +3416,7 @@ class LevelControlStep : public ClusterCommand
 public:
     LevelControlStep() : ClusterCommand("step")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
@@ -3467,8 +3443,7 @@ class LevelControlStepWithOnOff : public ClusterCommand
 public:
     LevelControlStepWithOnOff() : ClusterCommand("step-with-on-off")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         ClusterCommand::AddArguments();
@@ -4474,9 +4449,7 @@ public:
     {
         AddArgument("ProviderNodeId", 0, UINT64_MAX, &mRequest.providerNodeId);
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument(
-            "AnnouncementReason", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<decltype(mRequest.announcementReason)> *>(&mRequest.announcementReason));
+        AddArgument("AnnouncementReason", 0, UINT8_MAX, &mRequest.announcementReason);
         AddArgument("MetadataForNode", &mRequest.metadataForNode);
         AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
         ClusterCommand::AddArguments();
@@ -4583,10 +4556,8 @@ class OnOffOffWithEffect : public ClusterCommand
 public:
     OnOffOffWithEffect() : ClusterCommand("off-with-effect")
     {
-        AddArgument("EffectId", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectId)> *>(&mRequest.effectId));
-        AddArgument("EffectVariant", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant));
+        AddArgument("EffectId", 0, UINT8_MAX, &mRequest.effectId);
+        AddArgument("EffectVariant", 0, UINT8_MAX, &mRequest.effectVariant);
         ClusterCommand::AddArguments();
     }
 
@@ -4647,8 +4618,7 @@ class OnOffOnWithTimedOff : public ClusterCommand
 public:
     OnOffOnWithTimedOff() : ClusterCommand("on-with-timed-off")
     {
-        AddArgument("OnOffControl", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::OnOff::OnOffControl> *>(&mRequest.onOffControl));
+        AddArgument("OnOffControl", 0, UINT8_MAX, &mRequest.onOffControl);
         AddArgument("OnTime", 0, UINT16_MAX, &mRequest.onTime);
         AddArgument("OffWaitTime", 0, UINT16_MAX, &mRequest.offWaitTime);
         ClusterCommand::AddArguments();
@@ -5725,7 +5695,7 @@ public:
     TestClusterTestEmitTestEventRequest() : ClusterCommand("test-emit-test-event-request")
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
         AddArgument("Arg3", 0, 1, &mRequest.arg3);
         ClusterCommand::AddArguments();
     }
@@ -5750,7 +5720,7 @@ public:
     TestClusterTestEnumsRequest() : ClusterCommand("test-enums-request")
     {
         AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
         ClusterCommand::AddArguments();
     }
 
@@ -7765,11 +7735,8 @@ class ThermostatGetWeeklySchedule : public ClusterCommand
 public:
     ThermostatGetWeeklySchedule() : ClusterCommand("get-weekly-schedule")
     {
-        AddArgument("DaysToReturn", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.daysToReturn));
-        AddArgument(
-            "ModeToReturn", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(&mRequest.modeToReturn));
+        AddArgument("DaysToReturn", 0, UINT8_MAX, &mRequest.daysToReturn);
+        AddArgument("ModeToReturn", 0, UINT8_MAX, &mRequest.modeToReturn);
         ClusterCommand::AddArguments();
     }
 
@@ -7793,12 +7760,8 @@ public:
     ThermostatSetWeeklySchedule() : ClusterCommand("set-weekly-schedule"), mComplex_Payload(&mRequest.payload)
     {
         AddArgument("NumberOfTransitionsForSequence", 0, UINT8_MAX, &mRequest.numberOfTransitionsForSequence);
-        AddArgument(
-            "DayOfWeekForSequence", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.dayOfWeekForSequence));
-        AddArgument("ModeForSequence", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(
-                        &mRequest.modeForSequence));
+        AddArgument("DayOfWeekForSequence", 0, UINT8_MAX, &mRequest.dayOfWeekForSequence);
+        AddArgument("ModeForSequence", 0, UINT8_MAX, &mRequest.modeForSequence);
         AddArgument("Payload", &mComplex_Payload);
         ClusterCommand::AddArguments();
     }
@@ -7823,7 +7786,7 @@ class ThermostatSetpointRaiseLower : public ClusterCommand
 public:
     ThermostatSetpointRaiseLower() : ClusterCommand("setpoint-raise-lower")
     {
-        AddArgument("Mode", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.mode)> *>(&mRequest.mode));
+        AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
         AddArgument("Amount", INT8_MIN, INT8_MAX, &mRequest.amount);
         ClusterCommand::AddArguments();
     }
@@ -8612,6 +8575,7 @@ void registerClusterAccessControl(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -8620,6 +8584,7 @@ void registerClusterAccessControl(Commands & commands)
         make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id),                   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteAccessControlAcl>(),                                                     //
         make_unique<WriteAccessControlExtension>(),                                               //
         make_unique<SubscribeAttribute>(Id),                                                      //
@@ -8650,6 +8615,7 @@ void registerClusterAccountLogin(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),               //
         make_unique<AccountLoginGetSetupPINRequest>(), //
         make_unique<AccountLoginLoginRequest>(),       //
         make_unique<AccountLoginLogoutRequest>(),      //
@@ -8659,6 +8625,7 @@ void registerClusterAccountLogin(Commands & commands)
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
@@ -8681,6 +8648,7 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                                       //
         make_unique<AdministratorCommissioningOpenBasicCommissioningWindow>(), //
         make_unique<AdministratorCommissioningOpenCommissioningWindow>(),      //
         make_unique<AdministratorCommissioningRevokeCommissioning>(),          //
@@ -8693,6 +8661,7 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         make_unique<ReadAttribute>(Id, "admin-vendor-id", Attributes::AdminVendorId::Id),            //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "window-status", Attributes::WindowStatus::Id),          //
         make_unique<SubscribeAttribute>(Id, "admin-fabric-index", Attributes::AdminFabricIndex::Id), //
@@ -8718,6 +8687,7 @@ void registerClusterApplicationBasic(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -8732,6 +8702,7 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReadAttribute>(Id, "allowed-vendor-list", Attributes::AllowedVendorList::Id),       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),            //
+        make_unique<WriteAttribute>(Id),                                                                //
         make_unique<SubscribeAttribute>(Id),                                                            //
         make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id),                 //
         make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorId::Id),                     //
@@ -8762,6 +8733,7 @@ void registerClusterApplicationLauncher(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                    //
         make_unique<ApplicationLauncherHideAppRequest>(),   //
         make_unique<ApplicationLauncherLaunchAppRequest>(), //
         make_unique<ApplicationLauncherStopAppRequest>(),   //
@@ -8772,6 +8744,7 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ReadAttribute>(Id, "application-launcher-list", Attributes::ApplicationLauncherList::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                       //
+        make_unique<WriteAttribute>(Id),                                                                           //
         make_unique<SubscribeAttribute>(Id),                                                                       //
         make_unique<SubscribeAttribute>(Id, "application-launcher-list", Attributes::ApplicationLauncherList::Id), //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                      //
@@ -8795,6 +8768,7 @@ void registerClusterAudioOutput(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),               //
         make_unique<AudioOutputRenameOutputRequest>(), //
         make_unique<AudioOutputSelectOutputRequest>(), //
         //
@@ -8805,6 +8779,7 @@ void registerClusterAudioOutput(Commands & commands)
         make_unique<ReadAttribute>(Id, "current-audio-output", Attributes::CurrentAudioOutput::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                 //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),             //
+        make_unique<WriteAttribute>(Id),                                                                 //
         make_unique<SubscribeAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id, "audio-output-list", Attributes::AudioOutputList::Id),       //
         make_unique<SubscribeAttribute>(Id, "current-audio-output", Attributes::CurrentAudioOutput::Id), //
@@ -8829,6 +8804,7 @@ void registerClusterBarrierControl(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                        //
         make_unique<BarrierControlBarrierControlGoToPercent>(), //
         make_unique<BarrierControlBarrierControlStop>(),        //
         //
@@ -8841,6 +8817,7 @@ void registerClusterBarrierControl(Commands & commands)
         make_unique<ReadAttribute>(Id, "barrier-position", Attributes::BarrierPosition::Id),               //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                   //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),               //
+        make_unique<WriteAttribute>(Id),                                                                   //
         make_unique<SubscribeAttribute>(Id),                                                               //
         make_unique<SubscribeAttribute>(Id, "barrier-moving-state", Attributes::BarrierMovingState::Id),   //
         make_unique<SubscribeAttribute>(Id, "barrier-safety-status", Attributes::BarrierSafetyStatus::Id), //
@@ -8867,6 +8844,7 @@ void registerClusterBasic(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -8892,6 +8870,7 @@ void registerClusterBasic(Commands & commands)
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id),                                     //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                       //
+        make_unique<WriteAttribute>(Id),                                                                           //
         make_unique<WriteBasicNodeLabel>(),                                                                        //
         make_unique<WriteBasicLocation>(),                                                                         //
         make_unique<WriteBasicLocalConfigDisabled>(),                                                              //
@@ -8944,6 +8923,7 @@ void registerClusterBinaryInputBasic(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -8953,6 +8933,7 @@ void registerClusterBinaryInputBasic(Commands & commands)
         make_unique<ReadAttribute>(Id, "status-flags", Attributes::StatusFlags::Id),              //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteBinaryInputBasicOutOfService>(),                                         //
         make_unique<WriteBinaryInputBasicPresentValue>(),                                         //
         make_unique<SubscribeAttribute>(Id),                                                      //
@@ -8980,14 +8961,16 @@ void registerClusterBinding(Commands & commands)
         //
         // Commands
         //
-        make_unique<BindingBind>(),   //
-        make_unique<BindingUnbind>(), //
+        make_unique<ClusterCommand>(Id), //
+        make_unique<BindingBind>(),      //
+        make_unique<BindingUnbind>(),    //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
@@ -9010,6 +8993,7 @@ void registerClusterBooleanState(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9017,6 +9001,7 @@ void registerClusterBooleanState(Commands & commands)
         make_unique<ReadAttribute>(Id, "state-value", Attributes::StateValue::Id),                //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "state-value", Attributes::StateValue::Id),           //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
@@ -9042,6 +9027,7 @@ void registerClusterBridgedActions(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                          //
         make_unique<BridgedActionsDisableAction>(),               //
         make_unique<BridgedActionsDisableActionWithDuration>(),   //
         make_unique<BridgedActionsEnableAction>(),                //
@@ -9063,6 +9049,7 @@ void registerClusterBridgedActions(Commands & commands)
         make_unique<ReadAttribute>(Id, "setup-url", Attributes::SetupUrl::Id),                    //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "action-list", Attributes::ActionList::Id),           //
         make_unique<SubscribeAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id),       //
@@ -9092,12 +9079,14 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
@@ -9120,6 +9109,7 @@ void registerClusterChannel(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                    //
         make_unique<ChannelChangeChannelByNumberRequest>(), //
         make_unique<ChannelChangeChannelRequest>(),         //
         make_unique<ChannelSkipChannelRequest>(),           //
@@ -9130,6 +9120,7 @@ void registerClusterChannel(Commands & commands)
         make_unique<ReadAttribute>(Id, "channel-list", Attributes::ChannelList::Id),              //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "channel-list", Attributes::ChannelList::Id),         //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
@@ -9153,6 +9144,7 @@ void registerClusterColorControl(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                           //
         make_unique<ColorControlColorLoopSet>(),                   //
         make_unique<ColorControlEnhancedMoveHue>(),                //
         make_unique<ColorControlEnhancedMoveToHue>(),              //
@@ -9230,6 +9222,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id),       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                                      //
+        make_unique<WriteAttribute>(Id),                                                                                          //
         make_unique<WriteColorControlColorControlOptions>(),                                                                      //
         make_unique<WriteColorControlWhitePointX>(),                                                                              //
         make_unique<WriteColorControlWhitePointY>(),                                                                              //
@@ -9318,6 +9311,7 @@ void registerClusterContentLauncher(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                    //
         make_unique<ContentLauncherLaunchContentRequest>(), //
         make_unique<ContentLauncherLaunchURLRequest>(),     //
         //
@@ -9328,6 +9322,7 @@ void registerClusterContentLauncher(Commands & commands)
         make_unique<ReadAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                   //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                               //
+        make_unique<WriteAttribute>(Id),                                                                                   //
         make_unique<WriteContentLauncherSupportedStreamingProtocols>(),                                                    //
         make_unique<SubscribeAttribute>(Id),                                                                               //
         make_unique<SubscribeAttribute>(Id, "accept-header-list", Attributes::AcceptHeaderList::Id),                       //
@@ -9353,6 +9348,7 @@ void registerClusterDescriptor(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9363,6 +9359,7 @@ void registerClusterDescriptor(Commands & commands)
         make_unique<ReadAttribute>(Id, "parts-list", Attributes::PartsList::Id),                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "device-list", Attributes::DeviceList::Id),           //
         make_unique<SubscribeAttribute>(Id, "server-list", Attributes::ServerList::Id),           //
@@ -9389,12 +9386,14 @@ void registerClusterDiagnosticLogs(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                  //
         make_unique<DiagnosticLogsRetrieveLogsRequest>(), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id),                                                       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),      //
+        make_unique<WriteAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id),                                                  //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id), //
         //
@@ -9416,6 +9415,7 @@ void registerClusterDoorLock(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),            //
         make_unique<DoorLockClearCredential>(),     //
         make_unique<DoorLockClearUser>(),           //
         make_unique<DoorLockGetCredentialStatus>(), //
@@ -9434,8 +9434,11 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<ReadAttribute>(Id, "door-state", Attributes::DoorState::Id),                                             //
         make_unique<ReadAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id),      //
         make_unique<ReadAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),           //
+        make_unique<ReadAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),         //
         make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                              //
         make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                              //
+        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),                            //
+        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id),                            //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id),                                                //
         make_unique<ReadAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id),                                  //
         make_unique<ReadAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id),                                         //
@@ -9446,6 +9449,7 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<ReadAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id),                       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                                 //
+        make_unique<WriteAttribute>(Id),                                                                                     //
         make_unique<WriteDoorLockLanguage>(),                                                                                //
         make_unique<WriteDoorLockAutoRelockTime>(),                                                                          //
         make_unique<WriteDoorLockSoundVolume>(),                                                                             //
@@ -9460,8 +9464,11 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<SubscribeAttribute>(Id, "door-state", Attributes::DoorState::Id),                                        //
         make_unique<SubscribeAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id), //
         make_unique<SubscribeAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),      //
+        make_unique<SubscribeAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),    //
         make_unique<SubscribeAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                         //
         make_unique<SubscribeAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                         //
+        make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),                       //
+        make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id),                       //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id),                                           //
         make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id),                             //
         make_unique<SubscribeAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id),                                    //
@@ -9501,6 +9508,7 @@ void registerClusterElectricalMeasurement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9518,6 +9526,7 @@ void registerClusterElectricalMeasurement(Commands & commands)
         make_unique<ReadAttribute>(Id, "active-power-max", Attributes::ActivePowerMax::Id),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id),    //
         make_unique<SubscribeAttribute>(Id, "total-active-power", Attributes::TotalActivePower::Id), //
@@ -9551,6 +9560,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                      //
         make_unique<EthernetNetworkDiagnosticsResetCounts>(), //
         //
         // Attributes
@@ -9568,6 +9578,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "phyrate", Attributes::PHYRate::Id),                  //
         make_unique<SubscribeAttribute>(Id, "full-duplex", Attributes::FullDuplex::Id),           //
@@ -9600,6 +9611,7 @@ void registerClusterFixedLabel(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9607,6 +9619,7 @@ void registerClusterFixedLabel(Commands & commands)
         make_unique<ReadAttribute>(Id, "label-list", Attributes::LabelList::Id),                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "label-list", Attributes::LabelList::Id),             //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
@@ -9630,6 +9643,7 @@ void registerClusterFlowMeasurement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9640,6 +9654,7 @@ void registerClusterFlowMeasurement(Commands & commands)
         make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id),                      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id),        //
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id), //
@@ -9666,6 +9681,7 @@ void registerClusterGeneralCommissioning(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                          //
         make_unique<GeneralCommissioningArmFailSafe>(),           //
         make_unique<GeneralCommissioningCommissioningComplete>(), //
         make_unique<GeneralCommissioningSetRegulatoryConfig>(),   //
@@ -9679,6 +9695,7 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id),                        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                  //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                              //
+        make_unique<WriteAttribute>(Id),                                                                                  //
         make_unique<WriteGeneralCommissioningBreadcrumb>(),                                                               //
         make_unique<SubscribeAttribute>(Id),                                                                              //
         make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id),                                    //
@@ -9706,6 +9723,7 @@ void registerClusterGeneralDiagnostics(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9720,6 +9738,7 @@ void registerClusterGeneralDiagnostics(Commands & commands)
         make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                   //
+        make_unique<WriteAttribute>(Id),                                                                       //
         make_unique<SubscribeAttribute>(Id),                                                                   //
         make_unique<SubscribeAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id),          //
         make_unique<SubscribeAttribute>(Id, "reboot-count", Attributes::RebootCount::Id),                      //
@@ -9758,6 +9777,7 @@ void registerClusterGroupKeyManagement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                       //
         make_unique<GroupKeyManagementKeySetRead>(),           //
         make_unique<GroupKeyManagementKeySetReadAllIndices>(), //
         make_unique<GroupKeyManagementKeySetRemove>(),         //
@@ -9772,6 +9792,7 @@ void registerClusterGroupKeyManagement(Commands & commands)
         make_unique<ReadAttribute>(Id, "max-group-keys-per-fabric", Attributes::MaxGroupKeysPerFabric::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                         //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                     //
+        make_unique<WriteAttribute>(Id),                                                                         //
         make_unique<SubscribeAttribute>(Id),                                                                     //
         make_unique<SubscribeAttribute>(Id, "group-key-map", Attributes::GroupKeyMap::Id),                       //
         make_unique<SubscribeAttribute>(Id, "group-table", Attributes::GroupTable::Id),                          //
@@ -9798,6 +9819,7 @@ void registerClusterGroups(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),            //
         make_unique<GroupsAddGroup>(),              //
         make_unique<GroupsAddGroupIfIdentifying>(), //
         make_unique<GroupsGetGroupMembership>(),    //
@@ -9811,6 +9833,7 @@ void registerClusterGroups(Commands & commands)
         make_unique<ReadAttribute>(Id, "name-support", Attributes::NameSupport::Id),              //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "name-support", Attributes::NameSupport::Id),         //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
@@ -9834,6 +9857,7 @@ void registerClusterIdentify(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),      //
         make_unique<IdentifyIdentify>(),      //
         make_unique<IdentifyIdentifyQuery>(), //
         make_unique<IdentifyTriggerEffect>(), //
@@ -9845,6 +9869,7 @@ void registerClusterIdentify(Commands & commands)
         make_unique<ReadAttribute>(Id, "identify-type", Attributes::IdentifyType::Id),            //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteIdentifyIdentifyTime>(),                                                 //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "identify-time", Attributes::IdentifyTime::Id),       //
@@ -9870,6 +9895,7 @@ void registerClusterIlluminanceMeasurement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -9881,6 +9907,7 @@ void registerClusterIlluminanceMeasurement(Commands & commands)
         make_unique<ReadAttribute>(Id, "light-sensor-type", Attributes::LightSensorType::Id),        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id),        //
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id), //
@@ -9908,6 +9935,7 @@ void registerClusterKeypadInput(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),          //
         make_unique<KeypadInputSendKeyRequest>(), //
         //
         // Attributes
@@ -9915,6 +9943,7 @@ void registerClusterKeypadInput(Commands & commands)
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
@@ -9937,6 +9966,7 @@ void registerClusterLevelControl(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                 //
         make_unique<LevelControlMove>(),                 //
         make_unique<LevelControlMoveToLevel>(),          //
         make_unique<LevelControlMoveToLevelWithOnOff>(), //
@@ -9966,6 +9996,7 @@ void registerClusterLevelControl(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                    //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                //
+        make_unique<WriteAttribute>(Id),                                                                    //
         make_unique<WriteLevelControlOptions>(),                                                            //
         make_unique<WriteLevelControlOnOffTransitionTime>(),                                                //
         make_unique<WriteLevelControlOnLevel>(),                                                            //
@@ -10010,6 +10041,7 @@ void registerClusterLocalizationConfiguration(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10017,6 +10049,7 @@ void registerClusterLocalizationConfiguration(Commands & commands)
         make_unique<ReadAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id),              //
         make_unique<ReadAttribute>(Id, "supported-locales", Attributes::SupportedLocales::Id),      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),        //
+        make_unique<WriteAttribute>(Id),                                                            //
         make_unique<WriteLocalizationConfigurationActiveLocale>(),                                  //
         make_unique<SubscribeAttribute>(Id),                                                        //
         make_unique<SubscribeAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id),         //
@@ -10041,13 +10074,15 @@ void registerClusterLowPower(Commands & commands)
         //
         // Commands
         //
-        make_unique<LowPowerSleep>(), //
+        make_unique<ClusterCommand>(Id), //
+        make_unique<LowPowerSleep>(),    //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
@@ -10070,6 +10105,7 @@ void registerClusterMediaInput(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                 //
         make_unique<MediaInputHideInputStatusRequest>(), //
         make_unique<MediaInputRenameInputRequest>(),     //
         make_unique<MediaInputSelectInputRequest>(),     //
@@ -10082,6 +10118,7 @@ void registerClusterMediaInput(Commands & commands)
         make_unique<ReadAttribute>(Id, "current-media-input", Attributes::CurrentMediaInput::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),               //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),           //
+        make_unique<WriteAttribute>(Id),                                                               //
         make_unique<SubscribeAttribute>(Id),                                                           //
         make_unique<SubscribeAttribute>(Id, "media-input-list", Attributes::MediaInputList::Id),       //
         make_unique<SubscribeAttribute>(Id, "current-media-input", Attributes::CurrentMediaInput::Id), //
@@ -10106,6 +10143,7 @@ void registerClusterMediaPlayback(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                 //
         make_unique<MediaPlaybackFastForwardRequest>(),  //
         make_unique<MediaPlaybackNextRequest>(),         //
         make_unique<MediaPlaybackPauseRequest>(),        //
@@ -10129,6 +10167,7 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<ReadAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id),       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "playback-state", Attributes::PlaybackState::Id),     //
         make_unique<SubscribeAttribute>(Id, "start-time", Attributes::StartTime::Id),             //
@@ -10157,6 +10196,7 @@ void registerClusterModeSelect(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),       //
         make_unique<ModeSelectChangeToMode>(), //
         //
         // Attributes
@@ -10169,6 +10209,7 @@ void registerClusterModeSelect(Commands & commands)
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id),               //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteModeSelectOnMode>(),                                                     //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id),         //
@@ -10197,6 +10238,7 @@ void registerClusterNetworkCommissioning(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                             //
         make_unique<NetworkCommissioningAddOrUpdateThreadNetwork>(), //
         make_unique<NetworkCommissioningAddOrUpdateWiFiNetwork>(),   //
         make_unique<NetworkCommissioningConnectNetwork>(),           //
@@ -10217,6 +10259,7 @@ void registerClusterNetworkCommissioning(Commands & commands)
         make_unique<ReadAttribute>(Id, "last-connect-error-value", Attributes::LastConnectErrorValue::Id),      //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                              //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                    //
+        make_unique<WriteAttribute>(Id),                                                                        //
         make_unique<WriteNetworkCommissioningInterfaceEnabled>(),                                               //
         make_unique<SubscribeAttribute>(Id),                                                                    //
         make_unique<SubscribeAttribute>(Id, "max-networks", Attributes::MaxNetworks::Id),                       //
@@ -10248,6 +10291,7 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                             //
         make_unique<OtaSoftwareUpdateProviderApplyUpdateRequest>(),  //
         make_unique<OtaSoftwareUpdateProviderNotifyUpdateApplied>(), //
         make_unique<OtaSoftwareUpdateProviderQueryImage>(),          //
@@ -10257,6 +10301,7 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
@@ -10279,6 +10324,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                              //
         make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(), //
         //
         // Attributes
@@ -10290,6 +10336,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
         make_unique<ReadAttribute>(Id, "update-state-progress", Attributes::UpdateStateProgress::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                   //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),               //
+        make_unique<WriteAttribute>(Id),                                                                   //
         make_unique<WriteOtaSoftwareUpdateRequestorDefaultOtaProviders>(),                                 //
         make_unique<SubscribeAttribute>(Id),                                                               //
         make_unique<SubscribeAttribute>(Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id), //
@@ -10323,6 +10370,7 @@ void registerClusterOccupancySensing(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10332,6 +10380,7 @@ void registerClusterOccupancySensing(Commands & commands)
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                            //
+        make_unique<WriteAttribute>(Id),                                                                                //
         make_unique<SubscribeAttribute>(Id),                                                                            //
         make_unique<SubscribeAttribute>(Id, "occupancy", Attributes::Occupancy::Id),                                    //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id),              //
@@ -10357,6 +10406,7 @@ void registerClusterOnOff(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),             //
         make_unique<OnOffOff>(),                     //
         make_unique<OnOffOffWithEffect>(),           //
         make_unique<OnOffOn>(),                      //
@@ -10375,6 +10425,7 @@ void registerClusterOnOff(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                 //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),             //
+        make_unique<WriteAttribute>(Id),                                                                 //
         make_unique<WriteOnOffOnTime>(),                                                                 //
         make_unique<WriteOnOffOffWaitTime>(),                                                            //
         make_unique<WriteOnOffStartUpOnOff>(),                                                           //
@@ -10406,6 +10457,7 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10414,6 +10466,7 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands)
         make_unique<ReadAttribute>(Id, "switch-actions", Attributes::SwitchActions::Id),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteOnOffSwitchConfigurationSwitchActions>(),                                //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "switch-type", Attributes::SwitchType::Id),           //
@@ -10439,6 +10492,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                                   //
         make_unique<OperationalCredentialsAddNOC>(),                       //
         make_unique<OperationalCredentialsAddTrustedRootCertificate>(),    //
         make_unique<OperationalCredentialsAttestationRequest>(),           //
@@ -10460,6 +10514,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<ReadAttribute>(Id, "current-fabric-index", Attributes::CurrentFabricIndex::Id),                //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                       //
+        make_unique<WriteAttribute>(Id),                                                                           //
         make_unique<SubscribeAttribute>(Id),                                                                       //
         make_unique<SubscribeAttribute>(Id, "nocs", Attributes::NOCs::Id),                                         //
         make_unique<SubscribeAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id),                          //
@@ -10488,6 +10543,7 @@ void registerClusterPowerSource(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10504,6 +10560,7 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                           //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                                 //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                       //
+        make_unique<WriteAttribute>(Id),                                                                           //
         make_unique<SubscribeAttribute>(Id),                                                                       //
         make_unique<SubscribeAttribute>(Id, "status", Attributes::Status::Id),                                     //
         make_unique<SubscribeAttribute>(Id, "order", Attributes::Order::Id),                                       //
@@ -10536,6 +10593,7 @@ void registerClusterPowerSourceConfiguration(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10543,6 +10601,7 @@ void registerClusterPowerSourceConfiguration(Commands & commands)
         make_unique<ReadAttribute>(Id, "sources", Attributes::Sources::Id),                       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "sources", Attributes::Sources::Id),                  //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
@@ -10566,6 +10625,7 @@ void registerClusterPressureMeasurement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10575,6 +10635,7 @@ void registerClusterPressureMeasurement(Commands & commands)
         make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id),        //
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id), //
@@ -10600,6 +10661,7 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10631,6 +10693,7 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                         //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                               //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                     //
+        make_unique<WriteAttribute>(Id),                                                                         //
         make_unique<WritePumpConfigurationAndControlLifetimeRunningHours>(),                                     //
         make_unique<WritePumpConfigurationAndControlLifetimeEnergyConsumed>(),                                   //
         make_unique<WritePumpConfigurationAndControlOperationMode>(),                                            //
@@ -10716,6 +10779,7 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10726,6 +10790,7 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands)
         make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id),                      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id),        //
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id), //
@@ -10752,6 +10817,7 @@ void registerClusterScenes(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),         //
         make_unique<ScenesAddScene>(),           //
         make_unique<ScenesGetSceneMembership>(), //
         make_unique<ScenesRecallScene>(),        //
@@ -10770,6 +10836,7 @@ void registerClusterScenes(Commands & commands)
         make_unique<ReadAttribute>(Id, "name-support", Attributes::NameSupport::Id),              //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "scene-count", Attributes::SceneCount::Id),           //
         make_unique<SubscribeAttribute>(Id, "current-scene", Attributes::CurrentScene::Id),       //
@@ -10797,6 +10864,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                   //
         make_unique<SoftwareDiagnosticsResetWatermarks>(), //
         //
         // Attributes
@@ -10809,6 +10877,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                              //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                                    //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                          //
+        make_unique<WriteAttribute>(Id),                                                                              //
         make_unique<SubscribeAttribute>(Id),                                                                          //
         make_unique<SubscribeAttribute>(Id, "thread-metrics", Attributes::ThreadMetrics::Id),                         //
         make_unique<SubscribeAttribute>(Id, "current-heap-free", Attributes::CurrentHeapFree::Id),                    //
@@ -10838,6 +10907,7 @@ void registerClusterSwitch(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10848,6 +10918,7 @@ void registerClusterSwitch(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),               //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),           //
+        make_unique<WriteAttribute>(Id),                                                               //
         make_unique<SubscribeAttribute>(Id),                                                           //
         make_unique<SubscribeAttribute>(Id, "number-of-positions", Attributes::NumberOfPositions::Id), //
         make_unique<SubscribeAttribute>(Id, "current-position", Attributes::CurrentPosition::Id),      //
@@ -10888,6 +10959,7 @@ void registerClusterTargetNavigator(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                     //
         make_unique<TargetNavigatorNavigateTargetRequest>(), //
         //
         // Attributes
@@ -10897,6 +10969,7 @@ void registerClusterTargetNavigator(Commands & commands)
         make_unique<ReadAttribute>(Id, "current-navigator-target", Attributes::CurrentNavigatorTarget::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                         //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                     //
+        make_unique<WriteAttribute>(Id),                                                                         //
         make_unique<SubscribeAttribute>(Id),                                                                     //
         make_unique<SubscribeAttribute>(Id, "target-navigator-list", Attributes::TargetNavigatorList::Id),       //
         make_unique<SubscribeAttribute>(Id, "current-navigator-target", Attributes::CurrentNavigatorTarget::Id), //
@@ -10921,6 +10994,7 @@ void registerClusterTemperatureMeasurement(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -10931,6 +11005,7 @@ void registerClusterTemperatureMeasurement(Commands & commands)
         make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id),                      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),         //
+        make_unique<WriteAttribute>(Id),                                                             //
         make_unique<SubscribeAttribute>(Id),                                                         //
         make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id),        //
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id), //
@@ -10957,6 +11032,7 @@ void registerClusterTestCluster(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                                   //
         make_unique<TestClusterSimpleStructEchoRequest>(),                 //
         make_unique<TestClusterTest>(),                                    //
         make_unique<TestClusterTestAddArguments>(),                        //
@@ -11061,6 +11137,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                        //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                                    //
+        make_unique<WriteAttribute>(Id),                                                                                        //
         make_unique<WriteTestClusterBoolean>(),                                                                                 //
         make_unique<WriteTestClusterBitmap8>(),                                                                                 //
         make_unique<WriteTestClusterBitmap16>(),                                                                                //
@@ -11245,6 +11322,7 @@ void registerClusterThermostat(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),              //
         make_unique<ThermostatClearWeeklySchedule>(), //
         make_unique<ThermostatGetRelayStatusLog>(),   //
         make_unique<ThermostatGetWeeklySchedule>(),   //
@@ -11274,6 +11352,7 @@ void registerClusterThermostat(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                  //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                                        //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                              //
+        make_unique<WriteAttribute>(Id),                                                                                  //
         make_unique<WriteThermostatOccupiedCoolingSetpoint>(),                                                            //
         make_unique<WriteThermostatOccupiedHeatingSetpoint>(),                                                            //
         make_unique<WriteThermostatMinHeatSetpointLimit>(),                                                               //
@@ -11323,6 +11402,7 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -11332,6 +11412,7 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands)
         make_unique<ReadAttribute>(Id, "schedule-programming-visibility", Attributes::ScheduleProgrammingVisibility::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                                   //
+        make_unique<WriteAttribute>(Id),                                                                                       //
         make_unique<WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode>(),                                        //
         make_unique<WriteThermostatUserInterfaceConfigurationKeypadLockout>(),                                                 //
         make_unique<WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(),                                 //
@@ -11360,6 +11441,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                    //
         make_unique<ThreadNetworkDiagnosticsResetCounts>(), //
         //
         // Attributes
@@ -11432,6 +11514,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                     //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                                 //
+        make_unique<WriteAttribute>(Id),                                                                                     //
         make_unique<SubscribeAttribute>(Id),                                                                                 //
         make_unique<SubscribeAttribute>(Id, "channel", Attributes::Channel::Id),                                             //
         make_unique<SubscribeAttribute>(Id, "routing-role", Attributes::RoutingRole::Id),                                    //
@@ -11521,6 +11604,7 @@ void registerClusterTimeFormatLocalization(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -11529,6 +11613,7 @@ void registerClusterTimeFormatLocalization(Commands & commands)
         make_unique<ReadAttribute>(Id, "active-calendar-type", Attributes::ActiveCalendarType::Id),              //
         make_unique<ReadAttribute>(Id, "supported-calendar-types", Attributes::SupportedCalendarTypes::Id),      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                     //
+        make_unique<WriteAttribute>(Id),                                                                         //
         make_unique<WriteTimeFormatLocalizationHourFormat>(),                                                    //
         make_unique<WriteTimeFormatLocalizationActiveCalendarType>(),                                            //
         make_unique<SubscribeAttribute>(Id),                                                                     //
@@ -11555,6 +11640,7 @@ void registerClusterUnitLocalization(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -11562,6 +11648,7 @@ void registerClusterUnitLocalization(Commands & commands)
         make_unique<ReadAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id),      //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteUnitLocalizationTemperatureUnit>(),                                      //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id), //
@@ -11586,12 +11673,14 @@ void registerClusterUserLabel(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "label-list", Attributes::LabelList::Id),                  //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
+        make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteUserLabelLabelList>(),                                                   //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "label-list", Attributes::LabelList::Id),             //
@@ -11615,6 +11704,7 @@ void registerClusterWakeOnLan(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         //
         // Attributes
         //
@@ -11622,6 +11712,7 @@ void registerClusterWakeOnLan(Commands & commands)
         make_unique<ReadAttribute>(Id, "wake-on-lan-mac-address", Attributes::WakeOnLanMacAddress::Id),      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                 //
+        make_unique<WriteAttribute>(Id),                                                                     //
         make_unique<SubscribeAttribute>(Id),                                                                 //
         make_unique<SubscribeAttribute>(Id, "wake-on-lan-mac-address", Attributes::WakeOnLanMacAddress::Id), //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                //
@@ -11645,6 +11736,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                  //
         make_unique<WiFiNetworkDiagnosticsResetCounts>(), //
         //
         // Attributes
@@ -11666,6 +11758,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                          //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                      //
+        make_unique<WriteAttribute>(Id),                                                                          //
         make_unique<SubscribeAttribute>(Id),                                                                      //
         make_unique<SubscribeAttribute>(Id, "bssid", Attributes::Bssid::Id),                                      //
         make_unique<SubscribeAttribute>(Id, "security-type", Attributes::SecurityType::Id),                       //
@@ -11708,6 +11801,7 @@ void registerClusterWindowCovering(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id),                 //
         make_unique<WindowCoveringDownOrClose>(),        //
         make_unique<WindowCoveringGoToLiftPercentage>(), //
         make_unique<WindowCoveringGoToLiftValue>(),      //
@@ -11740,6 +11834,7 @@ void registerClusterWindowCovering(Commands & commands)
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                         //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                                               //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                                     //
+        make_unique<WriteAttribute>(Id),                                                                                         //
         make_unique<WriteWindowCoveringMode>(),                                                                                  //
         make_unique<SubscribeAttribute>(Id),                                                                                     //
         make_unique<SubscribeAttribute>(Id, "type", Attributes::Type::Id),                                                       //
@@ -11782,7 +11877,9 @@ void registerClusterAny(Commands & commands)
     const char * clusterName = "Any";
 
     commands_list clusterCommands = {
+        make_unique<ClusterCommand>(),     //
         make_unique<ReadAttribute>(),      //
+        make_unique<WriteAttribute>(),     //
         make_unique<SubscribeAttribute>(), //
         make_unique<ReadEvent>(),          //
         make_unique<SubscribeEvent>(),     //

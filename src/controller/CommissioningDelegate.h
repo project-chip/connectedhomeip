@@ -37,6 +37,7 @@ enum CommissioningStage : uint8_t
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
+    kGetNetworkTechnology,
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -271,13 +272,18 @@ struct BasicSoftware
     BasicSoftware(uint32_t version) : softwareVersion(version) {}
     uint32_t softwareVersion;
 };
+struct FeatureMap
+{
+    FeatureMap(uint32_t featureBitmap) : features(featureBitmap) {}
+    uint32_t features;
+};
 
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
-                                         EndpointParts, EndpointCommissioningInfo, BasicVendor, BasicProduct, BasicSoftware>
+                                         EndpointParts, EndpointCommissioningInfo, BasicVendor, BasicProduct, BasicSoftware, FeatureMap>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

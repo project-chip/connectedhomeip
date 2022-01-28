@@ -38,6 +38,8 @@ def AllTests(chip_tool: str):
 
         if name.startswith('TV_'):
             target = TestTarget.TV
+        elif name.startswith('DL_'):
+            target = TestTarget.DOOR_LOCK
         else:
             target = TestTarget.ALL_CLUSTERS
 

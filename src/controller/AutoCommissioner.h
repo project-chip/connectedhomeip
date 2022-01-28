@@ -39,7 +39,7 @@ public:
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
-    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr);
+    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -67,6 +67,9 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
+    // TODO: if the device library adds a network commissioning device type, this will need to be 1 per endpoint.
+    BitFlags<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> mNetworkTechnology;
+    bool mNeedsNetworkSetup = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;

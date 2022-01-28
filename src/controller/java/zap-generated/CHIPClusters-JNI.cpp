@@ -8680,16 +8680,24 @@ JNI_METHOD(void, DoorLockCluster, clearCredential)
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    jobject credential_credentialTypeItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialType", "Ljava/lang/Integer;",
-                                                      credential_credentialTypeItem_0);
-    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialTypeItem_0));
-    jobject credential_credentialIndexItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialIndex", "Ljava/lang/Integer;",
-                                                      credential_credentialIndexItem_0);
-    request.credential.credentialIndex = static_cast<std::remove_reference_t<decltype(request.credential.credentialIndex)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialIndexItem_0));
+    if (credential == nullptr)
+    {
+        request.credential.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.credential.SetNonNull();
+        jobject credential_credentialTypeItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(credential, "credentialType", "Ljava/lang/Integer;",
+                                                          credential_credentialTypeItem_1);
+        nonNullValue_0.credentialType = static_cast<std::remove_reference_t<decltype(nonNullValue_0.credentialType)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialTypeItem_1));
+        jobject credential_credentialIndexItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(credential, "credentialIndex", "Ljava/lang/Integer;",
+                                                          credential_credentialIndexItem_1);
+        nonNullValue_0.credentialIndex = static_cast<std::remove_reference_t<decltype(nonNullValue_0.credentialIndex)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialIndexItem_1));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8946,7 +8954,7 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)
 }
 JNI_METHOD(void, DoorLockCluster, setCredential)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject operationType, jobject credential,
- jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject timedInvokeTimeoutMs)
+ jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject userType, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8971,10 +8979,36 @@ JNI_METHOD(void, DoorLockCluster, setCredential)
         chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialIndexItem_0));
     cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(credentialData)));
     request.credentialData = cleanupByteArrays.back()->byteSpan();
-    request.userIndex      = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
-    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    if (userIndex == nullptr)
+    {
+        request.userIndex.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.userIndex.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    }
+    if (userStatus == nullptr)
+    {
+        request.userStatus.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.userStatus.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    }
+    if (userType == nullptr)
+    {
+        request.userType.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.userType.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
+    }
 
     std::unique_ptr<CHIPDoorLockClusterSetCredentialResponseCallback, void (*)(CHIPDoorLockClusterSetCredentialResponseCallback *)>
         onSuccess(Platform::New<CHIPDoorLockClusterSetCredentialResponseCallback>(callback),
@@ -9050,12 +9084,36 @@ JNI_METHOD(void, DoorLockCluster, setUser)
         nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
             chip::JniReferences::GetInstance().LongToPrimitive(userUniqueId));
     }
-    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
-    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
-    request.credentialRule = static_cast<std::remove_reference_t<decltype(request.credentialRule)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(credentialRule));
+    if (userStatus == nullptr)
+    {
+        request.userStatus.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.userStatus.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    }
+    if (userType == nullptr)
+    {
+        request.userType.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.userType.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
+    }
+    if (credentialRule == nullptr)
+    {
+        request.credentialRule.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.credentialRule.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(credentialRule));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -9372,6 +9430,43 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfPINUsersSupportedAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, DoorLockCluster, subscribeNumberOfRFIDUsersSupportedAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPDoorLockClusterNumberOfRFIDUsersSupportedAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, DoorLockCluster, subscribeMaxPINCodeLengthAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9434,6 +9529,80 @@ JNI_METHOD(void, DoorLockCluster, subscribeMinPINCodeLengthAttribute)
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::MinPINCodeLength::TypeInfo;
     auto successFn =
         chip::Callback::Callback<CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, subscribeMaxRFIDCodeLengthAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterMaxRFIDCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DoorLockCluster, subscribeMinRFIDCodeLengthAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DoorLock::Attributes::MinRFIDCodeLength::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterMinRFIDCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
@@ -29354,8 +29523,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNetworkNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPOctetStringAttributeCallback, void (*)(CHIPOctetStringAttributeCallback *)> onSuccess(
-        Platform::New<CHIPOctetStringAttributeCallback>(callback, true), chip::Platform::Delete<CHIPOctetStringAttributeCallback>);
+    std::unique_ptr<CHIPCharStringAttributeCallback, void (*)(CHIPCharStringAttributeCallback *)> onSuccess(
+        Platform::New<CHIPCharStringAttributeCallback>(callback, true), chip::Platform::Delete<CHIPCharStringAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29379,7 +29548,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNetworkNameAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

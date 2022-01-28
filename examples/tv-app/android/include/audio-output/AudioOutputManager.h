@@ -20,11 +20,14 @@
 
 #include <app/clusters/audio-output-server/audio-output-server.h>
 
-class AudioOutputManager : public chip::app::Clusters::AudioOutput::Delegate
+using chip::app::AttributeValueEncoder;
+using AudioOutputDelegate = chip::app::Clusters::AudioOutput::Delegate;
+
+class AudioOutputManager : public AudioOutputDelegate
 {
 public:
     uint8_t HandleGetCurrentOutput() override;
-    std::list<chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type> HandleGetOutputList() override;
+    CHIP_ERROR HandleGetOutputList(AttributeValueEncoder & aEncoder) override;
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
 };

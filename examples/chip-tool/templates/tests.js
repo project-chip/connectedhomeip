@@ -232,11 +232,8 @@ function getTests()
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestIdentifyCluster',
-    'TestGroupsCluster',
-    'TestGroupKeyManagementCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
-    'TestGroupMessaging',
   ];
 
   const SoftwareDiagnostics = [
@@ -247,6 +244,19 @@ function getTests()
 
   const Subscriptions = [
     'TestSubscribe_OnOff',
+  ];
+
+  const DoorLock = [
+    'DL_UsersAndCredentials',
+    'DL_LockUnlock',
+  ];
+
+  const Groups = [
+    'TestGroupMessaging',
+    'TestGroupsCluster',
+    'TestGroupDemoCommand',
+    'TestGroupDemoConfig',
+    'TestGroupKeyManagementCluster',
   ];
 
   const tests = [
@@ -279,6 +289,8 @@ function getTests()
     Others, //
     SoftwareDiagnostics, //
     Subscriptions, //
+    DoorLock, //
+    Groups, //
   ];
   return tests.flat(1);
 }

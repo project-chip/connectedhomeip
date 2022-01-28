@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/CommandResponseHelper.h>
 #include <app/util/af.h>
 
 namespace chip {
@@ -33,7 +34,7 @@ namespace KeypadInput {
 class Delegate
 {
 public:
-    virtual Commands::SendKeyResponse::Type HandleSendKey(const CecKeyCode & keyCode) = 0;
+    virtual void HandleSendKey(CommandResponseHelper<Commands::SendKeyResponse::Type> & helper, const CecKeyCode & keyCode) = 0;
 
     virtual ~Delegate() = default;
 };
