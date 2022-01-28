@@ -116,7 +116,7 @@ struct AesCcm128KeyBuffer : private AesCcm128Key
     AesCcm128KeyBuffer() {}
     const AesCcm128KeySpan Get() const { return this->Span(); };
     void Set(AesCcm128KeySpan keySpan) { *this = AesCcm128KeyBuffer(keySpan); }
-    void Clear() { *this =  AesCcm128KeyBuffer(); }
+    void Clear() { *this = AesCcm128KeyBuffer(); }
 };
 
 using OnboardingPayload        = chip::Platform::SharedPtr<chip::SetupPayload>;

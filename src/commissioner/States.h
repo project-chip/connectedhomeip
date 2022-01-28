@@ -400,8 +400,7 @@ struct CapturingAttestationChallenge : Base<TContext>
     {}
     void Enter()
     {
-        auto challenge =
-            this->mCommissionee.mPaseSession.Get()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+        auto challenge = this->mCommissionee.mPaseSession.Get()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         mAttestationInformation.Challenge()->Set(challenge);
         this->mCtx.Dispatch(TContext::Event::template Create<Events::AttestationInformation>(mAttestationInformation));
     }

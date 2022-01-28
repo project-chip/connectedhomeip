@@ -268,7 +268,8 @@ struct SigningCertificates : SdkStates::Base
 
 private:
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR err, const chip::ByteSpan & derNoc,
-                                           const chip::ByteSpan & derIcac, const chip::ByteSpan & derRcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
+                                           const chip::ByteSpan & derIcac, const chip::ByteSpan & derRcac,
+                                           Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
     {
 
         ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(err));
