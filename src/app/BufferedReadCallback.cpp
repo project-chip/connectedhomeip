@@ -226,8 +226,8 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
     return CHIP_NO_ERROR;
 }
 
-void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
-                                           const StatusIB & aStatus)
+void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
+                                           TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     CHIP_ERROR err;
 
@@ -254,7 +254,7 @@ void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPa
     // Update our latched buffered path.
     //
     mBufferedPath = aPath;
-    mDataVersion = aVersion;
+    mDataVersion  = aVersion;
 
 exit:
     if (err != CHIP_NO_ERROR)

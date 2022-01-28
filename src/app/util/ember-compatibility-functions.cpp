@@ -262,9 +262,8 @@ CHIP_ERROR ReadClusterDataVersion(const EndpointId & aEndpointId, const ClusterI
     DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
     if (version == nullptr)
     {
-        ChipLogError(DataManagement,
-                     "Endpoint %" PRIx16 ", Cluster" ChipLogFormatMEI " not found in ReadClusterDataVersion!",
-                aEndpointId, ChipLogValueMEI(aClusterId));
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster" ChipLogFormatMEI " not found in ReadClusterDataVersion!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
         return CHIP_ERROR_NOT_FOUND;
     }
     aDataVersion = *version;
@@ -276,15 +275,14 @@ void IncreaseClusterDataVersion(const EndpointId & aEndpointId, const ClusterId 
     DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
     if (version == nullptr)
     {
-        ChipLogError(DataManagement,
-                     "Endpoint %" PRIx16 ", Cluster" ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
-                aEndpointId, ChipLogValueMEI(aClusterId));
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster" ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
     }
     else
     {
         (*(version))++;
         ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster" ChipLogFormatMEI " update version to %" PRIx32, aEndpointId,
-                ChipLogValueMEI(aClusterId), *(version));
+                      ChipLogValueMEI(aClusterId), *(version));
     }
     return;
 }
@@ -365,8 +363,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
     DataVersion version = kTemporaryDataVersion;
     ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version);
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered,
-                                       state);
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)

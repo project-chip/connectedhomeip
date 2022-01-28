@@ -80,7 +80,8 @@ public:
 
     void OnReportBegin() override;
     void OnReportEnd() override;
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
+                         const StatusIB & aStatus) override;
     void OnDone() override {}
 
     std::vector<ValidationInstruction> mInstructionList;
@@ -94,8 +95,8 @@ void DataSeriesValidator::OnReportBegin()
 
 void DataSeriesValidator::OnReportEnd() {}
 
-void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
-                                          const StatusIB & aStatus)
+void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
+                                          TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     uint32_t expectedListLength;
 

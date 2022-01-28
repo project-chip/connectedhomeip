@@ -50,8 +50,8 @@ struct __attribute__((packed)) EventPath
     chip::EventId eventId;
 };
 
-using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::DataVersion version, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                             chip::AttributeId attributeId,
+using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::DataVersion version, chip::EndpointId endpointId,
+                                             chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
                                              uint32_t dataLen);
 using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -78,7 +78,8 @@ public:
 
     app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) override
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
+                         const StatusIB & aStatus) override
     {
         //
         // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read

@@ -116,7 +116,9 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) {}
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
+        {}
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.

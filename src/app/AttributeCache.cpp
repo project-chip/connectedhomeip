@@ -100,7 +100,8 @@ void AttributeCache::OnReportEnd()
     mCallback.OnReportEnd();
 }
 
-void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData, const StatusIB & aStatus)
+void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     //
     // Since the cache itself is a ReadClient::Callback, it may be incorrectly passed in directly when registering with the

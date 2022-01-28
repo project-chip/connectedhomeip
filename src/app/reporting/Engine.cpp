@@ -142,7 +142,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         // Try to encode our error as a status response.
                         err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
-                        if (err != CHIP_NO_ERROR) {
+                        if (err != CHIP_NO_ERROR)
+                        {
                             // OK, just roll back again and give up.
                             attributeReportIBs.Rollback(attributeBackup);
                         }

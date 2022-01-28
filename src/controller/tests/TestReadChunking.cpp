@@ -109,8 +109,8 @@ public:
     app::BufferedReadCallback mBufferedCallback;
 };
 
-void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
-                                       const app::StatusIB & aStatus)
+void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
+                                       TLV::TLVReader * apData, const app::StatusIB & aStatus)
 {
     if (aPath.mAttributeId != kTestListAttribute)
     {
