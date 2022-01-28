@@ -43,9 +43,10 @@ config("p6_ota_config") {
   ldflags +=["-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000"]
 
   defines = [
-    "OTA_SUPPORT=1 ",
-    "OTA_USE_EXTERNAL_FLASH=1",
-    "CY_BOOT_USE_EXTERNAL_FLASH=1",
+    "CY_OTA",
+    "OTA_SUPPORT ",
+    "OTA_USE_EXTERNAL_FLASH",
+    "CY_BOOT_USE_EXTERNAL_FLASH",
     "MCUBOOT_HEADER_SIZE=0x400",
     "MCUBOOT_MAX_IMG_SECTORS=3584",
     "CY_BOOT_SCRATCH_SIZE=0x00004000",
@@ -65,20 +66,26 @@ config("p6_ota_config") {
     "APP_VERSION_BUILD=0",
     "MCUBOOT_OVERWRITE_ONLY",
     "CY_ENABLE_XIP_PROGRAM",
-  ]
-
+    ]
 }
 
-# TODO: Fix ugly hack
 # Warning: Don't change the name of this target without also modifying
-# third_party/p6/BUILD.gn and third_party/p6/p6_sdk.gn. There is an ugly hack
-# that relies on this.
+# third_party/p6/BUILD.gn and third_party/p6/p6_sdk.gn. There are conditionals
+# relying on this name.
 p6_sdk_sources("ota_requestor_app_sdk_sources") {
   include_dirs = [
     "${chip_root}/src/platform/P6",
     "${p6_project_dir}/include",
     "${examples_plat_dir}",
     "${p6_project_dir}/bootloader_cm0p/config",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/flash_map_backend/",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/sysflash/",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/include",
+    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/"
   ]
 
   defines = [
@@ -87,7 +94,14 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setup_pin_code}",
   ]
 
-  sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h" ]
+  sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h",
+              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
+              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
+              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
+              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_map.c",
+              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/src/bootutil_misc.c",
+              "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_prog.c",
+              "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_qspi.c"]
 
   public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config", ":p6_ota_config" ]
 }
