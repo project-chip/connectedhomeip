@@ -37,7 +37,7 @@ class UserConsentDelegate
 public:
     virtual ~UserConsentDelegate() = default;
 
-    virtual UserConsentState GetUserConsentState(chip::NodeId nodeId, chip::EndpointId endpoint, uint32_t currentVersion,
+    virtual UserConsentState GetUserConsentState(NodeId nodeId, EndpointId endpoint, uint32_t currentVersion,
                                                  uint32_t newVersion) = 0;
 };
 

@@ -31,17 +31,16 @@ public:
     ~DefaultUserConsentProvider() = default;
 
     // This method returns kGranted unless explicitly denied by the user by calling RevokeUserConsent()
-    UserConsentState GetUserConsentState(chip::NodeId nodeId, chip::EndpointId endpoint, uint32_t currentVersion,
-                                         uint32_t newVersion);
+    UserConsentState GetUserConsentState(NodeId nodeId, EndpointId endpoint, uint32_t currentVersion, uint32_t newVersion);
 
     // Grant the user consent for the given node and endpoint for OTA updates
-    CHIP_ERROR GrantUserConsent(chip::NodeId nodeId, chip::EndpointId endpoint);
+    CHIP_ERROR GrantUserConsent(NodeId nodeId, EndpointId endpoint);
 
     // Revoke the user consent for the given node and endpoint for OTA updates
-    CHIP_ERROR RevokeUserConsent(chip::NodeId nodeId, chip::EndpointId endpoint);
+    CHIP_ERROR RevokeUserConsent(NodeId nodeId, EndpointId endpoint);
 
 private:
-    CHIP_ERROR SetUserConsentState(chip::NodeId nodeId, chip::EndpointId endpoint, UserConsentState state);
+    CHIP_ERROR SetUserConsentState(NodeId nodeId, EndpointId endpoint, UserConsentState state);
 
     static constexpr uint8_t kMaxUserConsentEntries = 10;
 
