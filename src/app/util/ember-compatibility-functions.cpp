@@ -286,15 +286,15 @@ protected:
     const EmberAfCluster * mCluster;
 };
 
-class GlobalListAttributeReader : public MandatoryGlobalAttributeReader
+class GlobalAttributeReader : public MandatoryGlobalAttributeReader
 {
 public:
-    GlobalListAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
+    GlobalAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-CHIP_ERROR GlobalListAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     using namespace Clusters::Globals::Attributes;
     // The id of the attributes below is not in the attribute metadata.
@@ -434,7 +434,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     {
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
         // reader (which can be lightweight constructed even from nullptr).
-        GlobalListAttributeReader reader(attributeCluster);
+        GlobalAttributeReader reader(attributeCluster);
         AttributeAccessInterface * attributeOverride =
             (attributeCluster != nullptr) ? &reader : findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
