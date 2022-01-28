@@ -38,6 +38,10 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
+constexpr size_t kExpectedFixedLocationLength = 2;
+static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
+              "Fixed location storage must be of size 2");
+
 class BasicAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -54,6 +58,12 @@ private:
 
 BasicAttrAccess gAttrAccess;
 
+CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+{
+    ReturnErrorOnFailure(status);
+    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
+}
+
 CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != Basic::Id)
@@ -62,41 +72,217 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    CHIP_ERROR status = CHIP_NO_ERROR;
+
     switch (aPath.mAttributeId)
     {
     case Location::Id:
-        return ReadLocation(aEncoder);
-    default:
+        status = ReadLocation(aEncoder);
+        break;
+
+    case VendorName::Id: {
+        constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxVendorNameLength;
+        char vendorName[kMaxLen + 1] = { 0 };
+        status                       = ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName));
+        status                       = EncodeStringOnSuccess(status, aEncoder, vendorName, kMaxLen);
         break;
     }
 
-    return CHIP_NO_ERROR;
+    case VendorID::Id: {
+        uint16_t vendorId = 0;
+        status            = ConfigurationMgr().GetVendorId(vendorId);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(vendorId);
+        }
+        break;
+    }
+
+    case ProductName::Id: {
+        constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
+        char productName[kMaxLen + 1] = { 0 };
+        status                        = ConfigurationMgr().GetProductName(productName, sizeof(productName));
+        status                        = EncodeStringOnSuccess(status, aEncoder, productName, kMaxLen);
+        break;
+    }
+
+    case ProductID::Id: {
+        uint16_t productId = 0;
+        status             = ConfigurationMgr().GetProductId(productId);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(productId);
+        }
+        break;
+    }
+
+    case HardwareVersion::Id: {
+        uint16_t hardwareVersion = 0;
+        status                   = ConfigurationMgr().GetHardwareVersion(hardwareVersion);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(hardwareVersion);
+        }
+        break;
+    }
+
+    case HardwareVersionString::Id: {
+        constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength;
+        char hardwareVersionString[kMaxLen + 1] = { 0 };
+        status = ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString));
+        status = EncodeStringOnSuccess(status, aEncoder, hardwareVersionString, kMaxLen);
+        break;
+    }
+
+    case SoftwareVersion::Id: {
+        uint32_t softwareVersion = 0;
+        status                   = ConfigurationMgr().GetSoftwareVersion(softwareVersion);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(softwareVersion);
+        }
+        break;
+    }
+
+    case SoftwareVersionString::Id: {
+        constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
+        char softwareVersionString[kMaxLen + 1] = { 0 };
+        status = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
+        status = EncodeStringOnSuccess(status, aEncoder, softwareVersionString, kMaxLen);
+        break;
+    }
+
+    case ManufacturingDate::Id: {
+        constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
+        char manufacturingDateString[kMaxLen + 1] = { 0 };
+        uint16_t manufacturingYear;
+        uint8_t manufacturingMonth;
+        uint8_t manufacturingDayOfMonth;
+        status = ConfigurationMgr().GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            manufacturingYear       = 2020;
+            manufacturingMonth      = 1;
+            manufacturingDayOfMonth = 1;
+            status                  = CHIP_NO_ERROR;
+        }
+
+        if (status == CHIP_NO_ERROR)
+        {
+            // Format is YYYYMMDD
+            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "%02" PRIu8 "%02" PRIu8,
+                     manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+            status = aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
+        }
+        break;
+    }
+
+    case PartNumber::Id: {
+        constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxPartNumberLength;
+        char partNumber[kMaxLen + 1] = { 0 };
+        status                       = ConfigurationMgr().GetPartNumber(partNumber, sizeof(partNumber));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            partNumber[0] = '\0';
+            status        = CHIP_NO_ERROR;
+        }
+
+        status = EncodeStringOnSuccess(status, aEncoder, partNumber, kMaxLen);
+        break;
+    }
+
+    case ProductURL::Id: {
+        constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxProductURLLength;
+        char productUrl[kMaxLen + 1] = { 0 };
+        status                       = ConfigurationMgr().GetProductURL(productUrl, sizeof(productUrl));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            productUrl[0] = '\0';
+            status        = CHIP_NO_ERROR;
+        }
+
+        status = EncodeStringOnSuccess(status, aEncoder, productUrl, kMaxLen);
+        break;
+    }
+
+    case ProductLabel::Id: {
+        constexpr size_t kMaxLen       = DeviceLayer::ConfigurationManager::kMaxProductLabelLength;
+        char productLabel[kMaxLen + 1] = { 0 };
+        status                         = ConfigurationMgr().GetProductLabel(productLabel, sizeof(productLabel));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            productLabel[0] = '\0';
+            status          = CHIP_NO_ERROR;
+        }
+
+        status = EncodeStringOnSuccess(status, aEncoder, productLabel, kMaxLen);
+        break;
+    }
+
+    case SerialNumber::Id: {
+        constexpr size_t kMaxLen             = DeviceLayer::ConfigurationManager::kMaxSerialNumberLength;
+        char serialNumberString[kMaxLen + 1] = { 0 };
+        status                               = ConfigurationMgr().GetSerialNumber(serialNumberString, sizeof(serialNumberString));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            serialNumberString[0] = '\0';
+            status                = CHIP_NO_ERROR;
+        }
+
+        status = EncodeStringOnSuccess(status, aEncoder, serialNumberString, kMaxLen);
+        break;
+    }
+
+    case UniqueID::Id: {
+        constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxUniqueIDLength;
+        char uniqueId[kMaxLen + 1] = { 0 };
+        status                     = ConfigurationMgr().GetUniqueId(uniqueId, sizeof(uniqueId));
+
+        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            uniqueId[0] = '\0';
+            status      = CHIP_NO_ERROR;
+        }
+
+        status = EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
+        break;
+    }
+
+    default:
+        // We did not find a processing path, the caller will delegate elsewhere.
+        break;
+    }
+
+    return status;
 }
 
 CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxLocationLength;
+    char location[kMaxLen + 1] = { 0 };
+    size_t codeLen             = 0;
 
-    char location[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
-    size_t codeLen = 0;
-
-    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
+    CHIP_ERROR err = ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen);
+    if ((err != CHIP_NO_ERROR) || (codeLen == 0))
     {
-        if (codeLen == 0)
-        {
-            err = aEncoder.Encode(chip::CharSpan::fromCharString("XX"));
-        }
-        else
-        {
-            err = aEncoder.Encode(chip::CharSpan::fromCharString(location));
-        }
-    }
-    else
-    {
-        err = aEncoder.Encode(chip::CharSpan::fromCharString("XX"));
+        strncpy(&location[0], "XX", kMaxLen + 1);
+        codeLen = strnlen(location, kMaxLen);
+        err     = CHIP_NO_ERROR;
     }
 
-    return err;
+    ReturnErrorOnFailure(err);
+    return aEncoder.Encode(chip::CharSpan(location, codeLen));
 }
 
 CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
@@ -105,8 +291,12 @@ CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attri
 
     switch (aPath.mAttributeId)
     {
-    case Location::Id:
-        return WriteLocation(aDecoder);
+    case Location::Id: {
+        CHIP_ERROR err = WriteLocation(aDecoder);
+        // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
+        ChipLogError(Zcl, "WriteLocation status: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
     default:
         break;
     }
@@ -119,8 +309,12 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     chip::CharSpan location;
 
     ReturnErrorOnFailure(aDecoder.Decode(location));
-    VerifyOrReturnError(location.size() <= DeviceLayer::ConfigurationManager::kMaxLocationLength,
-                        CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
+    ChipLogError(Zcl, "WriteLocation received, size %zu, location '%.*s'", location.size(), (int) location.size(), location.data());
+
+    bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
+    VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::InvalidValue).ToChipError());
 
     return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
 }
@@ -179,123 +373,6 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
     }
 
-    char location[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
-    size_t codeLen = 0;
-    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
-    {
-        if (codeLen == 0)
-        {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString("XX"));
-        }
-        else
-        {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString(location));
-        }
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
-    }
-    else
-    {
-        status = Attributes::Location::Set(endpoint, chip::CharSpan::fromCharString("XX"));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
-    }
-
-    char vendorName[DeviceLayer::ConfigurationManager::kMaxVendorNameLength + 1];
-    if (ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::VendorName::Set(endpoint, chip::CharSpan::fromCharString(vendorName));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Vendor Name: 0x%02x", status));
-    }
-
-    uint16_t vendorId;
-    if (ConfigurationMgr().GetVendorId(vendorId) == CHIP_NO_ERROR)
-    {
-        status = Attributes::VendorID::Set(endpoint, static_cast<VendorId>(vendorId));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Vendor Id: 0x%02x", status));
-    }
-
-    char productName[DeviceLayer::ConfigurationManager::kMaxProductNameLength + 1];
-    if (ConfigurationMgr().GetProductName(productName, sizeof(productName)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::ProductName::Set(endpoint, chip::CharSpan::fromCharString(productName));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Name: 0x%02x", status));
-    }
-
-    uint16_t productId;
-    if (ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR)
-    {
-        status = Attributes::ProductID::Set(endpoint, productId);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Id: 0x%02x", status));
-    }
-
-    char hardwareVersionString[DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength + 1];
-    if (ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::HardwareVersionString::Set(endpoint, CharSpan::fromCharString(hardwareVersionString));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Hardware Version String: 0x%02x", status));
-    }
-
-    uint16_t hardwareVersion;
-    if (ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
-    {
-        status = Attributes::HardwareVersion::Set(endpoint, hardwareVersion);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Hardware Version: 0x%02x", status));
-    }
-
-    char softwareVersionString[DeviceLayer::ConfigurationManager::kMaxSoftwareVersionLength + 1];
-    if (ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::SoftwareVersionString::Set(endpoint, CharSpan::fromCharString(softwareVersionString));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
-    }
-
-    uint32_t softwareVersion;
-    if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
-    {
-        status = Attributes::SoftwareVersion::Set(endpoint, softwareVersion);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version: 0x%02x", status));
-    }
-
-    char serialNumberString[DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    if (ConfigurationMgr().GetSerialNumber(serialNumberString, sizeof(serialNumberString)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::SerialNumber::Set(endpoint, CharSpan::fromCharString(serialNumberString));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Serial Number String: 0x%02x", status));
-    }
-
-    char manufacturingDateString[DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength + 1];
-    uint16_t manufacturingYear;
-    uint8_t manufacturingMonth;
-    uint8_t manufacturingDayOfMonth;
-    if (ConfigurationMgr().GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth) == CHIP_NO_ERROR)
-    {
-        snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8,
-                 manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
-        status = Attributes::ManufacturingDate::Set(endpoint, CharSpan::fromCharString(manufacturingDateString));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,
-                   ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
-    }
-
-    char partNumber[DeviceLayer::ConfigurationManager::kMaxPartNumberLength + 1];
-    if (ConfigurationMgr().GetPartNumber(partNumber, sizeof(partNumber)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::PartNumber::Set(endpoint, CharSpan::fromCharString(partNumber));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Part Number: 0x%02x", status));
-    }
-
-    char productURL[DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1];
-    if (ConfigurationMgr().GetProductURL(productURL, sizeof(productURL)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::ProductURL::Set(endpoint, CharSpan::fromCharString(productURL));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product URL: 0x%02x", status));
-    }
-
-    char productLabel[DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1];
-    if (ConfigurationMgr().GetProductLabel(productLabel, sizeof(productLabel)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::ProductLabel::Set(endpoint, CharSpan::fromCharString(productLabel));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Label: 0x%02x", status));
-    }
-
     bool localConfigDisabled;
     if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
     {
@@ -309,16 +386,10 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         status = Attributes::Reachable::Set(endpoint, reachable);
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Reachable: 0x%02x", status));
     }
-
-    char uniqueId[DeviceLayer::ConfigurationManager::kMaxUniqueIDLength + 1];
-    if (ConfigurationMgr().GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::UniqueID::Set(endpoint, CharSpan::fromCharString(uniqueId));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Unique Id: 0x%02x", status));
-    }
 }
 
 void MatterBasicPluginServerInitCallback()
 {
+    registerAttributeAccessOverride(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 }

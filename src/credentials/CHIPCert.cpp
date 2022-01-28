@@ -1084,6 +1084,15 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExtractFabricIdFromCert(const ByteSpan & opcert, FabricId * fabricId)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
+    return ExtractFabricIdFromCert(certData, fabricId);
+}
+
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
 {
     ChipCertificateSet certSet;

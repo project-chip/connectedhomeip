@@ -22,9 +22,8 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
-    #Disabled due to issue-12983
+
     - label: "Read location"
-      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
@@ -34,20 +33,19 @@ tests:
       command: "writeAttribute"
       attribute: "location"
       arguments:
-          value: "us"
-    #Disabled due to issue-12983
+          value: "US"
+
     - label: "Read back location"
-      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
-          value: "us"
+          value: "US"
 
     - label: "Restore initial location value"
       command: "writeAttribute"
       attribute: "location"
       arguments:
-          value: ""
+          value: "XX"
 
     - label: "Read AttributeList value"
       command: "readAttribute"

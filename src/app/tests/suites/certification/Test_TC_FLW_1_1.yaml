@@ -55,24 +55,14 @@ tests:
       response:
           value: 2
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    #disabled due to issue #13442
     - label: "Read the global attribute: AttributeList"
-      disabled: true
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: CommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "CommandList"
-      response:
-          constraints:
-              type: list
-
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: EventList"
       disabled: true
       command: "readAttribute"
@@ -97,6 +87,7 @@ tests:
           constraints:
               type: list
 
+    #Disabled due to issue #13442
     - label: "Read the optional global attribute : FeatureMap"
       disabled: true
       command: "readAttribute"

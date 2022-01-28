@@ -20,6 +20,7 @@
 
 #include <app/data-model/Nullable.h>
 #include <commands/clusters/ComplexArgument.h>
+#include <commands/clusters/CustomArgument.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <lib/core/Optional.h>
@@ -67,7 +68,8 @@ enum ArgumentType
     OctetString,
     Attribute,
     Address,
-    Complex
+    Complex,
+    Custom
 };
 
 struct Argument
@@ -127,6 +129,7 @@ public:
     size_t AddArgument(const char * name, chip::Span<const char> * value, uint8_t flags = 0);
     size_t AddArgument(const char * name, AddressWithInterface * out, uint8_t flags = 0);
     size_t AddArgument(const char * name, ComplexArgument * value);
+    size_t AddArgument(const char * name, CustomArgument * value);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out, uint8_t flags = 0)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Boolean, flags);

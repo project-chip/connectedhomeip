@@ -31,13 +31,6 @@ config("server_config") {
   if (chip_enable_group_messaging_tests) {
     defines += [ "CHIP_ENABLE_GROUP_MESSAGING_TESTS" ]
   }
-
-  if (current_os == "mac" || current_os == "ios") {
-    # Using Non persistent storage delegate since
-    # persistence is also disable in Unit test for linux and MacOS
-    # Issue #12174 for Darwin
-    defines += [ "CHIP_USE_NON_PERSISTENT_STORAGE_DELEGATE" ]
-  }
 }
 
 static_library("server") {

@@ -14792,7 +14792,7 @@ struct Type
 public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
-    chip::ByteSpan icac;
+    DataModel::Nullable<chip::ByteSpan> icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16701,12 +16701,6 @@ enum class DlDataOperationType : uint8_t
     kClear  = 0x01,
     kModify = 0x02,
 };
-// Enum for DlDoorLockStatus
-enum class DlDoorLockStatus : uint8_t
-{
-    kDuplicate = 0x02,
-    kOccupied  = 0x03,
-};
 // Enum for DlDoorState
 enum class DlDoorState : uint8_t
 {
@@ -17059,6 +17053,21 @@ enum class DoorLockDayOfWeek : uint8_t
     kThursday  = 0x10,
     kFriday    = 0x20,
     kSaturday  = 0x40,
+};
+
+// Bitmap for DoorLockFeature
+enum class DoorLockFeature : uint32_t
+{
+    kPINCredentials     = 0x1,
+    kRFIDCredentials    = 0x2,
+    kFingerCredentials  = 0x4,
+    kLogging            = 0x8,
+    kAccessSchedules    = 0x10,
+    kDoorPositionSensor = 0x20,
+    kFaceCredentials    = 0x40,
+    kCredentialsOTA     = 0x80,
+    kUsersManagement    = 0x100,
+    kNotifications      = 0x200,
 };
 
 namespace Structs {
@@ -17509,9 +17518,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -17527,9 +17536,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -18364,9 +18373,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan rfidCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -18382,9 +18391,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId         = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
-    DlUserType userType     = static_cast<DlUserType>(0);
+    uint16_t userId = static_cast<uint16_t>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     chip::ByteSpan rfidCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -18545,9 +18554,9 @@ public:
     uint16_t userIndex                = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
     DataModel::Nullable<uint32_t> userUniqueId;
-    DlUserStatus userStatus         = static_cast<DlUserStatus>(0);
-    DlUserType userType             = static_cast<DlUserType>(0);
-    DlCredentialRule credentialRule = static_cast<DlCredentialRule>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18566,9 +18575,9 @@ public:
     uint16_t userIndex                = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
     DataModel::Nullable<uint32_t> userUniqueId;
-    DlUserStatus userStatus         = static_cast<DlUserStatus>(0);
-    DlUserType userType             = static_cast<DlUserType>(0);
-    DlCredentialRule credentialRule = static_cast<DlCredentialRule>(0);
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetUser
@@ -18635,7 +18644,7 @@ public:
     DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>> credentials;
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
-    uint16_t nextUserIndex = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> nextUserIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18659,7 +18668,7 @@ public:
     DataModel::Nullable<DataModel::DecodableList<Structs::DlCredential::DecodableType>> credentials;
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
-    uint16_t nextUserIndex = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> nextUserIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetUserResponse
@@ -18803,6 +18812,7 @@ enum class Fields
     kCredentialData = 2,
     kUserIndex      = 3,
     kUserStatus     = 4,
+    kUserType       = 5,
 };
 
 struct Type
@@ -18815,8 +18825,9 @@ public:
     DlDataOperationType operationType = static_cast<DlDataOperationType>(0);
     Structs::DlCredential::Type credential;
     chip::ByteSpan credentialData;
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18834,8 +18845,9 @@ public:
     DlDataOperationType operationType = static_cast<DlDataOperationType>(0);
     Structs::DlCredential::DecodableType credential;
     chip::ByteSpan credentialData;
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlUserStatus userStatus = static_cast<DlUserStatus>(0);
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCredential
@@ -18960,7 +18972,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    Structs::DlCredential::Type credential;
+    DataModel::Nullable<Structs::DlCredential::Type> credential;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18975,7 +18987,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    Structs::DlCredential::DecodableType credential;
+    DataModel::Nullable<Structs::DlCredential::DecodableType> credential;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearCredential
