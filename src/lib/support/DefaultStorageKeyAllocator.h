@@ -40,7 +40,7 @@ public:
     // Access Control List
 
     const char * AccessControlList() { return Format("acl"); }
-    const char * AccessControlEntry(size_t index) { return Format("acl/%zx", index); }
+    const char * AccessControlEntry(size_t index) { return Format("acl/%x", static_cast<unsigned int>(index)); }
 
     // Group Data Provider
 
