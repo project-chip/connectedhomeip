@@ -86,7 +86,7 @@ public class ChipClusters {
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     public native void deleteCluster(long chipClusterPtr);
-    
+
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -249,7 +249,7 @@ public class ChipClusters {
 
 
     public void logoutRequest(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       logoutRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -260,11 +260,11 @@ public class ChipClusters {
       , String tempAccountIdentifier, String setupPIN
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void logoutRequest(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface GetSetupPINResponseCallback {
       void onSuccess(String setupPIN);
-      
+
       void onError(Exception error);
     }
 
@@ -352,7 +352,7 @@ public class ChipClusters {
     }
 
     public void revokeCommissioning(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       revokeCommissioning(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -363,7 +363,7 @@ public class ChipClusters {
       , Integer commissioningTimeout, byte[] PAKEVerifier, Integer discriminator, Long iterations, byte[] salt, Integer passcodeID
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void revokeCommissioning(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface AdminFabricIndexAttributeCallback {
@@ -719,7 +719,7 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface LauncherResponseCallback {
       void onSuccess(Integer status, String data);
-      
+
       void onError(Exception error);
     }
 
@@ -946,7 +946,7 @@ public class ChipClusters {
     }
 
     public void barrierControlStop(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       barrierControlStop(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -954,7 +954,7 @@ public class ChipClusters {
       , Integer percentOpen
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void barrierControlStop(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface AttributeListAttributeCallback {
@@ -2211,7 +2211,7 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface ChangeChannelResponseCallback {
       void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer errorType);
-      
+
       void onError(Exception error);
     }
 
@@ -3750,7 +3750,7 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface LaunchResponseCallback {
       void onSuccess(Integer status, String data);
-      
+
       void onError(Exception error);
     }
 
@@ -4028,7 +4028,7 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface RetrieveLogsResponseCallback {
       void onSuccess(Integer status, byte[] content, Long timeStamp, Long timeSinceBoot);
-      
+
       void onError(Exception error);
     }
 
@@ -4182,19 +4182,19 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface GetCredentialStatusResponseCallback {
       void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer nextCredentialIndex);
-      
+
       void onError(Exception error);
     }
 
     public interface GetUserResponseCallback {
       void onSuccess(Integer userIndex, @Nullable String userName, @Nullable Long userUniqueId, @Nullable Integer userStatus, @Nullable Integer userType, @Nullable Integer credentialRule, @Nullable ArrayList<ChipStructs.DoorLockClusterDlCredential> credentials, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextUserIndex);
-      
+
       void onError(Exception error);
     }
 
     public interface SetCredentialResponseCallback {
       void onSuccess(Integer status, @Nullable Integer userIndex, @Nullable Integer nextCredentialIndex);
-      
+
       void onError(Exception error);
     }
 
@@ -4958,12 +4958,12 @@ public class ChipClusters {
     }
 
     public void resetCounts(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       resetCounts(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void resetCounts(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface AttributeListAttributeCallback {
@@ -5438,7 +5438,7 @@ public class ChipClusters {
     }
 
     public void commissioningComplete(CommissioningCompleteResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       commissioningComplete(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -5457,26 +5457,26 @@ public class ChipClusters {
       , Integer expiryLengthSeconds, Long breadcrumb, Long timeoutMs
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void commissioningComplete(long chipClusterPtr, CommissioningCompleteResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void setRegulatoryConfig(long chipClusterPtr, SetRegulatoryConfigResponseCallback Callback
       , Integer location, String countryCode, Long breadcrumb, Long timeoutMs
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface ArmFailSafeResponseCallback {
       void onSuccess(Integer errorCode, String debugText);
-      
+
       void onError(Exception error);
     }
 
     public interface CommissioningCompleteResponseCallback {
       void onSuccess(Integer errorCode, String debugText);
-      
+
       void onError(Exception error);
     }
 
     public interface SetRegulatoryConfigResponseCallback {
       void onSuccess(Integer errorCode, String debugText);
-      
+
       void onError(Exception error);
     }
 
@@ -5910,13 +5910,13 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface KeySetReadAllIndicesResponseCallback {
       void onSuccess(ArrayList<Integer> groupKeySetIDs);
-      
+
       void onError(Exception error);
     }
 
     public interface KeySetReadResponseCallback {
       void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet);
-      
+
       void onError(Exception error);
     }
 
@@ -6101,7 +6101,7 @@ public class ChipClusters {
     }
 
     public void removeAllGroups(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       removeAllGroups(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -6137,7 +6137,7 @@ public class ChipClusters {
       , ArrayList<Integer> groupList
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void removeAllGroups(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void removeGroup(long chipClusterPtr, RemoveGroupResponseCallback Callback
       , Integer groupId
@@ -6147,25 +6147,25 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface AddGroupResponseCallback {
       void onSuccess(Integer status, Integer groupId);
-      
+
       void onError(Exception error);
     }
 
     public interface GetGroupMembershipResponseCallback {
       void onSuccess(Integer capacity, ArrayList<Integer> groupList);
-      
+
       void onError(Exception error);
     }
 
     public interface RemoveGroupResponseCallback {
       void onSuccess(Integer status, Integer groupId);
-      
+
       void onError(Exception error);
     }
 
     public interface ViewGroupResponseCallback {
       void onSuccess(Integer status, Integer groupId, String groupName);
-      
+
       void onError(Exception error);
     }
 
@@ -6261,7 +6261,7 @@ public class ChipClusters {
     }
 
     public void identifyQuery(IdentifyQueryResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       identifyQuery(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -6280,14 +6280,14 @@ public class ChipClusters {
       , Integer identifyTime
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void identifyQuery(long chipClusterPtr, IdentifyQueryResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void triggerEffect(long chipClusterPtr, DefaultClusterCallback Callback
       , Integer effectIdentifier, Integer effectVariant
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface IdentifyQueryResponseCallback {
       void onSuccess(Integer timeout);
-      
+
       void onError(Exception error);
     }
 
@@ -6579,7 +6579,7 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface SendKeyResponseCallback {
       void onSuccess(Integer status);
-      
+
       void onError(Exception error);
     }
 
@@ -6722,7 +6722,7 @@ public class ChipClusters {
     }
 
     public void stopWithOnOff(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       stopWithOnOff(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -6748,7 +6748,7 @@ public class ChipClusters {
       , Integer optionMask, Integer optionOverride
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void stopWithOnOff(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface OnLevelAttributeCallback {
@@ -7268,12 +7268,12 @@ public class ChipClusters {
     }
 
     public void sleep(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       sleep(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void sleep(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface AttributeListAttributeCallback {
@@ -7337,7 +7337,7 @@ public class ChipClusters {
     }
 
     public void hideInputStatusRequest(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       hideInputStatusRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7370,12 +7370,12 @@ public class ChipClusters {
     }
 
     public void showInputStatusRequest(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       showInputStatusRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void hideInputStatusRequest(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void renameInputRequest(long chipClusterPtr, DefaultClusterCallback Callback
       , Integer index, String name
@@ -7384,7 +7384,7 @@ public class ChipClusters {
       , Integer index
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void showInputStatusRequest(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface MediaInputListAttributeCallback {
@@ -7491,7 +7491,7 @@ public class ChipClusters {
     }
 
     public void fastForwardRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       fastForwardRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7502,7 +7502,7 @@ public class ChipClusters {
     }
 
     public void nextRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       nextRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7513,7 +7513,7 @@ public class ChipClusters {
     }
 
     public void pauseRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       pauseRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7524,7 +7524,7 @@ public class ChipClusters {
     }
 
     public void playRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       playRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7535,7 +7535,7 @@ public class ChipClusters {
     }
 
     public void previousRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       previousRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7546,7 +7546,7 @@ public class ChipClusters {
     }
 
     public void rewindRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       rewindRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7590,7 +7590,7 @@ public class ChipClusters {
     }
 
     public void startOverRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       startOverRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -7601,27 +7601,27 @@ public class ChipClusters {
     }
 
     public void stopRequest(PlaybackResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       stopRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void fastForwardRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void nextRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void pauseRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void playRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void previousRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void rewindRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void seekRequest(long chipClusterPtr, PlaybackResponseCallback Callback
       , Long position
@@ -7633,14 +7633,14 @@ public class ChipClusters {
       , Long deltaPositionMilliseconds
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void startOverRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void stopRequest(long chipClusterPtr, PlaybackResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface PlaybackResponseCallback {
       void onSuccess(Integer status);
-      
+
       void onError(Exception error);
     }
 
@@ -8077,19 +8077,19 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface ConnectNetworkResponseCallback {
       void onSuccess(Integer networkingStatus, String debugText, Long errorValue);
-      
+
       void onError(Exception error);
     }
 
     public interface NetworkConfigResponseCallback {
       void onSuccess(Integer networkingStatus, String debugText);
-      
+
       void onError(Exception error);
     }
 
     public interface ScanNetworksResponseCallback {
       void onSuccess(Integer networkingStatus, String debugText, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>> wiFiScanResults, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>> threadScanResults);
-      
+
       void onError(Exception error);
     }
 
@@ -8353,13 +8353,13 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface ApplyUpdateResponseCallback {
       void onSuccess(Integer action, Long delayedActionTime);
-      
+
       void onError(Exception error);
     }
 
     public interface QueryImageResponseCallback {
       void onSuccess(Integer status, Optional<Long> delayedActionTime, Optional<String> imageURI, Optional<Long> softwareVersion, Optional<String> softwareVersionString, Optional<byte[]> updateToken, Optional<Boolean> userConsentNeeded, Optional<byte[]> metadataForRequestor);
-      
+
       void onError(Exception error);
     }
 
@@ -8701,7 +8701,7 @@ public class ChipClusters {
     }
 
     public void off(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       off(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -8723,7 +8723,7 @@ public class ChipClusters {
     }
 
     public void on(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       on(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -8734,7 +8734,7 @@ public class ChipClusters {
     }
 
     public void onWithRecallGlobalScene(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       onWithRecallGlobalScene(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -8756,27 +8756,27 @@ public class ChipClusters {
     }
 
     public void toggle(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       toggle(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void off(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void offWithEffect(long chipClusterPtr, DefaultClusterCallback Callback
       , Integer effectId, Integer effectVariant
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void on(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void onWithRecallGlobalScene(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void onWithTimedOff(long chipClusterPtr, DefaultClusterCallback Callback
       , Integer onOffControl, Integer onTime, Integer offWaitTime
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void toggle(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface AttributeListAttributeCallback {
@@ -9204,25 +9204,25 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface AttestationResponseCallback {
       void onSuccess(byte[] attestationElements, byte[] signature);
-      
+
       void onError(Exception error);
     }
 
     public interface CertificateChainResponseCallback {
       void onSuccess(byte[] certificate);
-      
+
       void onError(Exception error);
     }
 
     public interface NOCResponseCallback {
       void onSuccess(Integer statusCode, Integer fabricIndex, String debugText);
-      
+
       void onError(Exception error);
     }
 
     public interface OpCSRResponseCallback {
       void onSuccess(byte[] NOCSRElements, byte[] attestationSignature);
-      
+
       void onError(Exception error);
     }
 
@@ -10663,37 +10663,37 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface AddSceneResponseCallback {
       void onSuccess(Integer status, Integer groupId, Integer sceneId);
-      
+
       void onError(Exception error);
     }
 
     public interface GetSceneMembershipResponseCallback {
       void onSuccess(Integer status, Integer capacity, Integer groupId, Integer sceneCount, ArrayList<Integer> sceneList);
-      
+
       void onError(Exception error);
     }
 
     public interface RemoveAllScenesResponseCallback {
       void onSuccess(Integer status, Integer groupId);
-      
+
       void onError(Exception error);
     }
 
     public interface RemoveSceneResponseCallback {
       void onSuccess(Integer status, Integer groupId, Integer sceneId);
-      
+
       void onError(Exception error);
     }
 
     public interface StoreSceneResponseCallback {
       void onSuccess(Integer status, Integer groupId, Integer sceneId);
-      
+
       void onError(Exception error);
     }
 
     public interface ViewSceneResponseCallback {
       void onSuccess(Integer status, Integer groupId, Integer sceneId, Integer transitionTime, String sceneName, ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets);
-      
+
       void onError(Exception error);
     }
 
@@ -10854,12 +10854,12 @@ public class ChipClusters {
     }
 
     public void resetWatermarks(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       resetWatermarks(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void resetWatermarks(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface ThreadMetricsAttributeCallback {
@@ -11163,7 +11163,7 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface NavigateTargetResponseCallback {
       void onSuccess(Integer status, String data);
-      
+
       void onError(Exception error);
     }
 
@@ -11414,7 +11414,7 @@ public class ChipClusters {
     }
 
     public void test(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       test(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -11524,7 +11524,7 @@ public class ChipClusters {
     }
 
     public void testNotHandled(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       testNotHandled(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -11557,7 +11557,7 @@ public class ChipClusters {
     }
 
     public void testSpecific(TestSpecificResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       testSpecific(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -11579,14 +11579,14 @@ public class ChipClusters {
     }
 
     public void testUnknownCommand(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       testUnknownCommand(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
 
     public void timedInvokeRequest(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       timedInvokeRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -11594,7 +11594,7 @@ public class ChipClusters {
       , ChipStructs.TestClusterClusterSimpleStruct arg1
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void test(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback Callback
       , Integer arg1, Integer arg2
@@ -11624,7 +11624,7 @@ public class ChipClusters {
       , ChipStructs.TestClusterClusterNestedStructList arg1
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void testNullableOptionalRequest(long chipClusterPtr, TestNullableOptionalResponseCallback Callback
       , @Nullable Optional<Integer> arg1
@@ -11633,62 +11633,62 @@ public class ChipClusters {
       , Optional<Boolean> arg1
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void testStructArgumentRequest(long chipClusterPtr, BooleanResponseCallback Callback
       , ChipStructs.TestClusterClusterSimpleStruct arg1
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void timedInvokeRequest(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface BooleanResponseCallback {
       void onSuccess(Boolean value);
-      
+
       void onError(Exception error);
     }
 
     public interface SimpleStructResponseCallback {
       void onSuccess(ChipStructs.TestClusterClusterSimpleStruct arg1);
-      
+
       void onError(Exception error);
     }
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(Integer returnValue);
-      
+
       void onError(Exception error);
     }
 
     public interface TestEmitTestEventResponseCallback {
       void onSuccess(Long value);
-      
+
       void onError(Exception error);
     }
 
     public interface TestEnumsResponseCallback {
       void onSuccess(Integer arg1, Integer arg2);
-      
+
       void onError(Exception error);
     }
 
     public interface TestListInt8UReverseResponseCallback {
       void onSuccess(ArrayList<Integer> arg1);
-      
+
       void onError(Exception error);
     }
 
     public interface TestNullableOptionalResponseCallback {
       void onSuccess(Boolean wasPresent, Optional<Boolean> wasNull, Optional<Integer> value, @Nullable Optional<Integer> originalValue);
-      
+
       void onError(Exception error);
     }
 
     public interface TestSpecificResponseCallback {
       void onSuccess(Integer returnValue);
-      
+
       void onError(Exception error);
     }
 
@@ -14116,7 +14116,7 @@ public class ChipClusters {
     }
 
     public void clearWeeklySchedule(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       clearWeeklySchedule(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -14127,7 +14127,7 @@ public class ChipClusters {
     }
 
     public void getRelayStatusLog(GetRelayStatusLogResponseCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       getRelayStatusLog(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -14165,10 +14165,10 @@ public class ChipClusters {
       setpointRaiseLower(chipClusterPtr, callback, mode, amount, timedInvokeTimeoutMs);
     }
     private native void clearWeeklySchedule(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void getRelayStatusLog(long chipClusterPtr, GetRelayStatusLogResponseCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void getWeeklySchedule(long chipClusterPtr, GetWeeklyScheduleResponseCallback Callback
       , Integer daysToReturn, Integer modeToReturn
@@ -14181,13 +14181,13 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface GetRelayStatusLogResponseCallback {
       void onSuccess(Integer timeOfDay, Integer relayStatus, Integer localTemperature, Integer humidityInPercentage, Integer setpoint, Integer unreadEntries);
-      
+
       void onError(Exception error);
     }
 
     public interface GetWeeklyScheduleResponseCallback {
       void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<Integer> payload);
-      
+
       void onError(Exception error);
     }
 
@@ -14815,12 +14815,12 @@ public class ChipClusters {
     }
 
     public void resetCounts(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       resetCounts(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void resetCounts(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface NeighborTableListAttributeCallback {
@@ -16452,12 +16452,12 @@ public class ChipClusters {
     }
 
     public void resetCounts(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       resetCounts(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void resetCounts(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface AttributeListAttributeCallback {
@@ -16787,7 +16787,7 @@ public class ChipClusters {
     }
 
     public void downOrClose(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       downOrClose(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -16842,7 +16842,7 @@ public class ChipClusters {
     }
 
     public void stopMotion(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       stopMotion(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
@@ -16853,12 +16853,12 @@ public class ChipClusters {
     }
 
     public void upOrOpen(DefaultClusterCallback callback
-      
+
       , int timedInvokeTimeoutMs) {
       upOrOpen(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void downOrClose(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void goToLiftPercentage(long chipClusterPtr, DefaultClusterCallback Callback
       , Integer liftPercentageValue, Integer liftPercent100thsValue
@@ -16873,10 +16873,10 @@ public class ChipClusters {
       , Integer tiltValue
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void stopMotion(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void upOrOpen(long chipClusterPtr, DefaultClusterCallback Callback
-      
+
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface CurrentPositionLiftAttributeCallback {
