@@ -140,7 +140,7 @@ class BaseTestHelper:
         self.logger.info("Device finished key exchange.")
         return True
 
-    def TestUsedTestCommssioner(self):
+    def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
     def TestCloseSession(self, nodeid: int):

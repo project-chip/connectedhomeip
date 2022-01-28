@@ -94,7 +94,7 @@ def main():
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 
-    FailIfNot(test.TestUsedTestCommssioner(), "Test commissioner check failed")
+    FailIfNot(test.TestUsedTestCommissioner(), "Test commissioner check failed")
 
     timeoutTicker.stop()
 
