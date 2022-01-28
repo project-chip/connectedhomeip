@@ -116,7 +116,14 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    int rc = psoc6_qspi_init();
+    int rc = boot_set_confirmed();
+    if (rc != 0)
+    {
+        P6_LOG("boot_set_confirmed failed");
+        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+    }
+
+    rc = psoc6_qspi_init();
     if (rc != 0)
     {
         P6_LOG("psoc6_qspi_init failed");
