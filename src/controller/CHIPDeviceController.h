@@ -543,7 +543,7 @@ public:
      *   Start establishing a PASE connection with a node for the purposes of commissioning.
      *   Commissioners that wish to use the auto-commissioning functions should use the
      *   supplied "PairDevice" functions above to automatically establish a connection then
-     *   perform commissioning. This function is intended to be use by commissioners that
+     *   perform commissioning. This function is intended to be used by commissioners that
      *   are not using the supplied auto-commissioner.
      *
      *   This function is non-blocking. PASE is established once the DevicePairingDelegate
