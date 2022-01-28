@@ -143,6 +143,7 @@ static_library("app") {
     "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "InteractionModelRevision.h",
   ]
 
   public_deps = [

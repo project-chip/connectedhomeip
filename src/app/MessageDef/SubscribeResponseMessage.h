@@ -29,11 +29,12 @@
 namespace chip {
 namespace app {
 namespace SubscribeResponseMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_SubscriptionId            = 0,
-    kCsTag_MinIntervalFloorSeconds   = 1,
-    kCsTag_MaxIntervalCeilingSeconds = 2,
+    kSubscriptionId            = 0,
+    kMinIntervalFloorSeconds   = 1,
+    kMaxIntervalCeilingSeconds = 2,
+    kInteractionModelRevision  = 3,
 };
 
 class Parser : public StructParser
@@ -77,6 +78,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder

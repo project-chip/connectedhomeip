@@ -29,7 +29,7 @@ namespace app {
 CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("InvokeRequestMessage =");
@@ -46,8 +46,8 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kSuppressResponse):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
 #if CHIP_DETAIL_LOGGING
             {
                 bool suppressResponse;
@@ -59,8 +59,8 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 
         case to_underlying(Tag::kTimedRequest):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
 #if CHIP_DETAIL_LOGGING
             {
                 bool timedRequest;
@@ -71,8 +71,8 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kInvokeRequests):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kInvokeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kInvokeRequests));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kInvokeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kInvokeRequests));
             {
                 InvokeRequests::Parser invokeRequests;
                 ReturnErrorOnFailure(invokeRequests.Init(reader));
@@ -81,6 +81,10 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
                 ReturnErrorOnFailure(invokeRequests.CheckSchemaValidity());
                 PRETTY_PRINT_DECDEPTH();
             }
+            break;
+        case to_underlying(Tag::kInteractionModelRevision):
+            ReturnErrorOnFailure(
+                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -94,9 +98,9 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         const int RequiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kTimedRequest)) |
-            (1 << to_underlying(Tag::kInvokeRequests));
+            (1 << to_underlying(Tag::kInvokeRequests)) | (1 << to_underlying(Tag::kInteractionModelRevision));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
@@ -130,6 +134,12 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parse
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+InvokeRequestMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
+}
+
 InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     if (mError == CHIP_NO_ERROR)
@@ -159,7 +169,14 @@ InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests()
 
 InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 }; // namespace app

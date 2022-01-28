@@ -29,9 +29,11 @@
 namespace chip {
 namespace app {
 namespace StatusResponseMessage {
-enum
+
+enum class Tag : uint8_t
 {
-    kCsTag_Status = 0,
+    kStatus                   = 0,
+    kInteractionModelRevision = 1,
 };
 
 class Parser : public StructParser
@@ -61,6 +63,8 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetStatus(Protocols::InteractionModel::Status & aStatus) const;
+
+    CHIP_ERROR GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const;
 };
 
 class Builder : public StructBuilder

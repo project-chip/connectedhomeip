@@ -29,7 +29,7 @@ namespace app {
 CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
     AttributeStatusIBs::Parser writeResponses;
     PRETTY_PRINT("WriteResponseMessage =");
@@ -45,14 +45,18 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kWriteResponses):
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kWriteResponses))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kWriteResponses));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kWriteResponses))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kWriteResponses));
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
             ReturnErrorOnFailure(writeResponses.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
             ReturnErrorOnFailure(writeResponses.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
+            break;
+        case to_underlying(Tag::kInteractionModelRevision):
+            ReturnErrorOnFailure(
+                CheckInteractionModelRevision(tagPresenceMask, to_underlying(Tag::kInteractionModelRevision), reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -65,9 +69,10 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kWriteResponses));
+        const int RequiredFields =
+            (1 << to_underlying(Tag::kWriteResponses)) | (1 << to_underlying(Tag::kInteractionModelRevision));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
@@ -89,6 +94,12 @@ CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatusIBs::P
     return apWriteResponses->Init(reader);
 }
 
+CHIP_ERROR
+WriteResponseMessage::Parser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kInteractionModelRevision), apInteractionModelRevision);
+}
+
 AttributeStatusIBs::Builder & WriteResponseMessage::Builder::CreateWriteResponses()
 {
     // skip if error has already been set
@@ -106,7 +117,14 @@ AttributeStatusIBs::Builder & WriteResponseMessage::Builder::GetWriteResponses()
 
 WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteResponseMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = EncodeInteractionModelRevision(to_underlying(Tag::kInteractionModelRevision), mpWriter);
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 } // namespace app

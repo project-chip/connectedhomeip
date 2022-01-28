@@ -23,12 +23,13 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
+#include <app/AppBuildConfig.h>
+#include <app/util/basic-types.h>
 #include <inttypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdarg.h>
 #include <stdio.h>
-
-#include <app/AppBuildConfig.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <app/InteractionModelRevision.h>
 
 namespace chip {
 namespace app {
@@ -94,5 +95,29 @@ void DecreaseDepth()
     gPrettyPrintingDepthLevel--;
 }
 #endif
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+CHIP_ERROR CheckInteractionModelRevision(int & aTagPresenceMask, uint8_t aTag, TLV::TLVReader & aReader)
+{
+    VerifyOrReturnError(!(aTagPresenceMask & 1 << aTag), CHIP_ERROR_INVALID_TLV_TAG);
+    aTagPresenceMask |= (1 << aTag);
+#if CHIP_DETAIL_LOGGING
+    {
+        uint8_t interactionModelRevision = 0;
+        ReturnErrorOnFailure(aReader.Get(interactionModelRevision));
+        PRETTY_PRINT("\tInteractionModelRevision = %u", interactionModelRevision);
+    }
+#endif // CHIP_DETAIL_LOGGING
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+
+CHIP_ERROR EncodeInteractionModelRevision(uint8_t aTag, TLV::TLVWriter * apWriter)
+{
+    InteractionModelRevision revision = 0;
+    revision = static_cast<InteractionModelRevision>(CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION);
+    ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(aTag), revision));
+    return CHIP_NO_ERROR;
+}
 }; // namespace app
 }; // namespace chip
