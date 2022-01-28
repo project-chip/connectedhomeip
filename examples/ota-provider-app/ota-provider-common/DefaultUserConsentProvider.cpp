@@ -24,12 +24,12 @@ DefaultUserConsentProvider::DefaultUserConsentProvider()
 {
     for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
     {
-        mUserConsentEntries[i].nodeId = chip::kUndefinedNodeId;
+        mUserConsentEntries[i].nodeId = kUndefinedNodeId;
     }
 }
 
-UserConsentState DefaultUserConsentProvider::GetUserConsentState(chip::NodeId nodeId, chip::EndpointId endpoint,
-                                                                 uint32_t currentVersion, uint32_t newVersion)
+UserConsentState DefaultUserConsentProvider::GetUserConsentState(NodeId nodeId, EndpointId endpoint, uint32_t currentVersion,
+                                                                 uint32_t newVersion)
 {
     for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
     {
@@ -41,7 +41,7 @@ UserConsentState DefaultUserConsentProvider::GetUserConsentState(chip::NodeId no
     return UserConsentState::kGranted;
 }
 
-CHIP_ERROR DefaultUserConsentProvider::SetUserConsentState(chip::NodeId nodeId, chip::EndpointId endpoint, UserConsentState state)
+CHIP_ERROR DefaultUserConsentProvider::SetUserConsentState(NodeId nodeId, EndpointId endpoint, UserConsentState state)
 {
     for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
     {
@@ -54,7 +54,7 @@ CHIP_ERROR DefaultUserConsentProvider::SetUserConsentState(chip::NodeId nodeId, 
 
     for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
     {
-        if (mUserConsentEntries[i].nodeId == chip::kUndefinedNodeId)
+        if (mUserConsentEntries[i].nodeId == kUndefinedNodeId)
         {
             mUserConsentEntries[i].nodeId   = nodeId;
             mUserConsentEntries[i].endpoint = endpoint;
@@ -66,12 +66,12 @@ CHIP_ERROR DefaultUserConsentProvider::SetUserConsentState(chip::NodeId nodeId, 
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR DefaultUserConsentProvider::GrantUserConsent(chip::NodeId nodeId, chip::EndpointId endpoint)
+CHIP_ERROR DefaultUserConsentProvider::GrantUserConsent(NodeId nodeId, EndpointId endpoint)
 {
     return SetUserConsentState(nodeId, endpoint, UserConsentState::kGranted);
 }
 
-CHIP_ERROR DefaultUserConsentProvider::RevokeUserConsent(chip::NodeId nodeId, chip::EndpointId endpoint)
+CHIP_ERROR DefaultUserConsentProvider::RevokeUserConsent(NodeId nodeId, EndpointId endpoint)
 {
     return SetUserConsentState(nodeId, endpoint, UserConsentState::kDenied);
 }
