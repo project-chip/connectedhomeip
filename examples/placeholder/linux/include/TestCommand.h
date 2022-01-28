@@ -41,7 +41,11 @@ public:
     virtual ~TestCommand() {}
 
     virtual void NextTest() = 0;
-    void Wait() {}
+    CHIP_ERROR WaitMS(chip::System::Clock::Timeout ms)
+    {
+        return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
+    }
+    CHIP_ERROR WaitForMs(uint16_t ms) { return WaitMS(chip::System::Clock::Milliseconds32(ms)); }
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -120,6 +124,11 @@ public:
         mCommandPath   = chip::app::ConcreteCommandPath(0, 0, 0);
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
+    static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
+    {
+        auto * command = static_cast<TestCommand *>(context);
+        command->NextTest();
+    }
 
     std::atomic_bool isRunning{ true };
 
@@ -128,4 +137,5 @@ protected:
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     void SetIdentity(const char * name){};
+    void Wait(){};
 };
