@@ -22,7 +22,7 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/data-model/DecodeWithoutFabricIndex.h>
+#include <app/data-model/Decode.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>

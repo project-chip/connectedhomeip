@@ -22,7 +22,7 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/data-model/DecodeWithoutFabricIndex.h>
+#include <app/data-model/Decode.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -136,7 +136,7 @@ void AccessControlClusterAclListAttributeFilter(TLV::TLVReader * tlvData, Callba
                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -157,7 +157,7 @@ void AccessControlClusterExtensionListAttributeFilter(TLV::TLVReader * tlvData, 
                                                       Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -178,7 +178,7 @@ void AccessControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -199,7 +199,7 @@ void AccountLoginClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -221,7 +221,7 @@ void AdministratorCommissioningClusterAttributeListListAttributeFilter(TLV::TLVR
                                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -242,7 +242,7 @@ void ApplicationBasicClusterAllowedVendorListListAttributeFilter(TLV::TLVReader 
                                                                  Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::VendorId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -263,7 +263,7 @@ void ApplicationBasicClusterAttributeListListAttributeFilter(TLV::TLVReader * tl
                                                              Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -285,7 +285,7 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
                                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint16_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -306,7 +306,7 @@ void ApplicationLauncherClusterAttributeListListAttributeFilter(TLV::TLVReader *
                                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -327,7 +327,7 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -348,7 +348,7 @@ void AudioOutputClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -369,7 +369,7 @@ void BarrierControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvD
                                                            Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -390,7 +390,7 @@ void BasicClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Call
                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -411,7 +411,7 @@ void BinaryInputBasicClusterAttributeListListAttributeFilter(TLV::TLVReader * tl
                                                              Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -432,7 +432,7 @@ void BindingClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Ca
                                                     Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -453,7 +453,7 @@ void BooleanStateClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -474,7 +474,7 @@ void BridgedActionsClusterActionListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -495,7 +495,7 @@ void BridgedActionsClusterEndpointListListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -516,7 +516,7 @@ void BridgedActionsClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvD
                                                            Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -537,7 +537,7 @@ void BridgedDeviceBasicClusterAttributeListListAttributeFilter(TLV::TLVReader * 
                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -558,7 +558,7 @@ void ChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Call
                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -579,7 +579,7 @@ void ChannelClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Ca
                                                     Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -600,7 +600,7 @@ void ColorControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -621,7 +621,7 @@ void ContentLauncherClusterAcceptHeaderListListAttributeFilter(TLV::TLVReader * 
                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::CharSpan> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -642,7 +642,7 @@ void ContentLauncherClusterAttributeListListAttributeFilter(TLV::TLVReader * tlv
                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -663,7 +663,7 @@ void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Ca
                                                     Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -684,7 +684,7 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
                                                     Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::ClusterId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -705,7 +705,7 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
                                                     Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::ClusterId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -726,7 +726,7 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::EndpointId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -747,7 +747,7 @@ void DescriptorClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData,
                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -768,7 +768,7 @@ void DiagnosticLogsClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvD
                                                            Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -789,7 +789,7 @@ void DoorLockClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, C
                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -811,7 +811,7 @@ void ElectricalMeasurementClusterAttributeListListAttributeFilter(TLV::TLVReader
                                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -833,7 +833,7 @@ void EthernetNetworkDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVR
                                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -854,7 +854,7 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -875,7 +875,7 @@ void FixedLabelClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData,
                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -896,7 +896,7 @@ void FlowMeasurementClusterAttributeListListAttributeFilter(TLV::TLVReader * tlv
                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -920,7 +920,7 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>
         list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -941,7 +941,7 @@ void GeneralCommissioningClusterAttributeListListAttributeFilter(TLV::TLVReader 
                                                                  Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -963,7 +963,7 @@ void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReade
                                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -985,7 +985,7 @@ void GeneralDiagnosticsClusterActiveHardwareFaultsListAttributeFilter(TLV::TLVRe
                                                                       Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint8_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1007,7 +1007,7 @@ void GeneralDiagnosticsClusterActiveRadioFaultsListAttributeFilter(TLV::TLVReade
                                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint8_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1029,7 +1029,7 @@ void GeneralDiagnosticsClusterActiveNetworkFaultsListAttributeFilter(TLV::TLVRea
                                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint8_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1050,7 +1050,7 @@ void GeneralDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVReader * 
                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1071,7 +1071,7 @@ void GroupKeyManagementClusterGroupKeyMapListAttributeFilter(TLV::TLVReader * tl
                                                              Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1092,7 +1092,7 @@ void GroupKeyManagementClusterGroupTableListAttributeFilter(TLV::TLVReader * tlv
                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1113,7 +1113,7 @@ void GroupKeyManagementClusterAttributeListListAttributeFilter(TLV::TLVReader * 
                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1134,7 +1134,7 @@ void GroupsClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Cal
                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1155,7 +1155,7 @@ void IdentifyClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, C
                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1177,7 +1177,7 @@ void IlluminanceMeasurementClusterAttributeListListAttributeFilter(TLV::TLVReade
                                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1198,7 +1198,7 @@ void KeypadInputClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1219,7 +1219,7 @@ void LevelControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1241,7 +1241,7 @@ void LocalizationConfigurationClusterSupportedLocalesListAttributeFilter(TLV::TL
                                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::CharSpan> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1262,7 +1262,7 @@ void LowPowerClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, C
                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1283,7 +1283,7 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1304,7 +1304,7 @@ void MediaInputClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData,
                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1325,7 +1325,7 @@ void MediaPlaybackClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1346,7 +1346,7 @@ void ModeSelectClusterSupportedModesListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1367,7 +1367,7 @@ void ModeSelectClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData,
                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1388,7 +1388,7 @@ void NetworkCommissioningClusterNetworksListAttributeFilter(TLV::TLVReader * tlv
                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1410,7 +1410,7 @@ void OtaSoftwareUpdateProviderClusterAttributeListListAttributeFilter(TLV::TLVRe
                                                                       Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1433,7 +1433,7 @@ void OtaSoftwareUpdateRequestorClusterDefaultOtaProvidersListAttributeFilter(TLV
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>
         list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1455,7 +1455,7 @@ void OtaSoftwareUpdateRequestorClusterAttributeListListAttributeFilter(TLV::TLVR
                                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1476,7 +1476,7 @@ void OccupancySensingClusterAttributeListListAttributeFilter(TLV::TLVReader * tl
                                                              Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1497,7 +1497,7 @@ void OnOffClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Call
                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1519,7 +1519,7 @@ void OnOffSwitchConfigurationClusterAttributeListListAttributeFilter(TLV::TLVRea
                                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1540,7 +1540,7 @@ void OperationalCredentialsClusterNOCsListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1561,7 +1561,7 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
                                                                  Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1583,7 +1583,7 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
                                                                              Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::ByteSpan> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1605,7 +1605,7 @@ void OperationalCredentialsClusterAttributeListListAttributeFilter(TLV::TLVReade
                                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1626,7 +1626,7 @@ void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * t
                                                               Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint8_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1647,7 +1647,7 @@ void PowerSourceClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1668,7 +1668,7 @@ void PowerSourceConfigurationClusterSourcesListAttributeFilter(TLV::TLVReader * 
                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint8_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1690,7 +1690,7 @@ void PowerSourceConfigurationClusterAttributeListListAttributeFilter(TLV::TLVRea
                                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1711,7 +1711,7 @@ void PressureMeasurementClusterAttributeListListAttributeFilter(TLV::TLVReader *
                                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1733,7 +1733,7 @@ void PumpConfigurationAndControlClusterAttributeListListAttributeFilter(TLV::TLV
                                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1755,7 +1755,7 @@ void RelativeHumidityMeasurementClusterAttributeListListAttributeFilter(TLV::TLV
                                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1776,7 +1776,7 @@ void ScenesClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Cal
                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1797,7 +1797,7 @@ void SoftwareDiagnosticsClusterThreadMetricsListAttributeFilter(TLV::TLVReader *
                                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1818,7 +1818,7 @@ void SoftwareDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVReader *
                                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1839,7 +1839,7 @@ void SwitchClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Cal
                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1861,7 +1861,7 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
                                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1882,7 +1882,7 @@ void TargetNavigatorClusterAttributeListListAttributeFilter(TLV::TLVReader * tlv
                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1904,7 +1904,7 @@ void TemperatureMeasurementClusterAttributeListListAttributeFilter(TLV::TLVReade
                                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1925,7 +1925,7 @@ void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Ca
                                                     Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<uint8_t> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1946,7 +1946,7 @@ void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::ByteSpan> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1967,7 +1967,7 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
                                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -1989,7 +1989,7 @@ void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(TLV::T
                                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2010,7 +2010,7 @@ void TestClusterClusterListLongOctetStringListAttributeFilter(TLV::TLVReader * t
                                                               Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::ByteSpan> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2031,7 +2031,7 @@ void TestClusterClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData
                                                         Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2052,7 +2052,7 @@ void ThermostatClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData,
                                                        Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2074,7 +2074,7 @@ void ThermostatUserInterfaceConfigurationClusterAttributeListListAttributeFilter
                                                                                  Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2097,7 +2097,7 @@ void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TL
                                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2119,7 +2119,7 @@ void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVRe
                                                                       Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2141,7 +2141,7 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
                                                                       Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2165,7 +2165,7 @@ void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFil
     chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>
         list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2188,7 +2188,7 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
                                                                                Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2210,7 +2210,7 @@ void ThreadNetworkDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVRea
                                                                      Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2232,7 +2232,7 @@ void TimeFormatLocalizationClusterSupportedCalendarTypesListAttributeFilter(TLV:
                                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2253,7 +2253,7 @@ void UserLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Call
                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2274,7 +2274,7 @@ void WakeOnLanClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, 
                                                       Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2296,7 +2296,7 @@ void WiFiNetworkDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVReade
                                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -2317,7 +2317,7 @@ void WindowCoveringClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvD
                                                            Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)

@@ -22,7 +22,7 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/data-model/DecodeWithoutFabricIndex.h>
+#include <app/data-model/Decode.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -139,7 +139,7 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>
         list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -160,7 +160,7 @@ void NetworkCommissioningClusterNetworksListAttributeFilter(TLV::TLVReader * tlv
                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -181,7 +181,7 @@ void OperationalCredentialsClusterNOCsListAttributeFilter(TLV::TLVReader * tlvDa
                                                           Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -202,7 +202,7 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
                                                                  Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
@@ -224,7 +224,7 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
                                                                              Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::ByteSpan> list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)

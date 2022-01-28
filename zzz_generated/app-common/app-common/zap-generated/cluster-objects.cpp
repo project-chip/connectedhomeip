@@ -81,184 +81,184 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MainsVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mainsVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mainsVoltage));
         break;
     case Attributes::MainsFrequency::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mainsFrequency));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mainsFrequency));
         break;
     case Attributes::MainsAlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mainsAlarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mainsAlarmMask));
         break;
     case Attributes::MainsVoltageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mainsVoltageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mainsVoltageMinThreshold));
         break;
     case Attributes::MainsVoltageMaxThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mainsVoltageMaxThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mainsVoltageMaxThreshold));
         break;
     case Attributes::MainsVoltageDwellTrip::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mainsVoltageDwellTrip));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mainsVoltageDwellTrip));
         break;
     case Attributes::BatteryVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltage));
         break;
     case Attributes::BatteryPercentageRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPercentageRemaining));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentageRemaining));
         break;
     case Attributes::BatteryManufacturer::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryManufacturer));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryManufacturer));
         break;
     case Attributes::BatterySize::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batterySize));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batterySize));
         break;
     case Attributes::BatteryAhrRating::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryAhrRating));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryAhrRating));
         break;
     case Attributes::BatteryQuantity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryQuantity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryQuantity));
         break;
     case Attributes::BatteryRatedVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryRatedVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryRatedVoltage));
         break;
     case Attributes::BatteryAlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryAlarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryAlarmMask));
         break;
     case Attributes::BatteryVoltageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryVoltageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltageMinThreshold));
         break;
     case Attributes::BatteryVoltageThreshold1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryVoltageThreshold1));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltageThreshold1));
         break;
     case Attributes::BatteryVoltageThreshold2::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryVoltageThreshold2));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltageThreshold2));
         break;
     case Attributes::BatteryVoltageThreshold3::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryVoltageThreshold3));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltageThreshold3));
         break;
     case Attributes::BatteryPercentageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPercentageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentageMinThreshold));
         break;
     case Attributes::BatteryPercentageThreshold1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPercentageThreshold1));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentageThreshold1));
         break;
     case Attributes::BatteryPercentageThreshold2::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPercentageThreshold2));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentageThreshold2));
         break;
     case Attributes::BatteryPercentageThreshold3::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPercentageThreshold3));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentageThreshold3));
         break;
     case Attributes::BatteryAlarmState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryAlarmState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryAlarmState));
         break;
     case Attributes::Battery2Voltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2Voltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2Voltage));
         break;
     case Attributes::Battery2PercentageRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2PercentageRemaining));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2PercentageRemaining));
         break;
     case Attributes::Battery2Manufacturer::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2Manufacturer));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2Manufacturer));
         break;
     case Attributes::Battery2Size::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2Size));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2Size));
         break;
     case Attributes::Battery2AhrRating::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2AhrRating));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2AhrRating));
         break;
     case Attributes::Battery2Quantity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2Quantity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2Quantity));
         break;
     case Attributes::Battery2RatedVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2RatedVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2RatedVoltage));
         break;
     case Attributes::Battery2AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2AlarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2AlarmMask));
         break;
     case Attributes::Battery2VoltageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2VoltageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2VoltageMinThreshold));
         break;
     case Attributes::Battery2VoltageThreshold1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2VoltageThreshold1));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2VoltageThreshold1));
         break;
     case Attributes::Battery2VoltageThreshold2::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2VoltageThreshold2));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2VoltageThreshold2));
         break;
     case Attributes::Battery2VoltageThreshold3::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2VoltageThreshold3));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2VoltageThreshold3));
         break;
     case Attributes::Battery2PercentageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2PercentageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2PercentageMinThreshold));
         break;
     case Attributes::Battery2PercentageThreshold1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2PercentageThreshold1));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2PercentageThreshold1));
         break;
     case Attributes::Battery2PercentageThreshold2::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2PercentageThreshold2));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2PercentageThreshold2));
         break;
     case Attributes::Battery2PercentageThreshold3::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2PercentageThreshold3));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2PercentageThreshold3));
         break;
     case Attributes::Battery2AlarmState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery2AlarmState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery2AlarmState));
         break;
     case Attributes::Battery3Voltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3Voltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3Voltage));
         break;
     case Attributes::Battery3PercentageRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3PercentageRemaining));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3PercentageRemaining));
         break;
     case Attributes::Battery3Manufacturer::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3Manufacturer));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3Manufacturer));
         break;
     case Attributes::Battery3Size::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3Size));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3Size));
         break;
     case Attributes::Battery3AhrRating::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3AhrRating));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3AhrRating));
         break;
     case Attributes::Battery3Quantity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3Quantity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3Quantity));
         break;
     case Attributes::Battery3RatedVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3RatedVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3RatedVoltage));
         break;
     case Attributes::Battery3AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3AlarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3AlarmMask));
         break;
     case Attributes::Battery3VoltageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3VoltageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3VoltageMinThreshold));
         break;
     case Attributes::Battery3VoltageThreshold1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3VoltageThreshold1));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3VoltageThreshold1));
         break;
     case Attributes::Battery3VoltageThreshold2::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3VoltageThreshold2));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3VoltageThreshold2));
         break;
     case Attributes::Battery3VoltageThreshold3::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3VoltageThreshold3));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3VoltageThreshold3));
         break;
     case Attributes::Battery3PercentageMinThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3PercentageMinThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3PercentageMinThreshold));
         break;
     case Attributes::Battery3PercentageThreshold1::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3PercentageThreshold1));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3PercentageThreshold1));
         break;
     case Attributes::Battery3PercentageThreshold2::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3PercentageThreshold2));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3PercentageThreshold2));
         break;
     case Attributes::Battery3PercentageThreshold3::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3PercentageThreshold3));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3PercentageThreshold3));
         break;
     case Attributes::Battery3AlarmState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, battery3AlarmState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, battery3AlarmState));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -283,40 +283,40 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentTemperature));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentTemperature));
         break;
     case Attributes::MinTempExperienced::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minTempExperienced));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minTempExperienced));
         break;
     case Attributes::MaxTempExperienced::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxTempExperienced));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxTempExperienced));
         break;
     case Attributes::OverTempTotalDwell::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, overTempTotalDwell));
+        ReturnErrorOnFailure(DataModel::Decode(reader, overTempTotalDwell));
         break;
     case Attributes::DeviceTempAlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, deviceTempAlarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, deviceTempAlarmMask));
         break;
     case Attributes::LowTempThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lowTempThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lowTempThreshold));
         break;
     case Attributes::HighTempThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, highTempThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, highTempThreshold));
         break;
     case Attributes::LowTempDwellTripPoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lowTempDwellTripPoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lowTempDwellTripPoint));
         break;
     case Attributes::HighTempDwellTripPoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, highTempDwellTripPoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, highTempDwellTripPoint));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -477,19 +477,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::IdentifyTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, identifyTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, identifyTime));
         break;
     case Attributes::IdentifyType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, identifyType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, identifyType));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -878,16 +878,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::NameSupport::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nameSupport));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nameSupport));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -1781,31 +1781,31 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::SceneCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sceneCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, sceneCount));
         break;
     case Attributes::CurrentScene::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentScene));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentScene));
         break;
     case Attributes::CurrentGroup::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentGroup));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentGroup));
         break;
     case Attributes::SceneValid::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sceneValid));
+        ReturnErrorOnFailure(DataModel::Decode(reader, sceneValid));
         break;
     case Attributes::NameSupport::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nameSupport));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nameSupport));
         break;
     case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lastConfiguredBy));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lastConfiguredBy));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -2030,28 +2030,28 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::OnOff::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, onOff));
+        ReturnErrorOnFailure(DataModel::Decode(reader, onOff));
         break;
     case Attributes::GlobalSceneControl::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, globalSceneControl));
+        ReturnErrorOnFailure(DataModel::Decode(reader, globalSceneControl));
         break;
     case Attributes::OnTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, onTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, onTime));
         break;
     case Attributes::OffWaitTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, offWaitTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, offWaitTime));
         break;
     case Attributes::StartUpOnOff::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startUpOnOff));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startUpOnOff));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -2076,19 +2076,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::SwitchType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, switchType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, switchType));
         break;
     case Attributes::SwitchActions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, switchActions));
+        ReturnErrorOnFailure(DataModel::Decode(reader, switchActions));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -2441,55 +2441,55 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentLevel));
         break;
     case Attributes::RemainingTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, remainingTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, remainingTime));
         break;
     case Attributes::MinLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minLevel));
         break;
     case Attributes::MaxLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxLevel));
         break;
     case Attributes::CurrentFrequency::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentFrequency));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentFrequency));
         break;
     case Attributes::MinFrequency::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minFrequency));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minFrequency));
         break;
     case Attributes::MaxFrequency::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxFrequency));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxFrequency));
         break;
     case Attributes::Options::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, options));
+        ReturnErrorOnFailure(DataModel::Decode(reader, options));
         break;
     case Attributes::OnOffTransitionTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, onOffTransitionTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, onOffTransitionTime));
         break;
     case Attributes::OnLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, onLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, onLevel));
         break;
     case Attributes::OnTransitionTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, onTransitionTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, onTransitionTime));
         break;
     case Attributes::OffTransitionTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, offTransitionTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, offTransitionTime));
         break;
     case Attributes::DefaultMoveRate::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, defaultMoveRate));
+        ReturnErrorOnFailure(DataModel::Decode(reader, defaultMoveRate));
         break;
     case Attributes::StartUpCurrentLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startUpCurrentLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startUpCurrentLevel));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -2726,16 +2726,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AlarmCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, alarmCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, alarmCount));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -2760,43 +2760,43 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Time::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, time));
+        ReturnErrorOnFailure(DataModel::Decode(reader, time));
         break;
     case Attributes::TimeStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, timeStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, timeStatus));
         break;
     case Attributes::TimeZone::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, timeZone));
+        ReturnErrorOnFailure(DataModel::Decode(reader, timeZone));
         break;
     case Attributes::DstStart::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dstStart));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dstStart));
         break;
     case Attributes::DstEnd::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dstEnd));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dstEnd));
         break;
     case Attributes::DstShift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dstShift));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dstShift));
         break;
     case Attributes::StandardTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, standardTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, standardTime));
         break;
     case Attributes::LocalTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, localTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, localTime));
         break;
     case Attributes::LastSetTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lastSetTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lastSetTime));
         break;
     case Attributes::ValidUntilTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, validUntilTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, validUntilTime));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -2821,40 +2821,40 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ActiveText::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeText));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeText));
         break;
     case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, description));
+        ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
     case Attributes::InactiveText::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, inactiveText));
+        ReturnErrorOnFailure(DataModel::Decode(reader, inactiveText));
         break;
     case Attributes::OutOfService::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, outOfService));
+        ReturnErrorOnFailure(DataModel::Decode(reader, outOfService));
         break;
     case Attributes::Polarity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, polarity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, polarity));
         break;
     case Attributes::PresentValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, presentValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, presentValue));
         break;
     case Attributes::Reliability::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reliability));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reliability));
         break;
     case Attributes::StatusFlags::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, statusFlags));
+        ReturnErrorOnFailure(DataModel::Decode(reader, statusFlags));
         break;
     case Attributes::ApplicationType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationType));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -3868,28 +3868,28 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::TotalProfileNum::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, totalProfileNum));
+        ReturnErrorOnFailure(DataModel::Decode(reader, totalProfileNum));
         break;
     case Attributes::MultipleScheduling::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, multipleScheduling));
+        ReturnErrorOnFailure(DataModel::Decode(reader, multipleScheduling));
         break;
     case Attributes::EnergyFormatting::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, energyFormatting));
+        ReturnErrorOnFailure(DataModel::Decode(reader, energyFormatting));
         break;
     case Attributes::EnergyRemote::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, energyRemote));
+        ReturnErrorOnFailure(DataModel::Decode(reader, energyRemote));
         break;
     case Attributes::ScheduleMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, scheduleMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, scheduleMode));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -4200,22 +4200,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::StartTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
         break;
     case Attributes::FinishTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, finishTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, finishTime));
         break;
     case Attributes::RemainingTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, remainingTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, remainingTime));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -4240,13 +4240,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -4314,25 +4314,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::DeviceList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, deviceList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, deviceList));
         break;
     case Attributes::ServerList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, serverList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, serverList));
         break;
     case Attributes::ClientList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clientList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clientList));
         break;
     case Attributes::PartsList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partsList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partsList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -4449,13 +4449,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -4631,19 +4631,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Acl::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acl));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acl));
         break;
     case Attributes::Extension::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, extension));
+        ReturnErrorOnFailure(DataModel::Decode(reader, extension));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -4680,19 +4680,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminFabricIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
             break;
         case to_underlying(Fields::kAdminNodeID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminNodeID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
             break;
         case to_underlying(Fields::kAdminPasscodeID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminPasscodeID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
             break;
         case to_underlying(Fields::kChangeType):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, changeType));
+            ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
             break;
         case to_underlying(Fields::kLatestValue):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, latestValue));
+            ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
             break;
         default:
             break;
@@ -4730,19 +4730,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminFabricIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
             break;
         case to_underlying(Fields::kAdminNodeID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminNodeID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
             break;
         case to_underlying(Fields::kAdminPasscodeID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminPasscodeID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
             break;
         case to_underlying(Fields::kChangeType):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, changeType));
+            ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
             break;
         case to_underlying(Fields::kLatestValue):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, latestValue));
+            ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
             break;
         default:
             break;
@@ -4936,34 +4936,34 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CheckInInterval::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, checkInInterval));
+        ReturnErrorOnFailure(DataModel::Decode(reader, checkInInterval));
         break;
     case Attributes::LongPollInterval::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, longPollInterval));
+        ReturnErrorOnFailure(DataModel::Decode(reader, longPollInterval));
         break;
     case Attributes::ShortPollInterval::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, shortPollInterval));
+        ReturnErrorOnFailure(DataModel::Decode(reader, shortPollInterval));
         break;
     case Attributes::FastPollTimeout::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fastPollTimeout));
+        ReturnErrorOnFailure(DataModel::Decode(reader, fastPollTimeout));
         break;
     case Attributes::CheckInIntervalMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, checkInIntervalMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, checkInIntervalMin));
         break;
     case Attributes::LongPollIntervalMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, longPollIntervalMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, longPollIntervalMin));
         break;
     case Attributes::FastPollTimeoutMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fastPollTimeoutMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, fastPollTimeoutMax));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -5572,22 +5572,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ActionList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, actionList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, actionList));
         break;
     case Attributes::EndpointList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, endpointList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, endpointList));
         break;
     case Attributes::SetupUrl::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, setupUrl));
+        ReturnErrorOnFailure(DataModel::Decode(reader, setupUrl));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -5622,13 +5622,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, actionID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
             break;
         case to_underlying(Fields::kInvokeID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, invokeID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
             break;
         case to_underlying(Fields::kNewState):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newState));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newState));
             break;
         default:
             break;
@@ -5665,16 +5665,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, actionID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
             break;
         case to_underlying(Fields::kInvokeID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, invokeID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
             break;
         case to_underlying(Fields::kNewState):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newState));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newState));
             break;
         case to_underlying(Fields::kError):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, error));
+            ReturnErrorOnFailure(DataModel::Decode(reader, error));
             break;
         default:
             break;
@@ -5730,70 +5730,70 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::InteractionModelVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, interactionModelVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, interactionModelVersion));
         break;
     case Attributes::VendorName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorName));
         break;
     case Attributes::VendorID::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorID));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
         break;
     case Attributes::ProductName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productName));
         break;
     case Attributes::ProductID::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productID));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productID));
         break;
     case Attributes::NodeLabel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nodeLabel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nodeLabel));
         break;
     case Attributes::Location::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, location));
+        ReturnErrorOnFailure(DataModel::Decode(reader, location));
         break;
     case Attributes::HardwareVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, hardwareVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersion));
         break;
     case Attributes::HardwareVersionString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, hardwareVersionString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersionString));
         break;
     case Attributes::SoftwareVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         break;
     case Attributes::SoftwareVersionString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersionString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersionString));
         break;
     case Attributes::ManufacturingDate::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, manufacturingDate));
+        ReturnErrorOnFailure(DataModel::Decode(reader, manufacturingDate));
         break;
     case Attributes::PartNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partNumber));
         break;
     case Attributes::ProductURL::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productURL));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productURL));
         break;
     case Attributes::ProductLabel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productLabel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productLabel));
         break;
     case Attributes::SerialNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, serialNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, serialNumber));
         break;
     case Attributes::LocalConfigDisabled::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, localConfigDisabled));
+        ReturnErrorOnFailure(DataModel::Decode(reader, localConfigDisabled));
         break;
     case Attributes::Reachable::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reachable));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reachable));
         break;
     case Attributes::UniqueID::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, uniqueID));
+        ReturnErrorOnFailure(DataModel::Decode(reader, uniqueID));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -5826,7 +5826,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersion));
+            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
             break;
         default:
             break;
@@ -5920,7 +5920,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReachableNewValue):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reachableNewValue));
+            ReturnErrorOnFailure(DataModel::Decode(reader, reachableNewValue));
             break;
         default:
             break;
@@ -6189,13 +6189,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -6323,25 +6323,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::DefaultOtaProviders::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, defaultOtaProviders));
+        ReturnErrorOnFailure(DataModel::Decode(reader, defaultOtaProviders));
         break;
     case Attributes::UpdatePossible::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, updatePossible));
+        ReturnErrorOnFailure(DataModel::Decode(reader, updatePossible));
         break;
     case Attributes::UpdateState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, updateState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, updateState));
         break;
     case Attributes::UpdateStateProgress::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, updateStateProgress));
+        ReturnErrorOnFailure(DataModel::Decode(reader, updateStateProgress));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -6378,16 +6378,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPreviousState):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, previousState));
+            ReturnErrorOnFailure(DataModel::Decode(reader, previousState));
             break;
         case to_underlying(Fields::kNewState):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newState));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newState));
             break;
         case to_underlying(Fields::kReason):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reason));
+            ReturnErrorOnFailure(DataModel::Decode(reader, reason));
             break;
         case to_underlying(Fields::kTargetSoftwareVersion):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, targetSoftwareVersion));
+            ReturnErrorOnFailure(DataModel::Decode(reader, targetSoftwareVersion));
             break;
         default:
             break;
@@ -6422,10 +6422,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersion));
+            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
             break;
         case to_underlying(Fields::kProductID):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productID));
+            ReturnErrorOnFailure(DataModel::Decode(reader, productID));
             break;
         default:
             break;
@@ -6462,16 +6462,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersion));
+            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
             break;
         case to_underlying(Fields::kBytesDownloaded):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bytesDownloaded));
+            ReturnErrorOnFailure(DataModel::Decode(reader, bytesDownloaded));
             break;
         case to_underlying(Fields::kProgressPercent):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, progressPercent));
+            ReturnErrorOnFailure(DataModel::Decode(reader, progressPercent));
             break;
         case to_underlying(Fields::kPlatformCode):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, platformCode));
+            ReturnErrorOnFailure(DataModel::Decode(reader, platformCode));
             break;
         default:
             break;
@@ -6497,19 +6497,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ActiveLocale::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeLocale));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeLocale));
         break;
     case Attributes::SupportedLocales::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, supportedLocales));
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedLocales));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -6534,22 +6534,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::HourFormat::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, hourFormat));
+        ReturnErrorOnFailure(DataModel::Decode(reader, hourFormat));
         break;
     case Attributes::ActiveCalendarType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeCalendarType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeCalendarType));
         break;
     case Attributes::SupportedCalendarTypes::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, supportedCalendarTypes));
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedCalendarTypes));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -6574,16 +6574,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::TemperatureUnit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, temperatureUnit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureUnit));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -6608,16 +6608,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Sources::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sources));
+        ReturnErrorOnFailure(DataModel::Decode(reader, sources));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -6767,106 +6767,106 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Status::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, status));
+        ReturnErrorOnFailure(DataModel::Decode(reader, status));
         break;
     case Attributes::Order::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, order));
+        ReturnErrorOnFailure(DataModel::Decode(reader, order));
         break;
     case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, description));
+        ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
     case Attributes::WiredAssessedInputVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredAssessedInputVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredAssessedInputVoltage));
         break;
     case Attributes::WiredAssessedInputFrequency::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredAssessedInputFrequency));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredAssessedInputFrequency));
         break;
     case Attributes::WiredCurrentType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredCurrentType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredCurrentType));
         break;
     case Attributes::WiredAssessedCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredAssessedCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredAssessedCurrent));
         break;
     case Attributes::WiredNominalVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredNominalVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredNominalVoltage));
         break;
     case Attributes::WiredMaximumCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredMaximumCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredMaximumCurrent));
         break;
     case Attributes::WiredPresent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiredPresent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiredPresent));
         break;
     case Attributes::ActiveWiredFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeWiredFaults));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeWiredFaults));
         break;
     case Attributes::BatteryVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltage));
         break;
     case Attributes::BatteryPercentRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPercentRemaining));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentRemaining));
         break;
     case Attributes::BatteryTimeRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryTimeRemaining));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryTimeRemaining));
         break;
     case Attributes::BatteryChargeLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryChargeLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargeLevel));
         break;
     case Attributes::BatteryReplacementNeeded::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryReplacementNeeded));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplacementNeeded));
         break;
     case Attributes::BatteryReplaceability::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryReplaceability));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplaceability));
         break;
     case Attributes::BatteryPresent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryPresent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPresent));
         break;
     case Attributes::ActiveBatteryFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeBatteryFaults));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryFaults));
         break;
     case Attributes::BatteryReplacementDescription::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryReplacementDescription));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplacementDescription));
         break;
     case Attributes::BatteryCommonDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryCommonDesignation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryCommonDesignation));
         break;
     case Attributes::BatteryANSIDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryANSIDesignation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryANSIDesignation));
         break;
     case Attributes::BatteryIECDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryIECDesignation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryIECDesignation));
         break;
     case Attributes::BatteryApprovedChemistry::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryApprovedChemistry));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryApprovedChemistry));
         break;
     case Attributes::BatteryCapacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryCapacity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryCapacity));
         break;
     case Attributes::BatteryQuantity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryQuantity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryQuantity));
         break;
     case Attributes::BatteryChargeState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryChargeState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargeState));
         break;
     case Attributes::BatteryTimeToFullCharge::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryTimeToFullCharge));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryTimeToFullCharge));
         break;
     case Attributes::BatteryFunctionalWhileCharging::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryFunctionalWhileCharging));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryFunctionalWhileCharging));
         break;
     case Attributes::BatteryChargingCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, batteryChargingCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargingCurrent));
         break;
     case Attributes::ActiveBatteryChargeFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeBatteryChargeFaults));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryChargeFaults));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -7164,25 +7164,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Breadcrumb::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, breadcrumb));
+        ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         break;
     case Attributes::BasicCommissioningInfoList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, basicCommissioningInfoList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, basicCommissioningInfoList));
         break;
     case Attributes::RegulatoryConfig::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, regulatoryConfig));
+        ReturnErrorOnFailure(DataModel::Decode(reader, regulatoryConfig));
         break;
     case Attributes::LocationCapability::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, locationCapability));
+        ReturnErrorOnFailure(DataModel::Decode(reader, locationCapability));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -7735,37 +7735,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MaxNetworks::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxNetworks));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxNetworks));
         break;
     case Attributes::Networks::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, networks));
+        ReturnErrorOnFailure(DataModel::Decode(reader, networks));
         break;
     case Attributes::ScanMaxTimeSeconds::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, scanMaxTimeSeconds));
+        ReturnErrorOnFailure(DataModel::Decode(reader, scanMaxTimeSeconds));
         break;
     case Attributes::ConnectMaxTimeSeconds::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, connectMaxTimeSeconds));
+        ReturnErrorOnFailure(DataModel::Decode(reader, connectMaxTimeSeconds));
         break;
     case Attributes::InterfaceEnabled::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, interfaceEnabled));
+        ReturnErrorOnFailure(DataModel::Decode(reader, interfaceEnabled));
         break;
     case Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lastNetworkingStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lastNetworkingStatus));
         break;
     case Attributes::LastNetworkID::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lastNetworkID));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lastNetworkID));
         break;
     case Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lastConnectErrorValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lastConnectErrorValue));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -7879,13 +7879,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -7971,37 +7971,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::NetworkInterfaces::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, networkInterfaces));
+        ReturnErrorOnFailure(DataModel::Decode(reader, networkInterfaces));
         break;
     case Attributes::RebootCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rebootCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rebootCount));
         break;
     case Attributes::UpTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, upTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, upTime));
         break;
     case Attributes::TotalOperationalHours::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, totalOperationalHours));
+        ReturnErrorOnFailure(DataModel::Decode(reader, totalOperationalHours));
         break;
     case Attributes::BootReasons::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bootReasons));
+        ReturnErrorOnFailure(DataModel::Decode(reader, bootReasons));
         break;
     case Attributes::ActiveHardwareFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeHardwareFaults));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeHardwareFaults));
         break;
     case Attributes::ActiveRadioFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeRadioFaults));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeRadioFaults));
         break;
     case Attributes::ActiveNetworkFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeNetworkFaults));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeNetworkFaults));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -8035,10 +8035,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, current));
+            ReturnErrorOnFailure(DataModel::Decode(reader, current));
             break;
         case to_underlying(Fields::kPrevious):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, previous));
+            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
             break;
         default:
             break;
@@ -8073,10 +8073,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, current));
+            ReturnErrorOnFailure(DataModel::Decode(reader, current));
             break;
         case to_underlying(Fields::kPrevious):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, previous));
+            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
             break;
         default:
             break;
@@ -8111,10 +8111,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, current));
+            ReturnErrorOnFailure(DataModel::Decode(reader, current));
             break;
         case to_underlying(Fields::kPrevious):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, previous));
+            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
             break;
         default:
             break;
@@ -8148,7 +8148,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kBootReason):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bootReason));
+            ReturnErrorOnFailure(DataModel::Decode(reader, bootReason));
             break;
         default:
             break;
@@ -8304,25 +8304,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ThreadMetrics::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, threadMetrics));
+        ReturnErrorOnFailure(DataModel::Decode(reader, threadMetrics));
         break;
     case Attributes::CurrentHeapFree::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentHeapFree));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentHeapFree));
         break;
     case Attributes::CurrentHeapUsed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentHeapUsed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentHeapUsed));
         break;
     case Attributes::CurrentHeapHighWatermark::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentHeapHighWatermark));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentHeapHighWatermark));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -8355,7 +8355,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareFault):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareFault));
+            ReturnErrorOnFailure(DataModel::Decode(reader, softwareFault));
             break;
         default:
             break;
@@ -8704,202 +8704,202 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Channel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, channel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, channel));
         break;
     case Attributes::RoutingRole::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, routingRole));
+        ReturnErrorOnFailure(DataModel::Decode(reader, routingRole));
         break;
     case Attributes::NetworkName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, networkName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, networkName));
         break;
     case Attributes::PanId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, panId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, panId));
         break;
     case Attributes::ExtendedPanId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, extendedPanId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, extendedPanId));
         break;
     case Attributes::MeshLocalPrefix::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, meshLocalPrefix));
+        ReturnErrorOnFailure(DataModel::Decode(reader, meshLocalPrefix));
         break;
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, overrunCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, overrunCount));
         break;
     case Attributes::NeighborTableList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, neighborTableList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, neighborTableList));
         break;
     case Attributes::RouteTableList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, routeTableList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, routeTableList));
         break;
     case Attributes::PartitionId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partitionId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partitionId));
         break;
     case Attributes::Weighting::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, weighting));
+        ReturnErrorOnFailure(DataModel::Decode(reader, weighting));
         break;
     case Attributes::DataVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dataVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dataVersion));
         break;
     case Attributes::StableDataVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, stableDataVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, stableDataVersion));
         break;
     case Attributes::LeaderRouterId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, leaderRouterId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, leaderRouterId));
         break;
     case Attributes::DetachedRoleCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, detachedRoleCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, detachedRoleCount));
         break;
     case Attributes::ChildRoleCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, childRoleCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, childRoleCount));
         break;
     case Attributes::RouterRoleCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, routerRoleCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, routerRoleCount));
         break;
     case Attributes::LeaderRoleCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, leaderRoleCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, leaderRoleCount));
         break;
     case Attributes::AttachAttemptCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attachAttemptCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attachAttemptCount));
         break;
     case Attributes::PartitionIdChangeCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partitionIdChangeCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partitionIdChangeCount));
         break;
     case Attributes::BetterPartitionAttachAttemptCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, betterPartitionAttachAttemptCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, betterPartitionAttachAttemptCount));
         break;
     case Attributes::ParentChangeCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, parentChangeCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, parentChangeCount));
         break;
     case Attributes::TxTotalCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txTotalCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txTotalCount));
         break;
     case Attributes::TxUnicastCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txUnicastCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txUnicastCount));
         break;
     case Attributes::TxBroadcastCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txBroadcastCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txBroadcastCount));
         break;
     case Attributes::TxAckRequestedCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txAckRequestedCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txAckRequestedCount));
         break;
     case Attributes::TxAckedCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txAckedCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txAckedCount));
         break;
     case Attributes::TxNoAckRequestedCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txNoAckRequestedCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txNoAckRequestedCount));
         break;
     case Attributes::TxDataCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txDataCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txDataCount));
         break;
     case Attributes::TxDataPollCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txDataPollCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txDataPollCount));
         break;
     case Attributes::TxBeaconCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txBeaconCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txBeaconCount));
         break;
     case Attributes::TxBeaconRequestCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txBeaconRequestCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txBeaconRequestCount));
         break;
     case Attributes::TxOtherCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txOtherCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txOtherCount));
         break;
     case Attributes::TxRetryCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txRetryCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txRetryCount));
         break;
     case Attributes::TxDirectMaxRetryExpiryCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txDirectMaxRetryExpiryCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txDirectMaxRetryExpiryCount));
         break;
     case Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txIndirectMaxRetryExpiryCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txIndirectMaxRetryExpiryCount));
         break;
     case Attributes::TxErrCcaCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txErrCcaCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txErrCcaCount));
         break;
     case Attributes::TxErrAbortCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txErrAbortCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txErrAbortCount));
         break;
     case Attributes::TxErrBusyChannelCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txErrBusyChannelCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txErrBusyChannelCount));
         break;
     case Attributes::RxTotalCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxTotalCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxTotalCount));
         break;
     case Attributes::RxUnicastCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxUnicastCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxUnicastCount));
         break;
     case Attributes::RxBroadcastCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxBroadcastCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxBroadcastCount));
         break;
     case Attributes::RxDataCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxDataCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxDataCount));
         break;
     case Attributes::RxDataPollCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxDataPollCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxDataPollCount));
         break;
     case Attributes::RxBeaconCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxBeaconCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxBeaconCount));
         break;
     case Attributes::RxBeaconRequestCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxBeaconRequestCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxBeaconRequestCount));
         break;
     case Attributes::RxOtherCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxOtherCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxOtherCount));
         break;
     case Attributes::RxAddressFilteredCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxAddressFilteredCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxAddressFilteredCount));
         break;
     case Attributes::RxDestAddrFilteredCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxDestAddrFilteredCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxDestAddrFilteredCount));
         break;
     case Attributes::RxDuplicatedCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxDuplicatedCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxDuplicatedCount));
         break;
     case Attributes::RxErrNoFrameCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxErrNoFrameCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxErrNoFrameCount));
         break;
     case Attributes::RxErrUnknownNeighborCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxErrUnknownNeighborCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxErrUnknownNeighborCount));
         break;
     case Attributes::RxErrInvalidSrcAddrCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxErrInvalidSrcAddrCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxErrInvalidSrcAddrCount));
         break;
     case Attributes::RxErrSecCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxErrSecCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxErrSecCount));
         break;
     case Attributes::RxErrFcsCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxErrFcsCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxErrFcsCount));
         break;
     case Attributes::RxErrOtherCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rxErrOtherCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rxErrOtherCount));
         break;
     case Attributes::ActiveTimestamp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeTimestamp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeTimestamp));
         break;
     case Attributes::PendingTimestamp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, pendingTimestamp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, pendingTimestamp));
         break;
     case Attributes::Delay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, delay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, delay));
         break;
     case Attributes::SecurityPolicy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, securityPolicy));
+        ReturnErrorOnFailure(DataModel::Decode(reader, securityPolicy));
         break;
     case Attributes::ChannelMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, channelMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, channelMask));
         break;
     case Attributes::OperationalDatasetComponents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationalDatasetComponents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, operationalDatasetComponents));
         break;
     case Attributes::ActiveNetworkFaultsList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeNetworkFaultsList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeNetworkFaultsList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -8932,7 +8932,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kConnectionStatus):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, connectionStatus));
+            ReturnErrorOnFailure(DataModel::Decode(reader, connectionStatus));
             break;
         default:
             break;
@@ -8988,52 +8988,52 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Bssid::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bssid));
+        ReturnErrorOnFailure(DataModel::Decode(reader, bssid));
         break;
     case Attributes::SecurityType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, securityType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, securityType));
         break;
     case Attributes::WiFiVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wiFiVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wiFiVersion));
         break;
     case Attributes::ChannelNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, channelNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, channelNumber));
         break;
     case Attributes::Rssi::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rssi));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rssi));
         break;
     case Attributes::BeaconLostCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, beaconLostCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, beaconLostCount));
         break;
     case Attributes::BeaconRxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, beaconRxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, beaconRxCount));
         break;
     case Attributes::PacketMulticastRxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, packetMulticastRxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, packetMulticastRxCount));
         break;
     case Attributes::PacketMulticastTxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, packetMulticastTxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, packetMulticastTxCount));
         break;
     case Attributes::PacketUnicastRxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, packetUnicastRxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, packetUnicastRxCount));
         break;
     case Attributes::PacketUnicastTxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, packetUnicastTxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, packetUnicastTxCount));
         break;
     case Attributes::CurrentMaxRate::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentMaxRate));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentMaxRate));
         break;
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, overrunCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, overrunCount));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -9066,7 +9066,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReasonCode):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reasonCode));
+            ReturnErrorOnFailure(DataModel::Decode(reader, reasonCode));
             break;
         default:
             break;
@@ -9102,10 +9102,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAssociationFailure):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, associationFailure));
+            ReturnErrorOnFailure(DataModel::Decode(reader, associationFailure));
             break;
         case to_underlying(Fields::kStatus):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, status));
+            ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
         default:
             break;
@@ -9139,7 +9139,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kConnectionStatus):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, connectionStatus));
+            ReturnErrorOnFailure(DataModel::Decode(reader, connectionStatus));
             break;
         default:
             break;
@@ -9195,40 +9195,40 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::PHYRate::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, PHYRate));
+        ReturnErrorOnFailure(DataModel::Decode(reader, PHYRate));
         break;
     case Attributes::FullDuplex::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fullDuplex));
+        ReturnErrorOnFailure(DataModel::Decode(reader, fullDuplex));
         break;
     case Attributes::PacketRxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, packetRxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, packetRxCount));
         break;
     case Attributes::PacketTxCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, packetTxCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, packetTxCount));
         break;
     case Attributes::TxErrCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, txErrCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, txErrCount));
         break;
     case Attributes::CollisionCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, collisionCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, collisionCount));
         break;
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, overrunCount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, overrunCount));
         break;
     case Attributes::CarrierDetect::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, carrierDetect));
+        ReturnErrorOnFailure(DataModel::Decode(reader, carrierDetect));
         break;
     case Attributes::TimeSinceReset::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, timeSinceReset));
+        ReturnErrorOnFailure(DataModel::Decode(reader, timeSinceReset));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -9253,13 +9253,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -9404,58 +9404,58 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::VendorName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorName));
         break;
     case Attributes::VendorID::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorID));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
         break;
     case Attributes::ProductName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productName));
         break;
     case Attributes::NodeLabel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nodeLabel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nodeLabel));
         break;
     case Attributes::HardwareVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, hardwareVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersion));
         break;
     case Attributes::HardwareVersionString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, hardwareVersionString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersionString));
         break;
     case Attributes::SoftwareVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         break;
     case Attributes::SoftwareVersionString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareVersionString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersionString));
         break;
     case Attributes::ManufacturingDate::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, manufacturingDate));
+        ReturnErrorOnFailure(DataModel::Decode(reader, manufacturingDate));
         break;
     case Attributes::PartNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partNumber));
         break;
     case Attributes::ProductURL::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productURL));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productURL));
         break;
     case Attributes::ProductLabel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productLabel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productLabel));
         break;
     case Attributes::SerialNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, serialNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, serialNumber));
         break;
     case Attributes::Reachable::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reachable));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reachable));
         break;
     case Attributes::UniqueID::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, uniqueID));
+        ReturnErrorOnFailure(DataModel::Decode(reader, uniqueID));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -9480,22 +9480,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::NumberOfPositions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfPositions));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfPositions));
         break;
     case Attributes::CurrentPosition::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPosition));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPosition));
         break;
     case Attributes::MultiPressMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, multiPressMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, multiPressMax));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -9528,7 +9528,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
             break;
         default:
             break;
@@ -9562,7 +9562,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
             break;
         default:
             break;
@@ -9596,7 +9596,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
             break;
         default:
             break;
@@ -9630,7 +9630,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPreviousPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, previousPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
             break;
         default:
             break;
@@ -9664,7 +9664,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPreviousPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, previousPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
             break;
         default:
             break;
@@ -9700,10 +9700,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
             break;
         case to_underlying(Fields::kCurrentNumberOfPressesCounted):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentNumberOfPressesCounted));
+            ReturnErrorOnFailure(DataModel::Decode(reader, currentNumberOfPressesCounted));
             break;
         default:
             break;
@@ -9739,10 +9739,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, newPosition));
+            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
             break;
         case to_underlying(Fields::kTotalNumberOfPressesCounted):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, totalNumberOfPressesCounted));
+            ReturnErrorOnFailure(DataModel::Decode(reader, totalNumberOfPressesCounted));
             break;
         default:
             break;
@@ -9888,22 +9888,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::WindowStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, windowStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, windowStatus));
         break;
     case Attributes::AdminFabricIndex::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminFabricIndex));
+        ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
         break;
     case Attributes::AdminVendorId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, adminVendorId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, adminVendorId));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -10523,31 +10523,31 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::NOCs::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, NOCs));
+        ReturnErrorOnFailure(DataModel::Decode(reader, NOCs));
         break;
     case Attributes::FabricsList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fabricsList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, fabricsList));
         break;
     case Attributes::SupportedFabrics::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, supportedFabrics));
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedFabrics));
         break;
     case Attributes::CommissionedFabrics::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, commissionedFabrics));
+        ReturnErrorOnFailure(DataModel::Decode(reader, commissionedFabrics));
         break;
     case Attributes::TrustedRootCertificates::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, trustedRootCertificates));
+        ReturnErrorOnFailure(DataModel::Decode(reader, trustedRootCertificates));
         break;
     case Attributes::CurrentFabricIndex::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentFabricIndex));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentFabricIndex));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -10942,25 +10942,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::GroupKeyMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, groupKeyMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyMap));
         break;
     case Attributes::GroupTable::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, groupTable));
+        ReturnErrorOnFailure(DataModel::Decode(reader, groupTable));
         break;
     case Attributes::MaxGroupsPerFabric::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxGroupsPerFabric));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxGroupsPerFabric));
         break;
     case Attributes::MaxGroupKeysPerFabric::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxGroupKeysPerFabric));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxGroupKeysPerFabric));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -10987,16 +10987,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LabelList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, labelList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, labelList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11023,16 +11023,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LabelList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, labelList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, labelList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11057,13 +11057,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11088,13 +11088,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11119,13 +11119,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11150,16 +11150,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::StateValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, stateValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, stateValue));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11192,7 +11192,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStateValue):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, stateValue));
+            ReturnErrorOnFailure(DataModel::Decode(reader, stateValue));
             break;
         default:
             break;
@@ -11340,28 +11340,28 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentMode));
         break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, supportedModes));
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
     case Attributes::OnMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, onMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, onMode));
         break;
     case Attributes::StartUpMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startUpMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startUpMode));
         break;
     case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, description));
+        ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -11386,28 +11386,28 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::PhysicalClosedLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalClosedLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalClosedLimit));
         break;
     case Attributes::MotorStepSize::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, motorStepSize));
+        ReturnErrorOnFailure(DataModel::Decode(reader, motorStepSize));
         break;
     case Attributes::Status::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, status));
+        ReturnErrorOnFailure(DataModel::Decode(reader, status));
         break;
     case Attributes::ClosedLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, closedLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, closedLimit));
         break;
     case Attributes::Mode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mode));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -13331,148 +13331,148 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LockState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lockState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lockState));
         break;
     case Attributes::LockType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lockType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lockType));
         break;
     case Attributes::ActuatorEnabled::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, actuatorEnabled));
+        ReturnErrorOnFailure(DataModel::Decode(reader, actuatorEnabled));
         break;
     case Attributes::DoorState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, doorState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, doorState));
         break;
     case Attributes::DoorOpenEvents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, doorOpenEvents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, doorOpenEvents));
         break;
     case Attributes::DoorClosedEvents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, doorClosedEvents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, doorClosedEvents));
         break;
     case Attributes::OpenPeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, openPeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, openPeriod));
         break;
     case Attributes::NumberOfLogRecordsSupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfLogRecordsSupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfLogRecordsSupported));
         break;
     case Attributes::NumberOfTotalUsersSupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfTotalUsersSupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfTotalUsersSupported));
         break;
     case Attributes::NumberOfPINUsersSupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfPINUsersSupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfPINUsersSupported));
         break;
     case Attributes::NumberOfRFIDUsersSupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfRFIDUsersSupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfRFIDUsersSupported));
         break;
     case Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfWeekDaySchedulesSupportedPerUser));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfWeekDaySchedulesSupportedPerUser));
         break;
     case Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfYearDaySchedulesSupportedPerUser));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfYearDaySchedulesSupportedPerUser));
         break;
     case Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfHolidaySchedulesSupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfHolidaySchedulesSupported));
         break;
     case Attributes::MaxPINCodeLength::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxPINCodeLength));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxPINCodeLength));
         break;
     case Attributes::MinPINCodeLength::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minPINCodeLength));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minPINCodeLength));
         break;
     case Attributes::MaxRFIDCodeLength::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxRFIDCodeLength));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxRFIDCodeLength));
         break;
     case Attributes::MinRFIDCodeLength::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minRFIDCodeLength));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minRFIDCodeLength));
         break;
     case Attributes::CredentialRulesSupport::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, credentialRulesSupport));
+        ReturnErrorOnFailure(DataModel::Decode(reader, credentialRulesSupport));
         break;
     case Attributes::EnableLogging::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enableLogging));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enableLogging));
         break;
     case Attributes::Language::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, language));
+        ReturnErrorOnFailure(DataModel::Decode(reader, language));
         break;
     case Attributes::LEDSettings::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, LEDSettings));
+        ReturnErrorOnFailure(DataModel::Decode(reader, LEDSettings));
         break;
     case Attributes::AutoRelockTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, autoRelockTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, autoRelockTime));
         break;
     case Attributes::SoundVolume::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, soundVolume));
+        ReturnErrorOnFailure(DataModel::Decode(reader, soundVolume));
         break;
     case Attributes::OperatingMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operatingMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, operatingMode));
         break;
     case Attributes::SupportedOperatingModes::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, supportedOperatingModes));
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedOperatingModes));
         break;
     case Attributes::DefaultConfigurationRegister::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, defaultConfigurationRegister));
+        ReturnErrorOnFailure(DataModel::Decode(reader, defaultConfigurationRegister));
         break;
     case Attributes::EnableLocalProgramming::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enableLocalProgramming));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enableLocalProgramming));
         break;
     case Attributes::EnableOneTouchLocking::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enableOneTouchLocking));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enableOneTouchLocking));
         break;
     case Attributes::EnableInsideStatusLED::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enableInsideStatusLED));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enableInsideStatusLED));
         break;
     case Attributes::EnablePrivacyModeButton::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enablePrivacyModeButton));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enablePrivacyModeButton));
         break;
     case Attributes::LocalProgrammingFeatures::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, localProgrammingFeatures));
+        ReturnErrorOnFailure(DataModel::Decode(reader, localProgrammingFeatures));
         break;
     case Attributes::WrongCodeEntryLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wrongCodeEntryLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wrongCodeEntryLimit));
         break;
     case Attributes::UserCodeTemporaryDisableTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, userCodeTemporaryDisableTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, userCodeTemporaryDisableTime));
         break;
     case Attributes::SendPINOverTheAir::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sendPINOverTheAir));
+        ReturnErrorOnFailure(DataModel::Decode(reader, sendPINOverTheAir));
         break;
     case Attributes::RequirePINforRemoteOperation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, requirePINforRemoteOperation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, requirePINforRemoteOperation));
         break;
     case Attributes::ExpiringUserTimeout::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, expiringUserTimeout));
+        ReturnErrorOnFailure(DataModel::Decode(reader, expiringUserTimeout));
         break;
     case Attributes::AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, alarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
         break;
     case Attributes::KeypadOperationEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, keypadOperationEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, keypadOperationEventMask));
         break;
     case Attributes::RemoteOperationEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, remoteOperationEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, remoteOperationEventMask));
         break;
     case Attributes::ManualOperationEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, manualOperationEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, manualOperationEventMask));
         break;
     case Attributes::RFIDOperationEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, RFIDOperationEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, RFIDOperationEventMask));
         break;
     case Attributes::KeypadProgrammingEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, keypadProgrammingEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, keypadProgrammingEventMask));
         break;
     case Attributes::RemoteProgrammingEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, remoteProgrammingEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, remoteProgrammingEventMask));
         break;
     case Attributes::RFIDProgrammingEventMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, RFIDProgrammingEventMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, RFIDProgrammingEventMask));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -13505,7 +13505,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAlarmCode):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, alarmCode));
+            ReturnErrorOnFailure(DataModel::Decode(reader, alarmCode));
             break;
         default:
             break;
@@ -13539,7 +13539,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kDoorState):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, doorState));
+            ReturnErrorOnFailure(DataModel::Decode(reader, doorState));
             break;
         default:
             break;
@@ -13578,22 +13578,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLockOperationType):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lockOperationType));
+            ReturnErrorOnFailure(DataModel::Decode(reader, lockOperationType));
             break;
         case to_underlying(Fields::kOperationSource):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationSource));
+            ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
             break;
         case to_underlying(Fields::kUserIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, userIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
             break;
         case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fabricIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         case to_underlying(Fields::kSourceNode):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sourceNode));
+            ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
             break;
         case to_underlying(Fields::kCredentials):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, credentials));
+            ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
             break;
         default:
             break;
@@ -13633,25 +13633,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLockOperationType):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lockOperationType));
+            ReturnErrorOnFailure(DataModel::Decode(reader, lockOperationType));
             break;
         case to_underlying(Fields::kOperationSource):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationSource));
+            ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
             break;
         case to_underlying(Fields::kOperationError):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationError));
+            ReturnErrorOnFailure(DataModel::Decode(reader, operationError));
             break;
         case to_underlying(Fields::kUserIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, userIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
             break;
         case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fabricIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         case to_underlying(Fields::kSourceNode):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sourceNode));
+            ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
             break;
         case to_underlying(Fields::kCredentials):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, credentials));
+            ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
             break;
         default:
             break;
@@ -13691,25 +13691,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLockDataType):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lockDataType));
+            ReturnErrorOnFailure(DataModel::Decode(reader, lockDataType));
             break;
         case to_underlying(Fields::kDataOperationType):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dataOperationType));
+            ReturnErrorOnFailure(DataModel::Decode(reader, dataOperationType));
             break;
         case to_underlying(Fields::kOperationSource):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationSource));
+            ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
             break;
         case to_underlying(Fields::kUserIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, userIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
             break;
         case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fabricIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         case to_underlying(Fields::kSourceNode):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, sourceNode));
+            ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
             break;
         case to_underlying(Fields::kDataIndex):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dataIndex));
+            ReturnErrorOnFailure(DataModel::Decode(reader, dataIndex));
             break;
         default:
             break;
@@ -13973,79 +13973,79 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Type::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, type));
+        ReturnErrorOnFailure(DataModel::Decode(reader, type));
         break;
     case Attributes::PhysicalClosedLimitLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalClosedLimitLift));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalClosedLimitLift));
         break;
     case Attributes::PhysicalClosedLimitTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalClosedLimitTilt));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalClosedLimitTilt));
         break;
     case Attributes::CurrentPositionLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPositionLift));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPositionLift));
         break;
     case Attributes::CurrentPositionTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPositionTilt));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPositionTilt));
         break;
     case Attributes::NumberOfActuationsLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfActuationsLift));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfActuationsLift));
         break;
     case Attributes::NumberOfActuationsTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfActuationsTilt));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfActuationsTilt));
         break;
     case Attributes::ConfigStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, configStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, configStatus));
         break;
     case Attributes::CurrentPositionLiftPercentage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPositionLiftPercentage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPositionLiftPercentage));
         break;
     case Attributes::CurrentPositionTiltPercentage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPositionTiltPercentage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPositionTiltPercentage));
         break;
     case Attributes::OperationalStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationalStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, operationalStatus));
         break;
     case Attributes::TargetPositionLiftPercent100ths::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, targetPositionLiftPercent100ths));
+        ReturnErrorOnFailure(DataModel::Decode(reader, targetPositionLiftPercent100ths));
         break;
     case Attributes::TargetPositionTiltPercent100ths::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, targetPositionTiltPercent100ths));
+        ReturnErrorOnFailure(DataModel::Decode(reader, targetPositionTiltPercent100ths));
         break;
     case Attributes::EndProductType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, endProductType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, endProductType));
         break;
     case Attributes::CurrentPositionLiftPercent100ths::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPositionLiftPercent100ths));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPositionLiftPercent100ths));
         break;
     case Attributes::CurrentPositionTiltPercent100ths::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentPositionTiltPercent100ths));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentPositionTiltPercent100ths));
         break;
     case Attributes::InstalledOpenLimitLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, installedOpenLimitLift));
+        ReturnErrorOnFailure(DataModel::Decode(reader, installedOpenLimitLift));
         break;
     case Attributes::InstalledClosedLimitLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, installedClosedLimitLift));
+        ReturnErrorOnFailure(DataModel::Decode(reader, installedClosedLimitLift));
         break;
     case Attributes::InstalledOpenLimitTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, installedOpenLimitTilt));
+        ReturnErrorOnFailure(DataModel::Decode(reader, installedOpenLimitTilt));
         break;
     case Attributes::InstalledClosedLimitTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, installedClosedLimitTilt));
+        ReturnErrorOnFailure(DataModel::Decode(reader, installedClosedLimitTilt));
         break;
     case Attributes::Mode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mode));
         break;
     case Attributes::SafetyStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, safetyStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, safetyStatus));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -14134,43 +14134,43 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::BarrierMovingState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierMovingState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierMovingState));
         break;
     case Attributes::BarrierSafetyStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierSafetyStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierSafetyStatus));
         break;
     case Attributes::BarrierCapabilities::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierCapabilities));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierCapabilities));
         break;
     case Attributes::BarrierOpenEvents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierOpenEvents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierOpenEvents));
         break;
     case Attributes::BarrierCloseEvents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierCloseEvents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierCloseEvents));
         break;
     case Attributes::BarrierCommandOpenEvents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierCommandOpenEvents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierCommandOpenEvents));
         break;
     case Attributes::BarrierCommandCloseEvents::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierCommandCloseEvents));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierCommandCloseEvents));
         break;
     case Attributes::BarrierOpenPeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierOpenPeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierOpenPeriod));
         break;
     case Attributes::BarrierClosePeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierClosePeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierClosePeriod));
         break;
     case Attributes::BarrierPosition::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, barrierPosition));
+        ReturnErrorOnFailure(DataModel::Decode(reader, barrierPosition));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -14195,85 +14195,85 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MaxPressure::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxPressure));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxPressure));
         break;
     case Attributes::MaxSpeed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxSpeed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxSpeed));
         break;
     case Attributes::MaxFlow::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxFlow));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxFlow));
         break;
     case Attributes::MinConstPressure::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minConstPressure));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minConstPressure));
         break;
     case Attributes::MaxConstPressure::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxConstPressure));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxConstPressure));
         break;
     case Attributes::MinCompPressure::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minCompPressure));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minCompPressure));
         break;
     case Attributes::MaxCompPressure::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxCompPressure));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxCompPressure));
         break;
     case Attributes::MinConstSpeed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minConstSpeed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minConstSpeed));
         break;
     case Attributes::MaxConstSpeed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxConstSpeed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxConstSpeed));
         break;
     case Attributes::MinConstFlow::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minConstFlow));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minConstFlow));
         break;
     case Attributes::MaxConstFlow::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxConstFlow));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxConstFlow));
         break;
     case Attributes::MinConstTemp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minConstTemp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minConstTemp));
         break;
     case Attributes::MaxConstTemp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxConstTemp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxConstTemp));
         break;
     case Attributes::PumpStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, pumpStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, pumpStatus));
         break;
     case Attributes::EffectiveOperationMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, effectiveOperationMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, effectiveOperationMode));
         break;
     case Attributes::EffectiveControlMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, effectiveControlMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, effectiveControlMode));
         break;
     case Attributes::Capacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, capacity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
         break;
     case Attributes::Speed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, speed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, speed));
         break;
     case Attributes::LifetimeRunningHours::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lifetimeRunningHours));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lifetimeRunningHours));
         break;
     case Attributes::Power::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, power));
+        ReturnErrorOnFailure(DataModel::Decode(reader, power));
         break;
     case Attributes::LifetimeEnergyConsumed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lifetimeEnergyConsumed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lifetimeEnergyConsumed));
         break;
     case Attributes::OperationMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, operationMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, operationMode));
         break;
     case Attributes::ControlMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, controlMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, controlMode));
         break;
     case Attributes::AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, alarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -15095,142 +15095,142 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LocalTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, localTemperature));
+        ReturnErrorOnFailure(DataModel::Decode(reader, localTemperature));
         break;
     case Attributes::OutdoorTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, outdoorTemperature));
+        ReturnErrorOnFailure(DataModel::Decode(reader, outdoorTemperature));
         break;
     case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, occupancy));
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancy));
         break;
     case Attributes::AbsMinHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, absMinHeatSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, absMinHeatSetpointLimit));
         break;
     case Attributes::AbsMaxHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, absMaxHeatSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, absMaxHeatSetpointLimit));
         break;
     case Attributes::AbsMinCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, absMinCoolSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, absMinCoolSetpointLimit));
         break;
     case Attributes::AbsMaxCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, absMaxCoolSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, absMaxCoolSetpointLimit));
         break;
     case Attributes::PiCoolingDemand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, piCoolingDemand));
+        ReturnErrorOnFailure(DataModel::Decode(reader, piCoolingDemand));
         break;
     case Attributes::PiHeatingDemand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, piHeatingDemand));
+        ReturnErrorOnFailure(DataModel::Decode(reader, piHeatingDemand));
         break;
     case Attributes::HvacSystemTypeConfiguration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, hvacSystemTypeConfiguration));
+        ReturnErrorOnFailure(DataModel::Decode(reader, hvacSystemTypeConfiguration));
         break;
     case Attributes::LocalTemperatureCalibration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, localTemperatureCalibration));
+        ReturnErrorOnFailure(DataModel::Decode(reader, localTemperatureCalibration));
         break;
     case Attributes::OccupiedCoolingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, occupiedCoolingSetpoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedCoolingSetpoint));
         break;
     case Attributes::OccupiedHeatingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, occupiedHeatingSetpoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedHeatingSetpoint));
         break;
     case Attributes::UnoccupiedCoolingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, unoccupiedCoolingSetpoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedCoolingSetpoint));
         break;
     case Attributes::UnoccupiedHeatingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, unoccupiedHeatingSetpoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedHeatingSetpoint));
         break;
     case Attributes::MinHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minHeatSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minHeatSetpointLimit));
         break;
     case Attributes::MaxHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxHeatSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxHeatSetpointLimit));
         break;
     case Attributes::MinCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minCoolSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minCoolSetpointLimit));
         break;
     case Attributes::MaxCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxCoolSetpointLimit));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxCoolSetpointLimit));
         break;
     case Attributes::MinSetpointDeadBand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minSetpointDeadBand));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minSetpointDeadBand));
         break;
     case Attributes::RemoteSensing::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, remoteSensing));
+        ReturnErrorOnFailure(DataModel::Decode(reader, remoteSensing));
         break;
     case Attributes::ControlSequenceOfOperation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, controlSequenceOfOperation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, controlSequenceOfOperation));
         break;
     case Attributes::SystemMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, systemMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, systemMode));
         break;
     case Attributes::AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, alarmMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
         break;
     case Attributes::ThermostatRunningMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, thermostatRunningMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, thermostatRunningMode));
         break;
     case Attributes::StartOfWeek::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startOfWeek));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startOfWeek));
         break;
     case Attributes::NumberOfWeeklyTransitions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfWeeklyTransitions));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfWeeklyTransitions));
         break;
     case Attributes::NumberOfDailyTransitions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfDailyTransitions));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfDailyTransitions));
         break;
     case Attributes::TemperatureSetpointHold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, temperatureSetpointHold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureSetpointHold));
         break;
     case Attributes::TemperatureSetpointHoldDuration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, temperatureSetpointHoldDuration));
+        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureSetpointHoldDuration));
         break;
     case Attributes::ThermostatProgrammingOperationMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, thermostatProgrammingOperationMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, thermostatProgrammingOperationMode));
         break;
     case Attributes::ThermostatRunningState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, thermostatRunningState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, thermostatRunningState));
         break;
     case Attributes::SetpointChangeSource::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, setpointChangeSource));
+        ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeSource));
         break;
     case Attributes::SetpointChangeAmount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, setpointChangeAmount));
+        ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeAmount));
         break;
     case Attributes::SetpointChangeSourceTimestamp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, setpointChangeSourceTimestamp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeSourceTimestamp));
         break;
     case Attributes::AcType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acType));
         break;
     case Attributes::AcCapacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCapacity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCapacity));
         break;
     case Attributes::AcRefrigerantType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acRefrigerantType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acRefrigerantType));
         break;
     case Attributes::AcCompressor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCompressor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressor));
         break;
     case Attributes::AcErrorCode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acErrorCode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acErrorCode));
         break;
     case Attributes::AcLouverPosition::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acLouverPosition));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acLouverPosition));
         break;
     case Attributes::AcCoilTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCoilTemperature));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCoilTemperature));
         break;
     case Attributes::AcCapacityFormat::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCapacityFormat));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCapacityFormat));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -15255,19 +15255,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::FanMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fanMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, fanMode));
         break;
     case Attributes::FanModeSequence::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, fanModeSequence));
+        ReturnErrorOnFailure(DataModel::Decode(reader, fanModeSequence));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -15292,37 +15292,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::RelativeHumidity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, relativeHumidity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, relativeHumidity));
         break;
     case Attributes::DehumidificationCooling::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dehumidificationCooling));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dehumidificationCooling));
         break;
     case Attributes::RhDehumidificationSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rhDehumidificationSetpoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rhDehumidificationSetpoint));
         break;
     case Attributes::RelativeHumidityMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, relativeHumidityMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, relativeHumidityMode));
         break;
     case Attributes::DehumidificationLockout::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dehumidificationLockout));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dehumidificationLockout));
         break;
     case Attributes::DehumidificationHysteresis::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dehumidificationHysteresis));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dehumidificationHysteresis));
         break;
     case Attributes::DehumidificationMaxCool::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dehumidificationMaxCool));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dehumidificationMaxCool));
         break;
     case Attributes::RelativeHumidityDisplay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, relativeHumidityDisplay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, relativeHumidityDisplay));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -15347,22 +15347,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::TemperatureDisplayMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, temperatureDisplayMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureDisplayMode));
         break;
     case Attributes::KeypadLockout::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, keypadLockout));
+        ReturnErrorOnFailure(DataModel::Decode(reader, keypadLockout));
         break;
     case Attributes::ScheduleProgrammingVisibility::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, scheduleProgrammingVisibility));
+        ReturnErrorOnFailure(DataModel::Decode(reader, scheduleProgrammingVisibility));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16325,169 +16325,169 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentHue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentHue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentHue));
         break;
     case Attributes::CurrentSaturation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentSaturation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentSaturation));
         break;
     case Attributes::RemainingTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, remainingTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, remainingTime));
         break;
     case Attributes::CurrentX::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentX));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentX));
         break;
     case Attributes::CurrentY::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentY));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentY));
         break;
     case Attributes::DriftCompensation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, driftCompensation));
+        ReturnErrorOnFailure(DataModel::Decode(reader, driftCompensation));
         break;
     case Attributes::CompensationText::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, compensationText));
+        ReturnErrorOnFailure(DataModel::Decode(reader, compensationText));
         break;
     case Attributes::ColorTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorTemperature));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperature));
         break;
     case Attributes::ColorMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorMode));
         break;
     case Attributes::ColorControlOptions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorControlOptions));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorControlOptions));
         break;
     case Attributes::NumberOfPrimaries::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfPrimaries));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfPrimaries));
         break;
     case Attributes::Primary1X::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary1X));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary1X));
         break;
     case Attributes::Primary1Y::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary1Y));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary1Y));
         break;
     case Attributes::Primary1Intensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary1Intensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary1Intensity));
         break;
     case Attributes::Primary2X::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary2X));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary2X));
         break;
     case Attributes::Primary2Y::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary2Y));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary2Y));
         break;
     case Attributes::Primary2Intensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary2Intensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary2Intensity));
         break;
     case Attributes::Primary3X::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary3X));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary3X));
         break;
     case Attributes::Primary3Y::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary3Y));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary3Y));
         break;
     case Attributes::Primary3Intensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary3Intensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary3Intensity));
         break;
     case Attributes::Primary4X::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary4X));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary4X));
         break;
     case Attributes::Primary4Y::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary4Y));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary4Y));
         break;
     case Attributes::Primary4Intensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary4Intensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary4Intensity));
         break;
     case Attributes::Primary5X::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary5X));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary5X));
         break;
     case Attributes::Primary5Y::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary5Y));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary5Y));
         break;
     case Attributes::Primary5Intensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary5Intensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary5Intensity));
         break;
     case Attributes::Primary6X::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary6X));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary6X));
         break;
     case Attributes::Primary6Y::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary6Y));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary6Y));
         break;
     case Attributes::Primary6Intensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, primary6Intensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, primary6Intensity));
         break;
     case Attributes::WhitePointX::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, whitePointX));
+        ReturnErrorOnFailure(DataModel::Decode(reader, whitePointX));
         break;
     case Attributes::WhitePointY::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, whitePointY));
+        ReturnErrorOnFailure(DataModel::Decode(reader, whitePointY));
         break;
     case Attributes::ColorPointRX::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointRX));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointRX));
         break;
     case Attributes::ColorPointRY::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointRY));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointRY));
         break;
     case Attributes::ColorPointRIntensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointRIntensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointRIntensity));
         break;
     case Attributes::ColorPointGX::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointGX));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointGX));
         break;
     case Attributes::ColorPointGY::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointGY));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointGY));
         break;
     case Attributes::ColorPointGIntensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointGIntensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointGIntensity));
         break;
     case Attributes::ColorPointBX::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointBX));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointBX));
         break;
     case Attributes::ColorPointBY::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointBY));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointBY));
         break;
     case Attributes::ColorPointBIntensity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorPointBIntensity));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorPointBIntensity));
         break;
     case Attributes::EnhancedCurrentHue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enhancedCurrentHue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enhancedCurrentHue));
         break;
     case Attributes::EnhancedColorMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enhancedColorMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enhancedColorMode));
         break;
     case Attributes::ColorLoopActive::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorLoopActive));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorLoopActive));
         break;
     case Attributes::ColorLoopDirection::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorLoopDirection));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorLoopDirection));
         break;
     case Attributes::ColorLoopTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorLoopTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorLoopTime));
         break;
     case Attributes::ColorLoopStartEnhancedHue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorLoopStartEnhancedHue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorLoopStartEnhancedHue));
         break;
     case Attributes::ColorLoopStoredEnhancedHue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorLoopStoredEnhancedHue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorLoopStoredEnhancedHue));
         break;
     case Attributes::ColorCapabilities::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorCapabilities));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorCapabilities));
         break;
     case Attributes::ColorTempPhysicalMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorTempPhysicalMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTempPhysicalMin));
         break;
     case Attributes::ColorTempPhysicalMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, colorTempPhysicalMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTempPhysicalMax));
         break;
     case Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, coupleColorTempToLevelMinMireds));
+        ReturnErrorOnFailure(DataModel::Decode(reader, coupleColorTempToLevelMinMireds));
         break;
     case Attributes::StartUpColorTemperatureMireds::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startUpColorTemperatureMireds));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startUpColorTemperatureMireds));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16512,61 +16512,61 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::PhysicalMinLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalMinLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalMinLevel));
         break;
     case Attributes::PhysicalMaxLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalMaxLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalMaxLevel));
         break;
     case Attributes::BallastStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, ballastStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, ballastStatus));
         break;
     case Attributes::MinLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minLevel));
         break;
     case Attributes::MaxLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxLevel));
         break;
     case Attributes::PowerOnLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerOnLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerOnLevel));
         break;
     case Attributes::PowerOnFadeTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerOnFadeTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerOnFadeTime));
         break;
     case Attributes::IntrinsicBallastFactor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, intrinsicBallastFactor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBallastFactor));
         break;
     case Attributes::BallastFactorAdjustment::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, ballastFactorAdjustment));
+        ReturnErrorOnFailure(DataModel::Decode(reader, ballastFactorAdjustment));
         break;
     case Attributes::LampQuality::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampQuality));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampQuality));
         break;
     case Attributes::LampType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampType));
         break;
     case Attributes::LampManufacturer::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampManufacturer));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampManufacturer));
         break;
     case Attributes::LampRatedHours::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampRatedHours));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampRatedHours));
         break;
     case Attributes::LampBurnHours::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampBurnHours));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampBurnHours));
         break;
     case Attributes::LampAlarmMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampAlarmMode));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampAlarmMode));
         break;
     case Attributes::LampBurnHoursTripPoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lampBurnHoursTripPoint));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampBurnHoursTripPoint));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16591,28 +16591,28 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::LightSensorType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lightSensorType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lightSensorType));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16637,25 +16637,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16680,40 +16680,40 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::ScaledValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, scaledValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, scaledValue));
         break;
     case Attributes::MinScaledValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minScaledValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minScaledValue));
         break;
     case Attributes::MaxScaledValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxScaledValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxScaledValue));
         break;
     case Attributes::ScaledTolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, scaledTolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, scaledTolerance));
         break;
     case Attributes::Scale::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, scale));
+        ReturnErrorOnFailure(DataModel::Decode(reader, scale));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16738,25 +16738,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16781,25 +16781,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16824,49 +16824,49 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, occupancy));
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancy));
         break;
     case Attributes::OccupancySensorType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, occupancySensorType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorType));
         break;
     case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, occupancySensorTypeBitmap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorTypeBitmap));
         break;
     case Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, pirOccupiedToUnoccupiedDelay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, pirOccupiedToUnoccupiedDelay));
         break;
     case Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, pirUnoccupiedToOccupiedDelay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, pirUnoccupiedToOccupiedDelay));
         break;
     case Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, pirUnoccupiedToOccupiedThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, pirUnoccupiedToOccupiedThreshold));
         break;
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, ultrasonicOccupiedToUnoccupiedDelay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay));
         break;
     case Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, ultrasonicUnoccupiedToOccupiedDelay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedDelay));
         break;
     case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, ultrasonicUnoccupiedToOccupiedThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedThreshold));
         break;
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalContactOccupiedToUnoccupiedDelay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactOccupiedToUnoccupiedDelay));
         break;
     case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalContactUnoccupiedToOccupiedDelay));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedDelay));
         break;
     case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, physicalContactUnoccupiedToOccupiedThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16891,25 +16891,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16934,25 +16934,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -16977,25 +16977,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17020,25 +17020,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17063,25 +17063,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17106,25 +17106,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17149,25 +17149,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17192,25 +17192,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17235,25 +17235,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17278,25 +17278,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17321,25 +17321,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17364,25 +17364,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17407,25 +17407,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17450,25 +17450,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17493,25 +17493,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17536,25 +17536,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17579,25 +17579,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17622,25 +17622,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17665,25 +17665,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17708,25 +17708,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17751,25 +17751,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17794,25 +17794,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17837,25 +17837,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17880,25 +17880,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17923,25 +17923,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -17966,25 +17966,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -18009,25 +18009,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -18052,25 +18052,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -18095,25 +18095,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -18138,25 +18138,25 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
         break;
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, minMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
         break;
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxMeasuredValue));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
         break;
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, tolerance));
+        ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -18433,34 +18433,34 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ZoneState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, zoneState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, zoneState));
         break;
     case Attributes::ZoneType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, zoneType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, zoneType));
         break;
     case Attributes::ZoneStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, zoneStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, zoneStatus));
         break;
     case Attributes::IasCieAddress::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, iasCieAddress));
+        ReturnErrorOnFailure(DataModel::Decode(reader, iasCieAddress));
         break;
     case Attributes::ZoneId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, zoneId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, zoneId));
         break;
     case Attributes::NumberOfZoneSensitivityLevelsSupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, numberOfZoneSensitivityLevelsSupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfZoneSensitivityLevelsSupported));
         break;
     case Attributes::CurrentZoneSensitivityLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentZoneSensitivityLevel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentZoneSensitivityLevel));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -19308,13 +19308,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -19419,16 +19419,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MaxDuration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, maxDuration));
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxDuration));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -19453,16 +19453,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::WakeOnLanMacAddress::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, wakeOnLanMacAddress));
+        ReturnErrorOnFailure(DataModel::Decode(reader, wakeOnLanMacAddress));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -19735,22 +19735,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ChannelList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, channelList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, channelList));
         break;
     case Attributes::ChannelLineup::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, channelLineup));
+        ReturnErrorOnFailure(DataModel::Decode(reader, channelLineup));
         break;
     case Attributes::CurrentChannel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentChannel));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentChannel));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -19894,19 +19894,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::TargetNavigatorList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, targetNavigatorList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, targetNavigatorList));
         break;
     case Attributes::CurrentNavigatorTarget::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentNavigatorTarget));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentNavigatorTarget));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -20352,34 +20352,34 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::PlaybackState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, playbackState));
+        ReturnErrorOnFailure(DataModel::Decode(reader, playbackState));
         break;
     case Attributes::StartTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, startTime));
+        ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
         break;
     case Attributes::Duration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, duration));
+        ReturnErrorOnFailure(DataModel::Decode(reader, duration));
         break;
     case Attributes::Position::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, position));
+        ReturnErrorOnFailure(DataModel::Decode(reader, position));
         break;
     case Attributes::PlaybackSpeed::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, playbackSpeed));
+        ReturnErrorOnFailure(DataModel::Decode(reader, playbackSpeed));
         break;
     case Attributes::SeekRangeEnd::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, seekRangeEnd));
+        ReturnErrorOnFailure(DataModel::Decode(reader, seekRangeEnd));
         break;
     case Attributes::SeekRangeStart::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, seekRangeStart));
+        ReturnErrorOnFailure(DataModel::Decode(reader, seekRangeStart));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -20587,19 +20587,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MediaInputList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, mediaInputList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, mediaInputList));
         break;
     case Attributes::CurrentMediaInput::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentMediaInput));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentMediaInput));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -20654,13 +20654,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -20753,13 +20753,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -21179,19 +21179,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AcceptHeaderList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acceptHeaderList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptHeaderList));
         break;
     case Attributes::SupportedStreamingProtocols::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, supportedStreamingProtocols));
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedStreamingProtocols));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -21335,19 +21335,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AudioOutputList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, audioOutputList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, audioOutputList));
         break;
     case Attributes::CurrentAudioOutput::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentAudioOutput));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentAudioOutput));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -21600,19 +21600,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ApplicationLauncherList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationLauncherList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationLauncherList));
         break;
     case Attributes::ApplicationLauncherApp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationLauncherApp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationLauncherApp));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -21680,37 +21680,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::VendorName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorName));
         break;
     case Attributes::VendorId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
         break;
     case Attributes::ApplicationName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationName));
         break;
     case Attributes::ProductId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productId));
         break;
     case Attributes::ApplicationApp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationApp));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationApp));
         break;
     case Attributes::ApplicationStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationStatus));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationStatus));
         break;
     case Attributes::ApplicationVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, applicationVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, applicationVersion));
         break;
     case Attributes::AllowedVendorList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, allowedVendorList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, allowedVendorList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -21873,13 +21873,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -23670,256 +23670,256 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Boolean::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, boolean));
+        ReturnErrorOnFailure(DataModel::Decode(reader, boolean));
         break;
     case Attributes::Bitmap8::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bitmap8));
+        ReturnErrorOnFailure(DataModel::Decode(reader, bitmap8));
         break;
     case Attributes::Bitmap16::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bitmap16));
+        ReturnErrorOnFailure(DataModel::Decode(reader, bitmap16));
         break;
     case Attributes::Bitmap32::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bitmap32));
+        ReturnErrorOnFailure(DataModel::Decode(reader, bitmap32));
         break;
     case Attributes::Bitmap64::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, bitmap64));
+        ReturnErrorOnFailure(DataModel::Decode(reader, bitmap64));
         break;
     case Attributes::Int8u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int8u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int8u));
         break;
     case Attributes::Int16u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int16u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int16u));
         break;
     case Attributes::Int24u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int24u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int24u));
         break;
     case Attributes::Int32u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int32u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int32u));
         break;
     case Attributes::Int40u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int40u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int40u));
         break;
     case Attributes::Int48u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int48u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int48u));
         break;
     case Attributes::Int56u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int56u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int56u));
         break;
     case Attributes::Int64u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int64u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int64u));
         break;
     case Attributes::Int8s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int8s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int8s));
         break;
     case Attributes::Int16s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int16s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int16s));
         break;
     case Attributes::Int24s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int24s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int24s));
         break;
     case Attributes::Int32s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int32s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int32s));
         break;
     case Attributes::Int40s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int40s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int40s));
         break;
     case Attributes::Int48s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int48s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int48s));
         break;
     case Attributes::Int56s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int56s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int56s));
         break;
     case Attributes::Int64s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, int64s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, int64s));
         break;
     case Attributes::Enum8::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enum8));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enum8));
         break;
     case Attributes::Enum16::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enum16));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enum16));
         break;
     case Attributes::FloatSingle::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, floatSingle));
+        ReturnErrorOnFailure(DataModel::Decode(reader, floatSingle));
         break;
     case Attributes::FloatDouble::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, floatDouble));
+        ReturnErrorOnFailure(DataModel::Decode(reader, floatDouble));
         break;
     case Attributes::OctetString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, octetString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, octetString));
         break;
     case Attributes::ListInt8u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, listInt8u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, listInt8u));
         break;
     case Attributes::ListOctetString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, listOctetString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, listOctetString));
         break;
     case Attributes::ListStructOctetString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, listStructOctetString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, listStructOctetString));
         break;
     case Attributes::LongOctetString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, longOctetString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, longOctetString));
         break;
     case Attributes::CharString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, charString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, charString));
         break;
     case Attributes::LongCharString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, longCharString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, longCharString));
         break;
     case Attributes::EpochUs::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, epochUs));
+        ReturnErrorOnFailure(DataModel::Decode(reader, epochUs));
         break;
     case Attributes::EpochS::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, epochS));
+        ReturnErrorOnFailure(DataModel::Decode(reader, epochS));
         break;
     case Attributes::VendorId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, vendorId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
         break;
     case Attributes::ListNullablesAndOptionalsStruct::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, listNullablesAndOptionalsStruct));
+        ReturnErrorOnFailure(DataModel::Decode(reader, listNullablesAndOptionalsStruct));
         break;
     case Attributes::EnumAttr::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, enumAttr));
+        ReturnErrorOnFailure(DataModel::Decode(reader, enumAttr));
         break;
     case Attributes::StructAttr::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, structAttr));
+        ReturnErrorOnFailure(DataModel::Decode(reader, structAttr));
         break;
     case Attributes::RangeRestrictedInt8u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rangeRestrictedInt8u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rangeRestrictedInt8u));
         break;
     case Attributes::RangeRestrictedInt8s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rangeRestrictedInt8s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rangeRestrictedInt8s));
         break;
     case Attributes::RangeRestrictedInt16u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rangeRestrictedInt16u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rangeRestrictedInt16u));
         break;
     case Attributes::RangeRestrictedInt16s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rangeRestrictedInt16s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rangeRestrictedInt16s));
         break;
     case Attributes::ListLongOctetString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, listLongOctetString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, listLongOctetString));
         break;
     case Attributes::ListFabricScoped::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, listFabricScoped));
+        ReturnErrorOnFailure(DataModel::Decode(reader, listFabricScoped));
         break;
     case Attributes::TimedWriteBoolean::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, timedWriteBoolean));
+        ReturnErrorOnFailure(DataModel::Decode(reader, timedWriteBoolean));
         break;
     case Attributes::GeneralErrorBoolean::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, generalErrorBoolean));
+        ReturnErrorOnFailure(DataModel::Decode(reader, generalErrorBoolean));
         break;
     case Attributes::ClusterErrorBoolean::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterErrorBoolean));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterErrorBoolean));
         break;
     case Attributes::Unsupported::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, unsupported));
+        ReturnErrorOnFailure(DataModel::Decode(reader, unsupported));
         break;
     case Attributes::NullableBoolean::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableBoolean));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableBoolean));
         break;
     case Attributes::NullableBitmap8::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableBitmap8));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableBitmap8));
         break;
     case Attributes::NullableBitmap16::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableBitmap16));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableBitmap16));
         break;
     case Attributes::NullableBitmap32::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableBitmap32));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableBitmap32));
         break;
     case Attributes::NullableBitmap64::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableBitmap64));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableBitmap64));
         break;
     case Attributes::NullableInt8u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt8u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt8u));
         break;
     case Attributes::NullableInt16u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt16u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt16u));
         break;
     case Attributes::NullableInt24u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt24u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt24u));
         break;
     case Attributes::NullableInt32u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt32u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt32u));
         break;
     case Attributes::NullableInt40u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt40u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt40u));
         break;
     case Attributes::NullableInt48u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt48u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt48u));
         break;
     case Attributes::NullableInt56u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt56u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt56u));
         break;
     case Attributes::NullableInt64u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt64u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt64u));
         break;
     case Attributes::NullableInt8s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt8s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt8s));
         break;
     case Attributes::NullableInt16s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt16s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt16s));
         break;
     case Attributes::NullableInt24s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt24s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt24s));
         break;
     case Attributes::NullableInt32s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt32s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt32s));
         break;
     case Attributes::NullableInt40s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt40s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt40s));
         break;
     case Attributes::NullableInt48s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt48s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt48s));
         break;
     case Attributes::NullableInt56s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt56s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt56s));
         break;
     case Attributes::NullableInt64s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableInt64s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt64s));
         break;
     case Attributes::NullableEnum8::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableEnum8));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableEnum8));
         break;
     case Attributes::NullableEnum16::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableEnum16));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableEnum16));
         break;
     case Attributes::NullableFloatSingle::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableFloatSingle));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableFloatSingle));
         break;
     case Attributes::NullableFloatDouble::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableFloatDouble));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableFloatDouble));
         break;
     case Attributes::NullableOctetString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableOctetString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableOctetString));
         break;
     case Attributes::NullableCharString::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableCharString));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableCharString));
         break;
     case Attributes::NullableEnumAttr::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableEnumAttr));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableEnumAttr));
         break;
     case Attributes::NullableStruct::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableStruct));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
         break;
     case Attributes::NullableRangeRestrictedInt8u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableRangeRestrictedInt8u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt8u));
         break;
     case Attributes::NullableRangeRestrictedInt8s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableRangeRestrictedInt8s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt8s));
         break;
     case Attributes::NullableRangeRestrictedInt16u::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableRangeRestrictedInt16u));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt16u));
         break;
     case Attributes::NullableRangeRestrictedInt16s::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, nullableRangeRestrictedInt16s));
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt16s));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -23957,22 +23957,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg1));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
             break;
         case to_underlying(Fields::kArg2):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg2));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
             break;
         case to_underlying(Fields::kArg3):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg3));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
             break;
         case to_underlying(Fields::kArg4):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg4));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
             break;
         case to_underlying(Fields::kArg5):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg5));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
             break;
         case to_underlying(Fields::kArg6):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg6));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
             break;
         default:
             break;
@@ -24006,7 +24006,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, arg1));
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
             break;
         default:
             break;
@@ -24327,13 +24327,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -24358,49 +24358,49 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::BasicIdentification::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, basicIdentification));
+        ReturnErrorOnFailure(DataModel::Decode(reader, basicIdentification));
         break;
     case Attributes::CompanyName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, companyName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, companyName));
         break;
     case Attributes::CompanyId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, companyId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, companyId));
         break;
     case Attributes::BrandName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, brandName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, brandName));
         break;
     case Attributes::BrandId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, brandId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, brandId));
         break;
     case Attributes::Model::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, model));
+        ReturnErrorOnFailure(DataModel::Decode(reader, model));
         break;
     case Attributes::PartNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partNumber));
         break;
     case Attributes::ProductRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productRevision));
         break;
     case Attributes::SoftwareRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, softwareRevision));
         break;
     case Attributes::ProductTypeName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productTypeName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productTypeName));
         break;
     case Attributes::ProductTypeId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productTypeId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productTypeId));
         break;
     case Attributes::CecedSpecificationVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, cecedSpecificationVersion));
+        ReturnErrorOnFailure(DataModel::Decode(reader, cecedSpecificationVersion));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -24425,49 +24425,49 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CompanyName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, companyName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, companyName));
         break;
     case Attributes::MeterTypeId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, meterTypeId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, meterTypeId));
         break;
     case Attributes::DataQualityId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dataQualityId));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dataQualityId));
         break;
     case Attributes::CustomerName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, customerName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, customerName));
         break;
     case Attributes::Model::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, model));
+        ReturnErrorOnFailure(DataModel::Decode(reader, model));
         break;
     case Attributes::PartNumber::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, partNumber));
+        ReturnErrorOnFailure(DataModel::Decode(reader, partNumber));
         break;
     case Attributes::ProductRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, productRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, productRevision));
         break;
     case Attributes::SoftwareRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, softwareRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, softwareRevision));
         break;
     case Attributes::UtilityName::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, utilityName));
+        ReturnErrorOnFailure(DataModel::Decode(reader, utilityName));
         break;
     case Attributes::Pod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, pod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, pod));
         break;
     case Attributes::AvailablePower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, availablePower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, availablePower));
         break;
     case Attributes::PowerThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerThreshold));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerThreshold));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -24636,13 +24636,13 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -24899,19 +24899,19 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LogMaxSize::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, logMaxSize));
+        ReturnErrorOnFailure(DataModel::Decode(reader, logMaxSize));
         break;
     case Attributes::LogQueueMaxSize::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, logQueueMaxSize));
+        ReturnErrorOnFailure(DataModel::Decode(reader, logQueueMaxSize));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
@@ -25112,397 +25112,397 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasurementType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measurementType));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementType));
         break;
     case Attributes::DcVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcVoltage));
         break;
     case Attributes::DcVoltageMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcVoltageMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcVoltageMin));
         break;
     case Attributes::DcVoltageMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcVoltageMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcVoltageMax));
         break;
     case Attributes::DcCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcCurrent));
         break;
     case Attributes::DcCurrentMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcCurrentMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcCurrentMin));
         break;
     case Attributes::DcCurrentMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcCurrentMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcCurrentMax));
         break;
     case Attributes::DcPower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcPower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcPower));
         break;
     case Attributes::DcPowerMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcPowerMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcPowerMin));
         break;
     case Attributes::DcPowerMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcPowerMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcPowerMax));
         break;
     case Attributes::DcVoltageMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcVoltageMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcVoltageMultiplier));
         break;
     case Attributes::DcVoltageDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcVoltageDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcVoltageDivisor));
         break;
     case Attributes::DcCurrentMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcCurrentMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcCurrentMultiplier));
         break;
     case Attributes::DcCurrentDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcCurrentDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcCurrentDivisor));
         break;
     case Attributes::DcPowerMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcPowerMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcPowerMultiplier));
         break;
     case Attributes::DcPowerDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, dcPowerDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, dcPowerDivisor));
         break;
     case Attributes::AcFrequency::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acFrequency));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acFrequency));
         break;
     case Attributes::AcFrequencyMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acFrequencyMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acFrequencyMin));
         break;
     case Attributes::AcFrequencyMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acFrequencyMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acFrequencyMax));
         break;
     case Attributes::NeutralCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, neutralCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, neutralCurrent));
         break;
     case Attributes::TotalActivePower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, totalActivePower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, totalActivePower));
         break;
     case Attributes::TotalReactivePower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, totalReactivePower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, totalReactivePower));
         break;
     case Attributes::TotalApparentPower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, totalApparentPower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, totalApparentPower));
         break;
     case Attributes::Measured1stHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measured1stHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measured1stHarmonicCurrent));
         break;
     case Attributes::Measured3rdHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measured3rdHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measured3rdHarmonicCurrent));
         break;
     case Attributes::Measured5thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measured5thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measured5thHarmonicCurrent));
         break;
     case Attributes::Measured7thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measured7thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measured7thHarmonicCurrent));
         break;
     case Attributes::Measured9thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measured9thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measured9thHarmonicCurrent));
         break;
     case Attributes::Measured11thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measured11thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measured11thHarmonicCurrent));
         break;
     case Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredPhase1stHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredPhase1stHarmonicCurrent));
         break;
     case Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredPhase3rdHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredPhase3rdHarmonicCurrent));
         break;
     case Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredPhase5thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredPhase5thHarmonicCurrent));
         break;
     case Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredPhase7thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredPhase7thHarmonicCurrent));
         break;
     case Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredPhase9thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredPhase9thHarmonicCurrent));
         break;
     case Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, measuredPhase11thHarmonicCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredPhase11thHarmonicCurrent));
         break;
     case Attributes::AcFrequencyMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acFrequencyMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acFrequencyMultiplier));
         break;
     case Attributes::AcFrequencyDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acFrequencyDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acFrequencyDivisor));
         break;
     case Attributes::PowerMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerMultiplier));
         break;
     case Attributes::PowerDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerDivisor));
         break;
     case Attributes::HarmonicCurrentMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, harmonicCurrentMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, harmonicCurrentMultiplier));
         break;
     case Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, phaseHarmonicCurrentMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, phaseHarmonicCurrentMultiplier));
         break;
     case Attributes::InstantaneousVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, instantaneousVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, instantaneousVoltage));
         break;
     case Attributes::InstantaneousLineCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, instantaneousLineCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, instantaneousLineCurrent));
         break;
     case Attributes::InstantaneousActiveCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, instantaneousActiveCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, instantaneousActiveCurrent));
         break;
     case Attributes::InstantaneousReactiveCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, instantaneousReactiveCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, instantaneousReactiveCurrent));
         break;
     case Attributes::InstantaneousPower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, instantaneousPower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, instantaneousPower));
         break;
     case Attributes::RmsVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltage));
         break;
     case Attributes::RmsVoltageMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageMin));
         break;
     case Attributes::RmsVoltageMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageMax));
         break;
     case Attributes::RmsCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrent));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrent));
         break;
     case Attributes::RmsCurrentMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentMin));
         break;
     case Attributes::RmsCurrentMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentMax));
         break;
     case Attributes::ActivePower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePower));
         break;
     case Attributes::ActivePowerMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerMin));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerMin));
         break;
     case Attributes::ActivePowerMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerMax));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerMax));
         break;
     case Attributes::ReactivePower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reactivePower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reactivePower));
         break;
     case Attributes::ApparentPower::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, apparentPower));
+        ReturnErrorOnFailure(DataModel::Decode(reader, apparentPower));
         break;
     case Attributes::PowerFactor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerFactor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerFactor));
         break;
     case Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsVoltageMeasurementPeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsVoltageMeasurementPeriod));
         break;
     case Attributes::AverageRmsUnderVoltageCounter::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsUnderVoltageCounter));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsUnderVoltageCounter));
         break;
     case Attributes::RmsExtremeOverVoltagePeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeOverVoltagePeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeOverVoltagePeriod));
         break;
     case Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeUnderVoltagePeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeUnderVoltagePeriod));
         break;
     case Attributes::RmsVoltageSagPeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSagPeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSagPeriod));
         break;
     case Attributes::RmsVoltageSwellPeriod::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSwellPeriod));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSwellPeriod));
         break;
     case Attributes::AcVoltageMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acVoltageMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acVoltageMultiplier));
         break;
     case Attributes::AcVoltageDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acVoltageDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acVoltageDivisor));
         break;
     case Attributes::AcCurrentMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCurrentMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCurrentMultiplier));
         break;
     case Attributes::AcCurrentDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCurrentDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCurrentDivisor));
         break;
     case Attributes::AcPowerMultiplier::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acPowerMultiplier));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acPowerMultiplier));
         break;
     case Attributes::AcPowerDivisor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acPowerDivisor));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acPowerDivisor));
         break;
     case Attributes::OverloadAlarmsMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, overloadAlarmsMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, overloadAlarmsMask));
         break;
     case Attributes::VoltageOverload::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, voltageOverload));
+        ReturnErrorOnFailure(DataModel::Decode(reader, voltageOverload));
         break;
     case Attributes::CurrentOverload::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, currentOverload));
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentOverload));
         break;
     case Attributes::AcOverloadAlarmsMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acOverloadAlarmsMask));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acOverloadAlarmsMask));
         break;
     case Attributes::AcVoltageOverload::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acVoltageOverload));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acVoltageOverload));
         break;
     case Attributes::AcCurrentOverload::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acCurrentOverload));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCurrentOverload));
         break;
     case Attributes::AcActivePowerOverload::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acActivePowerOverload));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acActivePowerOverload));
         break;
     case Attributes::AcReactivePowerOverload::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, acReactivePowerOverload));
+        ReturnErrorOnFailure(DataModel::Decode(reader, acReactivePowerOverload));
         break;
     case Attributes::AverageRmsOverVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsOverVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsOverVoltage));
         break;
     case Attributes::AverageRmsUnderVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsUnderVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsUnderVoltage));
         break;
     case Attributes::RmsExtremeOverVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeOverVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeOverVoltage));
         break;
     case Attributes::RmsExtremeUnderVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeUnderVoltage));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeUnderVoltage));
         break;
     case Attributes::RmsVoltageSag::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSag));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSag));
         break;
     case Attributes::RmsVoltageSwell::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSwell));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSwell));
         break;
     case Attributes::LineCurrentPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lineCurrentPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lineCurrentPhaseB));
         break;
     case Attributes::ActiveCurrentPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeCurrentPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeCurrentPhaseB));
         break;
     case Attributes::ReactiveCurrentPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reactiveCurrentPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reactiveCurrentPhaseB));
         break;
     case Attributes::RmsVoltagePhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltagePhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltagePhaseB));
         break;
     case Attributes::RmsVoltageMinPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageMinPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageMinPhaseB));
         break;
     case Attributes::RmsVoltageMaxPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageMaxPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageMaxPhaseB));
         break;
     case Attributes::RmsCurrentPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentPhaseB));
         break;
     case Attributes::RmsCurrentMinPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentMinPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentMinPhaseB));
         break;
     case Attributes::RmsCurrentMaxPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentMaxPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentMaxPhaseB));
         break;
     case Attributes::ActivePowerPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerPhaseB));
         break;
     case Attributes::ActivePowerMinPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerMinPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerMinPhaseB));
         break;
     case Attributes::ActivePowerMaxPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerMaxPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerMaxPhaseB));
         break;
     case Attributes::ReactivePowerPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reactivePowerPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reactivePowerPhaseB));
         break;
     case Attributes::ApparentPowerPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, apparentPowerPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, apparentPowerPhaseB));
         break;
     case Attributes::PowerFactorPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerFactorPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerFactorPhaseB));
         break;
     case Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsVoltageMeasurementPeriodPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsVoltageMeasurementPeriodPhaseB));
         break;
     case Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsOverVoltageCounterPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsOverVoltageCounterPhaseB));
         break;
     case Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsUnderVoltageCounterPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsUnderVoltageCounterPhaseB));
         break;
     case Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeOverVoltagePeriodPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeOverVoltagePeriodPhaseB));
         break;
     case Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeUnderVoltagePeriodPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeUnderVoltagePeriodPhaseB));
         break;
     case Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSagPeriodPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSagPeriodPhaseB));
         break;
     case Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSwellPeriodPhaseB));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSwellPeriodPhaseB));
         break;
     case Attributes::LineCurrentPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, lineCurrentPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, lineCurrentPhaseC));
         break;
     case Attributes::ActiveCurrentPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activeCurrentPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeCurrentPhaseC));
         break;
     case Attributes::ReactiveCurrentPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reactiveCurrentPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reactiveCurrentPhaseC));
         break;
     case Attributes::RmsVoltagePhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltagePhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltagePhaseC));
         break;
     case Attributes::RmsVoltageMinPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageMinPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageMinPhaseC));
         break;
     case Attributes::RmsVoltageMaxPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageMaxPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageMaxPhaseC));
         break;
     case Attributes::RmsCurrentPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentPhaseC));
         break;
     case Attributes::RmsCurrentMinPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentMinPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentMinPhaseC));
         break;
     case Attributes::RmsCurrentMaxPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsCurrentMaxPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsCurrentMaxPhaseC));
         break;
     case Attributes::ActivePowerPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerPhaseC));
         break;
     case Attributes::ActivePowerMinPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerMinPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerMinPhaseC));
         break;
     case Attributes::ActivePowerMaxPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, activePowerMaxPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, activePowerMaxPhaseC));
         break;
     case Attributes::ReactivePowerPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, reactivePowerPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, reactivePowerPhaseC));
         break;
     case Attributes::ApparentPowerPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, apparentPowerPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, apparentPowerPhaseC));
         break;
     case Attributes::PowerFactorPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, powerFactorPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, powerFactorPhaseC));
         break;
     case Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsVoltageMeasurementPeriodPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsVoltageMeasurementPeriodPhaseC));
         break;
     case Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsOverVoltageCounterPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsOverVoltageCounterPhaseC));
         break;
     case Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, averageRmsUnderVoltageCounterPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageRmsUnderVoltageCounterPhaseC));
         break;
     case Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeOverVoltagePeriodPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeOverVoltagePeriodPhaseC));
         break;
     case Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsExtremeUnderVoltagePeriodPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsExtremeUnderVoltagePeriodPhaseC));
         break;
     case Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSagPeriodPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSagPeriodPhaseC));
         break;
     case Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, rmsVoltageSwellPeriodPhaseC));
+        ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSwellPeriodPhaseC));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, attributeList));
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, featureMap));
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
         break;
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, clusterRevision));
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
         break;
     default:
         break;
