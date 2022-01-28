@@ -55,11 +55,6 @@
             "output": "src/controller/java/zap-generated/CHIPCallbackTypes.h"
         },
         {
-            "path": "CHIPClusters-JNI.zapt",
-            "name": "CHIP ZCL API for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPClusters-JNI.cpp"
-        },
-        {
             "path": "CHIPClustersWrite-JNI.zapt",
             "name": "CHIP ZCL API for Java (native code for writes)",
             "output": "src/controller/java/zap-generated/CHIPClustersWrite-JNI.cpp"
