@@ -96,9 +96,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     return CHIP_NO_ERROR;
 }
 
-bool AutoCommissioner::NetworkClusterUseable() {
-    return (mNetworkTechnology.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface) && mParams.GetWiFiCredentials().HasValue()) ||
-           (mNetworkTechnology.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface) && mParams.GetThreadOperationalDataset().HasValue());
+bool AutoCommissioner::NetworkClusterUseable()
+{
+    return (mNetworkTechnology.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface) &&
+            mParams.GetWiFiCredentials().HasValue()) ||
+        (mNetworkTechnology.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface) &&
+         mParams.GetThreadOperationalDataset().HasValue());
 }
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
@@ -109,7 +112,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     }
 
     bool checkNetworkTechnology = false;
-    if (currentStage == CommissioningStage::kCheckEndpointIsCommissionable  && mNeedsNetworkSetup && mNetworkEndpoint == mEndpoint) {
+    if (currentStage == CommissioningStage::kCheckEndpointIsCommissionable && mNeedsNetworkSetup && mNetworkEndpoint == mEndpoint)
+    {
         // We found a networking cluster on the current endpoint, but have not yet checked the feature map to
         // see what network technologies are supported.
         checkNetworkTechnology = true;
@@ -129,25 +133,32 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kGetPartsList:
         return CommissioningStage::kCheckEndpointIsCommissionable;
     case CommissioningStage::kCheckEndpointIsCommissionable:
-        if (checkNetworkTechnology) {
+        if (checkNetworkTechnology)
+        {
             return CommissioningStage::kGetNetworkTechnology;
-        } else {
+        }
+        else
+        {
             return CommissioningStage::kArmFailsafe;
         }
     case CommissioningStage::kGetNetworkTechnology:
-        if (mNeedsNetworkSetup && !NetworkClusterUseable()) {
+        if (mNeedsNetworkSetup && !NetworkClusterUseable())
+        {
             if (mAllEndpoints.numEndpoints > 0)
             {
                 // Cycle through the list of endpoints from the end, checking for network cluster.
                 mEndpoint = mAllEndpoints.endpoints[--mAllEndpoints.numEndpoints];
                 return CommissioningStage::kCheckEndpointIsCommissionable;
             }
-            else {
+            else
+            {
                 ChipLogError(Controller, "Unable to find a suitable network commissioning cluster for the given parameters");
                 lastErr = CHIP_ERROR_INVALID_ARGUMENT;
                 return CommissioningStage::kCleanup;
             }
-        } else {
+        }
+        else
+        {
             return CommissioningStage::kArmFailsafe;
         }
     case CommissioningStage::kArmFailsafe:
