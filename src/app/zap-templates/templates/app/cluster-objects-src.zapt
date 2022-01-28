@@ -77,7 +77,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, const Concret
     {
 {{#zcl_attributes_server}}
     case Attributes::{{asUpperCamelCase label}}::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, {{asLowerCamelCase label}}));
+        ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
         break;
 {{/zcl_attributes_server}}
     default:
@@ -112,7 +112,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         {
             {{#zcl_event_fields}}
         case to_underlying(Fields::k{{asUpperCamelCase name}}):
-            ReturnErrorOnFailure(DataModel::DecodeWithoutFabricIndex(reader, {{asLowerCamelCase name}}));
+            ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase name}}));
             break;
             {{/zcl_event_fields}}
         default:

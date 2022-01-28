@@ -118,9 +118,29 @@ template <typename X,
                                                                                        std::declval<Optional<FabricIndex> &>())),
                                                      CHIP_ERROR>::value,
                                     X> * = nullptr>
-CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, const FabricIndex & overwriteFabricIndex)
 {
-    return x.Decode(reader, overwriteFabricIndex);
+    return x.Decode(reader, MakeOptional(overwriteFabricIndex));
+}
+
+/*
+ * @brief
+ *
+ * This specific variant that decodes fabric scoped cluster objects (like structs, commands, events) from TLV depends on the
+ * presence of a Decode method on the object to present. The signature of that method is as follows:
+ *
+ * CHIP_ERROR <Object>::Decode(TLVReader &reader, Optional<FabricIndex> &overwriteFabricIndex);
+ *
+ */
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(),
+                                                                                       std::declval<Optional<FabricIndex> &>())),
+                                                     CHIP_ERROR>::value,
+                                    X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
+{
+    return x.Decode(reader, NullOptional);
 }
 
 /*

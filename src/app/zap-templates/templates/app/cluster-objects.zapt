@@ -7,7 +7,6 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
-#include <app/data-model/DecodeWithoutFabricIndex.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/support/BitFlags.h>

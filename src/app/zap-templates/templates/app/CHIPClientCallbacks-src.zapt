@@ -6,7 +6,7 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/data-model/DecodeWithoutFabricIndex.h>
+#include <app/data-model/Decode.h>
 #include <app/util/af.h>
 #include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
@@ -128,7 +128,7 @@ app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInsta
 void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     {{zapTypeToDecodableClusterObjectType type ns=parent.name}} list;
-    CHIP_ERROR err = DecodeWithoutFabricIndex(*tlvData, list);
+    CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
