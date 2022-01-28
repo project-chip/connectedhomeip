@@ -189,7 +189,7 @@ public:
 class Test_TC_BI_1_1 : public TestCommand
 {
 public:
-    Test_TC_BI_1_1() : TestCommand("Test_TC_BI_1_1"), mTestIndex(0)
+    Test_TC_BI_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -441,7 +441,7 @@ private:
 class Test_TC_BI_2_1 : public TestCommand
 {
 public:
-    Test_TC_BI_2_1() : TestCommand("Test_TC_BI_2_1"), mTestIndex(0)
+    Test_TC_BI_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -914,7 +914,7 @@ private:
 class Test_TC_BI_2_2 : public TestCommand
 {
 public:
-    Test_TC_BI_2_2() : TestCommand("Test_TC_BI_2_2"), mTestIndex(0)
+    Test_TC_BI_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1325,7 +1325,8 @@ private:
 class Test_TC_BOOL_1_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_1_1() : TestCommand("Test_TC_BOOL_1_1"), mTestIndex(0)
+    Test_TC_BOOL_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BOOL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1577,7 +1578,8 @@ private:
 class Test_TC_BOOL_2_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_2_1() : TestCommand("Test_TC_BOOL_2_1"), mTestIndex(0)
+    Test_TC_BOOL_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BOOL_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1792,7 +1794,8 @@ private:
 class Test_TC_BRAC_1_1 : public TestCommand
 {
 public:
-    Test_TC_BRAC_1_1() : TestCommand("Test_TC_BRAC_1_1"), mTestIndex(0)
+    Test_TC_BRAC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BRAC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1934,7 +1937,7 @@ private:
 class Test_TC_CC_1_1 : public TestCommand
 {
 public:
-    Test_TC_CC_1_1() : TestCommand("Test_TC_CC_1_1"), mTestIndex(0)
+    Test_TC_CC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -2110,7 +2113,7 @@ private:
 class Test_TC_CC_2_1 : public TestCommand
 {
 public:
-    Test_TC_CC_2_1() : TestCommand("Test_TC_CC_2_1"), mTestIndex(0)
+    Test_TC_CC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -7844,7 +7847,7 @@ private:
 class Test_TC_CC_3_1 : public TestCommand
 {
 public:
-    Test_TC_CC_3_1() : TestCommand("Test_TC_CC_3_1"), mTestIndex(0)
+    Test_TC_CC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8193,7 +8196,7 @@ private:
 class Test_TC_CC_3_2 : public TestCommand
 {
 public:
-    Test_TC_CC_3_2() : TestCommand("Test_TC_CC_3_2"), mTestIndex(0)
+    Test_TC_CC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8538,7 +8541,7 @@ private:
 class Test_TC_CC_3_3 : public TestCommand
 {
 public:
-    Test_TC_CC_3_3() : TestCommand("Test_TC_CC_3_3"), mTestIndex(0)
+    Test_TC_CC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8815,7 +8818,7 @@ private:
 class Test_TC_CC_4_1 : public TestCommand
 {
 public:
-    Test_TC_CC_4_1() : TestCommand("Test_TC_CC_4_1"), mTestIndex(0)
+    Test_TC_CC_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9055,7 +9058,7 @@ private:
 class Test_TC_CC_4_2 : public TestCommand
 {
 public:
-    Test_TC_CC_4_2() : TestCommand("Test_TC_CC_4_2"), mTestIndex(0)
+    Test_TC_CC_4_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9470,7 +9473,7 @@ private:
 class Test_TC_CC_4_3 : public TestCommand
 {
 public:
-    Test_TC_CC_4_3() : TestCommand("Test_TC_CC_4_3"), mTestIndex(0)
+    Test_TC_CC_4_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9747,7 +9750,7 @@ private:
 class Test_TC_CC_4_4 : public TestCommand
 {
 public:
-    Test_TC_CC_4_4() : TestCommand("Test_TC_CC_4_4"), mTestIndex(0)
+    Test_TC_CC_4_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9988,7 +9991,7 @@ private:
 class Test_TC_CC_5_1 : public TestCommand
 {
 public:
-    Test_TC_CC_5_1() : TestCommand("Test_TC_CC_5_1"), mTestIndex(0)
+    Test_TC_CC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10229,7 +10232,7 @@ private:
 class Test_TC_CC_5_2 : public TestCommand
 {
 public:
-    Test_TC_CC_5_2() : TestCommand("Test_TC_CC_5_2"), mTestIndex(0)
+    Test_TC_CC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10502,7 +10505,7 @@ private:
 class Test_TC_CC_5_3 : public TestCommand
 {
 public:
-    Test_TC_CC_5_3() : TestCommand("Test_TC_CC_5_3"), mTestIndex(0)
+    Test_TC_CC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10743,7 +10746,7 @@ private:
 class Test_TC_CC_6_1 : public TestCommand
 {
 public:
-    Test_TC_CC_6_1() : TestCommand("Test_TC_CC_6_1"), mTestIndex(0)
+    Test_TC_CC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10983,7 +10986,7 @@ private:
 class Test_TC_CC_6_2 : public TestCommand
 {
 public:
-    Test_TC_CC_6_2() : TestCommand("Test_TC_CC_6_2"), mTestIndex(0)
+    Test_TC_CC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11299,7 +11302,7 @@ private:
 class Test_TC_CC_6_3 : public TestCommand
 {
 public:
-    Test_TC_CC_6_3() : TestCommand("Test_TC_CC_6_3"), mTestIndex(0)
+    Test_TC_CC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11580,7 +11583,7 @@ private:
 class Test_TC_CC_7_1 : public TestCommand
 {
 public:
-    Test_TC_CC_7_1() : TestCommand("Test_TC_CC_7_1"), mTestIndex(0)
+    Test_TC_CC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11860,7 +11863,7 @@ private:
 class Test_TC_CC_7_2 : public TestCommand
 {
 public:
-    Test_TC_CC_7_2() : TestCommand("Test_TC_CC_7_2"), mTestIndex(0)
+    Test_TC_CC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12205,7 +12208,7 @@ private:
 class Test_TC_CC_7_3 : public TestCommand
 {
 public:
-    Test_TC_CC_7_3() : TestCommand("Test_TC_CC_7_3"), mTestIndex(0)
+    Test_TC_CC_7_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12482,7 +12485,7 @@ private:
 class Test_TC_CC_7_4 : public TestCommand
 {
 public:
-    Test_TC_CC_7_4() : TestCommand("Test_TC_CC_7_4"), mTestIndex(0)
+    Test_TC_CC_7_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12723,7 +12726,7 @@ private:
 class Test_TC_CC_8_1 : public TestCommand
 {
 public:
-    Test_TC_CC_8_1() : TestCommand("Test_TC_CC_8_1"), mTestIndex(0)
+    Test_TC_CC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_8_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -13385,7 +13388,7 @@ private:
 class Test_TC_CC_9_1 : public TestCommand
 {
 public:
-    Test_TC_CC_9_1() : TestCommand("Test_TC_CC_9_1"), mTestIndex(0)
+    Test_TC_CC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -14937,7 +14940,7 @@ private:
 class Test_TC_CC_9_2 : public TestCommand
 {
 public:
-    Test_TC_CC_9_2() : TestCommand("Test_TC_CC_9_2"), mTestIndex(0)
+    Test_TC_CC_9_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -15578,7 +15581,7 @@ private:
 class Test_TC_CC_9_3 : public TestCommand
 {
 public:
-    Test_TC_CC_9_3() : TestCommand("Test_TC_CC_9_3"), mTestIndex(0)
+    Test_TC_CC_9_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16219,7 +16222,7 @@ private:
 class Test_TC_DD_1_5 : public TestCommand
 {
 public:
-    Test_TC_DD_1_5() : TestCommand("Test_TC_DD_1_5"), mTestIndex(0)
+    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16287,7 +16290,7 @@ private:
 class Test_TC_DD_1_6 : public TestCommand
 {
 public:
-    Test_TC_DD_1_6() : TestCommand("Test_TC_DD_1_6"), mTestIndex(0)
+    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16376,7 +16379,7 @@ private:
 class Test_TC_DD_1_7 : public TestCommand
 {
 public:
-    Test_TC_DD_1_7() : TestCommand("Test_TC_DD_1_7"), mTestIndex(0)
+    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16454,7 +16457,7 @@ private:
 class Test_TC_DD_1_8 : public TestCommand
 {
 public:
-    Test_TC_DD_1_8() : TestCommand("Test_TC_DD_1_8"), mTestIndex(0)
+    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16531,7 +16534,7 @@ private:
 class Test_TC_DD_1_9 : public TestCommand
 {
 public:
-    Test_TC_DD_1_9() : TestCommand("Test_TC_DD_1_9"), mTestIndex(0)
+    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16619,7 +16622,7 @@ private:
 class Test_TC_DM_1_1 : public TestCommand
 {
 public:
-    Test_TC_DM_1_1() : TestCommand("Test_TC_DM_1_1"), mTestIndex(0)
+    Test_TC_DM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17418,7 +17421,7 @@ private:
 class Test_TC_DM_3_1 : public TestCommand
 {
 public:
-    Test_TC_DM_3_1() : TestCommand("Test_TC_DM_3_1"), mTestIndex(0)
+    Test_TC_DM_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17485,7 +17488,7 @@ private:
 class Test_TC_DM_2_2 : public TestCommand
 {
 public:
-    Test_TC_DM_2_2() : TestCommand("Test_TC_DM_2_2"), mTestIndex(0)
+    Test_TC_DM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17716,7 +17719,7 @@ private:
 class Test_TC_EMR_1_1 : public TestCommand
 {
 public:
-    Test_TC_EMR_1_1() : TestCommand("Test_TC_EMR_1_1"), mTestIndex(0)
+    Test_TC_EMR_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_EMR_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17972,7 +17975,8 @@ private:
 class Test_TC_ETHDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_ETHDIAG_1_1() : TestCommand("Test_TC_ETHDIAG_1_1"), mTestIndex(0)
+    Test_TC_ETHDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18039,7 +18043,8 @@ private:
 class Test_TC_ETHDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_ETHDIAG_2_1() : TestCommand("Test_TC_ETHDIAG_2_1"), mTestIndex(0)
+    Test_TC_ETHDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18106,7 +18111,7 @@ private:
 class Test_TC_FLW_1_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_1_1() : TestCommand("Test_TC_FLW_1_1"), mTestIndex(0)
+    Test_TC_FLW_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18282,7 +18287,7 @@ private:
 class Test_TC_FLW_2_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_1() : TestCommand("Test_TC_FLW_2_1"), mTestIndex(0)
+    Test_TC_FLW_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18822,7 +18827,7 @@ private:
 class Test_TC_FLW_2_2 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_2() : TestCommand("Test_TC_FLW_2_2"), mTestIndex(0)
+    Test_TC_FLW_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18963,7 +18968,7 @@ private:
 class Test_TC_ILL_1_1 : public TestCommand
 {
 public:
-    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0)
+    Test_TC_ILL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -19220,7 +19225,7 @@ private:
 class Test_TC_LVL_1_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_1_1() : TestCommand("Test_TC_LVL_1_1"), mTestIndex(0)
+    Test_TC_LVL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -19543,7 +19548,7 @@ private:
 class Test_TC_LVL_2_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_1() : TestCommand("Test_TC_LVL_2_1"), mTestIndex(0)
+    Test_TC_LVL_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20144,7 +20149,7 @@ private:
 class Test_TC_LVL_2_2 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_2() : TestCommand("Test_TC_LVL_2_2"), mTestIndex(0)
+    Test_TC_LVL_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20757,7 +20762,7 @@ private:
 class Test_TC_LVL_3_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_3_1() : TestCommand("Test_TC_LVL_3_1"), mTestIndex(0)
+    Test_TC_LVL_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -21270,7 +21275,7 @@ private:
 class Test_TC_LVL_4_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0)
+    Test_TC_LVL_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_4_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -21818,7 +21823,7 @@ private:
 class Test_TC_LVL_5_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0)
+    Test_TC_LVL_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22244,7 +22249,7 @@ private:
 class Test_TC_LVL_6_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_6_1() : TestCommand("Test_TC_LVL_6_1"), mTestIndex(0)
+    Test_TC_LVL_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22617,7 +22622,7 @@ private:
 class Test_TC_MC_1_1 : public TestCommand
 {
 public:
-    Test_TC_MC_1_1() : TestCommand("Test_TC_MC_1_1"), mTestIndex(0)
+    Test_TC_MC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22793,7 +22798,7 @@ private:
 class Test_TC_MC_2_1 : public TestCommand
 {
 public:
-    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0)
+    Test_TC_MC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22891,7 +22896,7 @@ private:
 class Test_TC_MC_3_1 : public TestCommand
 {
 public:
-    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0)
+    Test_TC_MC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22958,7 +22963,7 @@ private:
 class Test_TC_MC_3_2 : public TestCommand
 {
 public:
-    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0)
+    Test_TC_MC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23025,7 +23030,7 @@ private:
 class Test_TC_MC_3_3 : public TestCommand
 {
 public:
-    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0)
+    Test_TC_MC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23092,7 +23097,7 @@ private:
 class Test_TC_MC_3_4 : public TestCommand
 {
 public:
-    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0)
+    Test_TC_MC_3_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23159,7 +23164,7 @@ private:
 class Test_TC_MC_3_5 : public TestCommand
 {
 public:
-    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0)
+    Test_TC_MC_3_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23226,7 +23231,7 @@ private:
 class Test_TC_MC_3_6 : public TestCommand
 {
 public:
-    Test_TC_MC_3_6() : TestCommand("Test_TC_MC_3_6"), mTestIndex(0)
+    Test_TC_MC_3_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_6", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23293,7 +23298,7 @@ private:
 class Test_TC_MC_3_7 : public TestCommand
 {
 public:
-    Test_TC_MC_3_7() : TestCommand("Test_TC_MC_3_7"), mTestIndex(0)
+    Test_TC_MC_3_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_7", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23360,7 +23365,7 @@ private:
 class Test_TC_MC_3_8 : public TestCommand
 {
 public:
-    Test_TC_MC_3_8() : TestCommand("Test_TC_MC_3_8"), mTestIndex(0)
+    Test_TC_MC_3_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_8", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23427,7 +23432,7 @@ private:
 class Test_TC_MC_3_9 : public TestCommand
 {
 public:
-    Test_TC_MC_3_9() : TestCommand("Test_TC_MC_3_9"), mTestIndex(0)
+    Test_TC_MC_3_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_9", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23494,7 +23499,7 @@ private:
 class Test_TC_MC_3_10 : public TestCommand
 {
 public:
-    Test_TC_MC_3_10() : TestCommand("Test_TC_MC_3_10"), mTestIndex(0)
+    Test_TC_MC_3_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_10", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23561,7 +23566,7 @@ private:
 class Test_TC_MC_3_11 : public TestCommand
 {
 public:
-    Test_TC_MC_3_11() : TestCommand("Test_TC_MC_3_11"), mTestIndex(0)
+    Test_TC_MC_3_11(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_11", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23628,7 +23633,7 @@ private:
 class Test_TC_MC_5_1 : public TestCommand
 {
 public:
-    Test_TC_MC_5_1() : TestCommand("Test_TC_MC_5_1"), mTestIndex(0)
+    Test_TC_MC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23735,7 +23740,7 @@ private:
 class Test_TC_MC_5_2 : public TestCommand
 {
 public:
-    Test_TC_MC_5_2() : TestCommand("Test_TC_MC_5_2"), mTestIndex(0)
+    Test_TC_MC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23812,7 +23817,7 @@ private:
 class Test_TC_MC_5_3 : public TestCommand
 {
 public:
-    Test_TC_MC_5_3() : TestCommand("Test_TC_MC_5_3"), mTestIndex(0)
+    Test_TC_MC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23889,7 +23894,7 @@ private:
 class Test_TC_MC_6_1 : public TestCommand
 {
 public:
-    Test_TC_MC_6_1() : TestCommand("Test_TC_MC_6_1"), mTestIndex(0)
+    Test_TC_MC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24034,7 +24039,7 @@ private:
 class Test_TC_MC_6_2 : public TestCommand
 {
 public:
-    Test_TC_MC_6_2() : TestCommand("Test_TC_MC_6_2"), mTestIndex(0)
+    Test_TC_MC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24209,7 +24214,7 @@ private:
 class Test_TC_MC_6_3 : public TestCommand
 {
 public:
-    Test_TC_MC_6_3() : TestCommand("Test_TC_MC_6_3"), mTestIndex(0)
+    Test_TC_MC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24306,7 +24311,7 @@ private:
 class Test_TC_MC_6_4 : public TestCommand
 {
 public:
-    Test_TC_MC_6_4() : TestCommand("Test_TC_MC_6_4"), mTestIndex(0)
+    Test_TC_MC_6_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24547,7 +24552,7 @@ private:
 class Test_TC_MC_7_1 : public TestCommand
 {
 public:
-    Test_TC_MC_7_1() : TestCommand("Test_TC_MC_7_1"), mTestIndex(0)
+    Test_TC_MC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24614,7 +24619,7 @@ private:
 class Test_TC_MC_7_2 : public TestCommand
 {
 public:
-    Test_TC_MC_7_2() : TestCommand("Test_TC_MC_7_2"), mTestIndex(0)
+    Test_TC_MC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24681,7 +24686,7 @@ private:
 class Test_TC_MC_8_1 : public TestCommand
 {
 public:
-    Test_TC_MC_8_1() : TestCommand("Test_TC_MC_8_1"), mTestIndex(0)
+    Test_TC_MC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24831,7 +24836,7 @@ private:
 class Test_TC_MC_9_1 : public TestCommand
 {
 public:
-    Test_TC_MC_9_1() : TestCommand("Test_TC_MC_9_1"), mTestIndex(0)
+    Test_TC_MC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_9_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25134,7 +25139,7 @@ private:
 class Test_TC_OCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_1_1() : TestCommand("Test_TC_OCC_1_1"), mTestIndex(0)
+    Test_TC_OCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25348,7 +25353,7 @@ private:
 class Test_TC_OCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_1() : TestCommand("Test_TC_OCC_2_1"), mTestIndex(0)
+    Test_TC_OCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25758,7 +25763,7 @@ private:
 class Test_TC_OCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_2() : TestCommand("Test_TC_OCC_2_2"), mTestIndex(0)
+    Test_TC_OCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25909,7 +25914,7 @@ private:
 class Test_TC_OO_1_1 : public TestCommand
 {
 public:
-    Test_TC_OO_1_1() : TestCommand("Test_TC_OO_1_1"), mTestIndex(0)
+    Test_TC_OO_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -26318,7 +26323,7 @@ private:
 class Test_TC_OO_2_1 : public TestCommand
 {
 public:
-    Test_TC_OO_2_1() : TestCommand("Test_TC_OO_2_1"), mTestIndex(0)
+    Test_TC_OO_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -26932,7 +26937,7 @@ private:
 class Test_TC_OO_2_2 : public TestCommand
 {
 public:
-    Test_TC_OO_2_2() : TestCommand("Test_TC_OO_2_2"), mTestIndex(0)
+    Test_TC_OO_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -27482,7 +27487,7 @@ private:
 class Test_TC_OO_2_3 : public TestCommand
 {
 public:
-    Test_TC_OO_2_3() : TestCommand("Test_TC_OO_2_3"), mTestIndex(0)
+    Test_TC_OO_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29358,7 +29363,7 @@ private:
 class Test_TC_PS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PS_1_1() : TestCommand("Test_TC_PS_1_1"), mTestIndex(0)
+    Test_TC_PS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29610,7 +29615,7 @@ private:
 class Test_TC_PRS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0)
+    Test_TC_PRS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29787,7 +29792,7 @@ private:
 class Test_TC_PRS_2_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0)
+    Test_TC_PRS_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -30187,7 +30192,7 @@ private:
 class Test_TC_PCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_1_1() : TestCommand("Test_TC_PCC_1_1"), mTestIndex(0)
+    Test_TC_PCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -30404,7 +30409,7 @@ private:
 class Test_TC_PCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_1() : TestCommand("Test_TC_PCC_2_1"), mTestIndex(0)
+    Test_TC_PCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32338,7 +32343,7 @@ private:
 class Test_TC_PCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_2() : TestCommand("Test_TC_PCC_2_2"), mTestIndex(0)
+    Test_TC_PCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32522,7 +32527,7 @@ private:
 class Test_TC_PCC_2_3 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_3() : TestCommand("Test_TC_PCC_2_3"), mTestIndex(0)
+    Test_TC_PCC_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32950,7 +32955,7 @@ private:
 class Test_TC_RH_1_1 : public TestCommand
 {
 public:
-    Test_TC_RH_1_1() : TestCommand("Test_TC_RH_1_1"), mTestIndex(0)
+    Test_TC_RH_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33129,7 +33134,7 @@ private:
 class Test_TC_RH_2_1 : public TestCommand
 {
 public:
-    Test_TC_RH_2_1() : TestCommand("Test_TC_RH_2_1"), mTestIndex(0)
+    Test_TC_RH_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33353,7 +33358,7 @@ private:
 class Test_TC_RH_2_2 : public TestCommand
 {
 public:
-    Test_TC_RH_2_2() : TestCommand("Test_TC_RH_2_2"), mTestIndex(0)
+    Test_TC_RH_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33506,7 +33511,8 @@ private:
 class Test_TC_SWTCH_2_1 : public TestCommand
 {
 public:
-    Test_TC_SWTCH_2_1() : TestCommand("Test_TC_SWTCH_2_1"), mTestIndex(0)
+    Test_TC_SWTCH_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWTCH_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33801,7 +33807,8 @@ private:
 class Test_TC_SWTCH_2_2 : public TestCommand
 {
 public:
-    Test_TC_SWTCH_2_2() : TestCommand("Test_TC_SWTCH_2_2"), mTestIndex(0)
+    Test_TC_SWTCH_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWTCH_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34294,7 +34301,7 @@ private:
 class Test_TC_TM_1_1 : public TestCommand
 {
 public:
-    Test_TC_TM_1_1() : TestCommand("Test_TC_TM_1_1"), mTestIndex(0)
+    Test_TC_TM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34551,7 +34558,7 @@ private:
 class Test_TC_TM_2_1 : public TestCommand
 {
 public:
-    Test_TC_TM_2_1() : TestCommand("Test_TC_TM_2_1"), mTestIndex(0)
+    Test_TC_TM_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34695,7 +34702,7 @@ private:
 class Test_TC_TM_2_2 : public TestCommand
 {
 public:
-    Test_TC_TM_2_2() : TestCommand("Test_TC_TM_2_2"), mTestIndex(0)
+    Test_TC_TM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34848,7 +34855,8 @@ private:
 class Test_TC_TSTAT_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_1_1() : TestCommand("Test_TC_TSTAT_1_1"), mTestIndex(0)
+    Test_TC_TSTAT_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -35061,7 +35069,8 @@ private:
 class Test_TC_TSTAT_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_1() : TestCommand("Test_TC_TSTAT_2_1"), mTestIndex(0)
+    Test_TC_TSTAT_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -37399,7 +37408,8 @@ private:
 class Test_TC_TSTAT_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_2() : TestCommand("Test_TC_TSTAT_2_2"), mTestIndex(0)
+    Test_TC_TSTAT_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -39482,7 +39492,8 @@ private:
 class Test_TC_TSUIC_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_1_1() : TestCommand("Test_TC_TSUIC_1_1"), mTestIndex(0)
+    Test_TC_TSUIC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -39662,7 +39673,8 @@ private:
 class Test_TC_TSUIC_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_1() : TestCommand("Test_TC_TSUIC_2_1"), mTestIndex(0)
+    Test_TC_TSUIC_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -40303,7 +40315,8 @@ private:
 class Test_TC_TSUIC_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_2() : TestCommand("Test_TC_TSUIC_2_2"), mTestIndex(0)
+    Test_TC_TSUIC_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -40766,7 +40779,8 @@ private:
 class Test_TC_DIAGTH_1_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGTH_1_1() : TestCommand("Test_TC_DIAGTH_1_1"), mTestIndex(0)
+    Test_TC_DIAGTH_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DIAGTH_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41023,7 +41037,8 @@ private:
 class Test_TC_WIFIDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_WIFIDIAG_1_1() : TestCommand("Test_TC_WIFIDIAG_1_1"), mTestIndex(0)
+    Test_TC_WIFIDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41167,7 +41182,8 @@ private:
 class Test_TC_WIFIDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_WIFIDIAG_3_1() : TestCommand("Test_TC_WIFIDIAG_3_1"), mTestIndex(0)
+    Test_TC_WIFIDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41234,7 +41250,8 @@ private:
 class Test_TC_WNCV_1_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_1_1() : TestCommand("Test_TC_WNCV_1_1"), mTestIndex(0)
+    Test_TC_WNCV_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41564,7 +41581,8 @@ private:
 class Test_TC_WNCV_2_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_1() : TestCommand("Test_TC_WNCV_2_1"), mTestIndex(0)
+    Test_TC_WNCV_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43736,7 +43754,8 @@ private:
 class Test_TC_WNCV_2_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_2() : TestCommand("Test_TC_WNCV_2_2"), mTestIndex(0)
+    Test_TC_WNCV_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43803,7 +43822,8 @@ private:
 class Test_TC_WNCV_2_4 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_4() : TestCommand("Test_TC_WNCV_2_4"), mTestIndex(0)
+    Test_TC_WNCV_2_4(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43957,7 +43977,8 @@ private:
 class Test_TC_WNCV_2_5 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_5() : TestCommand("Test_TC_WNCV_2_5"), mTestIndex(0)
+    Test_TC_WNCV_2_5(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44111,7 +44132,8 @@ private:
 class Test_TC_WNCV_3_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_1() : TestCommand("Test_TC_WNCV_3_1"), mTestIndex(0)
+    Test_TC_WNCV_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44278,7 +44300,8 @@ private:
 class Test_TC_WNCV_3_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_2() : TestCommand("Test_TC_WNCV_3_2"), mTestIndex(0)
+    Test_TC_WNCV_3_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44445,7 +44468,8 @@ private:
 class Test_TC_WNCV_3_3 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_3() : TestCommand("Test_TC_WNCV_3_3"), mTestIndex(0)
+    Test_TC_WNCV_3_3(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44612,7 +44636,8 @@ private:
 class TV_TargetNavigatorCluster : public TestCommand
 {
 public:
-    TV_TargetNavigatorCluster() : TestCommand("TV_TargetNavigatorCluster"), mTestIndex(0)
+    TV_TargetNavigatorCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_TargetNavigatorCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44812,7 +44837,8 @@ private:
 class TV_AudioOutputCluster : public TestCommand
 {
 public:
-    TV_AudioOutputCluster() : TestCommand("TV_AudioOutputCluster"), mTestIndex(0)
+    TV_AudioOutputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_AudioOutputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45043,7 +45069,8 @@ private:
 class TV_ApplicationLauncherCluster : public TestCommand
 {
 public:
-    TV_ApplicationLauncherCluster() : TestCommand("TV_ApplicationLauncherCluster"), mTestIndex(0)
+    TV_ApplicationLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ApplicationLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45280,7 +45307,8 @@ private:
 class TV_KeypadInputCluster : public TestCommand
 {
 public:
-    TV_KeypadInputCluster() : TestCommand("TV_KeypadInputCluster"), mTestIndex(0)
+    TV_KeypadInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_KeypadInputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45384,7 +45412,8 @@ private:
 class TV_AccountLoginCluster : public TestCommand
 {
 public:
-    TV_AccountLoginCluster() : TestCommand("TV_AccountLoginCluster"), mTestIndex(0)
+    TV_AccountLoginCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_AccountLoginCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45555,7 +45584,8 @@ private:
 class TV_WakeOnLanCluster : public TestCommand
 {
 public:
-    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0)
+    TV_WakeOnLanCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_WakeOnLanCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45660,7 +45690,8 @@ private:
 class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
-    TV_ApplicationBasicCluster() : TestCommand("TV_ApplicationBasicCluster"), mTestIndex(0)
+    TV_ApplicationBasicCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ApplicationBasicCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45955,7 +45986,8 @@ private:
 class TV_MediaPlaybackCluster : public TestCommand
 {
 public:
-    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0)
+    TV_MediaPlaybackCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_MediaPlaybackCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46649,7 +46681,8 @@ private:
 class TV_ChannelCluster : public TestCommand
 {
 public:
-    TV_ChannelCluster() : TestCommand("TV_ChannelCluster"), mTestIndex(0)
+    TV_ChannelCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ChannelCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46886,7 +46919,8 @@ private:
 class TV_LowPowerCluster : public TestCommand
 {
 public:
-    TV_LowPowerCluster() : TestCommand("TV_LowPowerCluster"), mTestIndex(0)
+    TV_LowPowerCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_LowPowerCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46984,7 +47018,8 @@ private:
 class TV_ContentLauncherCluster : public TestCommand
 {
 public:
-    TV_ContentLauncherCluster() : TestCommand("TV_ContentLauncherCluster"), mTestIndex(0)
+    TV_ContentLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ContentLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -47255,7 +47290,8 @@ private:
 class TV_MediaInputCluster : public TestCommand
 {
 public:
-    TV_MediaInputCluster() : TestCommand("TV_MediaInputCluster"), mTestIndex(0)
+    TV_MediaInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_MediaInputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -47545,7 +47581,7 @@ private:
 class TestCluster : public TestCommand
 {
 public:
-    TestCluster() : TestCommand("TestCluster"), mTestIndex(0)
+    TestCluster(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -65600,7 +65636,8 @@ private:
 class TestClusterComplexTypes : public TestCommand
 {
 public:
-    TestClusterComplexTypes() : TestCommand("TestClusterComplexTypes"), mTestIndex(0)
+    TestClusterComplexTypes(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestClusterComplexTypes", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -66500,7 +66537,7 @@ private:
 class TestConstraints : public TestCommand
 {
 public:
-    TestConstraints() : TestCommand("TestConstraints"), mTestIndex(0)
+    TestConstraints(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestConstraints", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67315,7 +67352,8 @@ private:
 class TestDelayCommands : public TestCommand
 {
 public:
-    TestDelayCommands() : TestCommand("TestDelayCommands"), mTestIndex(0)
+    TestDelayCommands(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestDelayCommands", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67392,7 +67430,7 @@ private:
 class TestLogCommands : public TestCommand
 {
 public:
-    TestLogCommands() : TestCommand("TestLogCommands"), mTestIndex(0)
+    TestLogCommands(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestLogCommands", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67479,7 +67517,7 @@ private:
 class TestSaveAs : public TestCommand
 {
 public:
-    TestSaveAs() : TestCommand("TestSaveAs"), mTestIndex(0)
+    TestSaveAs(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestSaveAs", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -71581,7 +71619,8 @@ private:
 class TestConfigVariables : public TestCommand
 {
 public:
-    TestConfigVariables() : TestCommand("TestConfigVariables"), mTestIndex(0)
+    TestConfigVariables(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestConfigVariables", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -71731,7 +71770,8 @@ private:
 class TestDescriptorCluster : public TestCommand
 {
 public:
-    TestDescriptorCluster() : TestCommand("TestDescriptorCluster"), mTestIndex(0)
+    TestDescriptorCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestDescriptorCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72024,7 +72064,8 @@ private:
 class TestBasicInformation : public TestCommand
 {
 public:
-    TestBasicInformation() : TestCommand("TestBasicInformation"), mTestIndex(0)
+    TestBasicInformation(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestBasicInformation", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72316,7 +72357,8 @@ private:
 class TestIdentifyCluster : public TestCommand
 {
 public:
-    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0)
+    TestIdentifyCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestIdentifyCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72415,7 +72457,8 @@ private:
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
-    TestOperationalCredentialsCluster() : TestCommand("TestOperationalCredentialsCluster"), mTestIndex(0)
+    TestOperationalCredentialsCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestOperationalCredentialsCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72599,7 +72642,8 @@ private:
 class TestModeSelectCluster : public TestCommand
 {
 public:
-    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0)
+    TestModeSelectCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestModeSelectCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72980,7 +73024,8 @@ private:
 class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_1_1() : TestCommand("Test_TC_SWDIAG_1_1"), mTestIndex(0)
+    Test_TC_SWDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73169,7 +73214,8 @@ private:
 class Test_TC_SWDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_2_1() : TestCommand("Test_TC_SWDIAG_2_1"), mTestIndex(0)
+    Test_TC_SWDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73226,7 +73272,8 @@ private:
 class Test_TC_SWDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_3_1() : TestCommand("Test_TC_SWDIAG_3_1"), mTestIndex(0)
+    Test_TC_SWDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73380,7 +73427,8 @@ private:
 class TestSubscribe_OnOff : public TestCommand
 {
 public:
-    TestSubscribe_OnOff() : TestCommand("TestSubscribe_OnOff"), mTestIndex(0)
+    TestSubscribe_OnOff(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestSubscribe_OnOff", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73721,7 +73769,8 @@ private:
 class DL_UsersAndCredentials : public TestCommand
 {
 public:
-    DL_UsersAndCredentials() : TestCommand("DL_UsersAndCredentials"), mTestIndex(0)
+    DL_UsersAndCredentials(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("DL_UsersAndCredentials", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -79046,7 +79095,7 @@ private:
 class DL_LockUnlock : public TestCommand
 {
 public:
-    DL_LockUnlock() : TestCommand("DL_LockUnlock"), mTestIndex(0)
+    DL_LockUnlock(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_LockUnlock", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -79495,7 +79544,8 @@ private:
 class TestGroupMessaging : public TestCommand
 {
 public:
-    TestGroupMessaging() : TestCommand("TestGroupMessaging"), mTestIndex(0)
+    TestGroupMessaging(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupMessaging", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -79867,7 +79917,8 @@ private:
 class TestGroupsCluster : public TestCommand
 {
 public:
-    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0)
+    TestGroupsCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupsCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -80662,7 +80713,8 @@ private:
 class TestGroupDemoCommand : public TestCommand
 {
 public:
-    TestGroupDemoCommand() : TestCommand("TestGroupDemoCommand"), mTestIndex(0)
+    TestGroupDemoCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoCommand", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -81189,7 +81241,8 @@ private:
 class TestGroupDemoConfig : public TestCommand
 {
 public:
-    TestGroupDemoConfig() : TestCommand("TestGroupDemoConfig"), mTestIndex(0)
+    TestGroupDemoConfig(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoConfig", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -81296,7 +81349,8 @@ private:
 class TestGroupKeyManagementCluster : public TestCommand
 {
 public:
-    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0)
+    TestGroupKeyManagementCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupKeyManagementCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -81438,161 +81492,161 @@ private:
     }
 };
 
-void registerCommandsTests(Commands & commands)
+void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
-        make_unique<Test_TC_BI_1_1>(),
-        make_unique<Test_TC_BI_2_1>(),
-        make_unique<Test_TC_BI_2_2>(),
-        make_unique<Test_TC_BOOL_1_1>(),
-        make_unique<Test_TC_BOOL_2_1>(),
-        make_unique<Test_TC_BRAC_1_1>(),
-        make_unique<Test_TC_CC_1_1>(),
-        make_unique<Test_TC_CC_2_1>(),
-        make_unique<Test_TC_CC_3_1>(),
-        make_unique<Test_TC_CC_3_2>(),
-        make_unique<Test_TC_CC_3_3>(),
-        make_unique<Test_TC_CC_4_1>(),
-        make_unique<Test_TC_CC_4_2>(),
-        make_unique<Test_TC_CC_4_3>(),
-        make_unique<Test_TC_CC_4_4>(),
-        make_unique<Test_TC_CC_5_1>(),
-        make_unique<Test_TC_CC_5_2>(),
-        make_unique<Test_TC_CC_5_3>(),
-        make_unique<Test_TC_CC_6_1>(),
-        make_unique<Test_TC_CC_6_2>(),
-        make_unique<Test_TC_CC_6_3>(),
-        make_unique<Test_TC_CC_7_1>(),
-        make_unique<Test_TC_CC_7_2>(),
-        make_unique<Test_TC_CC_7_3>(),
-        make_unique<Test_TC_CC_7_4>(),
-        make_unique<Test_TC_CC_8_1>(),
-        make_unique<Test_TC_CC_9_1>(),
-        make_unique<Test_TC_CC_9_2>(),
-        make_unique<Test_TC_CC_9_3>(),
-        make_unique<Test_TC_DD_1_5>(),
-        make_unique<Test_TC_DD_1_6>(),
-        make_unique<Test_TC_DD_1_7>(),
-        make_unique<Test_TC_DD_1_8>(),
-        make_unique<Test_TC_DD_1_9>(),
-        make_unique<Test_TC_DM_1_1>(),
-        make_unique<Test_TC_DM_3_1>(),
-        make_unique<Test_TC_DM_2_2>(),
-        make_unique<Test_TC_EMR_1_1>(),
-        make_unique<Test_TC_ETHDIAG_1_1>(),
-        make_unique<Test_TC_ETHDIAG_2_1>(),
-        make_unique<Test_TC_FLW_1_1>(),
-        make_unique<Test_TC_FLW_2_1>(),
-        make_unique<Test_TC_FLW_2_2>(),
-        make_unique<Test_TC_ILL_1_1>(),
-        make_unique<Test_TC_LVL_1_1>(),
-        make_unique<Test_TC_LVL_2_1>(),
-        make_unique<Test_TC_LVL_2_2>(),
-        make_unique<Test_TC_LVL_3_1>(),
-        make_unique<Test_TC_LVL_4_1>(),
-        make_unique<Test_TC_LVL_5_1>(),
-        make_unique<Test_TC_LVL_6_1>(),
-        make_unique<Test_TC_MC_1_1>(),
-        make_unique<Test_TC_MC_2_1>(),
-        make_unique<Test_TC_MC_3_1>(),
-        make_unique<Test_TC_MC_3_2>(),
-        make_unique<Test_TC_MC_3_3>(),
-        make_unique<Test_TC_MC_3_4>(),
-        make_unique<Test_TC_MC_3_5>(),
-        make_unique<Test_TC_MC_3_6>(),
-        make_unique<Test_TC_MC_3_7>(),
-        make_unique<Test_TC_MC_3_8>(),
-        make_unique<Test_TC_MC_3_9>(),
-        make_unique<Test_TC_MC_3_10>(),
-        make_unique<Test_TC_MC_3_11>(),
-        make_unique<Test_TC_MC_5_1>(),
-        make_unique<Test_TC_MC_5_2>(),
-        make_unique<Test_TC_MC_5_3>(),
-        make_unique<Test_TC_MC_6_1>(),
-        make_unique<Test_TC_MC_6_2>(),
-        make_unique<Test_TC_MC_6_3>(),
-        make_unique<Test_TC_MC_6_4>(),
-        make_unique<Test_TC_MC_7_1>(),
-        make_unique<Test_TC_MC_7_2>(),
-        make_unique<Test_TC_MC_8_1>(),
-        make_unique<Test_TC_MC_9_1>(),
-        make_unique<Test_TC_OCC_1_1>(),
-        make_unique<Test_TC_OCC_2_1>(),
-        make_unique<Test_TC_OCC_2_2>(),
-        make_unique<Test_TC_OO_1_1>(),
-        make_unique<Test_TC_OO_2_1>(),
-        make_unique<Test_TC_OO_2_2>(),
-        make_unique<Test_TC_OO_2_3>(),
-        make_unique<Test_TC_PS_1_1>(),
-        make_unique<Test_TC_PRS_1_1>(),
-        make_unique<Test_TC_PRS_2_1>(),
-        make_unique<Test_TC_PCC_1_1>(),
-        make_unique<Test_TC_PCC_2_1>(),
-        make_unique<Test_TC_PCC_2_2>(),
-        make_unique<Test_TC_PCC_2_3>(),
-        make_unique<Test_TC_RH_1_1>(),
-        make_unique<Test_TC_RH_2_1>(),
-        make_unique<Test_TC_RH_2_2>(),
-        make_unique<Test_TC_SWTCH_2_1>(),
-        make_unique<Test_TC_SWTCH_2_2>(),
-        make_unique<Test_TC_TM_1_1>(),
-        make_unique<Test_TC_TM_2_1>(),
-        make_unique<Test_TC_TM_2_2>(),
-        make_unique<Test_TC_TSTAT_1_1>(),
-        make_unique<Test_TC_TSTAT_2_1>(),
-        make_unique<Test_TC_TSTAT_2_2>(),
-        make_unique<Test_TC_TSUIC_1_1>(),
-        make_unique<Test_TC_TSUIC_2_1>(),
-        make_unique<Test_TC_TSUIC_2_2>(),
-        make_unique<Test_TC_DIAGTH_1_1>(),
-        make_unique<Test_TC_WIFIDIAG_1_1>(),
-        make_unique<Test_TC_WIFIDIAG_3_1>(),
-        make_unique<Test_TC_WNCV_1_1>(),
-        make_unique<Test_TC_WNCV_2_1>(),
-        make_unique<Test_TC_WNCV_2_2>(),
-        make_unique<Test_TC_WNCV_2_4>(),
-        make_unique<Test_TC_WNCV_2_5>(),
-        make_unique<Test_TC_WNCV_3_1>(),
-        make_unique<Test_TC_WNCV_3_2>(),
-        make_unique<Test_TC_WNCV_3_3>(),
-        make_unique<TV_TargetNavigatorCluster>(),
-        make_unique<TV_AudioOutputCluster>(),
-        make_unique<TV_ApplicationLauncherCluster>(),
-        make_unique<TV_KeypadInputCluster>(),
-        make_unique<TV_AccountLoginCluster>(),
-        make_unique<TV_WakeOnLanCluster>(),
-        make_unique<TV_ApplicationBasicCluster>(),
-        make_unique<TV_MediaPlaybackCluster>(),
-        make_unique<TV_ChannelCluster>(),
-        make_unique<TV_LowPowerCluster>(),
-        make_unique<TV_ContentLauncherCluster>(),
-        make_unique<TV_MediaInputCluster>(),
-        make_unique<TestCluster>(),
-        make_unique<TestClusterComplexTypes>(),
-        make_unique<TestConstraints>(),
-        make_unique<TestDelayCommands>(),
-        make_unique<TestLogCommands>(),
-        make_unique<TestSaveAs>(),
-        make_unique<TestConfigVariables>(),
-        make_unique<TestDescriptorCluster>(),
-        make_unique<TestBasicInformation>(),
-        make_unique<TestIdentifyCluster>(),
-        make_unique<TestOperationalCredentialsCluster>(),
-        make_unique<TestModeSelectCluster>(),
-        make_unique<Test_TC_SWDIAG_1_1>(),
-        make_unique<Test_TC_SWDIAG_2_1>(),
-        make_unique<Test_TC_SWDIAG_3_1>(),
-        make_unique<TestSubscribe_OnOff>(),
-        make_unique<DL_UsersAndCredentials>(),
-        make_unique<DL_LockUnlock>(),
-        make_unique<TestGroupMessaging>(),
-        make_unique<TestGroupsCluster>(),
-        make_unique<TestGroupDemoCommand>(),
-        make_unique<TestGroupDemoConfig>(),
-        make_unique<TestGroupKeyManagementCluster>(),
+        make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BRAC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_4>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_4>(credsIssuerConfig),
+        make_unique<Test_TC_CC_8_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_3>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
+        make_unique<Test_TC_DM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_DM_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_DM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_EMR_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_ILL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_5>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_6>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_7>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_8>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_9>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_10>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_11>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_7_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_7_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_8_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_9_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_OO_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_PS_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_RH_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_RH_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_RH_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TM_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_DIAGTH_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_4>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_5>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_3>(credsIssuerConfig),
+        make_unique<TV_TargetNavigatorCluster>(credsIssuerConfig),
+        make_unique<TV_AudioOutputCluster>(credsIssuerConfig),
+        make_unique<TV_ApplicationLauncherCluster>(credsIssuerConfig),
+        make_unique<TV_KeypadInputCluster>(credsIssuerConfig),
+        make_unique<TV_AccountLoginCluster>(credsIssuerConfig),
+        make_unique<TV_WakeOnLanCluster>(credsIssuerConfig),
+        make_unique<TV_ApplicationBasicCluster>(credsIssuerConfig),
+        make_unique<TV_MediaPlaybackCluster>(credsIssuerConfig),
+        make_unique<TV_ChannelCluster>(credsIssuerConfig),
+        make_unique<TV_LowPowerCluster>(credsIssuerConfig),
+        make_unique<TV_ContentLauncherCluster>(credsIssuerConfig),
+        make_unique<TV_MediaInputCluster>(credsIssuerConfig),
+        make_unique<TestCluster>(credsIssuerConfig),
+        make_unique<TestClusterComplexTypes>(credsIssuerConfig),
+        make_unique<TestConstraints>(credsIssuerConfig),
+        make_unique<TestDelayCommands>(credsIssuerConfig),
+        make_unique<TestLogCommands>(credsIssuerConfig),
+        make_unique<TestSaveAs>(credsIssuerConfig),
+        make_unique<TestConfigVariables>(credsIssuerConfig),
+        make_unique<TestDescriptorCluster>(credsIssuerConfig),
+        make_unique<TestBasicInformation>(credsIssuerConfig),
+        make_unique<TestIdentifyCluster>(credsIssuerConfig),
+        make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
+        make_unique<TestModeSelectCluster>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),
+        make_unique<TestSubscribe_OnOff>(credsIssuerConfig),
+        make_unique<DL_UsersAndCredentials>(credsIssuerConfig),
+        make_unique<DL_LockUnlock>(credsIssuerConfig),
+        make_unique<TestGroupMessaging>(credsIssuerConfig),
+        make_unique<TestGroupsCluster>(credsIssuerConfig),
+        make_unique<TestGroupDemoCommand>(credsIssuerConfig),
+        make_unique<TestGroupDemoConfig>(credsIssuerConfig),
+        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);
