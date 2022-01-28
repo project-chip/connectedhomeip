@@ -196,6 +196,18 @@ PICS:
     - label: "Does the device implement the EndProductType"
       id: A_ENDPRODUCTTYPE
 
+    - label: "Does the device implement the Lift feature ?"
+      id: WNCV_LF
+
+    - label: "Does the device implement the Tilt feature ?"
+      id: WNCV_TL
+
+    - label: "Does the device implement the Position Aware Lift feature ?"
+      id: WNCV_PA_LF
+
+    - label: "Does the device implement the Position Aware Tilt feature ?"
+      id: WNCV_PA_TL
+
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
       id: A_ONOFF
