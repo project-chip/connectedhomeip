@@ -263,11 +263,43 @@ WindowApp::Button * WindowAppImpl::CreateButton(WindowApp::Button::Id id, const 
     return new Button(id, name);
 }
 
+void WindowAppImpl::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
+{
+    switch (attribute)
+    {
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        UpdateLEDs();
+        break;
+    /* RO Type: not supposed to dynamically change -> Cycling Window Covering Demo */
+    case Attributes::Type::Id:
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        UpdateLCD();
+        break;
+    /* ### ATTRIBUTEs CHANGEs IGNORED ### */
+    /* RO EndProductType: not supposed to dynamically change */
+    case Attributes::EndProductType::Id:
+    /* RO ConfigStatus: set by WC server */
+    case Attributes::ConfigStatus::Id:
+    /* RO SafetyStatus: set by WC server */
+    case Attributes::SafetyStatus::Id:
+    /* RW Mode: User can change */
+    case Attributes::Mode::Id:
+    default:
+        break;
+    }
+}
+
 void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
 {
     WindowApp::DispatchEvent(event);
     switch (event.mId)
     {
+    case EventId::AttributeChange:
+        DispatchEventAttributeChange(event.mEndpoint, event.mAttributeId);
+        break;
     case EventId::ResetWarning:
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
         // Turn off all LEDs before starting blink to make sure blink is
@@ -293,8 +325,6 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
         UpdateLEDs();
         break;
     case EventId::CoverTypeChange:
-    case EventId::LiftChanged:
-    case EventId::TiltChanged:
         UpdateLCD();
         break;
     case EventId::CoverChange:
