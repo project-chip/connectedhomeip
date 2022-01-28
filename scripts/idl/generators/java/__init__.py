@@ -99,7 +99,6 @@ def ClientClustersOnly(clusters: List[Cluster]):
             yield cluster
 
 def NamedFilter(choices: List, name: str):
-    print("%r %r\n" % (choices, name))
     for choice in choices:
         if choice.name == name:
             return choice
