@@ -197,7 +197,8 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP, gDataVersions[i]);
+            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP,
+                                                            Span<DataVersion>(gDataVersions[i]));
             return &app;
         }
     }
