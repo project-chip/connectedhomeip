@@ -346,53 +346,57 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
+    FabricIndex accessingFabricIndex = aDecoder.GetAccessingFabricIndex();
+
     if (!aPath.IsListItemOperation())
     {
         DataModel::DecodableList<AccessControlEntryCodec> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        size_t oldCount;
+        size_t oldCount = 0;
+        size_t allCount;
         size_t newCount;
         size_t maxCount;
-        ReturnErrorOnFailure(GetAccessControl().GetEntryCount(oldCount));
-        ReturnErrorOnFailure(list.ComputeSize(&newCount));
-        ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
-        ReturnErrorCodeIf(newCount > maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
 
-        auto iterator = list.begin();
-        size_t i      = 0;
-        while (iterator.Next())
+        AccessControl::EntryIterator it;
+        ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessFabricIndex));
+        for (it.Next() == CHIP_NO_ERROR)
         {
-            if (i < oldCount)
-            {
-                ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry));
-            }
-            else
-            {
-                ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry));
-            }
-            ++i;
+            oldCount++;
         }
-        ReturnErrorOnFailure(iterator.GetStatus());
 
-        while (i < oldCount)
+        while (oldCount > 0)
         {
             --oldCount;
-            ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount));
+            ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
+            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                       AccessControlCluster::ChangeTypeEnum::kRemoved));
         }
+
+        ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
+        ReturnErrorOnFailure(list.ComputeSize(&newCount));
+        ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
+        VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) > maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+        auto iterator = list.begin();
+        while (iterator.Next())
+        {
+            ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
+            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                       AccessControlCluster::ChangeTypeEnum::kAdded));
+        }
+        ReturnErrorOnFailure(iterator.GetStatus());
+        return CHIP_NO_ERROR;
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         AccessControlEntryCodec item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
 
-        size_t oldCount;
-        size_t maxCount;
-
-        ReturnErrorOnFailure(GetAccessControl().GetEntryCount(oldCount));
-        ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
-        ReturnErrorCodeIf(oldCount < maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
-        ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, item.entry));
+        ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
+        ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                   AccessControlCluster::ChangeTypeEnum::kAdded));
     }
     else
     {
