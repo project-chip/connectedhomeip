@@ -35,8 +35,8 @@ void ChunkedWriteCallback::OnResponse(const app::WriteClient * apWriteClient, co
         }
         else if (mAttributeStatus.mStatus != Protocols::InteractionModel::Status::Success)
         {
-            // We this is a response from previous write request, but it was failed before.
-            // We only report the first failure, so skip the following errors.
+            // This is a response on the same path as the last stored on. We only latch in the first encountered failure on that
+            // path, and ignore subsequent ones.
             return;
         }
         /**
@@ -61,7 +61,7 @@ void ChunkedWriteCallback::OnDone(app::WriteClient * apWriteClient)
 {
     if (mLastAttributePath.HasValue())
     {
-        // We have one status not reported to the application, call it now.
+        // We have a cached status that has yet to be reported to the application so call it now.
         // If we failed to receive the response, or we received a malformed response, OnResponse won't be called,
         // mLastAttributePath will be Missing() in this case.
         callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);

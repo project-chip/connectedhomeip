@@ -168,7 +168,16 @@ CHIP_ERROR WriteClient::FinalizeMessage(bool aHasMoreChunks)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteClient::CreateNewMessage()
+CHIP_ERROR WriteClient::EnsureMessage()
+{
+    if (mState != State::AddAttribute)
+    {
+        return StartNewMessage();
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::StartNewMessage()
 {
     uint16_t reservedSize = 0;
 
@@ -246,7 +255,7 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
         // If it failed with no memory, then we create a new chunk for it.
         mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
         mWriteRequestBuilder.GetWriteRequests().ResetError();
-        ReturnErrorOnFailure(CreateNewMessage());
+        ReturnErrorOnFailure(StartNewMessage());
         err = TryPutSinglePreencodedAttributeWritePayload(attributePath, data);
         // Since we have created a new chunk for this element, the encode is expected to success.
     }
@@ -282,6 +291,8 @@ CHIP_ERROR WriteClient::TryPutPreencodedAttributeWriteFirstListItem(const chip::
 CHIP_ERROR WriteClient::PutPreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
                                                            const TLV::TLVReader & data)
 {
+    ReturnErrorOnFailure(EnsureMessage());
+
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
@@ -305,7 +316,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttributeWritePayload(const chip::app::Conc
             // If it failed with no memory, then we create a new chunk for it.
             mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
             mWriteRequestBuilder.GetWriteRequests().ResetError();
-            ReturnErrorOnFailure(CreateNewMessage());
+            ReturnErrorOnFailure(StartNewMessage());
             ReturnErrorOnFailure(TryPutPreencodedAttributeWriteFirstListItem(path, data));
         }
 

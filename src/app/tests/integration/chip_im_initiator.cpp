@@ -353,7 +353,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient & apWriteClient)
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    SuccessOrExit(err = apWriteClient.EncodeAttributeWritePayload(
+    SuccessOrExit(err = apWriteClient.EncodeAttribute(
                       chip::app::AttributePathParams(2 /* endpoint */, 3 /* cluster */, 4 /* attribute */), true));
     SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
 

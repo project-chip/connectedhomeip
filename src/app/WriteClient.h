@@ -123,26 +123,24 @@ public:
                 const Optional<uint16_t> & aTimedWriteTimeoutMs) :
         mpExchangeMgr(apExchangeMgr),
         mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs)
-    {
-        CreateNewMessage();
-    }
+    {}
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
         mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
-    {
-        CreateNewMessage();
-    }
+    {}
 #endif
 
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode, will create a new chunk when necessary.
      */
     template <class T>
-    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
+    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & attributePath, const T & value)
     {
+        ReturnErrorOnFailure(EnsureMessage());
+
         return EncodeSingleAttributeDataIB(
             ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId), value);
     }
@@ -151,10 +149,12 @@ public:
      *  Encode a list attribute value with chunking feature, will create a new chunk when necessary.
      */
     template <class T>
-    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const DataModel::List<T> & value)
+    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & attributePath, const DataModel::List<T> & value)
     {
         ConcreteDataAttributePath path =
             ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+
+        ReturnErrorOnFailure(EnsureMessage());
 
         // Encode a list with only one element before all other data. Since we are using a clean chunk for this payload, this call
         // must success. Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
@@ -174,9 +174,10 @@ public:
      *  Encode an Nullable attribute value.
      */
     template <class T>
-    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath,
-                                           const DataModel::Nullable<T> & value)
+    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & attributePath, const DataModel::Nullable<T> & value)
     {
+        ReturnErrorOnFailure(EnsureMessage());
+
         if (value.IsNull())
         {
             return EncodeSingleAttributeDataIB(
@@ -184,7 +185,7 @@ public:
         }
         else
         {
-            return EncodeAttributeWritePayload(attributePath, value.Value());
+            return EncodeAttribute(attributePath, value.Value());
         }
     }
 
@@ -281,7 +282,7 @@ private:
             // If it failed with no memory, then we create a new chunk for it.
             mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
             mWriteRequestBuilder.GetWriteRequests().ResetError();
-            ReturnErrorOnFailure(CreateNewMessage());
+            ReturnErrorOnFailure(StartNewMessage());
             ReturnErrorOnFailure(TryEncodeSingleAttributeDataIB(attributePath, value));
         }
         else
@@ -311,6 +312,8 @@ private:
      */
     CHIP_ERROR TryPutPreencodedAttributeWriteFirstListItem(const chip::app::ConcreteDataAttributePath & attributePath,
                                                            const TLV::TLVReader & data);
+
+    CHIP_ERROR EnsureMessage();
 
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -347,7 +350,7 @@ private:
     /**
      * Create a new message (or a new chunk) for the write request.
      */
-    CHIP_ERROR CreateNewMessage();
+    CHIP_ERROR StartNewMessage();
 
     /**
      * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
@@ -385,7 +388,7 @@ private:
      *        AttributePathIB =           |
      *        {                           |
      *           Endpoint = 0x2,          |  "atomically" encodede via
-     *           Cluster = 0x50f,          > EncodeAttributeWritePayload or
+     *           Cluster = 0x50f,          > EncodeAttribute or
      *           Attribute = 0x0000_0006, |  PutPreencodedAttributeWritePayload
      *           ListIndex = Null,        |
      *        }                           |

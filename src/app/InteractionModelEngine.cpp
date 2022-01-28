@@ -336,7 +336,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messa
 
     for (auto & writeHandler : mWriteHandlers)
     {
-        if (writeHandler.IsMatchedExchangeContext(apExchangeContext))
+        if (writeHandler.MatchesExchangeContext(apExchangeContext))
         {
             return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
         }

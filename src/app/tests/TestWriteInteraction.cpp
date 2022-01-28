@@ -355,7 +355,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
     dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
 
-    writeClient.EncodeAttributeWritePayload(attributePathParams, dataTx);
+    writeClient.EncodeAttribute(attributePathParams, dataTx);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);

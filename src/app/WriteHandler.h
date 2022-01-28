@@ -96,7 +96,7 @@ public:
      */
     bool IsTimedWrite() const { return mIsTimedRequest; }
 
-    bool IsMatchedExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
+    bool MatchesExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
     {
         return !IsFree() && mpExchangeCtx == apExchangeContext;
     }

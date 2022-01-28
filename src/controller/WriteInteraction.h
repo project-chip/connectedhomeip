@@ -115,13 +115,12 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
 
     if (sessionHandle->IsGroupSession())
     {
-        ReturnErrorOnFailure(
-            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+        ReturnErrorOnFailure(client->EncodeAttribute(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else
     {
         ReturnErrorOnFailure(
-            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+            client->EncodeAttribute(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
     }
 
     ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));

@@ -186,7 +186,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
 
         ByteSpan list[kTestListLength];
 
-        err = writeClient.EncodeAttributeWritePayload(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = writeClient.SendWriteRequest(sessionHandle);
@@ -257,7 +257,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
             list[j] = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
         }
 
-        err = writeClient.EncodeAttributeWritePayload(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             // This kind of error is expected.
