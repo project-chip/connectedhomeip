@@ -103,7 +103,7 @@ constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_
 #define endpointDeviceId(x) fixedDeviceIds[x]
 #define endpointDeviceVersion(x) fixedDeviceVersions[x]
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
-#define endpointTypeMacro(x) (EmberAfEndpointType *) &(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]])
+#define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
 #define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
@@ -275,7 +275,7 @@ bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
 void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId clusterId, CommandId commandId, EmberAfStatus status,
                                            uint8_t clientServerMask)
 {
-    EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, clientServerMask);
     if (cluster != NULL)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
@@ -294,7 +294,7 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 {
     if (apsFrame != NULL && message != NULL && msgLen != 0)
     {
-        EmberAfCluster * cluster = emberAfFindCluster(
+        const EmberAfCluster * cluster = emberAfFindCluster(
             apsFrame->sourceEndpoint, apsFrame->clusterId,
             (((message[0] & ZCL_FRAME_CONTROL_DIRECTION_MASK) == ZCL_FRAME_CONTROL_SERVER_TO_CLIENT) ? CLUSTER_MASK_SERVER
                                                                                                      : CLUSTER_MASK_CLIENT));
@@ -314,7 +314,7 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 // This function is used to call the per-cluster attribute changed callback
 void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
 {
-    EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
     if (cluster != NULL)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
@@ -329,7 +329,7 @@ void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attr
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
     if (cluster == NULL)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
@@ -349,11 +349,11 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
 static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 {
     uint8_t clusterIndex;
-    EmberAfEndpointType * epType = definedEndpoint->endpointType;
+    const EmberAfEndpointType * epType = definedEndpoint->endpointType;
     // emberAfPushEndpointNetworkIndex(definedEndpoint->endpoint);
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
-        EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
+        const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         EmberAfGenericClusterFunction f;
         emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_INIT_FUNCTION);
@@ -379,10 +379,10 @@ void emAfCallInits(void)
 }
 
 // Returns the pointer to metadata, or null if it is not found
-EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                          uint8_t mask)
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                                                uint8_t mask)
 {
-    EmberAfAttributeMetadata * metadata = NULL;
+    const EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
     record.endpoint    = endpoint;
     record.clusterId   = clusterId;
@@ -395,10 +395,10 @@ EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, C
     return metadata;
 }
 
-static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
+static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
 {
-    EmberAfAttributeMetadata * m = (EmberAfAttributeMetadata *) &(generatedAttributes[0]);
-    uint16_t index               = 0;
+    const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
+    uint16_t index                     = 0;
     while (m < am)
     {
         if ((m->mask & ATTRIBUTE_MASK_SINGLETON) != 0U)
@@ -415,7 +415,7 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // If src == NULL, then this method will set memory to zeroes
 // See documentation for emAfReadOrWriteAttribute for the semantics of
 // readLength when reading and writing.
-static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am,
+static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, const EmberAfAttributeMetadata * am,
                                           bool write, uint16_t readLength)
 {
     EmberAfAttributeType attributeType = am->attributeType;
@@ -479,7 +479,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
  *   2. Cluster directions match as defined by cluster->mask
  *        and attRecord->clusterMask
  */
-bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord)
+bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord)
 {
     return (cluster->clusterId == attRecord->clusterId && cluster->mask & attRecord->clusterMask);
 }
@@ -491,7 +491,8 @@ bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * a
  *
  * Attributes match if attr ids match.
  */
-bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord)
+bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
+                        EmberAfAttributeSearchRecord * attRecord)
 {
     return (am->attributeId == attRecord->attributeId);
 }
@@ -509,7 +510,7 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 // type.  For strings, the function will copy as many bytes as will fit in the
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write)
 {
     uint16_t attributeOffsetIndex = 0;
@@ -521,7 +522,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 
         if (emAfEndpoints[ep].endpoint == attRecord->endpoint)
         {
-            EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+            const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
             uint8_t clusterIndex;
             if (!emberAfEndpointIndexIsEnabled(ep))
             {
@@ -529,13 +530,13 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
             }
             for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
             {
-                EmberAfCluster * cluster = &(endpointType->cluster[clusterIndex]);
+                const EmberAfCluster * cluster = &(endpointType->cluster[clusterIndex]);
                 if (emAfMatchCluster(cluster, attRecord))
                 { // Got the cluster
                     uint16_t attrIndex;
                     for (attrIndex = 0; attrIndex < cluster->attributeCount; attrIndex++)
                     {
-                        EmberAfAttributeMetadata * am = &(cluster->attributes[attrIndex]);
+                        const EmberAfAttributeMetadata * am = &(cluster->attributes[attrIndex]);
                         if (emAfMatchAttribute(cluster, am, attRecord))
                         { // Got the attribute
                             // If passed metadata location is not null, populate
@@ -625,15 +626,15 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
 }
 
-EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, ClusterId clusterId, EmberAfClusterMask mask,
-                                          uint8_t * index)
+const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
+                                                EmberAfClusterMask mask, uint8_t * index)
 {
     uint8_t i;
     uint8_t scopedIndex = 0;
 
     for (i = 0; i < endpointType->clusterCount; i++)
     {
-        EmberAfCluster * cluster = &(endpointType->cluster[i]);
+        const EmberAfCluster * cluster = &(endpointType->cluster[i]);
 
         if ((mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
              (mask == CLUSTER_MASK_SERVER && emberAfClusterIsServer(cluster))))
@@ -661,7 +662,7 @@ uint8_t emberAfClusterIndexInMatchingEndpoints(EndpointId endpoint, ClusterId cl
     uint8_t index = 0xFF;
     for (ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+        const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
         if (emberAfFindClusterInType(endpointType, clusterId, mask) != NULL)
         {
             index++;
@@ -680,7 +681,7 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
     uint8_t index = 0xFF;
     for (ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+        const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
         if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != NULL)
         {
             if (emAfEndpoints[ep].endpoint == endpoint)
@@ -758,7 +759,7 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 } // namespace chip
 
 // Finds the cluster that matches endpoint, clusterId, direction.
-EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+const EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
     uint16_t ep = emberAfIndexFromEndpoint(endpoint);
     if (ep == 0xFFFF)
@@ -772,7 +773,8 @@ EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId clusterId, Em
 }
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
-EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId endpoint, ClusterId clusterId,
+                                                                    EmberAfClusterMask mask)
 {
     uint16_t ep = emberAfIndexFromEndpointIncludingDisabledEndpoints(endpoint);
     if (ep < MAX_ENDPOINT_COUNT)
@@ -883,7 +885,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             uint8_t i;
             for (i = 0; i < emAfEndpoints[index].endpointType->clusterCount; i++)
             {
-                EmberAfCluster * cluster = &((emAfEndpoints[index].endpointType->cluster)[i]);
+                const EmberAfCluster * cluster = &((emAfEndpoints[index].endpointType->cluster)[i]);
                 //        emberAfCorePrintln("Disabling cluster tick for ep:%d, cluster:0x%2X, %p",
                 //                           endpoint,
                 //                           cluster->clusterId,
@@ -971,7 +973,7 @@ uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
     uint8_t i, c = 0;
     EmberAfDefinedEndpoint * de;
-    EmberAfCluster * cluster;
+    const EmberAfCluster * cluster;
 
     if (index == 0xFFFF)
     {
@@ -1016,7 +1018,7 @@ uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
 //  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
 //
 // Don't mix them.
-EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clusterIndex)
+const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clusterIndex)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
     EmberAfDefinedEndpoint * definedEndpoint;
@@ -1046,12 +1048,12 @@ uint16_t emberAfGetDeviceIdForEndpoint(EndpointId endpoint)
 
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
-EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool server)
+const EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool server)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
     EmberAfDefinedEndpoint * de;
     uint8_t i, c = 0;
-    EmberAfCluster * cluster;
+    const EmberAfCluster * cluster;
 
     if (index == 0xFFFF)
     {
@@ -1080,7 +1082,7 @@ EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool serve
 // Returns Optional<ClusterId>::Missing() if cluster does not exist.
 Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
 {
-    EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, n, server);
+    const EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, n, server);
     if (cluster == nullptr)
     {
         return Optional<ClusterId>::Missing();
@@ -1094,7 +1096,7 @@ uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterL
 {
     uint8_t clusterCount = emberAfClusterCount(endpoint, server);
     uint8_t i;
-    EmberAfCluster * cluster;
+    const EmberAfCluster * cluster;
     if (clusterCount > listLen)
     {
         clusterCount = listLen;
@@ -1147,7 +1149,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
         }
         for (clusterI = 0; clusterI < de->endpointType->clusterCount; clusterI++)
         {
-            EmberAfCluster * cluster = &(de->endpointType->cluster[clusterI]);
+            const EmberAfCluster * cluster = &(de->endpointType->cluster[clusterI]);
             if (clusterId.HasValue())
             {
                 if (clusterId.Value() != cluster->clusterId)
@@ -1166,8 +1168,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
             }
             for (attr = 0; attr < cluster->attributeCount; attr++)
             {
-                EmberAfAttributeMetadata * am = &(cluster->attributes[attr]);
-                ptr                           = nullptr; // Will get set to the value to write, as needed.
+                const EmberAfAttributeMetadata * am = &(cluster->attributes[attr]);
+                ptr                                 = nullptr; // Will get set to the value to write, as needed.
 
                 // First check for a persisted value.
                 if (!ignoreStorage && am->IsNonVolatile())
@@ -1260,7 +1262,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
 // to be null instead of pointing to all zeroes.
 // This function has to be able to deal with that.
 void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, ClusterId clusterId,
-                                        EmberAfAttributeMetadata * metadata)
+                                        const EmberAfAttributeMetadata * metadata)
 {
     // Get out of here if this attribute isn't marked non-volatile.
     if (!metadata->IsNonVolatile())
@@ -1298,7 +1300,7 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
 
 // This function returns the actual function point from the array,
 // iterating over the function bits.
-EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluster, EmberAfClusterMask functionMask)
+EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask)
 {
     EmberAfClusterMask mask = 0x01;
     uint8_t functionIndex   = 0;
@@ -1349,7 +1351,7 @@ app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointI
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
 {
-    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
     VerifyOrReturnError(clusterObj != nullptr, 0);
     return clusterObj->attributeCount;
 }
@@ -1357,7 +1359,7 @@ uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::Cluster
 uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                      chip::AttributeId attributeId)
 {
-    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
     VerifyOrReturnError(clusterObj != nullptr, UINT16_MAX);
 
     for (uint16_t i = 0; i < clusterObj->attributeCount; i++)
@@ -1372,7 +1374,7 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, 
 
 Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, ClusterId cluster, uint16_t attributeIndex)
 {
-    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
     if (clusterObj == nullptr || clusterObj->attributeCount <= attributeIndex)
     {
         return Optional<AttributeId>::Missing();
