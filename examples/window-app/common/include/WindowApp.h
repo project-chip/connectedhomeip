@@ -77,10 +77,6 @@ public:
         CoverChange,
         CoverTypeChange,
         TiltModeChange,
-        LiftUp,
-        LiftDown,
-        TiltUp,
-        TiltDown,
 
         // Cover Attribute update events
         AttributeChange,
@@ -108,12 +104,18 @@ public:
     {
         void Init(chip::EndpointId endpoint);
         void Finish();
+
+        void LiftUpdate(bool newTarget);
+        void LiftGoToTarget() { LiftUpdate(true); }
+        void LiftContinueToTarget() { LiftUpdate(false); }
         void LiftUp();
         void LiftDown();
-        void GotoLift(EventId action = EventId::None);
+
+        void TiltUpdate(bool newTarget);
+        void TiltGoToTarget() { TiltUpdate(true); }
+        void TiltContinueToTarget() { TiltUpdate(false); }
         void TiltUp();
         void TiltDown();
-        void GotoTilt(EventId action = EventId::None);
 
         EmberAfWcType CycleType();
 
@@ -129,8 +131,8 @@ public:
 
         Timer * mLiftTimer         = nullptr;
         Timer * mTiltTimer         = nullptr;
-        EventId mLiftAction        = EventId::None;
-        EventId mTiltAction        = EventId::None;
+        OperationalState mLiftOpState = OperationalState::Stall;
+        OperationalState mTiltOpState = OperationalState::Stall;
     };
 
     static WindowApp & Instance();
@@ -183,6 +185,7 @@ protected:
 
 private:
     void HandleLongPress();
+    void DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute);
 
     Cover mCoverList[WINDOW_COVER_COUNT];
     uint8_t mCurrentCover = 0;

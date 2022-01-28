@@ -19,7 +19,6 @@
 #include <WindowApp.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -201,8 +200,6 @@ void WindowApp::Finish()
 
 void WindowApp::DispatchEvent(const WindowApp::Event & event)
 {
-    Cover * cover = nullptr;
-
     switch (event.mId)
     {
     case EventId::ResetWarning:
@@ -296,26 +293,57 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
             GetCover().LiftDown();
         }
         break;
-
-    case EventId::LiftUp:
-    case EventId::LiftDown:
-        cover = GetCover(event.mEndpoint);
-        if (cover)
-        {
-            cover->GotoLift(event.mId);
-        }
+    case EventId::AttributeChange:
+        DispatchEventAttributeChange(event.mEndpoint, event.mAttributeId);
         break;
-
-    case EventId::TiltUp:
-    case EventId::TiltDown:
-        cover = GetCover(event.mEndpoint);
-        if (cover)
-        {
-            cover->GotoTilt(event.mId);
-        }
+    default:
         break;
+    }
+}
 
 
+
+
+void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
+{
+    Cover * cover = GetCover(endpoint);
+
+    if (nullptr == cover)
+    {
+        emberAfWindowCoveringClusterPrint("Ep[%u] not supported AttributeId=%u\n", endpoint, (unsigned int) attribute);
+        return;
+    }
+
+    switch (attribute)
+    {
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        cover->LiftGoToTarget();
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        cover->TiltGoToTarget();
+        break;
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        emberAfWindowCoveringClusterPrint("Global OpState: %02X\n", (unsigned int) OperationalStatusGet(endpoint).global);
+        break;
+    /* RW Mode */
+    case Attributes::Mode::Id:
+        emberAfWindowCoveringClusterPrint("Mode set: ignored");
+        break;
+    /* ### ATTRIBUTEs CHANGEs IGNORED ### */
+    /* RO Type: not supposed to dynamically change */
+    case Attributes::Type::Id:
+    /* RO EndProductType: not supposed to dynamically change */
+    case Attributes::EndProductType::Id:
+    /* RO ConfigStatus: set by WC server */
+    case Attributes::ConfigStatus::Id:
+    /* RO SafetyStatus: set by WC server */
+    case Attributes::SafetyStatus::Id:
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
     default:
         break;
     }
@@ -468,47 +496,49 @@ void WindowApp::Cover::LiftDown()
     LiftPositionSet(mEndpoint, percent100ths);
 }
 
-void WindowApp::Cover::GotoLift(EventId action)
+
+void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    NPercent100ths current, target;
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
-    if (current.IsNull() || target.IsNull())
+    OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
+    OperationalState opState = ComputeOperationalState(target, current);
+
+    /* If Triggered by a TARGET update */
+    if (newTarget)
     {
-        return;
+        mLiftTimer->Stop(); //Cancel previous motion if any
+        mLiftOpState = opState;
     }
 
-    if (EventId::None != action)
+    if (mLiftOpState == opState)
     {
-        mLiftAction = action;
-    }
-
-    if (EventId::LiftUp == mLiftAction)
-    {
-        if (current.Value() < target.Value())
+        /* Actuator still need to move, not reached/crossed Target yet */
+        switch (mLiftOpState)
         {
-            LiftUp();
-        }
-        else
-        {
-            mLiftAction = EventId::None;
-        }
-    }
-    else
-    {
-        if (current.Value() > target.Value())
-        {
+        case OperationalState::MovingDownOrClose:
             LiftDown();
-        }
-        else
-        {
-            mLiftAction = EventId::None;
+            break;
+        case OperationalState::MovingUpOrOpen:
+            LiftUp();
+            break;
+        default:
+            break;
         }
     }
+    else /* CURRENT reached TARGET or crossed it */
+    {
+        /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
+        Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, target);
+        mLiftOpState = OperationalState::Stall;
+    }
 
-    if (EventId::None != mLiftAction && mLiftTimer)
+    opStatus.lift = mLiftOpState;
+    OperationalStatusSetWithGlobalUpdated(mEndpoint, opStatus);
+
+    if ((OperationalState::Stall != mLiftOpState) && mLiftTimer)
     {
         mLiftTimer->Start();
     }
@@ -558,47 +588,48 @@ void WindowApp::Cover::TiltDown()
     TiltPositionSet(mEndpoint, percent100ths);
 }
 
-void WindowApp::Cover::GotoTilt(EventId action)
+void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    NPercent100ths current, target;
     Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
-    if (current.IsNull() || target.IsNull())
+    OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
+    OperationalState opState = ComputeOperationalState(target, current);
+
+    /* If Triggered by a TARGET update */
+    if (newTarget)
     {
-        return;
+        mTiltTimer->Stop(); // Cancel previous motion if any
+        mTiltOpState = opState;
     }
 
-    if (EventId::None != action)
+    if (mTiltOpState == opState)
     {
-        mTiltAction = action;
-    }
-
-    if (EventId::TiltUp == mTiltAction)
-    {
-        if (current.Value() < target.Value())
+        /* Actuator still need to move, not reached/crossed Target yet */
+        switch (mTiltOpState)
         {
-            TiltUp();
-        }
-        else
-        {
-            mTiltAction = EventId::None;
-        }
-    }
-    else
-    {
-        if (current.Value() > target.Value())
-        {
+        case OperationalState::MovingDownOrClose:
             TiltDown();
-        }
-        else
-        {
-            mTiltAction = EventId::None;
+            break;
+        case OperationalState::MovingUpOrOpen:
+            TiltUp();
+            break;
+        default:
+            break;
         }
     }
+    else /* CURRENT reached TARGET or crossed it */
+    {
+        /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
+        Attributes::CurrentPositionTiltPercent100ths::Set(mEndpoint, target);
+        mTiltOpState = OperationalState::Stall;
+    }
 
-    if (EventId::None != mTiltAction && mTiltTimer)
+    opStatus.tilt = mTiltOpState;
+    OperationalStatusSetWithGlobalUpdated(mEndpoint, opStatus);
+
+    if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
     {
         mTiltTimer->Start();
     }
@@ -633,7 +664,7 @@ void WindowApp::Cover::OnLiftTimeout(WindowApp::Timer & timer)
     WindowApp::Cover * cover = static_cast<WindowApp::Cover *>(timer.mContext);
     if (cover)
     {
-        cover->GotoLift();
+        cover->LiftContinueToTarget();
     }
 }
 
@@ -642,6 +673,6 @@ void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
     WindowApp::Cover * cover = static_cast<WindowApp::Cover *>(timer.mContext);
     if (cover)
     {
-        cover->GotoTilt();
+        cover->TiltContinueToTarget();
     }
 }
