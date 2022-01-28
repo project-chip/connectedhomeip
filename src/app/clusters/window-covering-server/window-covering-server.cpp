@@ -42,6 +42,8 @@ using namespace chip::app::Clusters::WindowCovering;
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
+#define FAKE_MOTION_DELAY_MS 6000
+
 /*
  * ConvertValue: Converts values from one range to another
  * Range In  -> from  inputLowValue to   inputHighValue
@@ -506,10 +508,16 @@ EmberEventControl * ConfigureFakeMotionEventControl(EndpointId endpoint)
     return controller;
 }
 
-
-/* PostAttributeChange is used in all-cluster-app simulation and CI testing : otherwise it is bounded to manufacturer specific implementation */
-void __attribute__((weak)) PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+/**
+ * @brief PostAttributeChange is called when an Attribute is modified
+ *
+ * @param[in] endpoint
+ * @param[in] attributeId
+ */
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
 {
+    // all-cluster-app: simulation for the CI testing
+    // otherwise it is defined for manufacturer specific implementation */
     NPercent100ths current, target;
     OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
     OperationalStatus opStatus = prevOpStatus;
@@ -522,7 +530,7 @@ void __attribute__((weak)) PostAttributeChange(chip::EndpointId endpoint, chip::
     case Attributes::OperationalStatus::Id:
         if (OperationalState::Stall != opStatus.global) {
             // Finish the fake motion attribute update:
-            emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), 6000);
+            emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), FAKE_MOTION_DELAY_MS);
         }
         break;
     /* ============= Positions for Position Aware ============= */
@@ -765,15 +773,14 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 }
 
 /**
- * @brief  Cluster Attribute Update Callback
+ * @brief Cluster Attribute Changed Callback
  */
-void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+void __attribute__((weak)) MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    emberAfWindowCoveringClusterPrint("Window Covering ServerAttributeChanged A");
     PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }
 
-void MatterWindowCoveringPluginServerInitCallback()
-{
-    emberAfWindowCoveringClusterPrint("Window Covering Cluster Plugin Init");
-}
+/**
+ * @brief Cluster Plugin Init Callback
+ */
+void MatterWindowCoveringPluginServerInitCallback() {}
