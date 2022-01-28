@@ -209,9 +209,10 @@ public:
     {
         // Allocate ephemeralInitiatorNodeID in Operational Node ID range
         NodeId ephemeralInitiatorNodeID;
-        do {
+        do
+        {
             ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
-        } while (ephemeralInitiatorNodeID == kUndefinedNodeId);
+        } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
