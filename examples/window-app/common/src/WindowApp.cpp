@@ -315,13 +315,6 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         }
         break;
 
-    case EventId::StopMotion:
-        cover = GetCover(event.mEndpoint);
-        if (cover)
-        {
-            cover->StopMotion();
-        }
-        break;
 
     default:
         break;
@@ -633,20 +626,6 @@ EmberAfWcType WindowApp::Cover::CycleType()
     }
     TypeSet(mEndpoint, type);
     return type;
-}
-
-void WindowApp::Cover::StopMotion()
-{
-    mLiftAction = EventId::None;
-    if (mLiftTimer)
-    {
-        mLiftTimer->Stop();
-    }
-    mTiltAction = EventId::None;
-    if (mTiltTimer)
-    {
-        mTiltTimer->Stop();
-    }
 }
 
 void WindowApp::Cover::OnLiftTimeout(WindowApp::Timer & timer)

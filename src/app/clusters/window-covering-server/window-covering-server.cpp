@@ -624,8 +624,7 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
 /**
  * @brief  Cluster StopMotion Command callback (from client)
  */
-bool __attribute__((weak))
-emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
