@@ -35,11 +35,11 @@ namespace app {
 namespace ReadRequestMessage {
 enum class Tag : uint8_t
 {
-    kAttributeRequests        = 0,
-    kDataVersionFilters       = 1,
-    kEventRequests            = 2,
-    kEventFilters             = 3,
-    kIsFabricFiltered         = 4,
+    kAttributeRequests  = 0,
+    kDataVersionFilters = 1,
+    kEventRequests      = 2,
+    kEventFilters       = 3,
+    kIsFabricFiltered   = 4,
 };
 
 class Parser : public MessageParser

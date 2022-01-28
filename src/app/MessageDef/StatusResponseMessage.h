@@ -32,7 +32,7 @@ namespace StatusResponseMessage {
 
 enum class Tag : uint8_t
 {
-    kStatus                   = 0,
+    kStatus = 0,
 };
 
 class Parser : public MessageParser

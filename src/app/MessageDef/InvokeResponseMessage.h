@@ -33,8 +33,8 @@ namespace app {
 namespace InvokeResponseMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse         = 0,
-    kInvokeResponses          = 1,
+    kSuppressResponse = 0,
+    kInvokeResponses  = 1,
 };
 
 class Parser : public MessageParser

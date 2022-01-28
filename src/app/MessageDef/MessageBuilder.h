@@ -18,8 +18,8 @@
 #pragma once
 
 #include "StructBuilder.h"
-#include <app/util/basic-types.h>
 #include <app/InteractionModelRevision.h>
+#include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {

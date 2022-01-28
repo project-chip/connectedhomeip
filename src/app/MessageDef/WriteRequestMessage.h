@@ -36,11 +36,11 @@ namespace app {
 namespace WriteRequestMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse         = 0,
-    kTimedRequest             = 1,
-    kWriteRequests            = 2,
-    kMoreChunkedMessages      = 3,
-    kIsFabricFiltered         = 4,
+    kSuppressResponse    = 0,
+    kTimedRequest        = 1,
+    kWriteRequests       = 2,
+    kMoreChunkedMessages = 3,
+    kIsFabricFiltered    = 4,
 };
 
 class Parser : public MessageParser
