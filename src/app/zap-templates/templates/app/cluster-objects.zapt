@@ -215,11 +215,9 @@ public:
     {{/zcl_event_fields}}
 
     {{#if event_is_fabric_scoped}}
-    {{#unless event_is_fabric_index_nullable}}
     auto GetFabricIndex() const {
         return {{ asLowerCamelCase event_fabric_idx_field }};
     }
-    {{/unless}}
     {{/if}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
