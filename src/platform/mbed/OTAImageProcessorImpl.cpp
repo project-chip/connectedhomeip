@@ -51,7 +51,7 @@ int OTAImageProcessorImpl::MemoryTest()
 
     if (!mBlockDevice)
     {
-        ChipLogError(NotSpecified, "Block device not set");
+        ChipLogError(SoftwareUpdate, "Block device not set");
         return 1;
     }
 
@@ -59,12 +59,12 @@ int OTAImageProcessorImpl::MemoryTest()
     ret = mBlockDevice->init();
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device initialization failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device initialization failed [%d]", ret);
         goto exit;
     }
 
     // Get the block device type
-    ChipLogProgress(NotSpecified, "Block device type: %s", mBlockDevice->get_type());
+    ChipLogProgress(SoftwareUpdate, "Block device type: %s", mBlockDevice->get_type());
 
     // Get device geometry
     read_size    = mBlockDevice->get_read_size();
@@ -72,12 +72,12 @@ int OTAImageProcessorImpl::MemoryTest()
     erase_size   = mBlockDevice->get_erase_size();
     full_size    = mBlockDevice->size();
 
-    ChipLogProgress(NotSpecified, "--- Block device geometry ---");
-    ChipLogProgress(NotSpecified, "read_size:    %lld B", read_size);
-    ChipLogProgress(NotSpecified, "program_size: %lld B", program_size);
-    ChipLogProgress(NotSpecified, "erase_size:   %lld B", erase_size);
-    ChipLogProgress(NotSpecified, "size:         %lld B", full_size);
-    ChipLogProgress(NotSpecified, "---\n");
+    ChipLogProgress(SoftwareUpdate, "--- Block device geometry ---");
+    ChipLogProgress(SoftwareUpdate, "read_size:    %lld B", read_size);
+    ChipLogProgress(SoftwareUpdate, "program_size: %lld B", program_size);
+    ChipLogProgress(SoftwareUpdate, "erase_size:   %lld B", erase_size);
+    ChipLogProgress(SoftwareUpdate, "size:         %lld B", full_size);
+    ChipLogProgress(SoftwareUpdate, "---\n");
 
     // Allocate a block with enough space for our data, aligned to the
     // nearest program_size. This is the minimum size necessary to write
@@ -91,34 +91,34 @@ int OTAImageProcessorImpl::MemoryTest()
     ret = mBlockDevice->read(buffer, 0, buffer_size);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device read failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "--- Currently stored data ---");
+    ChipLogProgress(SoftwareUpdate, "--- Currently stored data ---");
     for (size_t i = 0; i < buffer_size; i += 16)
     {
         for (size_t j = 0; j < 16; j++)
         {
             if (i + j < buffer_size)
             {
-                ChipLogProgress(NotSpecified, "%02x ", buffer[i + j]);
+                ChipLogProgress(SoftwareUpdate, "%02x ", buffer[i + j]);
             }
             else
             {
-                ChipLogProgress(NotSpecified, "   ");
+                ChipLogProgress(SoftwareUpdate, "   ");
             }
         }
-        ChipLogProgress(NotSpecified, " ");
+        ChipLogProgress(SoftwareUpdate, " ");
     }
-    ChipLogProgress(NotSpecified, "---\n");
+    ChipLogProgress(SoftwareUpdate, "---\n");
 
     // Write data to first block, write occurs in two parts,
     // an erase followed by a program
     ret = mBlockDevice->erase(0, erase_size);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device erase failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device erase failed [%d]", ret);
         goto exit;
     }
 
@@ -129,27 +129,27 @@ int OTAImageProcessorImpl::MemoryTest()
     ret = mBlockDevice->read(buffer, 0, buffer_size);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device read failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "--- Stored data after erase ---");
+    ChipLogProgress(SoftwareUpdate, "--- Stored data after erase ---");
     for (size_t i = 0; i < buffer_size; i += 16)
     {
         for (size_t j = 0; j < 16; j++)
         {
             if (i + j < buffer_size)
             {
-                ChipLogProgress(NotSpecified, "%02x ", buffer[i + j]);
+                ChipLogProgress(SoftwareUpdate, "%02x ", buffer[i + j]);
             }
             else
             {
-                ChipLogProgress(NotSpecified, "   ");
+                ChipLogProgress(SoftwareUpdate, "   ");
             }
-            ChipLogProgress(NotSpecified, " ");
+            ChipLogProgress(SoftwareUpdate, " ");
         }
     }
-    ChipLogProgress(NotSpecified, "---\n");
+    ChipLogProgress(SoftwareUpdate, "---\n");
 
     // Clear the buffer so we don't get old data
     memset(buffer, 0x0, buffer_size);
@@ -159,7 +159,7 @@ int OTAImageProcessorImpl::MemoryTest()
     ret = mBlockDevice->program(buffer, 0, buffer_size);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device program failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device program failed [%d]", ret);
         goto exit;
     }
 
@@ -171,43 +171,43 @@ int OTAImageProcessorImpl::MemoryTest()
     ret = mBlockDevice->read(buffer, 0, buffer_size);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device read failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "--- Stored data after write ---");
+    ChipLogProgress(SoftwareUpdate, "--- Stored data after write ---");
     for (size_t i = 0; i < buffer_size; i += 16)
     {
         for (size_t j = 0; j < 16; j++)
         {
             if (i + j < buffer_size)
             {
-                ChipLogProgress(NotSpecified, "%02x ", buffer[i + j]);
+                ChipLogProgress(SoftwareUpdate, "%02x ", buffer[i + j]);
             }
             else
             {
-                ChipLogProgress(NotSpecified, "   ");
+                ChipLogProgress(SoftwareUpdate, "   ");
             }
         }
 
-        ChipLogProgress(NotSpecified, " %.*s", buffer_size - i, &buffer[i]);
+        ChipLogProgress(SoftwareUpdate, " %.*s", buffer_size - i, &buffer[i]);
     }
-    ChipLogProgress(NotSpecified, "---\n");
+    ChipLogProgress(SoftwareUpdate, "---\n");
 
     ret = strcmp(buffer, "Hello Storage!");
     if (ret)
     {
-        ChipLogError(NotSpecified, "Data compare failed");
+        ChipLogError(SoftwareUpdate, "Data compare failed");
     }
     else
     {
-        ChipLogProgress(NotSpecified, "--- MEMORY TEST PASS ---");
+        ChipLogProgress(SoftwareUpdate, "--- MEMORY TEST PASS ---");
     }
 
 exit:
     if (ret)
     {
-        ChipLogError(NotSpecified, "--- MEMORY TEST FAILED ---");
+        ChipLogError(SoftwareUpdate, "--- MEMORY TEST FAILED ---");
     }
 
     if (buffer)
@@ -218,7 +218,7 @@ exit:
     ret = mBlockDevice->deinit();
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block deinitialization read failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block deinitialization read failed [%d]", ret);
         goto exit;
     }
 
@@ -454,7 +454,7 @@ int OTAImageProcessorImpl::PrepareMemory()
 
     if (!mBlockDevice)
     {
-        ChipLogError(NotSpecified, "Block device not set");
+        ChipLogError(SoftwareUpdate, "Block device not set");
         return 1;
     }
 
@@ -473,7 +473,7 @@ int OTAImageProcessorImpl::PrepareMemory()
     ret = mBlockDevice->read(&buff, 0, read_size);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Block device read failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
         return ret;
     }
 
@@ -486,7 +486,7 @@ int OTAImageProcessorImpl::CloseMemory()
 
     if (!mBlockDevice)
     {
-        ChipLogError(NotSpecified, "Block device not set");
+        ChipLogError(SoftwareUpdate, "Block device not set");
         return 1;
     }
 
@@ -508,7 +508,7 @@ int OTAImageProcessorImpl::ClearMemory()
 
     if (!mBlockDevice)
     {
-        ChipLogError(NotSpecified, "Block device not set");
+        ChipLogError(SoftwareUpdate, "Block device not set");
         return 1;
     }
 
@@ -529,7 +529,7 @@ int OTAImageProcessorImpl::ProgramMemory()
 
     if (!mBlockDevice)
     {
-        ChipLogError(NotSpecified, "Block device not set");
+        ChipLogError(SoftwareUpdate, "Block device not set");
         return 1;
     }
 
