@@ -644,8 +644,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+    mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this), mAutoCommissioner(this)
 {
@@ -1457,18 +1456,11 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNo
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
-void BasicSuccess(void * context, uint16_t val)
+void OnBasicFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Received success response 0x%x\n", val);
+    ChipLogProgress(Controller, "Received failure response %s\n", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
-}
-
-void BasicFailure(void * context, uint8_t status)
-{
-    ChipLogProgress(Controller, "Received failure response %d\n", (int) status);
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CommissioningStageComplete(static_cast<CHIP_ERROR>(status));
+    commissioner->CommissioningStageComplete(error);
 }
 
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
@@ -1592,6 +1584,51 @@ void AttributeReadFailure(void * context, CHIP_ERROR status)
     commissioner->CommissioningStageComplete(status);
 }
 
+void DeviceCommissioner::OnArmFailSafe(void * context,
+                                       const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+{
+    // TODO: Use errorCode
+    ChipLogProgress(Controller, "Received ArmFailSafe response");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnSetRegulatoryConfigResponse(
+    void * context, const GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data)
+{
+    // TODO: Use errorCode
+    ChipLogProgress(Controller, "Received SetRegulatoryConfig response");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnNetworkConfigResponse(void * context,
+                                                 const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
+{
+    // TODO: Use networkingStatus
+    ChipLogProgress(Controller, "Received NetworkConfig response");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnConnectNetworkResponse(
+    void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
+{
+    // TODO: Use networkingStatus
+    ChipLogProgress(Controller, "Received ConnectNetwork response");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnCommissioningCompleteResponse(
+    void * context, const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
+{
+    // TODO: Use errorCode
+    ChipLogProgress(Controller, "Received CommissioningComplete response");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
@@ -1612,11 +1649,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     {
     case CommissioningStage::kArmFailsafe: {
         ChipLogProgress(Controller, "Arming failsafe");
-        // TODO(cecille): Find a way to enumerate the clusters here.
-        GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
-        SetupCluster(genCom, proxy, endpoint, timeout);
-        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
+        GeneralCommissioning::Commands::ArmFailSafe::Type request;
+        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds();
+        request.breadcrumb          = breadcrumb;
+        request.timeoutMs           = kCommandTimeoutMs;
+        SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, timeout);
     }
     break;
     case CommissioningStage::kGetNetworkTechnology: {
@@ -1664,10 +1702,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
-        GeneralCommissioningCluster genCom;
-        SetupCluster(genCom, proxy, endpoint, timeout);
-        genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), regulatoryLocation, countryCode, breadcrumb,
-                                   kCommandTimeoutMs);
+        GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
+        request.location    = static_cast<GeneralCommissioning::RegulatoryLocationType>(regulatoryLocation);
+        request.countryCode = countryCode;
+        request.breadcrumb  = breadcrumb;
+        request.timeoutMs   = kCommandTimeoutMs;
+        SendCommand<GeneralCommissioningCluster>(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, timeout);
     }
     break;
     case CommissioningStage::kSendPAICertificateRequest:
@@ -1786,11 +1826,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
+
         ChipLogProgress(Controller, "Adding wifi network");
-        NetworkCommissioningCluster netCom;
-        SetupCluster(netCom, proxy, endpoint, timeout);
-        netCom.AddOrUpdateWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWiFiCredentials().Value().ssid,
-                                      params.GetWiFiCredentials().Value().credentials, breadcrumb);
+        NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
+        request.ssid        = params.GetWiFiCredentials().Value().ssid;
+        request.credentials = params.GetWiFiCredentials().Value().credentials;
+        request.breadcrumb  = breadcrumb;
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure);
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
@@ -1801,10 +1843,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         ChipLogProgress(Controller, "Adding thread network");
-        NetworkCommissioningCluster netCom;
-        SetupCluster(netCom, proxy, endpoint, timeout);
-        netCom.AddOrUpdateThreadNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetThreadOperationalDataset().Value(),
-                                        breadcrumb);
+        NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
+        request.operationalDataset = params.GetThreadOperationalDataset().Value();
+        request.breadcrumb         = breadcrumb;
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure);
     }
     break;
     case CommissioningStage::kWiFiNetworkEnable: {
@@ -1815,9 +1857,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         ChipLogProgress(Controller, "Enabling wifi network");
-        NetworkCommissioningCluster netCom;
-        SetupCluster(netCom, proxy, endpoint, timeout);
-        netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWiFiCredentials().Value().ssid, breadcrumb);
+        NetworkCommissioning::Commands::ConnectNetwork::Type request;
+        request.networkID  = params.GetWiFiCredentials().Value().ssid;
+        request.breadcrumb = breadcrumb;
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure);
     }
     break;
     case CommissioningStage::kThreadNetworkEnable: {
@@ -1832,9 +1875,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         ChipLogProgress(Controller, "Enabling thread network");
-        NetworkCommissioningCluster netCom;
-        SetupCluster(netCom, proxy, endpoint, timeout);
-        netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), extendedPanId, breadcrumb);
+        NetworkCommissioning::Commands::ConnectNetwork::Type request;
+        request.networkID  = extendedPanId;
+        request.breadcrumb = breadcrumb;
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure);
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -1849,9 +1893,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kSendComplete: {
         ChipLogProgress(Controller, "Calling commissioning complete");
-        GeneralCommissioningCluster genCom;
-        SetupCluster(genCom, proxy, endpoint, timeout);
-        genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
+        GeneralCommissioning::Commands::CommissioningComplete::Type request;
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, timeout);
     }
     break;
     case CommissioningStage::kCleanup:
@@ -1869,7 +1912,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kSecurePairing:
         break;
     }
-}
+} // namespace Controller
 
 } // namespace Controller
 } // namespace chip

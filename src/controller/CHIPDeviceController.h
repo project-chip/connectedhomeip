@@ -51,6 +51,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -88,10 +89,7 @@ constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVI
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
-typedef void (*BasicSuccessCallback)(void * context, uint16_t val);
-typedef void (*BasicFailureCallback)(void * context, uint8_t status);
-void BasicSuccess(void * context, uint16_t val);
-void BasicFailure(void * context, uint8_t status);
+void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
@@ -790,6 +788,19 @@ private:
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+    static void OnArmFailSafe(void * context,
+                              const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnSetRegulatoryConfigResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void
+    OnNetworkConfigResponse(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+    static void OnConnectNetworkResponse(
+        void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+    static void OnCommissioningCompleteResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
 
     /**
      * @brief
@@ -825,13 +836,26 @@ private:
         ClusterObjectT cluster;
         cluster.Associate(device, 0);
 
-        ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
-        return CHIP_NO_ERROR;
+        return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
 
-    // Cluster callbacks for advancing commissioning flows
-    Callback::Callback<BasicSuccessCallback> mSuccess;
-    Callback::Callback<BasicFailureCallback> mFailure;
+    template <typename ClusterObjectT, typename RequestObjectT>
+    CHIP_ERROR SendCommand(DeviceProxy * device, RequestObjectT request,
+                           CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                           CommandResponseFailureCallback failureCb, chip::Optional<chip::System::Clock::Timeout> timeout)
+    {
+        ClusterObjectT cluster;
+        cluster.Associate(device, 0);
+
+        if (timeout.HasValue())
+        {
+            VerifyOrReturnError(chip::CanCastTo<uint16_t>(timeout.Value().count()), CHIP_ERROR_INVALID_ARGUMENT);
+            chip::Optional<uint16_t> timedInvokeRequestTimeoutInMs(static_cast<uint16_t>(timeout.Value().count()));
+            return cluster.InvokeCommand(request, this, successCb, failureCb, timedInvokeRequestTimeoutInMs);
+        }
+
+        return cluster.InvokeCommand(request, this, successCb, failureCb);
+    }
 
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
