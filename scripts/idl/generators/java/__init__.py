@@ -132,7 +132,7 @@ class EncodableValue:
     the IDL and cluster
     """
     def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
-        self.context = context  # 
+        self.context = context
         self.data_type = data_type
         self.attrs = attrs
 
@@ -179,34 +179,34 @@ class EncodableValue:
 
     def without_nullable(self):
         result = self.clone()
-        result.attrs.remove(EncodableValueAttr.NULLABLE)   
+        result.attrs.remove(EncodableValueAttr.NULLABLE)
         return result
 
     def without_optional(self):
         result = self.clone()
-        result.attrs.remove(EncodableValueAttr.OPTIONAL)   
+        result.attrs.remove(EncodableValueAttr.OPTIONAL)
         return result
 
     def without_list(self):
         result = self.clone()
-        result.attrs.remove(EncodableValueAttr.LIST)   
+        result.attrs.remove(EncodableValueAttr.LIST)
         return result
 
     def get_underlying_struct(self):
-        for s in self.context.all_structs():
-            if s.name == self.data_type.name:
-                return s
-        raise Exception("Struct %s not found" % self.data_type.name)
+        s = self.context.find_struct(self.data_type.name)
+        if not s:
+            raise Exception("Struct %s not found" % self.data_type.name)
+        return s
 
     def get_underlying_enum(self):
-        for e in self.context.all_enums():
-            if e.name == self.data_type.name:
-                return e
-        raise Exception("Struct %s not found" % self.data_type.name)
+        e = self.context.find_enum(self.data_type.name)
+        if not e:
+            raise Exception("Enum %s not found" % self.data_type.name)
+        return e
 
     @property
     def boxed_java_type(self):
-        t = ParseDataType(self.data_type, self.context.all_enums())
+        t = ParseDataType(self.data_type, self.context)
 
         if type(t) == FundamentalType:
             if t == FundamentalType.BOOL:
@@ -242,7 +242,7 @@ class EncodableValue:
         if self.is_optional:
            return "Ljava/util/Optional;"
 
-        t = ParseDataType(self.data_type, self.context.all_enums())
+        t = ParseDataType(self.data_type, self.context)
 
         if type(t) == FundamentalType:
             if t == FundamentalType.BOOL:
