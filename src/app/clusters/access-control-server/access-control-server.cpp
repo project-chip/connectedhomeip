@@ -225,11 +225,11 @@ struct AccessControlEntryCodec
         return staging.Encode(aWriter, aTag);
     }
 
-    CHIP_ERROR Decode(TLV::TLVReader & aReader, const Optional<FabricIndex> & aFabricIndex)
+    CHIP_ERROR Decode(TLV::TLVReader & aReader)
     {
         AccessControlCluster::Structs::AccessControlEntry::DecodableType staging;
 
-        ReturnErrorOnFailure(staging.Decode(aReader, aFabricIndex));
+        ReturnErrorOnFailure(staging.Decode(aReader));
 
         ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
 
@@ -281,6 +281,8 @@ struct AccessControlEntryCodec
         entry.GetFabricIndex(fabricIndex);
         return fabricIndex;
     }
+
+    void SetFabricIndex(FabricIndex fabricIndex) { entry.SetFabricIndex(fabricIndex); }
 
     AccessControl::Entry entry;
 };
