@@ -64,7 +64,7 @@ CryptoContext::~CryptoContext()
     {
         ClearSecretData(key, sizeof(CryptoKey));
     }
-    if(mKeyContext)
+    if (mKeyContext)
     {
         mKeyContext->Release();
         mKeyContext = nullptr;
@@ -185,9 +185,9 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
     ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
     ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
-    if(mKeyContext)
+    if (mKeyContext)
     {
-        MutableByteSpan plaintext(output, input_length);// WARNING: ASSUMES input == output
+        MutableByteSpan plaintext(output, input_length); // WARNING: ASSUMES input == output
         MutableByteSpan mic(tag, taglen);
 
         ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), ByteSpan(IV, sizeof(IV)), mic));
@@ -206,7 +206,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         }
 
         ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
-                                            sizeof(IV), output, tag, taglen));
+                                             sizeof(IV), output, tag, taglen));
     }
 
     mac.SetTag(&header, tag, taglen);
@@ -230,9 +230,9 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
     ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
     ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
-    if(mKeyContext)
+    if (mKeyContext)
     {
-        MutableByteSpan ciphertext(output, input_length);// WARNING: ASSUMES input == output
+        MutableByteSpan ciphertext(output, input_length); // WARNING: ASSUMES input == output
         ByteSpan mic(tag, taglen);
 
         CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), ByteSpan(IV, sizeof(IV)), mic);
@@ -251,8 +251,8 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
             usage = kR2IKey;
         }
 
-        ReturnErrorOnFailure(AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
-                            sizeof(IV), output));
+        ReturnErrorOnFailure(AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage],
+                                             Crypto::kAES_CCM128_Key_Length, IV, sizeof(IV), output));
     }
     return CHIP_NO_ERROR;
 }

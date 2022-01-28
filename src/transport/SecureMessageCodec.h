@@ -27,8 +27,8 @@
 
 #pragma once
 
-#include <transport/SecureSession.h>
 #include <transport/CryptoContext.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 

@@ -1809,7 +1809,7 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
 void GroupDataProviderImpl::GroupKeyContext::Release()
 {
     memset(mKeyValue, 0, sizeof(mKeyValue));
-    if(mAllocated)
+    if (mAllocated)
     {
         mProvider.mKeyContexPool.ReleaseObject(this);
         mAllocated = false;

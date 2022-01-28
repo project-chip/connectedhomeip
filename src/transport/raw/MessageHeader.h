@@ -288,7 +288,7 @@ public:
 
     PacketHeader & SetSessionType(Header::SessionType type)
     {
-        mSessionType = type;
+        mSessionType     = type;
         uint8_t typeMask = to_underlying(Header::kSessionTypeMask);
         mSecFlags.SetRaw(static_cast<uint8_t>((mSecFlags.Raw() & ~typeMask) | (to_underlying(type) & typeMask)));
         return *this;

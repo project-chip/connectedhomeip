@@ -145,7 +145,8 @@ protected:
     public:
         GroupKeyContext(GroupDataProviderImpl & provider, bool allocated = false) : mProvider(provider) {}
 
-        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & key, uint16_t hash, bool allocated = false) : mProvider(provider), mAllocated(allocated)
+        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & key, uint16_t hash, bool allocated = false) :
+            mProvider(provider), mAllocated(allocated)
         {
             SetKey(key, hash);
         }
@@ -173,7 +174,7 @@ protected:
         GroupDataProviderImpl & mProvider;
         uint16_t mKeyHash                                                 = 0;
         uint8_t mKeyValue[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
-        bool mAllocated = false;
+        bool mAllocated                                                   = false;
     };
 
     class KeySetIteratorImpl : public KeySetIterator

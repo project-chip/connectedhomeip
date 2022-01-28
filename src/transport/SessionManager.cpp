@@ -125,7 +125,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     {
     case Transport::Session::SessionType::kGroup: {
         auto groupSession = sessionHandle->AsGroupSession();
-        auto * groups = Credentials::GetGroupDataProvider();
+        auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
         // TODO : #11911
@@ -144,7 +144,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Trace before any encryption
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
-        Crypto::SymmetricKeyContext *secret = groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
+        Crypto::SymmetricKeyContext * secret = groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         VerifyOrReturnError(nullptr != secret, CHIP_ERROR_INTERNAL);
 
         packetHeader.SetSessionId(secret->GetKeyHash());
@@ -560,7 +560,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 {
     PayloadHeader payloadHeader;
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
-    Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+    Credentials::GroupDataProvider * groups              = Credentials::GetGroupDataProvider();
     VerifyOrReturn(nullptr != groups);
 
     if (!packetHeader.GetDestinationGroupId().HasValue())
@@ -582,18 +582,19 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     }
 
     Credentials::GroupDataProvider::GroupSession groupContext;
-    if(packetHeader.IsValidGroupMsg())
+    if (packetHeader.IsValidGroupMsg())
     {
         // Trial decryption with GroupDataProvider
-        auto iter      = groups->IterateGroupSessions(packetHeader.GetSessionId());
+        auto iter = groups->IterateGroupSessions(packetHeader.GetSessionId());
         VerifyOrReturn(nullptr != iter);
 
         System::PacketBufferHandle msgCopy;
         bool decrypted = false;
         while (!decrypted && iter->Next(groupContext))
         {
-            msgCopy = msg.CloneData();
-            decrypted = (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
+            msgCopy   = msg.CloneData();
+            decrypted = (CHIP_NO_ERROR ==
+                         SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
         }
         iter->Release();
         VerifyOrReturn(decrypted);
