@@ -561,8 +561,8 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 CHIP_ERROR DeviceController::CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId,
                                                        chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
                                                        chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                                                       Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+                                                       CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                                                       CommandResponseFailureCallback failureCb)
 {
     PeerId peerId;
     peerId.SetNodeId(deviceId);
@@ -578,8 +578,12 @@ CHIP_ERROR DeviceController::CreateBindingWithCallback(chip::NodeId deviceId, ch
     chip::Controller::BindingCluster cluster;
     cluster.Associate(device, deviceEndpointId);
 
-    ReturnErrorOnFailure(
-        cluster.Bind(onSuccessCallback, onFailureCallback, bindingNodeId, bindingGroupId, bindingEndpointId, bindingClusterId));
+    Binding::Commands::Bind::Type request;
+    request.nodeId     = bindingNodeId;
+    request.groupId    = bindingGroupId;
+    request.endpointId = bindingEndpointId;
+    request.clusterId  = bindingClusterId;
+    ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
 
     ChipLogDetail(Controller, "Sent Bind command request, waiting for response");
     return CHIP_NO_ERROR;

@@ -34,7 +34,6 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
@@ -321,10 +320,11 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId, chip::NodeId bindingNodeId,
-                                         chip::GroupId bindingGroupId, chip::EndpointId bindingEndpointId,
-                                         chip::ClusterId bindingClusterId, Callback::Cancelable * onSuccessCallback,
-                                         Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR
+    CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId, chip::NodeId bindingNodeId,
+                              chip::GroupId bindingGroupId, chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                              CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                              CommandResponseFailureCallback failureCb);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
