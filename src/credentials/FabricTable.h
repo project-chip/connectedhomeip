@@ -172,7 +172,7 @@ public:
         }
         return mOperationalKey;
     }
-    CHIP_ERROR SetEphemeralKey(const Crypto::P256Keypair * key);
+    CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
@@ -200,31 +200,27 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetICACert(ByteSpan & cert)
+    CHIP_ERROR GetICACert(ByteSpan & cert) const
     {
         cert = mICACert;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetNOCCert(ByteSpan & cert)
+    CHIP_ERROR GetNOCCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mNOCCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mNOCCert;
         return CHIP_NO_ERROR;
     }
 
-    Credentials::CertificateKeyId GetTrustedRootId() const
+    CHIP_ERROR GetTrustedRootId(Credentials::CertificateKeyId & skid) const
     {
-        Credentials::CertificateKeyId skid;
-        Credentials::ExtractSKIDFromChipCert(mRootCert, skid);
-        return skid;
+        return Credentials::ExtractSKIDFromChipCert(mRootCert, skid);
     }
 
-    Credentials::P256PublicKeySpan GetRootPubkey() const
+    CHIP_ERROR GetRootPubkey(Credentials::P256PublicKeySpan & publicKey) const
     {
-        Credentials::P256PublicKeySpan publicKey;
-        Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
-        return publicKey;
+        return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
@@ -406,10 +402,10 @@ class DLL_EXPORT FabricTable
 {
 public:
     FabricTable() { Reset(); }
-    CHIP_ERROR Store(FabricIndex id);
+    CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
-    CHIP_ERROR Delete(FabricIndex id);
+    CHIP_ERROR Delete(FabricIndex index);
     void DeleteAllFabrics();
 
     /**
@@ -425,6 +421,7 @@ public:
 
     void ReleaseFabricIndex(FabricIndex fabricIndex);
 
+    FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 

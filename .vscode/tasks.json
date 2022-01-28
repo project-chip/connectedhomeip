@@ -142,7 +142,8 @@
                 "-c=${input:mbedCommand}",
                 "-a=${input:mbedApp}",
                 "-b=${input:mbedTarget}",
-                "-p=${input:mbedProfile}"
+                "-p=${input:mbedProfile}",
+                "-T=${input:mbedAppType}"
             ],
             "group": "build",
             "problemMatcher": {
@@ -200,7 +201,8 @@
                 "lighting-app",
                 "pigweed-app",
                 "all-clusters-app",
-                "shell"
+                "shell",
+                "ota-requestor-app"
             ],
             "default": "lock-app"
         },
@@ -215,8 +217,15 @@
             "type": "pickString",
             "id": "mbedProfile",
             "description": "What mbed profile do you want to use?",
-            "options": ["develop", "release", "debug"],
-            "default": "develop"
+            "options": ["release", "develop", "debug"],
+            "default": "release"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedAppType",
+            "description": "What mbed application type do you want to use?",
+            "options": ["simple", "boot", "upgrade"],
+            "default": "simple"
         },
         {
             "type": "promptString",

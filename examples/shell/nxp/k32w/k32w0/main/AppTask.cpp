@@ -110,7 +110,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Print the current software version
-    char softwareVersionString[ConfigurationManager::kMaxSoftwareVersionLength + 1] = { 0 };
+    char softwareVersionString[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
     err = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
     if (err != CHIP_NO_ERROR)
     {

@@ -67,6 +67,10 @@ struct GroupTableCodec
         mProvider(provider), mFabric(fabric_index), mInfo(info)
     {}
 
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return mFabric; }
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     {
         TLV::TLVType outer;
@@ -351,14 +355,16 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
         return true;
     }
 
+    // In KeySetReadResponse, EpochKey0, EpochKey1 and EpochKey2 key contents shall be null
     GroupKeyManagement::Commands::KeySetReadResponse::Type response;
     response.groupKeySet.groupKeySetID  = keyset.keyset_id;
     response.groupKeySet.securityPolicy = keyset.policy;
+
     // Keyset 0
     if (keyset.num_keys_used > 0)
     {
         response.groupKeySet.epochStartTime0 = keyset.epoch_keys[0].start_time;
-        response.groupKeySet.epochKey0       = chip::ByteSpan(keyset.epoch_keys[0].key, GroupDataProvider::EpochKey::kLengthBytes);
+        response.groupKeySet.epochKey0       = chip::ByteSpan(nullptr, 0);
     }
     else
     {
@@ -369,7 +375,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     if (keyset.num_keys_used > 1)
     {
         response.groupKeySet.epochStartTime1 = keyset.epoch_keys[1].start_time;
-        response.groupKeySet.epochKey1       = chip::ByteSpan(keyset.epoch_keys[1].key, GroupDataProvider::EpochKey::kLengthBytes);
+        response.groupKeySet.epochKey1       = chip::ByteSpan(nullptr, 0);
     }
     else
     {
@@ -380,7 +386,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     if (keyset.num_keys_used > 2)
     {
         response.groupKeySet.epochStartTime2 = keyset.epoch_keys[2].start_time;
-        response.groupKeySet.epochKey2       = chip::ByteSpan(keyset.epoch_keys[2].key, GroupDataProvider::EpochKey::kLengthBytes);
+        response.groupKeySet.epochKey2       = chip::ByteSpan(nullptr, 0);
     }
     else
     {

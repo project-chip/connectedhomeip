@@ -23,5 +23,5 @@ using namespace chip::app::Clusters::WakeOnLan;
 
 CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(chip::CharSpan("00:00:00:00:00", strlen("00:00:00:00:00")));
+    return aEncoder.Encode(CharSpan::fromCharString("00:00:00:00:00"));
 }

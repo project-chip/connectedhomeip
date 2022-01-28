@@ -30,6 +30,8 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 
 using namespace chip;
 using namespace chip::TLV;
@@ -94,7 +96,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
             {
                 ClusterStatus clusterStatus;
                 ReturnErrorOnFailure(reader.Get(clusterStatus));
-                PRETTY_PRINT("\tstatus = 0x%" PRIx8 ",", clusterStatus);
+                PRETTY_PRINT("\tcluster-status = 0x%" PRIx8 ",", clusterStatus);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -181,6 +183,50 @@ void StatusIB::InitFromChipError(CHIP_ERROR aError)
     }
 
     mStatus = Status::Failure;
+}
+
+namespace {
+bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!err.IsIMStatus())
+    {
+        return false;
+    }
+
+    const char * desc = nullptr;
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    constexpr char generalFormat[] = "General error: 0x%02" PRIx8;
+    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02" PRIx8;
+
+    // Formatting an 8-bit int will take at most 2 chars, and replace the '%'
+    // and the format letter(s) for PRIx8, so a buffer big enough to hold our
+    // format string will also hold our formatted string.
+    constexpr size_t formattedSize = max(sizeof(generalFormat), sizeof(clusterFormat));
+    char formattedString[formattedSize];
+
+    StatusIB status;
+    status.InitFromChipError(err);
+    if (status.mClusterStatus.HasValue())
+    {
+        snprintf(formattedString, formattedSize, clusterFormat, status.mClusterStatus.Value());
+    }
+    else
+    {
+        snprintf(formattedString, formattedSize, generalFormat, to_underlying(status.mStatus));
+    }
+    desc = formattedString;
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+    FormatError(buf, bufSize, "IM", err, desc);
+
+    return true;
+}
+} // anonymous namespace
+
+void StatusIB::RegisterErrorFormatter()
+{
+    static ErrorFormatter sStatusIBErrorFormatter = { FormatStatusIBError, nullptr };
+
+    ::RegisterErrorFormatter(&sStatusIBErrorFormatter);
 }
 
 }; // namespace app

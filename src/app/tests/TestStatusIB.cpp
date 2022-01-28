@@ -19,6 +19,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -88,10 +89,30 @@ void TestStatusIBToFromChipError(nlTestSuite * aSuite, void * aContext)
     }
 }
 
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+void TestStatusIBErrorToString(nlTestSuite * aSuite, void * aContext)
+{
+    StatusIB status;
+    status.mStatus   = Status::InvalidAction;
+    CHIP_ERROR err   = status.ToChipError();
+    const char * str = ErrorStr(err);
+    NL_TEST_ASSERT(aSuite, strcmp(str, "IM Error 0x00000580: General error: 0x80") == 0);
+
+    status.mStatus        = Status::Failure;
+    status.mClusterStatus = MakeOptional(static_cast<ClusterStatus>(5));
+    err                   = status.ToChipError();
+    str                   = ErrorStr(err);
+    NL_TEST_ASSERT(aSuite, strcmp(str, "IM Error 0x00000605: Cluster-specific error: 0x05") == 0);
+}
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
 // clang-format off
 const nlTest sTests[] =
 {
     NL_TEST_DEF("StatusIBToFromChipError", TestStatusIBToFromChipError),
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    NL_TEST_DEF("StatusIBErrorToString", TestStatusIBErrorToString),
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -105,6 +126,9 @@ static int TestSetup(void * inContext)
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
         return FAILURE;
+    // Hand-register the error formatter.  Normally it's registered by
+    // InteractionModelEngine::Init, but we don't want to mess with that here.
+    StatusIB::RegisterErrorFormatter();
     return SUCCESS;
 }
 

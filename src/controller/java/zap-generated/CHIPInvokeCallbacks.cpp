@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -82,9 +82,7 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject setupPIN;
-
-    chip::UtfString setupPINUtfString(env, dataResponse.setupPIN);
-    setupPIN = setupPINUtfString.jniValue();
+    setupPIN = env->NewStringUTF(std::string(dataResponse.setupPIN.data(), dataResponse.setupPIN.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, setupPIN);
 }
@@ -143,15 +141,12 @@ void CHIPApplicationLauncherClusterLauncherResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::StatusEnum>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
     jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
+    data = env->NewStringUTF(std::string(dataResponse.data.data(), dataResponse.data.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
@@ -203,18 +198,53 @@ void CHIPChannelClusterChangeChannelResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess", "(Lchip/devicecontroller/ChipStructs$ChannelClusterChannelInfo;Ljava/lang/Integer;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject channelMatch;
+    jobject channelMatch_majorNumber;
+    std::string channelMatch_majorNumberClassName     = "java/lang/Integer";
+    std::string channelMatch_majorNumberCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(channelMatch_majorNumberClassName.c_str(),
+                                                                   channelMatch_majorNumberCtorSignature.c_str(),
+                                                                   dataResponse.channelMatch.majorNumber, channelMatch_majorNumber);
+    jobject channelMatch_minorNumber;
+    std::string channelMatch_minorNumberClassName     = "java/lang/Integer";
+    std::string channelMatch_minorNumberCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(channelMatch_minorNumberClassName.c_str(),
+                                                                   channelMatch_minorNumberCtorSignature.c_str(),
+                                                                   dataResponse.channelMatch.minorNumber, channelMatch_minorNumber);
+    jobject channelMatch_name;
+    channelMatch_name =
+        env->NewStringUTF(std::string(dataResponse.channelMatch.name.data(), dataResponse.channelMatch.name.size()).c_str());
+    jobject channelMatch_callSign;
+    channelMatch_callSign = env->NewStringUTF(
+        std::string(dataResponse.channelMatch.callSign.data(), dataResponse.channelMatch.callSign.size()).c_str());
+    jobject channelMatch_affiliateCallSign;
+    channelMatch_affiliateCallSign = env->NewStringUTF(
+        std::string(dataResponse.channelMatch.affiliateCallSign.data(), dataResponse.channelMatch.affiliateCallSign.size())
+            .c_str());
 
-    channelMatch = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    jclass channelInfoStructClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo",
+                                                         channelInfoStructClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo"));
+    chip::JniClass structJniClass(channelInfoStructClass);
+    jmethodID channelInfoStructCtor =
+        env->GetMethodID(channelInfoStructClass, "<init>",
+                         "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+    VerifyOrReturn(channelInfoStructCtor != nullptr,
+                   ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor"));
+
+    channelMatch = env->NewObject(channelInfoStructClass, channelInfoStructCtor, channelMatch_majorNumber, channelMatch_minorNumber,
+                                  channelMatch_name, channelMatch_callSign, channelMatch_affiliateCallSign);
     jobject errorType;
-
     std::string errorTypeClassName     = "java/lang/Integer";
     std::string errorTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::Channel::ErrorTypeEnum>(
-        errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(), dataResponse.errorType, errorType);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorType), errorType);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
 }
@@ -271,15 +301,12 @@ void CHIPContentLauncherClusterLaunchResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::StatusEnum>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
     jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
+    data = env->NewStringUTF(std::string(dataResponse.data.data(), dataResponse.data.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
@@ -337,23 +364,21 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DiagnosticLogs::LogsStatus>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
     jobject content;
-
-    chip::ByteArray contentByteArray(env, dataResponse.content);
-    content = contentByteArray.jniValue();
+    jbyteArray contentByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.content.size()));
+    env->SetByteArrayRegion(contentByteArray, 0, static_cast<jsize>(dataResponse.content.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.content.data()));
+    content = contentByteArray;
     jobject timeStamp;
-
     std::string timeStampClassName     = "java/lang/Long";
     std::string timeStampCtorSignature = "(J)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(timeStampClassName.c_str(), timeStampCtorSignature.c_str(),
                                                                    dataResponse.timeStamp, timeStamp);
     jobject timeSinceBoot;
-
     std::string timeSinceBootClassName     = "java/lang/Long";
     std::string timeSinceBootCtorSignature = "(J)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
@@ -416,24 +441,35 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject credentialExists;
-
     std::string credentialExistsClassName     = "java/lang/Boolean";
     std::string credentialExistsCtorSignature = "(Z)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
         credentialExistsClassName.c_str(), credentialExistsCtorSignature.c_str(), dataResponse.credentialExists, credentialExists);
     jobject userIndex;
-
-    std::string userIndexClassName     = "java/lang/Integer";
-    std::string userIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
-                                                                   dataResponse.userIndex.Value(), userIndex);
+    if (dataResponse.userIndex.IsNull())
+    {
+        userIndex = nullptr;
+    }
+    else
+    {
+        std::string userIndexClassName     = "java/lang/Integer";
+        std::string userIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
+                                                                       dataResponse.userIndex.Value(), userIndex);
+    }
     jobject nextCredentialIndex;
-
-    std::string nextCredentialIndexClassName     = "java/lang/Integer";
-    std::string nextCredentialIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(nextCredentialIndexClassName.c_str(),
-                                                                   nextCredentialIndexCtorSignature.c_str(),
-                                                                   dataResponse.nextCredentialIndex.Value(), nextCredentialIndex);
+    if (dataResponse.nextCredentialIndex.IsNull())
+    {
+        nextCredentialIndex = nullptr;
+    }
+    else
+    {
+        std::string nextCredentialIndexClassName     = "java/lang/Integer";
+        std::string nextCredentialIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            nextCredentialIndexClassName.c_str(), nextCredentialIndexCtorSignature.c_str(),
+            dataResponse.nextCredentialIndex.Value(), nextCredentialIndex);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, credentialExists, userIndex, nextCredentialIndex);
 }
@@ -487,68 +523,157 @@ void CHIPDoorLockClusterGetUserResponseCallback::CallbackFn(
 
     err = JniReferences::GetInstance().FindMethod(
         env, javaCallbackRef, "onSuccess",
-        "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+        "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/"
+        "ArrayList;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
         &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject userIndex;
-
     std::string userIndexClassName     = "java/lang/Integer";
     std::string userIndexCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
                                                                    dataResponse.userIndex, userIndex);
     jobject userName;
-
-    chip::UtfString userNameUtfString(env, dataResponse.userName.Value());
-    userName = userNameUtfString.jniValue();
+    if (dataResponse.userName.IsNull())
+    {
+        userName = nullptr;
+    }
+    else
+    {
+        userName =
+            env->NewStringUTF(std::string(dataResponse.userName.Value().data(), dataResponse.userName.Value().size()).c_str());
+    }
     jobject userUniqueId;
-
-    std::string userUniqueIdClassName     = "java/lang/Long";
-    std::string userUniqueIdCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(userUniqueIdClassName.c_str(), userUniqueIdCtorSignature.c_str(),
-                                                                   dataResponse.userUniqueId.Value(), userUniqueId);
+    if (dataResponse.userUniqueId.IsNull())
+    {
+        userUniqueId = nullptr;
+    }
+    else
+    {
+        std::string userUniqueIdClassName     = "java/lang/Long";
+        std::string userUniqueIdCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+            userUniqueIdClassName.c_str(), userUniqueIdCtorSignature.c_str(), dataResponse.userUniqueId.Value(), userUniqueId);
+    }
     jobject userStatus;
-
-    std::string userStatusClassName     = "java/lang/Integer";
-    std::string userStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlUserStatus>(
-        userStatusClassName.c_str(), userStatusCtorSignature.c_str(), dataResponse.userStatus.Value(), userStatus);
+    if (dataResponse.userStatus.IsNull())
+    {
+        userStatus = nullptr;
+    }
+    else
+    {
+        std::string userStatusClassName     = "java/lang/Integer";
+        std::string userStatusCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userStatusClassName.c_str(), userStatusCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(dataResponse.userStatus.Value()),
+                                                                      userStatus);
+    }
     jobject userType;
-
-    std::string userTypeClassName     = "java/lang/Integer";
-    std::string userTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlUserType>(
-        userTypeClassName.c_str(), userTypeCtorSignature.c_str(), dataResponse.userType.Value(), userType);
+    if (dataResponse.userType.IsNull())
+    {
+        userType = nullptr;
+    }
+    else
+    {
+        std::string userTypeClassName     = "java/lang/Integer";
+        std::string userTypeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userTypeClassName.c_str(), userTypeCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(dataResponse.userType.Value()),
+                                                                      userType);
+    }
     jobject credentialRule;
-
-    std::string credentialRuleClassName     = "java/lang/Integer";
-    std::string credentialRuleCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlCredentialRule>(
-        credentialRuleClassName.c_str(), credentialRuleCtorSignature.c_str(), dataResponse.credentialRule.Value(), credentialRule);
+    if (dataResponse.credentialRule.IsNull())
+    {
+        credentialRule = nullptr;
+    }
+    else
+    {
+        std::string credentialRuleClassName     = "java/lang/Integer";
+        std::string credentialRuleCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            credentialRuleClassName.c_str(), credentialRuleCtorSignature.c_str(),
+            static_cast<uint8_t>(dataResponse.credentialRule.Value()), credentialRule);
+    }
     jobject credentials;
+    if (dataResponse.credentials.IsNull())
+    {
+        credentials = nullptr;
+    }
+    else
+    {
+        chip::JniReferences::GetInstance().CreateArrayList(credentials);
 
-    credentials = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+        auto iter_credentials_1 = dataResponse.credentials.Value().begin();
+        while (iter_credentials_1.Next())
+        {
+            auto & entry_1 = iter_credentials_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_credentialType;
+            std::string newElement_1_credentialTypeClassName     = "java/lang/Integer";
+            std::string newElement_1_credentialTypeCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_credentialTypeClassName.c_str(), newElement_1_credentialTypeCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_1.credentialType), newElement_1_credentialType);
+            jobject newElement_1_credentialIndex;
+            std::string newElement_1_credentialIndexClassName     = "java/lang/Integer";
+            std::string newElement_1_credentialIndexCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_credentialIndexClassName.c_str(),
+                                                                           newElement_1_credentialIndexCtorSignature.c_str(),
+                                                                           entry_1.credentialIndex, newElement_1_credentialIndex);
+
+            jclass dlCredentialStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$DoorLockClusterDlCredential", dlCredentialStructClass);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterDlCredential"));
+            chip::JniClass structJniClass(dlCredentialStructClass);
+            jmethodID dlCredentialStructCtor =
+                env->GetMethodID(dlCredentialStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            VerifyOrReturn(dlCredentialStructCtor != nullptr,
+                           ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterDlCredential constructor"));
+
+            newElement_1 = env->NewObject(dlCredentialStructClass, dlCredentialStructCtor, newElement_1_credentialType,
+                                          newElement_1_credentialIndex);
+            chip::JniReferences::GetInstance().AddToArrayList(credentials, newElement_1);
+        }
+    }
     jobject creatorFabricIndex;
-
-    std::string creatorFabricIndexClassName     = "java/lang/Integer";
-    std::string creatorFabricIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::FabricIndex>(
-        creatorFabricIndexClassName.c_str(), creatorFabricIndexCtorSignature.c_str(), dataResponse.creatorFabricIndex.Value(),
-        creatorFabricIndex);
+    if (dataResponse.creatorFabricIndex.IsNull())
+    {
+        creatorFabricIndex = nullptr;
+    }
+    else
+    {
+        std::string creatorFabricIndexClassName     = "java/lang/Integer";
+        std::string creatorFabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(creatorFabricIndexClassName.c_str(),
+                                                                      creatorFabricIndexCtorSignature.c_str(),
+                                                                      dataResponse.creatorFabricIndex.Value(), creatorFabricIndex);
+    }
     jobject lastModifiedFabricIndex;
-
-    std::string lastModifiedFabricIndexClassName     = "java/lang/Integer";
-    std::string lastModifiedFabricIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::FabricIndex>(
-        lastModifiedFabricIndexClassName.c_str(), lastModifiedFabricIndexCtorSignature.c_str(),
-        dataResponse.lastModifiedFabricIndex.Value(), lastModifiedFabricIndex);
+    if (dataResponse.lastModifiedFabricIndex.IsNull())
+    {
+        lastModifiedFabricIndex = nullptr;
+    }
+    else
+    {
+        std::string lastModifiedFabricIndexClassName     = "java/lang/Integer";
+        std::string lastModifiedFabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            lastModifiedFabricIndexClassName.c_str(), lastModifiedFabricIndexCtorSignature.c_str(),
+            dataResponse.lastModifiedFabricIndex.Value(), lastModifiedFabricIndex);
+    }
     jobject nextUserIndex;
-
-    std::string nextUserIndexClassName     = "java/lang/Integer";
-    std::string nextUserIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-        nextUserIndexClassName.c_str(), nextUserIndexCtorSignature.c_str(), dataResponse.nextUserIndex, nextUserIndex);
+    if (dataResponse.nextUserIndex.IsNull())
+    {
+        nextUserIndex = nullptr;
+    }
+    else
+    {
+        std::string nextUserIndexClassName     = "java/lang/Integer";
+        std::string nextUserIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            nextUserIndexClassName.c_str(), nextUserIndexCtorSignature.c_str(), dataResponse.nextUserIndex.Value(), nextUserIndex);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, userIndex, userName, userUniqueId, userStatus, userType, credentialRule,
                         credentials, creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);
@@ -606,24 +731,35 @@ void CHIPDoorLockClusterSetCredentialResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DlStatus>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
     jobject userIndex;
-
-    std::string userIndexClassName     = "java/lang/Integer";
-    std::string userIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
-                                                                   dataResponse.userIndex.Value(), userIndex);
+    if (dataResponse.userIndex.IsNull())
+    {
+        userIndex = nullptr;
+    }
+    else
+    {
+        std::string userIndexClassName     = "java/lang/Integer";
+        std::string userIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
+                                                                       dataResponse.userIndex.Value(), userIndex);
+    }
     jobject nextCredentialIndex;
-
-    std::string nextCredentialIndexClassName     = "java/lang/Integer";
-    std::string nextCredentialIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(nextCredentialIndexClassName.c_str(),
-                                                                   nextCredentialIndexCtorSignature.c_str(),
-                                                                   dataResponse.nextCredentialIndex.Value(), nextCredentialIndex);
+    if (dataResponse.nextCredentialIndex.IsNull())
+    {
+        nextCredentialIndex = nullptr;
+    }
+    else
+    {
+        std::string nextCredentialIndexClassName     = "java/lang/Integer";
+        std::string nextCredentialIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            nextCredentialIndexClassName.c_str(), nextCredentialIndexCtorSignature.c_str(),
+            dataResponse.nextCredentialIndex.Value(), nextCredentialIndex);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, userIndex, nextCredentialIndex);
 }
@@ -682,15 +818,12 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject errorCode;
-
     std::string errorCodeClassName     = "java/lang/Integer";
     std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError>(
-        errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorCode), errorCode);
     jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
+    debugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -751,15 +884,12 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::Callb
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject errorCode;
-
     std::string errorCodeClassName     = "java/lang/Integer";
     std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError>(
-        errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorCode), errorCode);
     jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
+    debugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -820,15 +950,12 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::Callbac
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject errorCode;
-
     std::string errorCodeClassName     = "java/lang/Integer";
     std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError>(
-        errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorCode), errorCode);
     jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
+    debugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -884,12 +1011,23 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/ArrayList;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject groupKeySetIDs;
+    chip::JniReferences::GetInstance().CreateArrayList(groupKeySetIDs);
 
-    groupKeySetIDs = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_groupKeySetIDs_0 = dataResponse.groupKeySetIDs.begin();
+    while (iter_groupKeySetIDs_0.Next())
+    {
+        auto & entry_0 = iter_groupKeySetIDs_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(groupKeySetIDs, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySetIDs);
 }
@@ -943,12 +1081,74 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
+                                                  "(Lchip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeySet;)V",
+                                                  &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject groupKeySet;
+    jobject groupKeySet_groupKeySetID;
+    std::string groupKeySet_groupKeySetIDClassName     = "java/lang/Integer";
+    std::string groupKeySet_groupKeySetIDCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+        groupKeySet_groupKeySetIDClassName.c_str(), groupKeySet_groupKeySetIDCtorSignature.c_str(),
+        dataResponse.groupKeySet.groupKeySetID, groupKeySet_groupKeySetID);
+    jobject groupKeySet_securityPolicy;
+    std::string groupKeySet_securityPolicyClassName     = "java/lang/Integer";
+    std::string groupKeySet_securityPolicyCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        groupKeySet_securityPolicyClassName.c_str(), groupKeySet_securityPolicyCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.groupKeySet.securityPolicy), groupKeySet_securityPolicy);
+    jobject groupKeySet_epochKey0;
+    jbyteArray groupKeySet_epochKey0ByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey0.size()));
+    env->SetByteArrayRegion(groupKeySet_epochKey0ByteArray, 0, static_cast<jsize>(dataResponse.groupKeySet.epochKey0.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey0.data()));
+    groupKeySet_epochKey0 = groupKeySet_epochKey0ByteArray;
+    jobject groupKeySet_epochStartTime0;
+    std::string groupKeySet_epochStartTime0ClassName     = "java/lang/Long";
+    std::string groupKeySet_epochStartTime0CtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+        groupKeySet_epochStartTime0ClassName.c_str(), groupKeySet_epochStartTime0CtorSignature.c_str(),
+        dataResponse.groupKeySet.epochStartTime0, groupKeySet_epochStartTime0);
+    jobject groupKeySet_epochKey1;
+    jbyteArray groupKeySet_epochKey1ByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey1.size()));
+    env->SetByteArrayRegion(groupKeySet_epochKey1ByteArray, 0, static_cast<jsize>(dataResponse.groupKeySet.epochKey1.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey1.data()));
+    groupKeySet_epochKey1 = groupKeySet_epochKey1ByteArray;
+    jobject groupKeySet_epochStartTime1;
+    std::string groupKeySet_epochStartTime1ClassName     = "java/lang/Long";
+    std::string groupKeySet_epochStartTime1CtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+        groupKeySet_epochStartTime1ClassName.c_str(), groupKeySet_epochStartTime1CtorSignature.c_str(),
+        dataResponse.groupKeySet.epochStartTime1, groupKeySet_epochStartTime1);
+    jobject groupKeySet_epochKey2;
+    jbyteArray groupKeySet_epochKey2ByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey2.size()));
+    env->SetByteArrayRegion(groupKeySet_epochKey2ByteArray, 0, static_cast<jsize>(dataResponse.groupKeySet.epochKey2.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey2.data()));
+    groupKeySet_epochKey2 = groupKeySet_epochKey2ByteArray;
+    jobject groupKeySet_epochStartTime2;
+    std::string groupKeySet_epochStartTime2ClassName     = "java/lang/Long";
+    std::string groupKeySet_epochStartTime2CtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+        groupKeySet_epochStartTime2ClassName.c_str(), groupKeySet_epochStartTime2CtorSignature.c_str(),
+        dataResponse.groupKeySet.epochStartTime2, groupKeySet_epochStartTime2);
 
-    groupKeySet = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    jclass groupKeySetStructClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeySet", groupKeySetStructClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeySet"));
+    chip::JniClass structJniClass(groupKeySetStructClass);
+    jmethodID groupKeySetStructCtor =
+        env->GetMethodID(groupKeySetStructClass, "<init>",
+                         "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;)V");
+    VerifyOrReturn(groupKeySetStructCtor != nullptr,
+                   ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKeySet constructor"));
+
+    groupKeySet =
+        env->NewObject(groupKeySetStructClass, groupKeySetStructCtor, groupKeySet_groupKeySetID, groupKeySet_securityPolicy,
+                       groupKeySet_epochKey0, groupKeySet_epochStartTime0, groupKeySet_epochKey1, groupKeySet_epochStartTime1,
+                       groupKeySet_epochKey2, groupKeySet_epochStartTime2);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySet);
 }
@@ -1005,13 +1205,11 @@ void CHIPGroupsClusterAddGroupResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
@@ -1068,18 +1266,29 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                  &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject capacity;
-
     std::string capacityClassName     = "java/lang/Integer";
     std::string capacityCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(capacityClassName.c_str(), capacityCtorSignature.c_str(),
                                                                   dataResponse.capacity, capacity);
     jobject groupList;
+    chip::JniReferences::GetInstance().CreateArrayList(groupList);
 
-    groupList = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_groupList_0 = dataResponse.groupList.begin();
+    while (iter_groupList_0.Next())
+    {
+        auto & entry_0 = iter_groupList_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
+                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(groupList, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, capacity, groupList);
 }
@@ -1136,13 +1345,11 @@ void CHIPGroupsClusterRemoveGroupResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
@@ -1203,21 +1410,17 @@ void CHIPGroupsClusterViewGroupResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
     jobject groupName;
-
-    chip::UtfString groupNameUtfString(env, dataResponse.groupName);
-    groupName = groupNameUtfString.jniValue();
+    groupName = env->NewStringUTF(std::string(dataResponse.groupName.data(), dataResponse.groupName.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, groupName);
 }
@@ -1273,7 +1476,6 @@ void CHIPIdentifyClusterIdentifyQueryResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject timeout;
-
     std::string timeoutClassName     = "java/lang/Integer";
     std::string timeoutCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(timeoutClassName.c_str(), timeoutCtorSignature.c_str(),
@@ -1333,11 +1535,10 @@ void CHIPKeypadInputClusterSendKeyResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::KeypadInput::StatusEnum>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
@@ -1393,11 +1594,10 @@ void CHIPMediaPlaybackClusterPlaybackResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::StatusEnum>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
@@ -1456,17 +1656,14 @@ void CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject NetworkingStatus;
-
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(
-        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), dataResponse.networkingStatus, NetworkingStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.networkingStatus), NetworkingStatus);
     jobject DebugText;
-
-    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
-    DebugText = DebugTextUtfString.jniValue();
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
     jobject ErrorValue;
-
     std::string ErrorValueClassName     = "java/lang/Long";
     std::string ErrorValueCtorSignature = "(J)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(ErrorValueClassName.c_str(), ErrorValueCtorSignature.c_str(),
@@ -1529,15 +1726,13 @@ void CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject NetworkingStatus;
-
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(
-        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), dataResponse.networkingStatus, NetworkingStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.networkingStatus), NetworkingStatus);
     jobject DebugText;
-
-    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
-    DebugText = DebugTextUtfString.jniValue();
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText);
 }
@@ -1591,20 +1786,19 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject NetworkingStatus;
-
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(
-        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), dataResponse.networkingStatus, NetworkingStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.networkingStatus), NetworkingStatus);
     jobject DebugText;
-
-    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
-    DebugText = DebugTextUtfString.jniValue();
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
     jobject WiFiScanResults;
     if (!dataResponse.wiFiScanResults.HasValue())
     {
@@ -1612,9 +1806,67 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
     }
     else
     {
+        chip::JniReferences::GetInstance().CreateArrayList(WiFiScanResults);
 
-        WiFiScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
-        chip::JniReferences::GetInstance().CreateOptional(WiFiScanResults, WiFiScanResults);
+        auto iter_WiFiScanResults_1 = dataResponse.wiFiScanResults.Value().begin();
+        while (iter_WiFiScanResults_1.Next())
+        {
+            auto & entry_1 = iter_WiFiScanResults_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_security;
+            std::string newElement_1_securityClassName     = "java/lang/Integer";
+            std::string newElement_1_securityCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1_securityClassName.c_str(),
+                                                                          newElement_1_securityCtorSignature.c_str(),
+                                                                          entry_1.security, newElement_1_security);
+            jobject newElement_1_ssid;
+            jbyteArray newElement_1_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry_1.ssid.size()));
+            env->SetByteArrayRegion(newElement_1_ssidByteArray, 0, static_cast<jsize>(entry_1.ssid.size()),
+                                    reinterpret_cast<const jbyte *>(entry_1.ssid.data()));
+            newElement_1_ssid = newElement_1_ssidByteArray;
+            jobject newElement_1_bssid;
+            jbyteArray newElement_1_bssidByteArray = env->NewByteArray(static_cast<jsize>(entry_1.bssid.size()));
+            env->SetByteArrayRegion(newElement_1_bssidByteArray, 0, static_cast<jsize>(entry_1.bssid.size()),
+                                    reinterpret_cast<const jbyte *>(entry_1.bssid.data()));
+            newElement_1_bssid = newElement_1_bssidByteArray;
+            jobject newElement_1_channel;
+            std::string newElement_1_channelClassName     = "java/lang/Integer";
+            std::string newElement_1_channelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_channelClassName.c_str(),
+                                                                           newElement_1_channelCtorSignature.c_str(),
+                                                                           entry_1.channel, newElement_1_channel);
+            jobject newElement_1_wiFiBand;
+            std::string newElement_1_wiFiBandClassName     = "java/lang/Integer";
+            std::string newElement_1_wiFiBandCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_wiFiBandClassName.c_str(), newElement_1_wiFiBandCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_1.wiFiBand), newElement_1_wiFiBand);
+            jobject newElement_1_rssi;
+            std::string newElement_1_rssiClassName     = "java/lang/Integer";
+            std::string newElement_1_rssiCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(
+                newElement_1_rssiClassName.c_str(), newElement_1_rssiCtorSignature.c_str(), entry_1.rssi, newElement_1_rssi);
+
+            jclass wiFiInterfaceScanResultStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult",
+                wiFiInterfaceScanResultStructClass);
+            VerifyOrReturn(
+                err == CHIP_NO_ERROR,
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult"));
+            chip::JniClass structJniClass(wiFiInterfaceScanResultStructClass);
+            jmethodID wiFiInterfaceScanResultStructCtor =
+                env->GetMethodID(wiFiInterfaceScanResultStructClass, "<init>",
+                                 "(Ljava/lang/Integer;[B[BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            VerifyOrReturn(
+                wiFiInterfaceScanResultStructCtor != nullptr,
+                ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult constructor"));
+
+            newElement_1 = env->NewObject(wiFiInterfaceScanResultStructClass, wiFiInterfaceScanResultStructCtor,
+                                          newElement_1_security, newElement_1_ssid, newElement_1_bssid, newElement_1_channel,
+                                          newElement_1_wiFiBand, newElement_1_rssi);
+            chip::JniReferences::GetInstance().AddToArrayList(WiFiScanResults, newElement_1);
+        }
     }
     jobject ThreadScanResults;
     if (!dataResponse.threadScanResults.HasValue())
@@ -1623,9 +1875,78 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
     }
     else
     {
+        chip::JniReferences::GetInstance().CreateArrayList(ThreadScanResults);
 
-        ThreadScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
-        chip::JniReferences::GetInstance().CreateOptional(ThreadScanResults, ThreadScanResults);
+        auto iter_ThreadScanResults_1 = dataResponse.threadScanResults.Value().begin();
+        while (iter_ThreadScanResults_1.Next())
+        {
+            auto & entry_1 = iter_ThreadScanResults_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_panId;
+            std::string newElement_1_panIdClassName     = "java/lang/Long";
+            std::string newElement_1_panIdCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+                newElement_1_panIdClassName.c_str(), newElement_1_panIdCtorSignature.c_str(), entry_1.panId, newElement_1_panId);
+            jobject newElement_1_extendedPanId;
+            std::string newElement_1_extendedPanIdClassName     = "java/lang/Long";
+            std::string newElement_1_extendedPanIdCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_1_extendedPanIdClassName.c_str(),
+                                                                           newElement_1_extendedPanIdCtorSignature.c_str(),
+                                                                           entry_1.extendedPanId, newElement_1_extendedPanId);
+            jobject newElement_1_networkName;
+            newElement_1_networkName =
+                env->NewStringUTF(std::string(entry_1.networkName.data(), entry_1.networkName.size()).c_str());
+            jobject newElement_1_channel;
+            std::string newElement_1_channelClassName     = "java/lang/Integer";
+            std::string newElement_1_channelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_channelClassName.c_str(),
+                                                                           newElement_1_channelCtorSignature.c_str(),
+                                                                           entry_1.channel, newElement_1_channel);
+            jobject newElement_1_version;
+            std::string newElement_1_versionClassName     = "java/lang/Integer";
+            std::string newElement_1_versionCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1_versionClassName.c_str(),
+                                                                          newElement_1_versionCtorSignature.c_str(),
+                                                                          entry_1.version, newElement_1_version);
+            jobject newElement_1_extendedAddress;
+            std::string newElement_1_extendedAddressClassName     = "java/lang/Long";
+            std::string newElement_1_extendedAddressCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_1_extendedAddressClassName.c_str(),
+                                                                           newElement_1_extendedAddressCtorSignature.c_str(),
+                                                                           entry_1.extendedAddress, newElement_1_extendedAddress);
+            jobject newElement_1_rssi;
+            std::string newElement_1_rssiClassName     = "java/lang/Integer";
+            std::string newElement_1_rssiCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(
+                newElement_1_rssiClassName.c_str(), newElement_1_rssiCtorSignature.c_str(), entry_1.rssi, newElement_1_rssi);
+            jobject newElement_1_lqi;
+            std::string newElement_1_lqiClassName     = "java/lang/Integer";
+            std::string newElement_1_lqiCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_lqiClassName.c_str(), newElement_1_lqiCtorSignature.c_str(), entry_1.lqi, newElement_1_lqi);
+
+            jclass threadInterfaceScanResultStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult",
+                threadInterfaceScanResultStructClass);
+            VerifyOrReturn(
+                err == CHIP_NO_ERROR,
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult"));
+            chip::JniClass structJniClass(threadInterfaceScanResultStructClass);
+            jmethodID threadInterfaceScanResultStructCtor =
+                env->GetMethodID(threadInterfaceScanResultStructClass, "<init>",
+                                 "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
+                                 "lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            VerifyOrReturn(
+                threadInterfaceScanResultStructCtor != nullptr,
+                ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult constructor"));
+
+            newElement_1 =
+                env->NewObject(threadInterfaceScanResultStructClass, threadInterfaceScanResultStructCtor, newElement_1_panId,
+                               newElement_1_extendedPanId, newElement_1_networkName, newElement_1_channel, newElement_1_version,
+                               newElement_1_extendedAddress, newElement_1_rssi, newElement_1_lqi);
+            chip::JniReferences::GetInstance().AddToArrayList(ThreadScanResults, newElement_1);
+        }
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
@@ -1686,13 +2007,11 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback::CallbackFn
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject action;
-
     std::string actionClassName     = "java/lang/Integer";
     std::string actionCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction>(
-        actionClassName.c_str(), actionCtorSignature.c_str(), dataResponse.action, action);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(actionClassName.c_str(), actionCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.action), action);
     jobject delayedActionTime;
-
     std::string delayedActionTimeClassName     = "java/lang/Long";
     std::string delayedActionTimeCtorSignature = "(J)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(delayedActionTimeClassName.c_str(),
@@ -1760,11 +2079,10 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
     jobject delayedActionTime;
     if (!dataResponse.delayedActionTime.HasValue())
     {
@@ -1772,13 +2090,11 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
         std::string delayedActionTimeClassName     = "java/lang/Long";
         std::string delayedActionTimeCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(delayedActionTimeClassName.c_str(),
                                                                        delayedActionTimeCtorSignature.c_str(),
                                                                        dataResponse.delayedActionTime.Value(), delayedActionTime);
-        chip::JniReferences::GetInstance().CreateOptional(delayedActionTime, delayedActionTime);
     }
     jobject imageURI;
     if (!dataResponse.imageURI.HasValue())
@@ -1787,10 +2103,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
-        chip::UtfString imageURIUtfString(env, dataResponse.imageURI.Value());
-        imageURI = imageURIUtfString.jniValue();
-        chip::JniReferences::GetInstance().CreateOptional(imageURI, imageURI);
+        imageURI =
+            env->NewStringUTF(std::string(dataResponse.imageURI.Value().data(), dataResponse.imageURI.Value().size()).c_str());
     }
     jobject softwareVersion;
     if (!dataResponse.softwareVersion.HasValue())
@@ -1799,13 +2113,11 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
         std::string softwareVersionClassName     = "java/lang/Long";
         std::string softwareVersionCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(softwareVersionClassName.c_str(),
                                                                        softwareVersionCtorSignature.c_str(),
                                                                        dataResponse.softwareVersion.Value(), softwareVersion);
-        chip::JniReferences::GetInstance().CreateOptional(softwareVersion, softwareVersion);
     }
     jobject softwareVersionString;
     if (!dataResponse.softwareVersionString.HasValue())
@@ -1814,10 +2126,9 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
-        chip::UtfString softwareVersionStringUtfString(env, dataResponse.softwareVersionString.Value());
-        softwareVersionString = softwareVersionStringUtfString.jniValue();
-        chip::JniReferences::GetInstance().CreateOptional(softwareVersionString, softwareVersionString);
+        softwareVersionString = env->NewStringUTF(
+            std::string(dataResponse.softwareVersionString.Value().data(), dataResponse.softwareVersionString.Value().size())
+                .c_str());
     }
     jobject updateToken;
     if (!dataResponse.updateToken.HasValue())
@@ -1826,10 +2137,10 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
-        chip::ByteArray updateTokenByteArray(env, dataResponse.updateToken.Value());
-        updateToken = updateTokenByteArray.jniValue();
-        chip::JniReferences::GetInstance().CreateOptional(updateToken, updateToken);
+        jbyteArray updateTokenByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.updateToken.Value().size()));
+        env->SetByteArrayRegion(updateTokenByteArray, 0, static_cast<jsize>(dataResponse.updateToken.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.updateToken.Value().data()));
+        updateToken = updateTokenByteArray;
     }
     jobject userConsentNeeded;
     if (!dataResponse.userConsentNeeded.HasValue())
@@ -1838,13 +2149,11 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
         std::string userConsentNeededClassName     = "java/lang/Boolean";
         std::string userConsentNeededCtorSignature = "(Z)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<bool>(userConsentNeededClassName.c_str(),
                                                                    userConsentNeededCtorSignature.c_str(),
                                                                    dataResponse.userConsentNeeded.Value(), userConsentNeeded);
-        chip::JniReferences::GetInstance().CreateOptional(userConsentNeeded, userConsentNeeded);
     }
     jobject metadataForRequestor;
     if (!dataResponse.metadataForRequestor.HasValue())
@@ -1853,10 +2162,12 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     }
     else
     {
-
-        chip::ByteArray metadataForRequestorByteArray(env, dataResponse.metadataForRequestor.Value());
-        metadataForRequestor = metadataForRequestorByteArray.jniValue();
-        chip::JniReferences::GetInstance().CreateOptional(metadataForRequestor, metadataForRequestor);
+        jbyteArray metadataForRequestorByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.metadataForRequestor.Value().size()));
+        env->SetByteArrayRegion(metadataForRequestorByteArray, 0,
+                                static_cast<jsize>(dataResponse.metadataForRequestor.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.metadataForRequestor.Value().data()));
+        metadataForRequestor = metadataForRequestorByteArray;
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, delayedActionTime, imageURI, softwareVersion, softwareVersionString,
@@ -1916,13 +2227,15 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject AttestationElements;
-
-    chip::ByteArray AttestationElementsByteArray(env, dataResponse.attestationElements);
-    AttestationElements = AttestationElementsByteArray.jniValue();
+    jbyteArray AttestationElementsByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.attestationElements.size()));
+    env->SetByteArrayRegion(AttestationElementsByteArray, 0, static_cast<jsize>(dataResponse.attestationElements.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.attestationElements.data()));
+    AttestationElements = AttestationElementsByteArray;
     jobject Signature;
-
-    chip::ByteArray SignatureByteArray(env, dataResponse.signature);
-    Signature = SignatureByteArray.jniValue();
+    jbyteArray SignatureByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.signature.size()));
+    env->SetByteArrayRegion(SignatureByteArray, 0, static_cast<jsize>(dataResponse.signature.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.signature.data()));
+    Signature = SignatureByteArray;
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, AttestationElements, Signature);
 }
@@ -1982,9 +2295,10 @@ void CHIPOperationalCredentialsClusterCertificateChainResponseCallback::Callback
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject Certificate;
-
-    chip::ByteArray CertificateByteArray(env, dataResponse.certificate);
-    Certificate = CertificateByteArray.jniValue();
+    jbyteArray CertificateByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.certificate.size()));
+    env->SetByteArrayRegion(CertificateByteArray, 0, static_cast<jsize>(dataResponse.certificate.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.certificate.data()));
+    Certificate = CertificateByteArray;
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Certificate);
 }
@@ -2042,21 +2356,17 @@ void CHIPOperationalCredentialsClusterNOCResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject StatusCode;
-
     std::string StatusCodeClassName     = "java/lang/Integer";
     std::string StatusCodeCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusCodeClassName.c_str(), StatusCodeCtorSignature.c_str(),
                                                                   dataResponse.statusCode, StatusCode);
     jobject FabricIndex;
-
     std::string FabricIndexClassName     = "java/lang/Integer";
     std::string FabricIndexCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(FabricIndexClassName.c_str(), FabricIndexCtorSignature.c_str(),
                                                                   dataResponse.fabricIndex, FabricIndex);
     jobject DebugText;
-
-    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
-    DebugText = DebugTextUtfString.jniValue();
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, StatusCode, FabricIndex, DebugText);
 }
@@ -2114,13 +2424,15 @@ void CHIPOperationalCredentialsClusterOpCSRResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject NOCSRElements;
-
-    chip::ByteArray NOCSRElementsByteArray(env, dataResponse.NOCSRElements);
-    NOCSRElements = NOCSRElementsByteArray.jniValue();
+    jbyteArray NOCSRElementsByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.NOCSRElements.size()));
+    env->SetByteArrayRegion(NOCSRElementsByteArray, 0, static_cast<jsize>(dataResponse.NOCSRElements.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.NOCSRElements.data()));
+    NOCSRElements = NOCSRElementsByteArray;
     jobject AttestationSignature;
-
-    chip::ByteArray AttestationSignatureByteArray(env, dataResponse.attestationSignature);
-    AttestationSignature = AttestationSignatureByteArray.jniValue();
+    jbyteArray AttestationSignatureByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.attestationSignature.size()));
+    env->SetByteArrayRegion(AttestationSignatureByteArray, 0, static_cast<jsize>(dataResponse.attestationSignature.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.attestationSignature.data()));
+    AttestationSignature = AttestationSignatureByteArray;
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, NOCSRElements, AttestationSignature);
 }
@@ -2177,19 +2489,16 @@ void CHIPScenesClusterAddSceneResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
     jobject sceneId;
-
     std::string sceneIdClassName     = "java/lang/Integer";
     std::string sceneIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(sceneIdClassName.c_str(), sceneIdCtorSignature.c_str(),
@@ -2246,38 +2555,45 @@ void CHIPScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess",
+        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject capacity;
-
     std::string capacityClassName     = "java/lang/Integer";
     std::string capacityCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(capacityClassName.c_str(), capacityCtorSignature.c_str(),
                                                                   dataResponse.capacity, capacity);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
     jobject sceneCount;
-
     std::string sceneCountClassName     = "java/lang/Integer";
     std::string sceneCountCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(sceneCountClassName.c_str(), sceneCountCtorSignature.c_str(),
                                                                   dataResponse.sceneCount, sceneCount);
     jobject sceneList;
+    chip::JniReferences::GetInstance().CreateArrayList(sceneList);
 
-    sceneList = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_sceneList_0 = dataResponse.sceneList.begin();
+    while (iter_sceneList_0.Next())
+    {
+        auto & entry_0 = iter_sceneList_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(sceneList, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, capacity, groupId, sceneCount, sceneList);
 }
@@ -2334,13 +2650,11 @@ void CHIPScenesClusterRemoveAllScenesResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
@@ -2401,19 +2715,16 @@ void CHIPScenesClusterRemoveSceneResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
     jobject sceneId;
-
     std::string sceneIdClassName     = "java/lang/Integer";
     std::string sceneIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(sceneIdClassName.c_str(), sceneIdCtorSignature.c_str(),
@@ -2474,19 +2785,16 @@ void CHIPScenesClusterStoreSceneResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
     jobject sceneId;
-
     std::string sceneIdClassName     = "java/lang/Integer";
     std::string sceneIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(sceneIdClassName.c_str(), sceneIdCtorSignature.c_str(),
@@ -2544,40 +2852,72 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
 
     err = JniReferences::GetInstance().FindMethod(
         env, javaCallbackRef, "onSuccess",
-        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V", &javaMethod);
+        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/util/ArrayList;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   dataResponse.status, status);
     jobject groupId;
-
     std::string groupIdClassName     = "java/lang/Integer";
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
     jobject sceneId;
-
     std::string sceneIdClassName     = "java/lang/Integer";
     std::string sceneIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(sceneIdClassName.c_str(), sceneIdCtorSignature.c_str(),
                                                                   dataResponse.sceneId, sceneId);
     jobject transitionTime;
-
     std::string transitionTimeClassName     = "java/lang/Integer";
     std::string transitionTimeCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
         transitionTimeClassName.c_str(), transitionTimeCtorSignature.c_str(), dataResponse.transitionTime, transitionTime);
     jobject sceneName;
-
-    chip::UtfString sceneNameUtfString(env, dataResponse.sceneName);
-    sceneName = sceneNameUtfString.jniValue();
+    sceneName = env->NewStringUTF(std::string(dataResponse.sceneName.data(), dataResponse.sceneName.size()).c_str());
     jobject extensionFieldSets;
+    chip::JniReferences::GetInstance().CreateArrayList(extensionFieldSets);
 
-    extensionFieldSets = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_extensionFieldSets_0 = dataResponse.extensionFieldSets.begin();
+    while (iter_extensionFieldSets_0.Next())
+    {
+        auto & entry_0 = iter_extensionFieldSets_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_clusterId;
+        std::string newElement_0_clusterIdClassName     = "java/lang/Long";
+        std::string newElement_0_clusterIdCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_clusterIdClassName.c_str(),
+                                                                       newElement_0_clusterIdCtorSignature.c_str(),
+                                                                       entry_0.clusterId, newElement_0_clusterId);
+        jobject newElement_0_length;
+        std::string newElement_0_lengthClassName     = "java/lang/Integer";
+        std::string newElement_0_lengthCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_lengthClassName.c_str(), newElement_0_lengthCtorSignature.c_str(), entry_0.length, newElement_0_length);
+        jobject newElement_0_value;
+        std::string newElement_0_valueClassName     = "java/lang/Integer";
+        std::string newElement_0_valueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_valueClassName.c_str(), newElement_0_valueCtorSignature.c_str(), entry_0.value, newElement_0_value);
+
+        jclass sceneExtensionFieldSetStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ScenesClusterSceneExtensionFieldSet", sceneExtensionFieldSetStructClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Could not find class ChipStructs$ScenesClusterSceneExtensionFieldSet"));
+        chip::JniClass structJniClass(sceneExtensionFieldSetStructClass);
+        jmethodID sceneExtensionFieldSetStructCtor = env->GetMethodID(sceneExtensionFieldSetStructClass, "<init>",
+                                                                      "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        VerifyOrReturn(sceneExtensionFieldSetStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterSceneExtensionFieldSet constructor"));
+
+        newElement_0 = env->NewObject(sceneExtensionFieldSetStructClass, sceneExtensionFieldSetStructCtor, newElement_0_clusterId,
+                                      newElement_0_length, newElement_0_value);
+        chip::JniReferences::GetInstance().AddToArrayList(extensionFieldSets, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
 }
@@ -2636,15 +2976,12 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
-
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TargetNavigator::StatusEnum>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
     jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
+    data = env->NewStringUTF(std::string(dataResponse.data.data(), dataResponse.data.size()).c_str());
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
@@ -2700,7 +3037,6 @@ void CHIPTestClusterClusterBooleanResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject value;
-
     std::string valueClassName     = "java/lang/Boolean";
     std::string valueCtorSignature = "(Z)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<bool>(valueClassName.c_str(), valueCtorSignature.c_str(),
@@ -2757,12 +3093,62 @@ void CHIPTestClusterClusterSimpleStructResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess", "(Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject arg1;
+    jobject arg1_a;
+    std::string arg1_aClassName     = "java/lang/Integer";
+    std::string arg1_aCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(arg1_aClassName.c_str(), arg1_aCtorSignature.c_str(),
+                                                                  dataResponse.arg1.a, arg1_a);
+    jobject arg1_b;
+    std::string arg1_bClassName     = "java/lang/Boolean";
+    std::string arg1_bCtorSignature = "(Z)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(arg1_bClassName.c_str(), arg1_bCtorSignature.c_str(),
+                                                               dataResponse.arg1.b, arg1_b);
+    jobject arg1_c;
+    std::string arg1_cClassName     = "java/lang/Integer";
+    std::string arg1_cCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(arg1_cClassName.c_str(), arg1_cCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.arg1.c), arg1_c);
+    jobject arg1_d;
+    jbyteArray arg1_dByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.arg1.d.size()));
+    env->SetByteArrayRegion(arg1_dByteArray, 0, static_cast<jsize>(dataResponse.arg1.d.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.arg1.d.data()));
+    arg1_d = arg1_dByteArray;
+    jobject arg1_e;
+    arg1_e = env->NewStringUTF(std::string(dataResponse.arg1.e.data(), dataResponse.arg1.e.size()).c_str());
+    jobject arg1_f;
+    std::string arg1_fClassName     = "java/lang/Integer";
+    std::string arg1_fCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(arg1_fClassName.c_str(), arg1_fCtorSignature.c_str(),
+                                                                  dataResponse.arg1.f.Raw(), arg1_f);
+    jobject arg1_g;
+    std::string arg1_gClassName     = "java/lang/Float";
+    std::string arg1_gCtorSignature = "(F)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<float>(arg1_gClassName.c_str(), arg1_gCtorSignature.c_str(),
+                                                                dataResponse.arg1.g, arg1_g);
+    jobject arg1_h;
+    std::string arg1_hClassName     = "java/lang/Double";
+    std::string arg1_hCtorSignature = "(D)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<double>(arg1_hClassName.c_str(), arg1_hCtorSignature.c_str(),
+                                                                 dataResponse.arg1.h, arg1_h);
 
-    arg1 = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    jclass simpleStructStructClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct",
+                                                         simpleStructStructClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct"));
+    chip::JniClass structJniClass(simpleStructStructClass);
+    jmethodID simpleStructStructCtor = env->GetMethodID(simpleStructStructClass, "<init>",
+                                                        "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/"
+                                                        "String;Ljava/lang/Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
+    VerifyOrReturn(simpleStructStructCtor != nullptr,
+                   ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor"));
+
+    arg1 = env->NewObject(simpleStructStructClass, simpleStructStructCtor, arg1_a, arg1_b, arg1_c, arg1_d, arg1_e, arg1_f, arg1_g,
+                          arg1_h);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1);
 }
@@ -2820,7 +3206,6 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject returnValue;
-
     std::string returnValueClassName     = "java/lang/Integer";
     std::string returnValueCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(returnValueClassName.c_str(), returnValueCtorSignature.c_str(),
@@ -2882,7 +3267,6 @@ void CHIPTestClusterClusterTestEmitTestEventResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject value;
-
     std::string valueClassName     = "java/lang/Long";
     std::string valueCtorSignature = "(J)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
@@ -2943,17 +3327,15 @@ void CHIPTestClusterClusterTestEnumsResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject arg1;
-
     std::string arg1ClassName     = "java/lang/Integer";
     std::string arg1CtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::VendorId>(arg1ClassName.c_str(), arg1CtorSignature.c_str(),
-                                                                         dataResponse.arg1, arg1);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(arg1ClassName.c_str(), arg1CtorSignature.c_str(),
+                                                                   static_cast<uint16_t>(dataResponse.arg1), arg1);
     jobject arg2;
-
     std::string arg2ClassName     = "java/lang/Integer";
     std::string arg2CtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TestCluster::SimpleEnum>(
-        arg2ClassName.c_str(), arg2CtorSignature.c_str(), dataResponse.arg2, arg2);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(arg2ClassName.c_str(), arg2CtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.arg2), arg2);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1, arg2);
 }
@@ -3007,12 +3389,23 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/ArrayList;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject arg1;
+    chip::JniReferences::GetInstance().CreateArrayList(arg1);
 
-    arg1 = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_arg1_0 = dataResponse.arg1.begin();
+    while (iter_arg1_0.Next())
+    {
+        auto & entry_0 = iter_arg1_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(arg1, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1);
 }
@@ -3072,7 +3465,6 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject wasPresent;
-
     std::string wasPresentClassName     = "java/lang/Boolean";
     std::string wasPresentCtorSignature = "(Z)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<bool>(wasPresentClassName.c_str(), wasPresentCtorSignature.c_str(),
@@ -3084,12 +3476,10 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallback::CallbackFn(
     }
     else
     {
-
         std::string wasNullClassName     = "java/lang/Boolean";
         std::string wasNullCtorSignature = "(Z)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<bool>(wasNullClassName.c_str(), wasNullCtorSignature.c_str(),
                                                                    dataResponse.wasNull.Value(), wasNull);
-        chip::JniReferences::GetInstance().CreateOptional(wasNull, wasNull);
     }
     jobject value;
     if (!dataResponse.value.HasValue())
@@ -3098,12 +3488,10 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallback::CallbackFn(
     }
     else
     {
-
         std::string valueClassName     = "java/lang/Integer";
         std::string valueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
                                                                       dataResponse.value.Value(), value);
-        chip::JniReferences::GetInstance().CreateOptional(value, value);
     }
     jobject originalValue;
     if (!dataResponse.originalValue.HasValue())
@@ -3114,17 +3502,15 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallback::CallbackFn(
     {
         if (dataResponse.originalValue.Value().IsNull())
         {
-            chip::JniReferences::GetInstance().CreateOptional(nullptr, originalValue);
+            originalValue = nullptr;
         }
         else
         {
-
             std::string originalValueClassName     = "java/lang/Integer";
             std::string originalValueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 originalValueClassName.c_str(), originalValueCtorSignature.c_str(), dataResponse.originalValue.Value().Value(),
                 originalValue);
-            chip::JniReferences::GetInstance().CreateOptional(originalValue, originalValue);
         }
     }
 
@@ -3183,7 +3569,6 @@ void CHIPTestClusterClusterTestSpecificResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject returnValue;
-
     std::string returnValueClassName     = "java/lang/Integer";
     std::string returnValueCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(returnValueClassName.c_str(), returnValueCtorSignature.c_str(),
@@ -3248,38 +3633,32 @@ void CHIPThermostatClusterGetRelayStatusLogResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject timeOfDay;
-
     std::string timeOfDayClassName     = "java/lang/Integer";
     std::string timeOfDayCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(timeOfDayClassName.c_str(), timeOfDayCtorSignature.c_str(),
                                                                    dataResponse.timeOfDay, timeOfDay);
     jobject relayStatus;
-
     std::string relayStatusClassName     = "java/lang/Integer";
     std::string relayStatusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(relayStatusClassName.c_str(), relayStatusCtorSignature.c_str(),
                                                                    dataResponse.relayStatus, relayStatus);
     jobject localTemperature;
-
     std::string localTemperatureClassName     = "java/lang/Integer";
     std::string localTemperatureCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(
         localTemperatureClassName.c_str(), localTemperatureCtorSignature.c_str(), dataResponse.localTemperature, localTemperature);
     jobject humidityInPercentage;
-
     std::string humidityInPercentageClassName     = "java/lang/Integer";
     std::string humidityInPercentageCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(humidityInPercentageClassName.c_str(),
                                                                   humidityInPercentageCtorSignature.c_str(),
                                                                   dataResponse.humidityInPercentage, humidityInPercentage);
     jobject setpoint;
-
     std::string setpointClassName     = "java/lang/Integer";
     std::string setpointCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(setpointClassName.c_str(), setpointCtorSignature.c_str(),
                                                                   dataResponse.setpoint, setpoint);
     jobject unreadEntries;
-
     std::string unreadEntriesClassName     = "java/lang/Integer";
     std::string unreadEntriesCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
@@ -3338,33 +3717,43 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject numberOfTransitionsForSequence;
-
     std::string numberOfTransitionsForSequenceClassName     = "java/lang/Integer";
     std::string numberOfTransitionsForSequenceCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
         numberOfTransitionsForSequenceClassName.c_str(), numberOfTransitionsForSequenceCtorSignature.c_str(),
         dataResponse.numberOfTransitionsForSequence, numberOfTransitionsForSequence);
     jobject dayOfWeekForSequence;
-
     std::string dayOfWeekForSequenceClassName     = "java/lang/Integer";
     std::string dayOfWeekForSequenceCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::BitFlags<chip::app::Clusters::Thermostat::DayOfWeek>>(
-        dayOfWeekForSequenceClassName.c_str(), dayOfWeekForSequenceCtorSignature.c_str(), dataResponse.dayOfWeekForSequence,
-        dayOfWeekForSequence);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(dayOfWeekForSequenceClassName.c_str(),
+                                                                  dayOfWeekForSequenceCtorSignature.c_str(),
+                                                                  dataResponse.dayOfWeekForSequence.Raw(), dayOfWeekForSequence);
     jobject modeForSequence;
-
     std::string modeForSequenceClassName     = "java/lang/Integer";
     std::string modeForSequenceCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::BitFlags<chip::app::Clusters::Thermostat::ModeForSequence>>(
-        modeForSequenceClassName.c_str(), modeForSequenceCtorSignature.c_str(), dataResponse.modeForSequence, modeForSequence);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(modeForSequenceClassName.c_str(),
+                                                                  modeForSequenceCtorSignature.c_str(),
+                                                                  dataResponse.modeForSequence.Raw(), modeForSequence);
     jobject payload;
+    chip::JniReferences::GetInstance().CreateArrayList(payload);
 
-    payload = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    auto iter_payload_0 = dataResponse.payload.begin();
+    while (iter_payload_0.Next())
+    {
+        auto & entry_0 = iter_payload_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
+                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToArrayList(payload, newElement_0);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence,
                         payload);

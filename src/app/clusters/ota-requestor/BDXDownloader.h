@@ -26,6 +26,7 @@
 
 #include "OTADownloader.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <system/SystemPacketBuffer.h>
@@ -49,10 +50,10 @@ public:
     {
     public:
         // Handle download state change
-        virtual void OnDownloadStateChanged(State state) = 0;
+        virtual void OnDownloadStateChanged(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) = 0;
         // Handle update progress change
-        virtual void OnUpdateProgressChanged(uint8_t percent) = 0;
-        virtual ~StateDelegate()                              = default;
+        virtual void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) = 0;
+        virtual ~StateDelegate()                                                        = default;
     };
 
     // To be called when there is an incoming message to handle (of any protocol type)
@@ -77,7 +78,7 @@ public:
 private:
     void PollTransferSession();
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
-    void SetState(State state);
+    void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
 
     chip::bdx::TransferSession mBdxTransfer;
     MessagingDelegate * mMsgDelegate = nullptr;

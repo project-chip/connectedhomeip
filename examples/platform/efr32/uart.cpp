@@ -32,6 +32,10 @@ extern "C" {
 #include <stddef.h>
 #include <string.h>
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
+
 #if !defined(MIN)
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
@@ -200,7 +204,9 @@ void USART_IRQHandler(void)
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
-#ifndef PW_RPC_ENABLED
+#if defined(SL_WIFI)
+    /* TODO */
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }
@@ -224,7 +230,9 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
-#ifndef PW_RPC_ENABLED
+#if defined(SL_WIFI)
+    /* TODO */
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }
@@ -241,12 +249,23 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return UART_CONSOLE_ERR;
     }
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
     // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
     // TODO Use DMA and find/fix what causes the issue with PW
     if (UARTDRV_ForceTransmit(sl_uartdrv_usart_vcom_handle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
     {
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
         return BufLength;
     }
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
 
     return UART_CONSOLE_ERR;
 }

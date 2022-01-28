@@ -27,6 +27,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
@@ -53,8 +54,11 @@ class OctetStringData
 {
 public:
     uint8_t * Data() { return mDataBuf; }
+    const uint8_t * Data() const { return mDataBuf; }
     size_t Length() const { return mDataLen; }
     void SetLength(size_t size) { mDataLen = size; }
+
+    ByteSpan AsSpan() const { return ByteSpan(Data(), Length()); }
 
 private:
     uint8_t mDataBuf[kAttributeEntryLength];
@@ -84,6 +88,7 @@ private:
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -91,9 +96,8 @@ uint8_t gListUint8Data[kAttributeListLength];
 OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
-Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::kValueA,
-                                                      ByteSpan(), CharSpan(), BitFlags<SimpleBitmap>(),
-                                                      0,          0 };
+OctetStringData gStructAttributeByteSpanData;
+Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
 // We don't actually support any interesting bits in the struct for now, except
@@ -124,8 +128,17 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case ListLongOctetString::Id: {
         return ReadListLongOctetStringAttribute(aEncoder);
     }
+    case ListFabricScoped::Id: {
+        return ReadListFabricScopedAttribute(aEncoder);
+    }
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
+    }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
     }
     default: {
         break;
@@ -156,6 +169,12 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case NullableStruct::Id: {
         return WriteNullableStruct(aDecoder);
+    }
+    case GeneralErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
+    }
+    case ClusterErrorBoolean::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
     }
     default: {
         break;
@@ -217,8 +236,7 @@ CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & 
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            ByteSpan span(gListOctetStringData[index].Data(), gListOctetStringData[index].Length());
-            ReturnErrorOnFailure(encoder.Encode(span));
+            ReturnErrorOnFailure(encoder.Encode(gListOctetStringData[index].AsSpan()));
         }
         return CHIP_NO_ERROR;
     });
@@ -323,9 +341,8 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDec
         memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
         gListOperationalCert[index].SetLength(entry.operationalCert.size());
 
-        listStructOctetStringData[index].fabricIndex = entry.fabricIndex;
-        listStructOctetStringData[index].operationalCert =
-            ByteSpan(gListOperationalCert[index].Data(), gListOperationalCert[index].Length());
+        listStructOctetStringData[index].fabricIndex     = entry.fabricIndex;
+        listStructOctetStringData[index].operationalCert = gListOperationalCert[index].AsSpan();
         index++;
     }
 
@@ -403,7 +420,37 @@ CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder)
 {
-    return aDecoder.Decode(gStructAttributeValue);
+    // We don't support a nonempty charspan here for now.
+    Structs::SimpleStruct::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    VerifyOrReturnError(temp.e.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    const size_t octet_size = temp.d.size();
+    VerifyOrReturnError(octet_size <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    gStructAttributeValue = temp;
+    memcpy(gStructAttributeByteSpanData.Data(), temp.d.data(), octet_size);
+    gStructAttributeByteSpanData.SetLength(octet_size);
+    gStructAttributeValue.d = gStructAttributeByteSpanData.AsSpan();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
+
+        for (const auto & fb : Server::GetInstance().GetFabricTable())
+        {
+            val.fabricIndex = fb.GetFabricIndex();
+            ReturnErrorOnFailure(encoder.Encode(val));
+        }
+
+        // Always append a fake fabric index so we can test fabric filter even when there is only one fabric provisioned.
+        val.fabricIndex = kUndefinedFabricIndex;
+        ReturnErrorOnFailure(encoder.Encode(val));
+        return CHIP_NO_ERROR;
+    });
 }
 
 } // namespace
@@ -411,6 +458,25 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
                                            const Test::DecodableType & commandData)
 {
+    // Setup the test variables
+    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    for (int i = 0; i < kAttributeListLength; ++i)
+    {
+        gListUint8Data[i] = 0;
+        gListOctetStringData[i].SetLength(0);
+        gListOperationalCert[i].SetLength(0);
+        listStructOctetStringData[i].fabricIndex     = 0;
+        listStructOctetStringData[i].operationalCert = ByteSpan();
+        gSimpleEnums[i]                              = SimpleEnum::kUnspecified;
+    }
+    gSimpleEnumCount = 0;
+
+    gStructAttributeValue = Structs::SimpleStruct::Type();
+
+    gNullableStructAttributeValue.SetNull();
+
+    gNullablesAndOptionalsStruct = Structs::NullablesAndOptionalsStruct::Type();
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -499,6 +565,7 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
+
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestEmitTestEventRequest::DecodableType & commandData)
@@ -510,6 +577,22 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 
     // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
     Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
+
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+    commandObj->AddResponseData(commandPath, responseData);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
+{
+    Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
+    Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
 
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {

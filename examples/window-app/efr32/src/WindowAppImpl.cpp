@@ -31,6 +31,10 @@
 #include <sl_simple_led_instances.h>
 #include <sl_system_kernel.h>
 
+#ifdef SL_WIFI
+#include "wfx_host_events.h"
+#endif
+
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -143,6 +147,18 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
+    }
+    EFR32_LOG("APP: Done WiFi Init");
+    /* We will init server when we get IP */
+#endif
     WindowApp::Init();
 
     // Initialize App Task
@@ -308,30 +324,40 @@ void WindowAppImpl::UpdateLEDs()
         {
             mStatusLED.Blink(200, 200);
         }
-        else if (mState.isThreadProvisioned && mState.isThreadEnabled)
+        else
+#if CHIP_ENABLE_OPENTHREAD
+            if (mState.isThreadProvisioned && mState.isThreadEnabled)
+#else
+            if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
+#endif
+
         {
             mStatusLED.Blink(950, 50);
         }
-        else if (mState.haveBLEConnections)
-        {
-            mStatusLED.Blink(100, 100);
-        }
-        else
-        {
-            mStatusLED.Blink(50, 950);
-        }
+        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
+        else { mStatusLED.Blink(50, 950); }
 
         // Action LED
+        NPercent100ths current;
+        LimitStatus liftLimit = LimitStatus::Intermediate;
+
+        Attributes::CurrentPositionLiftPercent100ths::Get(cover.mEndpoint, current);
+
+        if (!current.IsNull())
+        {
+            AbsoluteLimits limits = { .open = WC_PERCENT100THS_MIN_OPEN, .closed = WC_PERCENT100THS_MAX_CLOSED };
+            liftLimit             = CheckLimitState(current.Value(), limits);
+        }
 
         if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
         {
             mActionLED.Blink(100);
         }
-        else if (IsLiftOpen(cover.mEndpoint))
+        else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
             mActionLED.Set(true);
         }
-        else if (IsLiftClosed(cover.mEndpoint))
+        else if (LimitStatus::IsDownOrClose == liftLimit)
         {
             mActionLED.Set(false);
         }
@@ -346,7 +372,11 @@ void WindowAppImpl::UpdateLCD()
 {
     // Update LCD
 #ifdef DISPLAY_ENABLED
+#if CHIP_ENABLE_OPENTHREAD
     if (mState.isThreadProvisioned)
+#else
+    if (mState.isWiFiProvisioned)
+#endif
     {
         Cover & cover      = GetCover();
         EmberAfWcType type = TypeGet(cover.mEndpoint);
@@ -362,7 +392,10 @@ void WindowAppImpl::UpdateLCD()
     }
     else
     {
-        LCDWriteQRCode((uint8_t *) mQRCode.c_str());
+        if (GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+        {
+            LCDWriteQRCode((uint8_t *) mQRCode.c_str());
+        }
     }
 #endif
 }

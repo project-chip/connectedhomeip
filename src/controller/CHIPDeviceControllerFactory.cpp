@@ -150,7 +150,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     InitDataModelHandler(stateParams.exchangeMgr);
 
     stateParams.imDelegate = params.imDelegate;
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.imDelegate));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
@@ -168,12 +168,10 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
 #endif
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
-    controllerParams.ephemeralKeypair               = params.ephemeralKeypair;
+    controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
-    controllerParams.fabricIndex                    = params.fabricIndex;
-    controllerParams.fabricId                       = params.fabricId;
     controllerParams.storageDelegate                = params.storageDelegate;
 
     controllerParams.systemState        = mSystemState;

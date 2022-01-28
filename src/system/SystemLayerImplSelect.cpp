@@ -373,7 +373,7 @@ void LayerImplSelect::HandleEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    if (mSelectResult < 0)
+    if (!IsSelectResultValid())
     {
         ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(CHIP_ERROR_POSIX(errno)));
         return;

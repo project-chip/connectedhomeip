@@ -135,7 +135,9 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
         else if (IsSeparator(buffer[i]))
         {
             buffer[i] = 0;
-            if (!IsSeparator(buffer[i + 1]))
+            // Don't treat the previous character as a separator if this one is 0
+            // otherwise the trailing space will become a token
+            if (!IsSeparator(buffer[i + 1]) && buffer[i + 1] != 0)
             {
                 tokens[cursor++] = &buffer[i + 1];
             }

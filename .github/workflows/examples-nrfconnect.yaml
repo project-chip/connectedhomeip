@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.40
+            image: connectedhomeip/chip-build-nrf-platform:0.5.52
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -127,14 +127,6 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf5340dk_nrf5340_cpuapp lighting-app \
                     examples/lighting-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-            - name: Build example nRF Connect SDK Shell on nRF5340 DK
-              timeout-minutes: 10
-              run: |
-                  scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nrfconnect nrf5340dk_nrf5340_cpuapp shell \
-                    examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pump App on nRF52840 DK
               timeout-minutes: 10

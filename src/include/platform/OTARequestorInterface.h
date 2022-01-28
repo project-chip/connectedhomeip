@@ -64,8 +64,22 @@ public:
     // Send ApplyImage command
     virtual void ApplyUpdate() = 0;
 
+    // Send NotifyUpdateApplied command
+    virtual void NotifyUpdateApplied(uint32_t version) = 0;
+
+    // Get image update progress in percents unit
+    virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
+
+    // Get requestor state
+    virtual CHIP_ERROR GetState(EndpointId endpointId,
+                                chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
+
     // Manually set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;
+
+    // Application directs the Requestor to cancel image update in progress. All the Requestor state is
+    // cleared, UpdateState is reset to Idle
+    virtual void CancelImageUpdate() = 0;
 };
 
 // The instance of the class implementing OTARequestorInterface must be managed through

@@ -51,7 +51,7 @@ bool SendStatusIfDelegateNull(EndpointId endpoint)
     if (GetDelegate(endpoint) == nullptr)
     {
         ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu16, endpoint);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
         return true;
     }
     return false;
@@ -121,7 +121,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
-    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateUpplied");
+    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateApplied");
 
     if (SendStatusIfDelegateNull(endpoint))
     {

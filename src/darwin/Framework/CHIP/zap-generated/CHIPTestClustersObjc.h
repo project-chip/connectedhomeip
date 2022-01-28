@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -326,8 +326,12 @@ NS_ASSUME_NONNULL_BEGIN
                                          completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNumberOfPINUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfRFIDUsersSupportedWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMinRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -521,6 +525,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMinFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end
@@ -532,6 +537,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestLocalizationConfiguration : CHIPLocalizationConfiguration
 
 - (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end
 
@@ -685,6 +691,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestOperationalCredentials : CHIPOperationalCredentials
 
+- (void)writeAttributeNOCsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFabricsListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSupportedFabricsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCommissionedFabricsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1004,6 +1011,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
+ * Cluster Time Format Localization
+ *
+ */
+@interface CHIPTestTimeFormatLocalization : CHIPTimeFormatLocalization
+
+- (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
+ * Cluster Unit Localization
+ *
+ */
+@interface CHIPTestUnitLocalization : CHIPUnitLocalization
+
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 

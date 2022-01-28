@@ -41,13 +41,20 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/clusters/channel-server/channel-delegate.h>
 #include <app/clusters/channel-server/channel-server.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Channel;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -60,8 +67,18 @@ Delegate * gDelegateTable[EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT] = { nu
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::Channel::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
+    {
+        ChipLogError(Zcl, "Channel returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetChannelDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -82,8 +99,9 @@ namespace Channel {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::Channel::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -105,7 +123,7 @@ namespace {
 class ChannelAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    ChannelAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::Channel::Id) {}
+    ChannelAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), Channel::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
@@ -122,20 +140,30 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::ChannelLineup::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadLineupAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::CurrentChannel::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentChannelAttribute(aEncoder, delegate);
     }
     default: {
@@ -179,7 +207,7 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleChangeChannel(match, responder);
+        delegate->HandleChangeChannel(responder, match);
     }
 
 exit:

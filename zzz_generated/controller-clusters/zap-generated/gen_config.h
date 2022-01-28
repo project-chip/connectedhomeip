@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -86,6 +86,8 @@
 #define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THERMOSTAT_UI_CONFIG_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TIME_FORMAT_LOCALIZATION_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_UNIT_LOCALIZATION_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_USER_LABEL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -320,6 +322,14 @@
 // Use this macro to check if the client side of the Thread Network Diagnostics cluster is included
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_CLIENT
+
+// Use this macro to check if the client side of the Time Format Localization cluster is included
+#define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION_CLIENT
+
+// Use this macro to check if the client side of the Unit Localization cluster is included
+#define ZCL_USING_UNIT_LOCALIZATION_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_UNIT_LOCALIZATION_CLIENT
 
 // Use this macro to check if the client side of the User Label cluster is included
 #define ZCL_USING_USER_LABEL_CLUSTER_CLIENT

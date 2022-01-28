@@ -27,6 +27,7 @@ adb
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddThreadNetwork
 adk
 adoc
 AdvAutonomous
@@ -42,6 +43,7 @@ alloc
 Ameba
 amebad
 amebaiot
+announcementReason
 AnnounceOTAProvider
 APIs
 apk
@@ -144,6 +146,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDVersionNumber
 ced
 cfg
 CFLAGS
@@ -252,17 +255,20 @@ customizations
 cvfJ
 cxx
 CY
+CYW
 DAC
 DAP
 DataFrame
 dataset
 datasets
 dbf
+DBG
 dBm
 DBUILD
 dbus
 dcc
 DCHIP
+DCL
 DCMAKE
 DCONFIG
 debianutils
@@ -287,6 +293,7 @@ DeviceLayer
 DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
+deviceSoftwareVersionModel
 DevKitC
 DevKitM
 df
@@ -316,6 +323,7 @@ DMM
 DNS
 Dnsmasq
 dnsmasqd
+DNSSD
 DNSStubListener
 Dockerfile
 Dockerfiles
@@ -355,6 +363,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EnableNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName
@@ -413,7 +422,9 @@ FreeRTOSConfig
 fsl
 fstab
 fsync
+ftd
 fullclean
+gbl
 gcloud
 GDB
 GeneralCommissioning
@@ -597,6 +608,7 @@ MatterLock
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
+maxApplicableSoftwareVersion
 MaxInterval
 MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
@@ -632,6 +644,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+minApplicableSoftwareVersion
 Minicom
 MinInterval
 MinIntervalFloorSeconds
@@ -650,6 +663,7 @@ MoveToSaturation
 MoveWithOnOff
 MPSL
 MRP
+MTD
 MTU
 Multiband
 Multicast
@@ -720,8 +734,10 @@ optionsOverride
 orgs
 OTA
 OTADownloader
+otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorInterface
+OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
@@ -730,6 +746,7 @@ OTARequestor
 OTARequestorDriver
 OTARequestorSerialPort
 otasoftwareupdaterequestor
+otaURL
 OTBR
 otcli
 PAA
@@ -774,6 +791,7 @@ pre
 preprocessor
 Presetup
 prj
+providerNodeId
 ProductID
 ProductLabel
 ProductName
@@ -837,6 +855,8 @@ RendezVousTest
 repo
 req
 Requestor
+Requestor's
+Requestors
 responder
 retargeting
 reusability
@@ -878,6 +898,7 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
+SED
 SEGGER
 semver
 sendto
@@ -915,7 +936,9 @@ softmmu
 SoftwareDiagnostics
 SoftwareVersion
 SoftwareVersionString
+softwareVersionValid
 SPI
+spiflash
 spinel
 src
 SRP
@@ -940,6 +963,7 @@ submodules
 subprocess
 SubscribeResponse
 SubscriptionId
+subtype
 sudo
 svg
 SVR
@@ -978,6 +1002,7 @@ testws
 texinfo
 textboxes
 TFT
+threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
 Thunderboard
@@ -988,6 +1013,7 @@ TLV
 tmp
 tngvndl
 TODO
+tokenized
 toolchain
 toolchains
 topologies
@@ -1048,6 +1074,7 @@ VendorName
 vendorpayload
 venv
 Verifier
+Verifiers
 VID
 visualstudio
 vlatest

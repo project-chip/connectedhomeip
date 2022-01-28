@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -421,6 +421,20 @@ class DLL_EXPORT ThreadNetworkDiagnosticsClusterTest : public ThreadNetworkDiagn
 public:
     ThreadNetworkDiagnosticsClusterTest() : ThreadNetworkDiagnosticsCluster() {}
     ~ThreadNetworkDiagnosticsClusterTest() {}
+};
+
+class DLL_EXPORT TimeFormatLocalizationClusterTest : public TimeFormatLocalizationCluster
+{
+public:
+    TimeFormatLocalizationClusterTest() : TimeFormatLocalizationCluster() {}
+    ~TimeFormatLocalizationClusterTest() {}
+};
+
+class DLL_EXPORT UnitLocalizationClusterTest : public UnitLocalizationCluster
+{
+public:
+    UnitLocalizationClusterTest() : UnitLocalizationCluster() {}
+    ~UnitLocalizationClusterTest() {}
 };
 
 class DLL_EXPORT UserLabelClusterTest : public UserLabelCluster

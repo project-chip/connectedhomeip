@@ -149,6 +149,10 @@ void emberAfEndpointConfigure(void)
         static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
         memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
                sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
+        for (ep = FIXED_ENDPOINT_COUNT; ep < MAX_ENDPOINT_COUNT; ep++)
+        {
+            emAfEndpoints[ep].endpoint = kInvalidEndpointId;
+        }
     }
 #endif
 }
@@ -180,11 +184,15 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     {
         return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
     }
+    if (id == kInvalidEndpointId)
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
 
     index = static_cast<uint16_t>(realIndex);
     for (uint16_t i = FIXED_ENDPOINT_COUNT; i < MAX_ENDPOINT_COUNT; i++)
     {
-        if (emAfEndpoints[i].endpoint == id && emAfEndpoints[i].endpointType != NULL)
+        if (emAfEndpoints[i].endpoint == id)
         {
             return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
         }
@@ -213,15 +221,13 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
 
     index = static_cast<uint8_t>(index + FIXED_ENDPOINT_COUNT);
 
-    if ((index < MAX_ENDPOINT_COUNT) && (emAfEndpoints[index].endpoint != 0) && (emberAfEndpointIndexIsEnabled(index)))
+    if ((index < MAX_ENDPOINT_COUNT) && (emAfEndpoints[index].endpoint != kInvalidEndpointId) &&
+        (emberAfEndpointIndexIsEnabled(index)))
     {
         ep = emAfEndpoints[index].endpoint;
-        if (ep)
-        {
-            emberAfSetDeviceEnabled(ep, false);
-            emberAfEndpointEnableDisable(ep, false);
-            emAfEndpoints[index].endpoint = 0;
-        }
+        emberAfSetDeviceEnabled(ep, false);
+        emberAfEndpointEnableDisable(ep, false);
+        emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
 
     return ep;
@@ -548,7 +554,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     src = buffer;
                                     dst = attributeLocation;
                                     if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             EMBER_AF_NULL_MANUFACTURER_CODE, am->attributeId))
+                                                                             am->attributeId))
                                     {
                                         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
                                     }
@@ -563,7 +569,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     src = attributeLocation;
                                     dst = buffer;
                                     if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            EMBER_AF_NULL_MANUFACTURER_CODE, am->attributeId))
+                                                                            am->attributeId))
                                     {
                                         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
                                     }
@@ -572,12 +578,10 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write
-                                                ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                        am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer)
-                                                : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                       am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer,
-                                                                                       emberAfAttributeSize(am)));
+                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                          am, buffer)
+                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                         am, buffer, emberAfAttributeSize(am)));
                                 }
                                 else
                                 {
@@ -1113,7 +1117,7 @@ void emberAfResetAttributes(EndpointId endpoint)
     emAfLoadAttributeDefaults(endpoint, true);
 }
 
-void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
+void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional<ClusterId> clusterId)
 {
     uint16_t ep;
     uint8_t clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
@@ -1144,6 +1148,13 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
         for (clusterI = 0; clusterI < de->endpointType->clusterCount; clusterI++)
         {
             EmberAfCluster * cluster = &(de->endpointType->cluster[clusterI]);
+            if (clusterId.HasValue())
+            {
+                if (clusterId.Value() != cluster->clusterId)
+                {
+                    continue;
+                }
+            }
 
             // when the attributeCount is high, the loop takes too long to run and a
             // watchdog kicks in causing a reset. As a workaround, we'll

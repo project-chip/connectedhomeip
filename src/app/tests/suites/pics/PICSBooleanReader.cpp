@@ -25,11 +25,7 @@
 std::map<std::string, bool> PICSBooleanReader::Read(std::string filepath)
 {
     std::ifstream f(filepath);
-    if (!f.is_open())
-    {
-        ChipLogError(chipTool, "Error reading: %s", filepath.c_str());
-        abort();
-    }
+    VerifyOrDieWithMsg(f.is_open(), chipTool, "Error reading: %s", filepath.c_str());
 
     std::map<std::string, bool> PICS;
     std::string line;
@@ -46,11 +42,7 @@ std::map<std::string, bool> PICSBooleanReader::Read(std::string filepath)
         std::stringstream ss(line);
 
         std::getline(ss, key, '=');
-        if (key.empty())
-        {
-            ChipLogError(chipTool, "Missing PICS key at line %u", lineNumber + 1);
-            abort();
-        }
+        VerifyOrDieWithMsg(!key.empty(), chipTool, "Missing PICS key at line %u", lineNumber + 1);
 
         std::getline(ss, value);
         if (value == "0")
@@ -64,7 +56,7 @@ std::map<std::string, bool> PICSBooleanReader::Read(std::string filepath)
         else
         {
             ChipLogError(chipTool, "%s: PICS value should be either '0' or '1', got '%s'", key.c_str(), value.c_str());
-            abort();
+            chipDie();
         }
 
         lineNumber++;

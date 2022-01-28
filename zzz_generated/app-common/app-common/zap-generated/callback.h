@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -236,6 +236,14 @@ void emberAfLocalizationConfigurationClusterInitCallback(chip::EndpointId endpoi
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitLocalizationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Power Source Configuration Cluster Init
  *
@@ -3480,6 +3488,112 @@ void emberAfTimeFormatLocalizationClusterServerTickCallback(chip::EndpointId end
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTimeFormatLocalizationClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Unit Localization Cluster
+//
+
+/** @brief Unit Localization Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitLocalizationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitLocalizationClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterUnitLocalizationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Unit Localization Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterUnitLocalizationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Unit Localization Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfUnitLocalizationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Unit Localization Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfUnitLocalizationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Unit Localization Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterUnitLocalizationClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Unit Localization Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterUnitLocalizationClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Unit Localization Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUnitLocalizationClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUnitLocalizationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Power Source Configuration Cluster
@@ -15054,6 +15168,11 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
+                                                                            chip::app::CommandSender * commandObj, uint64_t value);
+/**
  * @brief Test Cluster Cluster TestListNestedStructListArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
@@ -15107,6 +15226,12 @@ bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
@@ -15292,16 +15417,14 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute read.
  */
-bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                        chip::AttributeId attributeId);
+bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /** @brief Attribute Write Access
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute write.
  */
-bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                         chip::AttributeId attributeId);
+bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /** @brief Default Response
  *
@@ -15381,8 +15504,8 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  * application was not able to read the attribute.
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength);
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -15425,8 +15548,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * attribute.
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer);
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 /** @brief Get Current Time
  *

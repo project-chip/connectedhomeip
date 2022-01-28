@@ -73,12 +73,15 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
                ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
+               ${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
                ${CHIP_ROOT}/src/app/clusters/identify-server/identify-server.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/unit-localization-server/unit-localization-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
@@ -98,4 +101,5 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
                )

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1535,6 +1535,27 @@ void OnOffSwitchConfigurationClusterAttributeListListAttributeFilter(TLV::TLVRea
     cb->mCall(cb->mContext, list);
 }
 
+void OperationalCredentialsClusterNOCsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<OperationalCredentialsNOCsListAttributeCallback> * cb =
+        Callback::Callback<OperationalCredentialsNOCsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -2205,6 +2226,28 @@ void ThreadNetworkDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVRea
     cb->mCall(cb->mContext, list);
 }
 
+void TimeFormatLocalizationClusterSupportedCalendarTypesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                            Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback> * cb =
+        Callback::Callback<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void UserLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
@@ -2331,7 +2374,7 @@ bool emberAfChannelClusterChangeChannelResponseCallback(
 
     Callback::Callback<ChannelClusterChangeChannelResponseCallback> * cb =
         Callback::Callback<ChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, ChannelInfo(), errorType);
+    cb->mCall(cb->mContext, ::ChannelInfo(), errorType);
     return true;
 }
 
@@ -2498,7 +2541,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
 
     Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback> * cb =
         Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, GroupKeySet());
+    cb->mCall(cb->mContext, ::GroupKeySet());
     return true;
 }
 
@@ -2897,7 +2940,7 @@ bool emberAfTestClusterClusterSimpleStructResponseCallback(
 
     Callback::Callback<TestClusterClusterSimpleStructResponseCallback> * cb =
         Callback::Callback<TestClusterClusterSimpleStructResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, SimpleStruct());
+    cb->mCall(cb->mContext, ::SimpleStruct());
     return true;
 }
 

@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -46,54 +47,24 @@ public:
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
-    CHIP_ERROR ReadActiveLocale(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteActiveLocale(EndpointId endpoint, AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadSupportedLocales(AttributeValueEncoder & aEncoder);
 };
 
 LocalizationConfigurationAttrAccess gAttrAccess;
 
-CHIP_ERROR LocalizationConfigurationAttrAccess::ReadActiveLocale(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    char activeLocale[DeviceLayer::ConfigurationManager::kMaxLanguageTagLength + 1];
-    size_t codeLen = 0;
-
-    if (DeviceLayer::ConfigurationMgr().GetActiveLocale(activeLocale, sizeof(activeLocale), codeLen) == CHIP_NO_ERROR)
-    {
-        err = aEncoder.Encode(chip::CharSpan(activeLocale, strlen(activeLocale)));
-    }
-
-    return err;
-}
-
-CHIP_ERROR LocalizationConfigurationAttrAccess::WriteActiveLocale(EndpointId endpoint, AttributeValueDecoder & aDecoder)
-{
-    DeviceLayer::AttributeList<chip::CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
-    chip::CharSpan activeLocale;
-
-    ReturnErrorOnFailure(aDecoder.Decode(activeLocale));
-    VerifyOrReturnError(activeLocale.size() <= DeviceLayer::ConfigurationManager::kMaxLanguageTagLength,
-                        CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    return DeviceLayer::ConfigurationMgr().StoreActiveLocale(activeLocale.data(), activeLocale.size());
-}
-
 CHIP_ERROR LocalizationConfigurationAttrAccess::ReadSupportedLocales(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::AttributeList<chip::CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
+    DeviceLayer::AttributeList<CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
 
     if (DeviceLayer::PlatformMgr().GetSupportedLocales(supportedLocales) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&supportedLocales](const auto & encoder) -> CHIP_ERROR {
-            for (auto locales : supportedLocales)
+            for (const Span<const char> & locale : supportedLocales)
             {
-                ReturnErrorOnFailure(encoder.Encode(locales));
+                ReturnErrorOnFailure(encoder.Encode(locale));
             }
 
             return CHIP_NO_ERROR;
@@ -113,8 +84,6 @@ CHIP_ERROR LocalizationConfigurationAttrAccess::Read(const ConcreteReadAttribute
 
     switch (aPath.mAttributeId)
     {
-    case ActiveLocale::Id:
-        return ReadActiveLocale(aPath.mEndpointId, aEncoder);
     case SupportedLocales::Id:
         return ReadSupportedLocales(aEncoder);
     default:
@@ -122,22 +91,91 @@ CHIP_ERROR LocalizationConfigurationAttrAccess::Read(const ConcreteReadAttribute
     }
     return CHIP_NO_ERROR;
 }
+} // anonymous namespace
 
-CHIP_ERROR LocalizationConfigurationAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+// =============================================================================
+// Pre-change callbacks for cluster attributes
+// =============================================================================
+
+static Protocols::InteractionModel::Status emberAfPluginLocalizationConfigurationOnActiveLocaleChange(EndpointId EndpointId,
+                                                                                                      CharSpan newLangtag)
 {
-    VerifyOrDie(aPath.mClusterId == LocalizationConfiguration::Id);
+    DeviceLayer::AttributeList<CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
 
-    switch (aPath.mAttributeId)
+    if (DeviceLayer::PlatformMgr().GetSupportedLocales(supportedLocales) == CHIP_NO_ERROR)
     {
-    case ActiveLocale::Id:
-        return WriteActiveLocale(aPath.mEndpointId, aDecoder);
-    default:
-        break;
+        for (const Span<const char> & locale : supportedLocales)
+        {
+            if (locale.data_equal(newLangtag))
+            {
+                return Protocols::InteractionModel::Status::Success;
+            }
+        }
     }
-    return CHIP_NO_ERROR;
+
+    return Protocols::InteractionModel::Status::InvalidValue;
 }
 
-} // anonymous namespace
+static Protocols::InteractionModel::Status
+emberAfPluginLocalizationConfigurationOnUnhandledAttributeChange(EndpointId EndpointId, EmberAfAttributeType attrType,
+                                                                 uint16_t attrSize, uint8_t * attrValue)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback(
+    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+{
+    Protocols::InteractionModel::Status res;
+
+    switch (attributePath.mAttributeId)
+    {
+    case ActiveLocale::Id: {
+        // TODO:: allow fromZclString for CharSpan as well and use that here
+        auto langtag = CharSpan(Uint8::to_char(&value[1]), static_cast<size_t>(value[0]));
+        res          = emberAfPluginLocalizationConfigurationOnActiveLocaleChange(attributePath.mEndpointId, langtag);
+    }
+    break;
+
+    default:
+        res =
+            emberAfPluginLocalizationConfigurationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
+        break;
+    }
+
+    return res;
+}
+
+void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoint)
+{
+    DeviceLayer::AttributeList<CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
+    CharSpan validLocale;
+
+    char outBuffer[Attributes::ActiveLocale::TypeInfo::MaxLength()];
+    MutableCharSpan activeLocale(outBuffer);
+    EmberAfStatus status = ActiveLocale::Get(endpoint, activeLocale);
+
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", status));
+
+    // We could have an invalid ActiveLocale value if an OTA update removed support for the value we were using.
+    if (DeviceLayer::PlatformMgr().GetSupportedLocales(supportedLocales) == CHIP_NO_ERROR)
+    {
+        for (const Span<const char> & locale : supportedLocales)
+        {
+            if (locale.data_equal(activeLocale))
+            {
+                return;
+            }
+
+            validLocale = locale;
+        }
+
+        // If initial value is not one of the allowed values, pick one valid value and write it.
+        status = ActiveLocale::Set(endpoint, validLocale);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Failed to write active locale with error: 0x%02x", status));
+    }
+}
 
 void MatterLocalizationConfigurationPluginServerInitCallback(void)
 {

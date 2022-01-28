@@ -57,12 +57,10 @@ static void InitOTARequestor(void)
 {
 #if CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.SetServerInstance(&Server::GetInstance());
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    gRequestorCore.SetBDXDownloader(&gDownloader);
 #endif
 }
 

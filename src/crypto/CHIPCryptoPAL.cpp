@@ -21,6 +21,7 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
@@ -655,6 +656,63 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     }
 
     return status;
+}
+
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKey, uint64_t fabricId, uint64_t & compressedFabricId)
+{
+    uint8_t allocated[sizeof(fabricId)];
+    MutableByteSpan span(allocated);
+    ReturnErrorOnFailure(GenerateCompressedFabricId(rootPublicKey, fabricId, span));
+    // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
+    // returns a binary buffer and is agnostic of usage of the output as an integer type.
+    compressedFabricId = Encoding::BigEndian::Get64(allocated);
+    return CHIP_NO_ERROR;
+}
+
+/* Operational Group Key Group, Security Salt: "GroupKey v1.0" */
+static const uint8_t kGroupSecuritySalt[]        = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
+static const uint8_t kOperationalGroupKeySalt[0] = {};
+
+/* Group Key Derivation Function, Info: "GroupKeyHash" ” */
+static const uint8_t kGroupKeyHashInfo[]  = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x48, 0x61, 0x73, 0x68 };
+static const uint8_t kGroupKeyHashSalt[0] = {};
+
+/*
+    OperationalGroupKey = Crypto_KDF (
+        InputKey = Epoch Key,
+        Salt = [],
+        Info = Group Security Salt,
+        Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS)
+*/
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key)
+{
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Crypto::HKDF_sha crypto;
+    return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), kOperationalGroupKeySalt, sizeof(kOperationalGroupKeySalt),
+                              kGroupSecuritySalt, sizeof(kGroupSecuritySalt), out_key.data(),
+                              Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+}
+
+/*
+    GKH = Crypto_KDF (
+        InputKey = OperationalGroupKey,
+        Salt = [],
+        Info = "GroupKeyHash",
+        Length = 16)
+*/
+CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id)
+{
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == operational_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    Crypto::HKDF_sha crypto;
+    uint8_t out_key[sizeof(uint16_t)];
+
+    ReturnErrorOnFailure(crypto.HKDF_SHA256(operational_key.data(), operational_key.size(), kGroupKeyHashSalt,
+                                            sizeof(kGroupKeyHashSalt), kGroupKeyHashInfo, sizeof(kGroupKeyHashInfo), out_key,
+                                            sizeof(out_key)));
+    session_id = Encoding::BigEndian::Get16(out_key);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Crypto

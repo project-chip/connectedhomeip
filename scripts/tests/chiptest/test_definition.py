@@ -19,6 +19,8 @@ import time
 from datetime import datetime
 import typing
 import threading
+from pathlib import Path
+import platform
 
 from enum import Enum, auto
 from dataclasses import dataclass
@@ -30,6 +32,7 @@ TEST_NODE_ID = '0x12344321'
 class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
+    DOOR_LOCK = auto()
 
 
 @dataclass
@@ -94,17 +97,35 @@ class TestDefinition:
                 app_cmd = paths.all_clusters_app
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
+            elif self.target == TestTarget.DOOR_LOCK:
+                logging.info(
+                    "Ignore test - test is made for door lock which is not supported yet")
+                return
             else:
                 raise Exception(
                     "Unknown test target - don't know which application to run")
 
             tool_cmd = paths.chip_tool
-            if os.path.exists('/tmp/chip_tool_config.ini'):
-                os.unlink('/tmp/chip_tool_config.ini')
+
+            files_to_unlink = [
+                '/tmp/chip_tool_config.ini',
+                '/tmp/chip_tool_config.alpha.ini',
+                '/tmp/chip_tool_config.beta.ini',
+                '/tmp/chip_tool_config.gamma.ini',
+            ]
+
+            for f in files_to_unlink:
+                if os.path.exists(f):
+                    os.unlink(f)
 
             # Remove server all_clusters_app or tv_app storage, so it will be commissionable again
-            if os.path.exists('/tmp/chip_kvs'):
-                os.unlink('/tmp/chip_kvs')
+            if platform.system() == 'Linux':
+                if os.path.exists('/tmp/chip_kvs'):
+                    os.unlink('/tmp/chip_kvs')
+
+            if platform.system() == "Darwin":
+                if os.path.exists(str(Path.home()) + '/Documents/chip.store'):
+                    os.unlink(str(Path.home()) + '/Documents/chip.store')
 
             discriminator = str(randrange(1, 4096))
             logging.debug(
@@ -139,3 +160,4 @@ class TestDefinition:
         finally:
             if app_process:
                 app_process.kill()
+                app_process.wait(10)

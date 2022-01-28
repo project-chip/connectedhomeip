@@ -46,9 +46,8 @@ public:
     //
     // In the latter case, path will be non-null. Otherwise, it shall be null.
     //
-    using OnErrorCallbackType =
-        std::function<void(const app::ConcreteAttributePath * path, app::StatusIB status, CHIP_ERROR aError)>;
-    using OnDoneCallbackType = std::function<void(app::WriteClient *)>;
+    using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * path, CHIP_ERROR err)>;
+    using OnDoneCallbackType  = std::function<void(app::WriteClient *)>;
 
     WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
@@ -56,20 +55,17 @@ public:
 
     void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath, app::StatusIB status) override
     {
-        if (status.mStatus == Protocols::InteractionModel::Status::Success)
+        if (status.IsSuccess())
         {
             mOnSuccess(aPath);
         }
         else
         {
-            mOnError(&aPath, status, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+            mOnError(&aPath, status.ToChipError());
         }
     }
 
-    void OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError) override
-    {
-        mOnError(nullptr, aStatus, aError);
-    }
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone(app::WriteClient * apWriteClient) override
     {
@@ -78,6 +74,7 @@ public:
             mOnDone(apWriteClient);
         }
 
+        chip::Platform::Delete(apWriteClient);
         // Always needs to be the last call
         chip::Platform::Delete(this);
     }
@@ -100,29 +97,30 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
-    app::WriteClientHandle handle;
-
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
+    auto client   = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
+                                                         callback.get(), aTimedWriteTimeoutMs);
+
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get(), aTimedWriteTimeoutMs));
-
-    // At this point the handle will ensure our callback's OnDone is always
-    // called.
-    callback.release();
+    VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (sessionHandle->IsGroupSession())
     {
         ReturnErrorOnFailure(
-            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else
     {
         ReturnErrorOnFailure(
-            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
     }
 
-    ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
+    ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));
+
+    // At this point the handle will ensure our callback's OnDone is always
+    // called.
+    client.release();
+    callback.release();
 
     return CHIP_NO_ERROR;
 }

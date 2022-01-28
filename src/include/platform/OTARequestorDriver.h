@@ -40,6 +40,15 @@ struct UpdateDescription
     ByteSpan metadataForRequestor;
 };
 
+enum class UpdateFailureState
+{
+    kQuerying,
+    kDownloading,
+    kApplying,
+    kNotifying,
+    kAwaitingNextAction,
+};
+
 enum class UpdateNotFoundReason
 {
     Busy,
@@ -61,7 +70,7 @@ public:
     virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
 
     /// Called when an error occurs at any OTA requestor operation
-    virtual void HandleError(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state, CHIP_ERROR error) = 0;
+    virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
@@ -80,6 +89,9 @@ public:
 
     /// Called when the current software update should be discontinued
     virtual void UpdateDiscontinued() = 0;
+
+    /// Called when the current software update has been cancelled by the local application
+    virtual void UpdateCancelled() = 0;
 };
 
 } // namespace chip

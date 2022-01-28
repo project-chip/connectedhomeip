@@ -130,6 +130,8 @@ static_library("app") {
     "OperationalDeviceProxyPool.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "RequiredPrivilege.cpp",
+    "RequiredPrivilege.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "TimedHandler.cpp",

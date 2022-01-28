@@ -107,17 +107,22 @@ CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     switch (aPath.mAttributeId)
     {
     case app::Clusters::AudioOutput::Attributes::AudioOutputList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
         return ReadOutputListAttribute(aEncoder, delegate);
     }
     case app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
         return ReadCurrentOutputAttribute(aEncoder, delegate);
     }
     default: {
@@ -130,14 +135,7 @@ CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
 
 CHIP_ERROR AudioOutputAttrAccess::ReadOutputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<Structs::OutputInfo::Type> outputList = delegate->HandleGetOutputList();
-    return aEncoder.EncodeList([outputList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & output : outputList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(output));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetOutputList(aEncoder);
 }
 
 CHIP_ERROR AudioOutputAttrAccess::ReadCurrentOutputAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

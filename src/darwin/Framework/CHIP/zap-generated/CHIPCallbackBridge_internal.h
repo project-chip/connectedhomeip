@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
 using CHIPCommandSuccessCallbackType = CommandSuccessCallback;
 typedef void (*CHIPDefaultSuccessCallbackType)(void *);
-typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
 
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
@@ -165,6 +164,9 @@ typedef void (*NullableApplianceControlClusterWarningEventAttributeCallback)(
 typedef void (*AccessControlClusterAuthModeAttributeCallback)(void *, chip::app::Clusters::AccessControl::AuthMode);
 typedef void (*NullableAccessControlClusterAuthModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> &);
+typedef void (*AccessControlClusterChangeTypeEnumAttributeCallback)(void *, chip::app::Clusters::AccessControl::ChangeTypeEnum);
+typedef void (*NullableAccessControlClusterChangeTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> &);
 typedef void (*AccessControlClusterPrivilegeAttributeCallback)(void *, chip::app::Clusters::AccessControl::Privilege);
 typedef void (*NullableAccessControlClusterPrivilegeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> &);
@@ -213,6 +215,33 @@ typedef void (*TimeFormatLocalizationClusterHourFormatAttributeCallback)(void *,
                                                                          chip::app::Clusters::TimeFormatLocalization::HourFormat);
 typedef void (*NullableTimeFormatLocalizationClusterHourFormatAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> &);
+typedef void (*UnitLocalizationClusterTempUnitAttributeCallback)(void *, chip::app::Clusters::UnitLocalization::TempUnit);
+typedef void (*NullableUnitLocalizationClusterTempUnitAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> &);
+typedef void (*PowerSourceClusterBatChargeFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeFaultType);
+typedef void (*NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> &);
+typedef void (*PowerSourceClusterBatChargeLevelAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeLevel);
+typedef void (*NullablePowerSourceClusterBatChargeLevelAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> &);
+typedef void (*PowerSourceClusterBatChargeStateAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeState);
+typedef void (*NullablePowerSourceClusterBatChargeStateAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> &);
+typedef void (*PowerSourceClusterBatFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatFaultType);
+typedef void (*NullablePowerSourceClusterBatFaultTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> &);
+typedef void (*PowerSourceClusterBatReplaceabilityAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatReplaceability);
+typedef void (*NullablePowerSourceClusterBatReplaceabilityAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> &);
+typedef void (*PowerSourceClusterPowerSourceStatusAttributeCallback)(void *, chip::app::Clusters::PowerSource::PowerSourceStatus);
+typedef void (*NullablePowerSourceClusterPowerSourceStatusAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> &);
+typedef void (*PowerSourceClusterWiredCurrentTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredCurrentType);
+typedef void (*NullablePowerSourceClusterWiredCurrentTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> &);
+typedef void (*PowerSourceClusterWiredFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredFaultType);
+typedef void (*NullablePowerSourceClusterWiredFaultTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> &);
 typedef void (*GeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback)(
     void *, chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError);
 typedef void (*NullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback)(
@@ -318,9 +347,6 @@ typedef void (*NullableDoorLockClusterDlCredentialTypeAttributeCallback)(
 typedef void (*DoorLockClusterDlDataOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDataOperationType);
 typedef void (*NullableDoorLockClusterDlDataOperationTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> &);
-typedef void (*DoorLockClusterDlDoorLockStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorLockStatus);
-typedef void (*NullableDoorLockClusterDlDoorLockStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorLockStatus> &);
 typedef void (*DoorLockClusterDlDoorStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorState);
 typedef void (*NullableDoorLockClusterDlDoorStateAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> &);
@@ -3110,6 +3136,37 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPOperationalCredentialsNOCsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsNOCsListAttributeCallback>
+{
+public:
+    CHIPOperationalCredentialsNOCsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsNOCsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+            value);
+};
+
+class CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge
+    : public CHIPOperationalCredentialsNOCsListAttributeCallbackBridge
+{
+public:
+    CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOperationalCredentialsNOCsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>
 {
@@ -4007,6 +4064,37 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value);
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge
+    : public CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -5403,6 +5491,64 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccessControlClusterChangeTypeEnumAttributeCallback>
+{
+public:
+    CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlClusterChangeTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value);
+};
+
+class CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge
+    : public CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+{
+public:
+    CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableAccessControlClusterChangeTypeEnumAttributeCallback>
+{
+public:
+    CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableAccessControlClusterChangeTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value);
+};
+
+class CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+{
+public:
+    CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPAccessControlClusterPrivilegeAttributeCallbackBridge
     : public CHIPCallbackBridge<AccessControlClusterPrivilegeAttributeCallback>
 {
@@ -6181,6 +6327,528 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge
+    : public CHIPCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>
+{
+public:
+    CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::UnitLocalization::TempUnit value);
+};
+
+class CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
+    : public CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge
+{
+public:
+    CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>
+{
+public:
+    CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value);
+};
+
+class CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
+    : public CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
+{
+public:
+    CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterBatChargeFaultTypeAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterBatChargeFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeFaultType value);
+};
+
+class CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> & value);
+};
+
+class CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterBatChargeLevelAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterBatChargeLevelAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeLevel value);
+};
+
+class CHIPPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterBatChargeLevelAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterBatChargeLevelAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> & value);
+};
+
+class CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterBatChargeStateAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterBatChargeStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeState value);
+};
+
+class CHIPPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterBatChargeStateAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterBatChargeStateAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> & value);
+};
+
+class CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterBatFaultTypeAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterBatFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatFaultType value);
+};
+
+class CHIPPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterBatFaultTypeAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterBatFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> & value);
+};
+
+class CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterBatReplaceabilityAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterBatReplaceabilityAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatReplaceability value);
+};
+
+class CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterBatReplaceabilityAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterBatReplaceabilityAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> & value);
+};
+
+class CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterPowerSourceStatusAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterPowerSourceStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value);
+};
+
+class CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterPowerSourceStatusAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterPowerSourceStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> & value);
+};
+
+class CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterWiredCurrentTypeAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterWiredCurrentTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::WiredCurrentType value);
+};
+
+class CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterWiredCurrentTypeAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterWiredCurrentTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> & value);
+};
+
+class CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceClusterWiredFaultTypeAttributeCallback>
+{
+public:
+    CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceClusterWiredFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::WiredFaultType value);
+};
+
+class CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullablePowerSourceClusterWiredFaultTypeAttributeCallback>
+{
+public:
+    CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullablePowerSourceClusterWiredFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> & value);
+};
+
+class CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7872,64 +8540,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterDlDoorLockStatusAttributeCallback>
-{
-public:
-    CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterDlDoorLockStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlDoorLockStatus value);
-};
-
-class CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableDoorLockClusterDlDoorLockStatusAttributeCallback>
-{
-public:
-    CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableDoorLockClusterDlDoorLockStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorLockStatus> & value);
-};
-
-class CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge
-    : public CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge
-{
-public:
-    CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

@@ -28,7 +28,6 @@
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -96,7 +95,7 @@ private:
 
     static Server sServer;
 
-    class ServerStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+    class DeviceStorageDelegate : public PersistentStorageDelegate, public FabricStorage
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
@@ -114,16 +113,12 @@ private:
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
-            ChipLogProgress(AppServer, "Saved into server storage: %s", key);
-            return CHIP_NO_ERROR;
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
         }
 
         CHIP_ERROR SyncDeleteKeyValue(const char * key) override
         {
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
-            ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
-            return CHIP_NO_ERROR;
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
         }
 
         CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
@@ -137,6 +132,37 @@ private:
         };
 
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
+    };
+
+    class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
+    {
+    public:
+        GroupDataProviderListener() {}
+
+        CHIP_ERROR Init(ServerTransportMgr * transports)
+        {
+            VerifyOrReturnError(transports != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mTransports = transports;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
+        {
+            if (mTransports->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(fabric_index, new_group.group_id), true) !=
+                CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Unable to listen to group");
+            }
+        };
+
+        void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
+        {
+            mTransports->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(fabric_index, old_group.group_id), false);
+        };
+
+    private:
+        ServerTransportMgr * mTransports;
     };
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -163,12 +189,10 @@ private:
 
     // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
     // See: https://github.com/project-chip/connectedhomeip/issues/12276
-    ServerStorageDelegate mServerStorage;
-    // Currently, the GroupDataProvider cannot use KeyValueStoreMgr() due to
-    // (https://github.com/project-chip/connectedhomeip/issues/12174)
-    TestPersistentStorageDelegate mGroupsStorage;
+    DeviceStorageDelegate mDeviceStorage;
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
+    GroupDataProviderListener mListener;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_UNIT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
@@ -103,7 +105,7 @@
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL
 // User options for server plugin Level Control
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 255
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
 
@@ -159,6 +161,16 @@
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
+
+// Use this macro to check if the server side of the Time Format Localization cluster is included
+#define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION_SERVER
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION
+
+// Use this macro to check if the server side of the Unit Localization cluster is included
+#define ZCL_USING_UNIT_LOCALIZATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_UNIT_LOCALIZATION_SERVER
+#define EMBER_AF_PLUGIN_UNIT_LOCALIZATION
 
 // Use this macro to check if the server side of the User Label cluster is included
 #define ZCL_USING_USER_LABEL_CLUSTER_SERVER

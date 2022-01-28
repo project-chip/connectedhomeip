@@ -204,8 +204,8 @@ public:
     static CHIP_ERROR GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
     static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);
     static CHIP_ERROR ClearWiFiStationProvision(void);
-    static cy_rslt_t p6_wifi_get_config(wifi_interface_t interface, wifi_config_t * conf);
-    static cy_rslt_t p6_wifi_set_config(wifi_interface_t interface, wifi_config_t * conf);
+    static CHIP_ERROR p6_wifi_get_config(wifi_interface_t interface, wifi_config_t * conf);
+    static CHIP_ERROR p6_wifi_set_config(wifi_interface_t interface, wifi_config_t * conf);
     static CHIP_ERROR p6_wifi_disconnect(void);
     static CHIP_ERROR p6_wifi_connect(void);
     static CHIP_ERROR p6_start_ap(void);
@@ -218,6 +218,14 @@ public:
     static CHIP_ERROR ping_init(void);
     static void unpack_xtlv_buf(const uint8_t * tlv_buf, uint16_t buflen, wl_cnt_ver_30_t * cnt, wl_cnt_ge40mcst_v1_t * cnt_ge40);
     static void heap_usage(heap_info_t * heap);
+    static CHIP_ERROR GetWiFiSSID(char * buf, size_t bufSize);
+    static CHIP_ERROR StoreWiFiSSID(char * buf);
+    static CHIP_ERROR GetWiFiPassword(char * buf, size_t bufSize);
+    static CHIP_ERROR StoreWiFiPassword(char * buf);
+    static CHIP_ERROR GetWiFiSecurityCode(uint32_t & security);
+    static CHIP_ERROR StoreWiFiSecurityCode(uint32_t security);
+    static CHIP_ERROR wifi_get_mode(uint32_t & security);
+    static CHIP_ERROR wifi_set_mode(uint32_t security);
 };
 
 } // namespace Internal

@@ -192,7 +192,14 @@ CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId 
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
     MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
-    P256PublicKey rootPubkey(GetRootPubkey());
+    P256PublicKey rootPubkey;
+
+    {
+        P256PublicKeySpan rootPubkeySpan;
+        ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
+        rootPubkey = rootPubkeySpan;
+    }
+
     ChipLogDetail(Inet, "Generating compressed fabric ID using uncompressed fabric ID 0x" ChipLogFormatX64 " and root pubkey",
                   ChipLogValueX64(fabricId));
     ChipLogByteSpan(Inet, ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length()));
@@ -232,10 +239,11 @@ CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::SetEphemeralKey(const P256Keypair * key)
+CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
+    VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     P256SerializedKeypair serialized;
-    ReturnErrorOnFailure(key->Serialize(serialized));
+    ReturnErrorOnFailure(keyPair->Serialize(serialized));
     if (mOperationalKey == nullptr)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -332,7 +340,9 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
         kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
     HMAC_sha hmac;
     uint8_t destinationMessage[kDestinationMessageLen];
-    P256PublicKeySpan rootPubkeySpan = GetRootPubkey();
+    P256PublicKeySpan rootPubkeySpan;
+
+    ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
 
     Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
 
@@ -393,6 +403,30 @@ void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
     }
 }
 
+FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)
+{
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        FabricInfo * fabric = FindFabricWithIndex(i);
+        if (fabric == nullptr)
+        {
+            continue;
+        }
+        P256PublicKeySpan candidatePubKey;
+        if (fabric->GetRootPubkey(candidatePubKey) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (rootPubKey.data_equal(candidatePubKey) && fabricId == fabric->GetFabricId())
+        {
+            LoadFromStorage(fabric);
+            return fabric;
+        }
+    }
+    return nullptr;
+}
+
 FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 {
     if (fabricIndex >= kMinValidFabricIndex && fabricIndex <= kMaxValidFabricIndex)
@@ -437,21 +471,21 @@ void FabricTable::Reset()
     }
 }
 
-CHIP_ERROR FabricTable::Store(FabricIndex id)
+CHIP_ERROR FabricTable::Store(FabricIndex index)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     FabricInfo * fabric = nullptr;
 
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    fabric = FindFabricWithIndex(id);
+    fabric = FindFabricWithIndex(index);
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = fabric->CommitToStorage(mStorage);
 exit:
     if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Fabric (%d) persisted to storage. Calling OnFabricPersistedToStorage", id);
+        ChipLogProgress(Discovery, "Fabric (%d) persisted to storage. Calling OnFabricPersistedToStorage", index);
         mDelegate->OnFabricPersistedToStorage(fabric);
     }
     return err;
@@ -483,7 +517,7 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
 
-    SetEphemeralKey(newFabric.GetOperationalKey());
+    SetOperationalKeypair(newFabric.GetOperationalKey());
     SetRootCert(newFabric.mRootCert);
 
     ChipLogProgress(Discovery, "Verifying the received credentials");
@@ -552,21 +586,21 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR FabricTable::Delete(FabricIndex id)
+CHIP_ERROR FabricTable::Delete(FabricIndex index)
 {
     FabricInfo * fabric      = nullptr;
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool fabricIsInitialized = false;
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    fabric              = FindFabricWithIndex(id);
+    fabric              = FindFabricWithIndex(index);
     fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
-    err                 = FabricInfo::DeleteFromStorage(mStorage, id); // Delete from storage regardless
+    err                 = FabricInfo::DeleteFromStorage(mStorage, index); // Delete from storage regardless
 
 exit:
     if (err == CHIP_NO_ERROR)
     {
-        ReleaseFabricIndex(id);
+        ReleaseFabricIndex(index);
         if (mDelegate != nullptr && fabricIsInitialized)
         {
             if (mFabricCount == 0)
@@ -577,8 +611,8 @@ exit:
             {
                 mFabricCount--;
             }
-            ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", id);
-            mDelegate->OnFabricDeletedFromStorage(id);
+            ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
+            mDelegate->OnFabricDeletedFromStorage(index);
         }
     }
     return CHIP_NO_ERROR;

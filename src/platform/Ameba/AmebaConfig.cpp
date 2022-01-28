@@ -72,10 +72,7 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDeviceICACerts   = { k
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_ActiveLocale                = { kConfigNamespace_ChipConfig, "active-locale" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_HourFormat                  = { kConfigNamespace_ChipConfig, "hour-format" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_CalendarType                = { kConfigNamespace_ChipConfig, "calendar-type" };
 
 // Keys stored in the Chip-counters namespace
 const AmebaConfig::Key AmebaConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };

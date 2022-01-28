@@ -55,7 +55,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} {{#if isList}}list{{else}}value{{/if}});
+    static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} {{#if isArray}}list{{else}}value{{/if}});
     static void OnSubscriptionEstablished(void * context) {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
