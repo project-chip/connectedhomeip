@@ -332,6 +332,12 @@ server cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
+  }
+
   struct NetworkInfo {
     OCTET_STRING networkID = 0;
     BOOLEAN connected = 1;
@@ -440,6 +446,10 @@ server cluster OnOff = 6 {
   enum OnOffEffectIdentifier : enum8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -621,6 +631,13 @@ server cluster PowerSource = 47 {
     kUnspecfied = 0;
     kOverVoltage = 1;
     kUnderVoltage = 2;
+  }
+
+  bitmap PowerSourceFeature : BITMAP32 {
+    kWired = 0x1;
+    kBattery = 0x2;
+    kRechargeable = 0x4;
+    kReplaceable = 0x8;
   }
 
   readonly attribute enum8 status = 0;
