@@ -168,7 +168,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 
         for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
         {
-            EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
+            const EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
             streamer_printf(streamer_get(), "  - Cluster 0x%04X\r\n", cluster->clusterId);
         }
     }
