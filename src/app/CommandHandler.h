@@ -194,10 +194,7 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
-    NodeId SourceNodeId() const
-    {
-        return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor().subject;
-    }
+    NodeId SourceNodeId() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor().subject; }
 
 private:
     friend class TestCommandInteraction;
