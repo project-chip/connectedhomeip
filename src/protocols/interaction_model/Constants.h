@@ -80,7 +80,8 @@ enum class Status : uint8_t
     Deprecated84           = 0x84,
     InvalidCommand         = 0x85,
     UnsupportedAttribute   = 0x86,
-    InvalidValue           = 0x87,
+    ConstraintError        = 0x87,
+    InvalidValue           = ConstraintError, // Deprecated
     UnsupportedWrite       = 0x88,
     ResourceExhausted      = 0x89,
     Deprecated8a           = 0x8a,
@@ -91,7 +92,7 @@ enum class Status : uint8_t
     UnsupportedRead        = 0x8f,
     Deprecated90           = 0x90,
     Deprecated91           = 0x91,
-    Reserved92             = 0x92, // ProtocolCode 0x92 does not have any comments in the spec.
+    DataVersionMismatch    = 0x92,
     Deprecated93           = 0x93,
     Timeout                = 0x94,
     Reserved95             = 0x95,
@@ -100,7 +101,6 @@ enum class Status : uint8_t
     Reserved98             = 0x98,
     Reserved99             = 0x99,
     Reserved9a             = 0x9a,
-    ConstraintError        = 0x9b,
     Busy                   = 0x9c,
     Deprecatedc0           = 0xc0,
     Deprecatedc1           = 0xc1,
@@ -109,6 +109,7 @@ enum class Status : uint8_t
     Deprecatedc4           = 0xc4,
     NoUpstreamSubscription = 0xc5,
     NeedsTimedInteraction  = 0xc6,
+    UnsupportedEvent       = 0xc7,
 };
 } // namespace InteractionModel
 

@@ -12557,10 +12557,17 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(
                                 reinterpret_cast<const jbyte *>(entry_0.noc.data()));
         newElement_0_noc = newElement_0_nocByteArray;
         jobject newElement_0_icac;
-        jbyteArray newElement_0_icacByteArray = env->NewByteArray(static_cast<jsize>(entry_0.icac.size()));
-        env->SetByteArrayRegion(newElement_0_icacByteArray, 0, static_cast<jsize>(entry_0.icac.size()),
-                                reinterpret_cast<const jbyte *>(entry_0.icac.data()));
-        newElement_0_icac = newElement_0_icacByteArray;
+        if (entry_0.icac.IsNull())
+        {
+            newElement_0_icac = nullptr;
+        }
+        else
+        {
+            jbyteArray newElement_0_icacByteArray = env->NewByteArray(static_cast<jsize>(entry_0.icac.Value().size()));
+            env->SetByteArrayRegion(newElement_0_icacByteArray, 0, static_cast<jsize>(entry_0.icac.Value().size()),
+                                    reinterpret_cast<const jbyte *>(entry_0.icac.Value().data()));
+            newElement_0_icac = newElement_0_icacByteArray;
+        }
 
         jclass NOCStructStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(

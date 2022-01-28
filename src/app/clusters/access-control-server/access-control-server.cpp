@@ -25,6 +25,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -271,6 +272,16 @@ struct AccessControlEntryCodec
         return CHIP_NO_ERROR;
     }
 
+    bool MatchesFabricIndex(FabricIndex fabricIndex) const
+    {
+        FabricIndex entryFabricIndex;
+        if (entry.GetFabricIndex(entryFabricIndex) == CHIP_NO_ERROR)
+        {
+            return fabricIndex == entryFabricIndex;
+        }
+        return false;
+    }
+
     AccessControl::Entry entry;
 };
 
@@ -292,6 +303,84 @@ private:
 };
 
 constexpr uint16_t AccessControlAttribute::ClusterRevision;
+
+CHIP_ERROR LogAccessControlEvent(const AccessControl::Entry & entry, const Access::SubjectDescriptor & subjectDescriptor,
+                                 AccessControlCluster::ChangeTypeEnum changeType)
+{
+    CHIP_ERROR err;
+
+    // Record AccessControlEntry event
+    EventNumber eventNumber;
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    DataModel::Nullable<AccessControlCluster::Structs::AccessControlEntry::Type> latestValue;
+
+    // Populate AccessControlEntryStruct from AccessControl entry.
+    AccessControlCluster::Structs::AccessControlEntry::Type staging;
+
+    ReturnErrorOnFailure(entry.GetFabricIndex(staging.fabricIndex));
+
+    {
+        Privilege privilege;
+        ReturnErrorOnFailure(entry.GetPrivilege(privilege));
+        ReturnErrorOnFailure(AccessControlEntryCodec::Convert(privilege, staging.privilege));
+    }
+
+    {
+        AuthMode authMode;
+        ReturnErrorOnFailure(entry.GetAuthMode(authMode));
+        ReturnErrorOnFailure(AccessControlEntryCodec::Convert(authMode, staging.authMode));
+    }
+
+    NodeId subjectBuffer[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY];
+    size_t subjectCount;
+    ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
+    if (subjectCount > 0)
+    {
+        for (size_t i = 0; i < subjectCount; ++i)
+        {
+            ReturnErrorOnFailure(entry.GetSubject(i, subjectBuffer[i]));
+        }
+        staging.subjects.SetNonNull(subjectBuffer, subjectCount);
+    }
+
+    AccessControlCluster::Structs::Target::Type targetBuffer[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY];
+    size_t targetCount;
+    ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
+    if (targetCount > 0)
+    {
+        for (size_t i = 0; i < targetCount; ++i)
+        {
+            AccessControl::Entry::Target target;
+            ReturnErrorOnFailure(entry.GetTarget(i, target));
+            ReturnErrorOnFailure(AccessControlEntryCodec::Convert(target, targetBuffer[i]));
+        }
+        staging.targets.SetNonNull(targetBuffer, targetCount);
+    }
+
+    latestValue.SetNonNull(staging);
+
+    if (subjectDescriptor.authMode == Access::AuthMode::kCase)
+    {
+        adminNodeID.SetNonNull(subjectDescriptor.subject);
+    }
+    else if (subjectDescriptor.authMode == Access::AuthMode::kPase)
+    {
+        adminNodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor.subject));
+    }
+
+    AccessControlCluster::Events::AccessControlEntryChanged::Type event{ subjectDescriptor.fabricIndex, adminNodeID,
+                                                                         adminPasscodeID, changeType, latestValue };
+
+    // AccessControl event only occurs on endpoint 0.
+    err = LogEvent(event, 0, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "AccessControl: Failed to record AccessControlEntryChanged event");
+    }
+
+    return err;
+}
 
 CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -364,10 +453,14 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
         if (i < oldCount)
         {
             ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry));
+            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                       AccessControlCluster::ChangeTypeEnum::kChanged));
         }
         else
         {
             ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry));
+            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                       AccessControlCluster::ChangeTypeEnum::kAdded));
         }
         ++i;
     }
@@ -377,6 +470,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     {
         --oldCount;
         ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount));
+        ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                   AccessControlCluster::ChangeTypeEnum::kRemoved));
     }
 
     return CHIP_NO_ERROR;

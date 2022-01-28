@@ -43,6 +43,7 @@ alloc
 Ameba
 amebad
 amebaiot
+announcementReason
 AnnounceOTAProvider
 APIs
 apk
@@ -145,6 +146,7 @@ CCMP
 CCS
 CCSTUDIO
 CCXML
+CDVersionNumber
 ced
 cfg
 CFLAGS
@@ -266,6 +268,7 @@ DBUILD
 dbus
 dcc
 DCHIP
+DCL
 DCMAKE
 DCONFIG
 debianutils
@@ -290,6 +293,7 @@ DeviceLayer
 DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
+deviceSoftwareVersionModel
 DevKitC
 DevKitM
 df
@@ -604,6 +608,7 @@ MatterLock
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
+maxApplicableSoftwareVersion
 MaxInterval
 MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
@@ -639,6 +644,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+minApplicableSoftwareVersion
 Minicom
 MinInterval
 MinIntervalFloorSeconds
@@ -728,6 +734,7 @@ optionsOverride
 orgs
 OTA
 OTADownloader
+otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorInterface
 OTAProvider
@@ -739,6 +746,7 @@ OTARequestor
 OTARequestorDriver
 OTARequestorSerialPort
 otasoftwareupdaterequestor
+otaURL
 OTBR
 otcli
 PAA
@@ -783,6 +791,7 @@ pre
 preprocessor
 Presetup
 prj
+providerNodeId
 ProductID
 ProductLabel
 ProductName
@@ -927,6 +936,7 @@ softmmu
 SoftwareDiagnostics
 SoftwareVersion
 SoftwareVersionString
+softwareVersionValid
 SPI
 spinel
 src
@@ -1063,6 +1073,7 @@ VendorName
 vendorpayload
 venv
 Verifier
+Verifiers
 VID
 visualstudio
 vlatest

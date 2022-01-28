@@ -278,7 +278,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
             strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
             thread->NameBuf[kMaxThreadNameLength] = '\0';
-            thread->name                          = CharSpan(thread->NameBuf, strlen(thread->NameBuf));
+            thread->name                          = CharSpan::fromCharString(thread->NameBuf);
             thread->id                            = atoi(entry->d_name);
 
             // TODO: Get stack info of each thread
@@ -432,7 +432,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
                 ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-                ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
+                ifp->name                            = CharSpan::fromCharString(ifp->Name);
                 ifp->fabricConnected                 = ifa->ifa_flags & IFF_RUNNING;
                 ifp->type                            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
                 ifp->offPremiseServicesReachableIPv4 = false;

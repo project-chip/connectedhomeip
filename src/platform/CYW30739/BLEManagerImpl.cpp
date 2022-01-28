@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Provides an implementation of the BLEManager singleton object
- *          for the P64343W platform.
+ *          for the CYW30739 platform.
  */
 
 /* this file behaves like a config.h, comes first */
@@ -778,24 +778,27 @@ void BLEManagerImpl::SetAdvertisingData(void)
     wiced_bt_ble_advert_elem_t adv_elem[4];
     uint8_t num_elem             = 0;
     uint8_t flag                 = BTM_BLE_GENERAL_DISCOVERABLE_FLAG | BTM_BLE_BREDR_NOT_SUPPORTED;
-    uint8_t chip_service_uuid[2] = { BIT16_TO_8(__UUID16_CHIPoBLEService) };
-    ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     uint16_t deviceDiscriminator = 0;
     uint8_t localDeviceNameLen;
-    uint8_t service_data[9];
-    uint8_t * p   = service_data;
     uint8_t * rpa = wiced_btm_get_private_bda();
+    struct
+    {
+        uint16_t uuid;
+        ChipBLEDeviceIdentificationInfo info;
+    } service_data = {
+        .uuid = __UUID16_CHIPoBLEService,
+    };
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(service_data.info);
     SuccessOrExit(err);
 
     // Verify device name was not already set
     if (!sInstance.mFlags.Has(Flags::kFlag_DeviceNameSet))
     {
         /* Default device name is CHIP-<DISCRIMINATOR> */
-        deviceDiscriminator = mDeviceIdInfo.GetDeviceDiscriminator();
+        deviceDiscriminator = service_data.info.GetDeviceDiscriminator();
 
         memset(sInstance.mDeviceName, 0, kMaxDeviceNameLength);
         snprintf(sInstance.mDeviceName, kMaxDeviceNameLength, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
@@ -827,16 +830,8 @@ void BLEManagerImpl::SetAdvertisingData(void)
     /* Second element is the service data for CHIP service */
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_SERVICE_DATA;
     adv_elem[num_elem].len         = sizeof(service_data);
-    adv_elem[num_elem].p_data      = service_data;
+    adv_elem[num_elem].p_data      = (uint8_t *) &service_data;
     num_elem++;
-    UINT8_TO_STREAM(p, chip_service_uuid[0]);
-    UINT8_TO_STREAM(p, chip_service_uuid[1]);
-    UINT8_TO_STREAM(p, 0); // CHIP BLE Opcode == 0x00 (Uncommissioned)
-    UINT16_TO_STREAM(p, deviceDiscriminator);
-    UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceVendorId[0]);
-    UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceVendorId[1]);
-    UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceProductId[0]);
-    UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceProductId[1]);
 
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
     adv_elem[num_elem].len         = localDeviceNameLen;

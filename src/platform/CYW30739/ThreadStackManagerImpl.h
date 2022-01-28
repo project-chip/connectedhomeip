@@ -44,6 +44,8 @@ public:
     // ===== Methods that implement the ThreadStackManager abstract interface.
     CHIP_ERROR _InitThreadStack();
 
+    inline bool IsCurrentTask(void) { return wiced_rtos_is_current_thread(mThread) == WICED_SUCCESS; }
+
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 

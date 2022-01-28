@@ -49,8 +49,8 @@ class TypedReadAttributeCallback final : public app::ReadClient::Callback
 public:
     using OnSuccessCallbackType =
         std::function<void(const app::ConcreteAttributePath & aPath, const DecodableAttributeType & aData)>;
-    using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath, CHIP_ERROR aError)>;
-    using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadAttributeCallback * callback)>;
+    using OnErrorCallbackType                   = std::function<void(const app::ConcreteAttributePath * aPath, CHIP_ERROR aError)>;
+    using OnDoneCallbackType                    = std::function<void(TypedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
@@ -63,9 +63,11 @@ public:
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
+    void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
+
 private:
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
-                         TLV::TLVReader * apData, const app::StatusIB & aStatus) override
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableAttributeType value;
@@ -92,11 +94,11 @@ private:
         }
     }
 
-    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
+    void OnDone() override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished)
         {
@@ -111,6 +113,7 @@ private:
     OnDoneCallbackType mOnDone;
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
     app::BufferedReadCallback mBufferedReadAdapter;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
 template <typename DecodableEventType>
@@ -119,7 +122,7 @@ class TypedReadEventCallback final : public app::ReadClient::Callback
 public:
     using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
-    using OnDoneCallbackType    = std::function<void(app::ReadClient * client, TypedReadEventCallback * callback)>;
+    using OnDoneCallbackType    = std::function<void(TypedReadEventCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
@@ -128,9 +131,10 @@ public:
         mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
     {}
 
+    void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
+
 private:
-    void OnEventData(const app::ReadClient * apReadClient, const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const app::StatusIB * apStatus) override
+    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventType value;
@@ -151,11 +155,11 @@ private:
         }
     }
 
-    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
+    void OnDone() override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished)
         {
@@ -167,6 +171,7 @@ private:
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
 } // namespace Controller

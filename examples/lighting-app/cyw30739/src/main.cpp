@@ -37,6 +37,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
+static void InitApp(intptr_t args);
 static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
 static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
 static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t value);
@@ -114,17 +115,7 @@ APPLICATION_START()
     }
 #endif
 
-    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
-
-    LightMgr().Init();
-    LightMgr().SetCallbacks(LightManagerCallback, NULL);
-
-    /* Start CHIP datamodel server */
-    chip::Server::GetInstance().Init();
-
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    ConfigurationMgr().LogDeviceConfig();
+    PlatformMgr().ScheduleWork(InitApp, 0);
 
     const int ret = Engine::Root().Init();
     if (!chip::ChipError::IsSuccess(ret))
@@ -136,6 +127,21 @@ APPLICATION_START()
     Engine::Root().RunMainLoop();
 
     assert(!wiced_rtos_check_for_stack_overflow());
+}
+
+void InitApp(intptr_t args)
+{
+    ConfigurationMgr().LogDeviceConfig();
+
+    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+
+    /* Start CHIP datamodel server */
+    chip::Server::GetInstance().Init();
+
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    LightMgr().Init();
+    LightMgr().SetCallbacks(LightManagerCallback, NULL);
 }
 
 void EventHandler(const ChipDeviceEvent * event, intptr_t arg)

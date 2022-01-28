@@ -101,10 +101,11 @@ public:
         mDataLen = new_size;
     }
 
-    // Allow creating ByteSpans from ZCL octet strings, so we don't have to
-    // reinvent it various places.
+    // Allow creating ByteSpans and CharSpans from ZCL octet strings, so we
+    // don't have to reinvent it various places.
     template <class U,
-              typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<uint8_t, std::remove_const_t<U>>::value>>
+              typename = std::enable_if_t<std::is_same<uint8_t, std::remove_const_t<U>>::value &&
+                                          (std::is_same<const uint8_t, T>::value || std::is_same<const char, T>::value)>>
     static Span fromZclString(U * bytes)
     {
         size_t length = bytes[0];
@@ -113,7 +114,15 @@ public:
         {
             length = 0;
         }
-        return Span(&bytes[1], length);
+        // Need reinterpret_cast if we're a CharSpan.
+        return Span(reinterpret_cast<T *>(&bytes[1]), length);
+    }
+
+    // Allow creating CharSpans from a character string.
+    template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
+    static Span fromCharString(U * chars)
+    {
+        return Span(chars, strlen(chars));
     }
 
     // operator== explicitly not implemented on Span, because its meaning

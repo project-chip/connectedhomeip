@@ -287,17 +287,17 @@ CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
     FixedLabel::Structs::LabelStruct::Type floor;
     FixedLabel::Structs::LabelStruct::Type direction;
 
-    room.label = CharSpan("room", strlen("room"));
-    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+    room.label = CharSpan::fromCharString("room");
+    room.value = CharSpan::fromCharString("bedroom 2");
 
-    orientation.label = CharSpan("orientation", strlen("orientation"));
-    orientation.value = CharSpan("North", strlen("North"));
+    orientation.label = CharSpan::fromCharString("orientation");
+    orientation.value = CharSpan::fromCharString("North");
 
-    floor.label = CharSpan("floor", strlen("floor"));
-    floor.value = CharSpan("2", strlen("2"));
+    floor.label = CharSpan::fromCharString("floor");
+    floor.value = CharSpan::fromCharString("2");
 
-    direction.label = CharSpan("direction", strlen("direction"));
-    direction.value = CharSpan("up", strlen("up"));
+    direction.label = CharSpan::fromCharString("direction");
+    direction.value = CharSpan::fromCharString("up");
 
     labelList.add(room);
     labelList.add(orientation);
@@ -325,17 +325,17 @@ PlatformManagerImpl::_GetUserLabelList(
     UserLabel::Structs::LabelStruct::Type floor;
     UserLabel::Structs::LabelStruct::Type direction;
 
-    room.label = CharSpan("room", strlen("room"));
-    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+    room.label = CharSpan::fromCharString("room");
+    room.value = CharSpan::fromCharString("bedroom 2");
 
-    orientation.label = CharSpan("orientation", strlen("orientation"));
-    orientation.value = CharSpan("North", strlen("North"));
+    orientation.label = CharSpan::fromCharString("orientation");
+    orientation.value = CharSpan::fromCharString("North");
 
-    floor.label = CharSpan("floor", strlen("floor"));
-    floor.value = CharSpan("2", strlen("2"));
+    floor.label = CharSpan::fromCharString("floor");
+    floor.value = CharSpan::fromCharString("2");
 
-    direction.label = CharSpan("direction", strlen("direction"));
-    direction.value = CharSpan("up", strlen("up"));
+    direction.label = CharSpan::fromCharString("direction");
+    direction.value = CharSpan::fromCharString("up");
 
     labelList.add(room);
     labelList.add(orientation);
@@ -349,14 +349,14 @@ CHIP_ERROR
 PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
-    supportedLocales.add(CharSpan("en-US", strlen("en-US")));
-    supportedLocales.add(CharSpan("de-DE", strlen("de-DE")));
-    supportedLocales.add(CharSpan("fr-FR", strlen("fr-FR")));
-    supportedLocales.add(CharSpan("en-GB", strlen("en-GB")));
-    supportedLocales.add(CharSpan("es-ES", strlen("es-ES")));
-    supportedLocales.add(CharSpan("zh-CN", strlen("zh-CN")));
-    supportedLocales.add(CharSpan("it-IT", strlen("it-IT")));
-    supportedLocales.add(CharSpan("ja-JP", strlen("ja-JP")));
+    supportedLocales.add(CharSpan::fromCharString("en-US"));
+    supportedLocales.add(CharSpan::fromCharString("de-DE"));
+    supportedLocales.add(CharSpan::fromCharString("fr-FR"));
+    supportedLocales.add(CharSpan::fromCharString("en-GB"));
+    supportedLocales.add(CharSpan::fromCharString("es-ES"));
+    supportedLocales.add(CharSpan::fromCharString("zh-CN"));
+    supportedLocales.add(CharSpan::fromCharString("it-IT"));
+    supportedLocales.add(CharSpan::fromCharString("ja-JP"));
 
     return CHIP_NO_ERROR;
 }
@@ -474,13 +474,13 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
 
     if (delegate != nullptr)
     {
-        SoftwareDiagnostics::Structs::SoftwareFault::Type softwareFault;
+        SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
         char threadName[kMaxThreadNameLength + 1];
 
         softwareFault.id = gettid();
         strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
         threadName[kMaxThreadNameLength] = '\0';
-        softwareFault.name               = CharSpan(threadName, strlen(threadName));
+        softwareFault.name               = CharSpan::fromCharString(threadName);
         softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
 
         delegate->OnSoftwareFaultDetected(softwareFault);

@@ -172,7 +172,7 @@ public:
         }
         return mOperationalKey;
     }
-    CHIP_ERROR SetEphemeralKey(const Crypto::P256Keypair * key);
+    CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
@@ -402,10 +402,10 @@ class DLL_EXPORT FabricTable
 {
 public:
     FabricTable() { Reset(); }
-    CHIP_ERROR Store(FabricIndex id);
+    CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
-    CHIP_ERROR Delete(FabricIndex id);
+    CHIP_ERROR Delete(FabricIndex index);
     void DeleteAllFabrics();
 
     /**
@@ -421,6 +421,7 @@ public:
 
     void ReleaseFabricIndex(FabricIndex fabricIndex);
 
+    FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 

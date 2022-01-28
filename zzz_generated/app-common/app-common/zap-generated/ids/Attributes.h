@@ -1347,6 +1347,36 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TimeFormatLocalization
 
+namespace UnitLocalization {
+namespace Attributes {
+
+namespace TemperatureUnit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureUnit
+
+namespace ServerGeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
+} // namespace ServerGeneratedCommandList
+
+namespace ClientGeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
+} // namespace ClientGeneratedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UnitLocalization
+
 namespace PowerSourceConfiguration {
 namespace Attributes {
 

@@ -217,7 +217,7 @@ async function asJavaType(type, zclType, cluster, options)
     classType += asJavaBoxedType(type, zclType);
   }
 
-  if (!options.hash.forceNotList && (this.isList || this.isArray || this.entryType)) {
+  if (!options.hash.forceNotList && (this.isArray || this.entryType)) {
     if (!options.hash.removeGenericType) {
       classType = 'ArrayList<' + classType + '>';
     } else {
@@ -271,7 +271,7 @@ async function asJniHelper(type, zclType, cluster, options)
     return { jniType : "jobject", jniSignature : signature, jniBoxedSignature : signature };
   }
 
-  if (this.isList || this.isArray) {
+  if (this.isArray) {
     const signature = "Ljava/util/ArrayList;"
     return { jniType : "jobject", jniSignature : signature, jniBoxedSignature : signature };
   }

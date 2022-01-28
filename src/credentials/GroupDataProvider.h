@@ -146,22 +146,6 @@ public:
             VerifyOrReturnError(this->policy == other.policy && this->num_keys_used == other.num_keys_used, false);
             return !memcmp(this->epoch_keys, other.epoch_keys, this->num_keys_used * sizeof(EpochKey));
         }
-
-        ByteSpan GetCurrentKey()
-        {
-            // An epoch key update SHALL order the keys from oldest to newest,
-            // the current epoch key having the second newest time
-            switch (this->num_keys_used)
-            {
-            case 1:
-            case 2:
-                return ByteSpan(epoch_keys[0].key, EpochKey::kLengthBytes);
-            case 3:
-                return ByteSpan(epoch_keys[1].key, EpochKey::kLengthBytes);
-            default:
-                return ByteSpan(nullptr, 0);
-            }
-        }
     };
 
     /**
@@ -317,7 +301,8 @@ public:
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
 
     // Decryption
-    virtual GroupSessionIterator * IterateGroupSessions(uint16_t session_id) = 0;
+    virtual GroupSessionIterator * IterateGroupSessions(uint16_t session_id)                        = 0;
+    virtual Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) = 0;
 
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };

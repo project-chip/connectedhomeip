@@ -435,6 +435,47 @@ private:
 };
 
 /**
+ *  @brief  A data structure for holding an AES CCM128 symmetric key, without the ownership of it.
+ */
+using AesCcm128KeySpan = FixedByteSpan<Crypto::kAES_CCM128_Key_Length>;
+
+class AesCcm128Key
+{
+public:
+    AesCcm128Key() {}
+
+    ~AesCcm128Key()
+    {
+        // Sanitize after use
+        ClearSecretData(&bytes[0], Length());
+    }
+
+    template <size_t N>
+    constexpr AesCcm128Key(const uint8_t (&raw_value)[N])
+    {
+        static_assert(N == kAES_CCM128_Key_Length, "Can only array-initialize from proper bounds");
+        memcpy(&bytes[0], &raw_value[0], N);
+    }
+
+    template <size_t N>
+    constexpr AesCcm128Key(const FixedByteSpan<N> & value)
+    {
+        static_assert(N == kAES_CCM128_Key_Length, "Can only initialize from proper sized byte span");
+        memcpy(&bytes[0], value.data(), N);
+    }
+
+    size_t Length() const { return sizeof(bytes); }
+    operator uint8_t *() { return bytes; }
+    operator const uint8_t *() const { return bytes; }
+    const uint8_t * ConstBytes() const { return &bytes[0]; }
+    AesCcm128KeySpan Span() const { return AesCcm128KeySpan(bytes); }
+    uint8_t * Bytes() { return &bytes[0]; }
+
+private:
+    uint8_t bytes[kAES_CCM128_Key_Length];
+};
+
+/**
  * @brief Convert a raw ECDSA signature to ASN.1 signature (per X9.62) as used by TLS libraries.
  *
  * Errors are:
@@ -1305,6 +1346,12 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 class SymmetricKeyContext
 {
 public:
+    /**
+     * @brief Returns the symmetric key hash
+     * @return Group Key Hash
+     */
+    virtual uint16_t GetKeyHash() = 0;
+
     virtual ~SymmetricKeyContext() = default;
     /**
      * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
@@ -1348,6 +1395,11 @@ public:
      */
     virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
                                       const ByteSpan & mic) const = 0;
+
+    /**
+     * @brief Release the dynamic memory used to allocate this instance of the SymmetricKeyContext
+     */
+    virtual void Release() = 0;
 };
 
 /**

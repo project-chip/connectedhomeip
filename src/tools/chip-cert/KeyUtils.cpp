@@ -240,15 +240,15 @@ exit:
 
 bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 {
-    bool res                  = true;
-    FILE * file               = nullptr;
-    uint8_t * keyToWrite      = nullptr;
-    uint32_t keyToWriteLen    = 0;
-    uint32_t chipKeyLen       = kP256_PublicKey_Length + kP256_PrivateKey_Length;
+    bool res               = true;
+    FILE * file            = nullptr;
+    uint8_t * keyToWrite   = nullptr;
+    uint32_t keyToWriteLen = 0;
+    P256SerializedKeypair serializedKeypair;
+    uint32_t chipKeyLen       = sizeof(serializedKeypair);
     uint32_t chipKeyBase64Len = BASE64_ENCODED_LEN(chipKeyLen);
     std::unique_ptr<uint8_t[]> chipKey(new uint8_t[chipKeyLen]);
     std::unique_ptr<uint8_t[]> chipKeyBase64(new uint8_t[chipKeyBase64Len]);
-    P256SerializedKeypair serializedKeypair;
 
     VerifyOrExit(key != nullptr, res = false);
 
@@ -282,7 +282,7 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 
         if (keyFmt == kKeyFormat_Chip_Base64)
         {
-            res = Base64Encode(serializedKeypair, static_cast<uint32_t>(serializedKeypair.Length()), chipKeyBase64.get(),
+            res = Base64Encode(serializedKeypair, static_cast<uint32_t>(sizeof(serializedKeypair)), chipKeyBase64.get(),
                                chipKeyBase64Len, chipKeyBase64Len);
             VerifyTrueOrExit(res);
 

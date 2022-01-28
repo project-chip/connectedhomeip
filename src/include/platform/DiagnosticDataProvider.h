@@ -95,7 +95,9 @@ public:
      * @brief
      *   Called when a software fault that has taken place on the Node.
      */
-    virtual void OnSoftwareFaultDetected(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & softwareFault) {}
+    virtual void
+    OnSoftwareFaultDetected(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
+    {}
 };
 
 /**
