@@ -619,6 +619,9 @@ client cluster Groups = 4 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 
   request struct AddGroupRequest {
     INT16U groupId = 0;
@@ -641,8 +644,11 @@ client cluster Groups = 4 {
   request struct ViewGroupRequest {
     INT16U groupId = 0;
   }
+<<<<<<< HEAD
 =======
 >>>>>>> Restore the previous asBlocks behavior
+=======
+>>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 }
 
 client cluster Identify = 3 {
@@ -1142,6 +1148,9 @@ client cluster Scenes = 5 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 
   request struct AddSceneRequest {
     INT16U groupId = 0;
@@ -1179,6 +1188,7 @@ client cluster Scenes = 5 {
     INT16U groupId = 0;
     INT8U sceneId = 1;
   }
+<<<<<<< HEAD
 
   response struct AddSceneResponse {
     ENUM8 status = 0;
@@ -1221,6 +1231,8 @@ client cluster Scenes = 5 {
   }
 =======
 >>>>>>> Restore the previous asBlocks behavior
+=======
+>>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 }
 
 server cluster SoftwareDiagnostics = 52 {
