@@ -649,9 +649,8 @@ Clusters.init = async function(context) {
 //
 // Helpers: All
 //
-function asBlocks(promise, options)
-{
-  return promise.then(data => templateUtil.collectBlocks(data, options, this))
+function asBlocks(promise, options) {
+  return promise.then(data => data ? templateUtil.collectBlocks(data, options, this) : '')
 }
 
 function ensureClusters(context)
