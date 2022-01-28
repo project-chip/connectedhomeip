@@ -197,7 +197,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 }
 
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
-                                        uint8_t deviceVersion, DataVersion * dataVersionStorage)
+                                        uint8_t deviceVersion, const Span<DataVersion> & dataVersionStorage)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -208,6 +208,12 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     if (id == kInvalidEndpointId)
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+
+    auto serverClusterCount = emberAfClusterCountForEndpointType(ep, /* server = */ true);
+    if (dataVersionStorage.size() < serverClusterCount)
+    {
+        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
     }
 
     index = static_cast<uint16_t>(realIndex);
@@ -223,24 +229,21 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceId      = deviceId;
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
-    emAfEndpoints[index].dataVersions  = dataVersionStorage;
+    emAfEndpoints[index].dataVersions  = dataVersionStorage.data();
     emAfEndpoints[index].networkIndex  = 0;
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
 
-    // Initialize the data versions, if we have space.
-    if (dataVersionStorage)
+    // Initialize the data versions.
+    size_t dataSize = sizeof(DataVersion) * serverClusterCount;
+    if (dataSize != 0)
     {
-        size_t dataSize = sizeof(DataVersion) * emberAfClusterCountByIndex(index, /* server = */ true);
-        if (dataSize != 0)
+        if (Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(dataVersionStorage.data()), dataSize) != CHIP_NO_ERROR)
         {
-            if (Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(dataVersionStorage), dataSize) != CHIP_NO_ERROR)
-            {
-                // Now what?  At least 0-init it.
-                memset(dataVersionStorage, 0, dataSize);
-            }
+            // Now what?  At least 0-init it.
+            memset(dataVersionStorage.data(), 0, dataSize);
         }
     }
 
@@ -1020,10 +1023,16 @@ uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server)
     {
         return 0;
     }
+
+    return emberAfClusterCountForEndpointType(de->endpointType, server);
+}
+
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
+{
     uint8_t c = 0;
-    for (uint8_t i = 0; i < de->endpointType->clusterCount; i++)
+    for (uint8_t i = 0; i < type->clusterCount; i++)
     {
-        auto * cluster = &(de->endpointType->cluster[i]);
+        auto * cluster = &(type->cluster[i]);
         if (server && emberAfClusterIsServer(cluster))
         {
             c++;

@@ -86,7 +86,7 @@ namespace chip {
 namespace AppPlatform {
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
-                                             DataVersion * dataVersionStorage)
+                                             const Span<DataVersion> & dataVersionStorage)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
