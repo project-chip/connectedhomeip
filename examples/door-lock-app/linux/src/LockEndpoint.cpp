@@ -20,12 +20,12 @@
 
 using chip::to_underlying;
 
-bool LockEndpoint::Lock(chip::Optional<chip::ByteSpan> pin)
+bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin)
 {
     return setLockState(DlLockState::kLocked, pin);
 }
 
-bool LockEndpoint::Unlock(chip::Optional<chip::ByteSpan> pin)
+bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin)
 {
     return setLockState(DlLockState::kUnlocked, pin);
 }
@@ -99,7 +99,16 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         return false;
     }
 
-    strncpy(userInStorage.userName, userName.data(), userName.size());
+    if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
+    {
+        ChipLogError(Zcl,
+                     "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16
+                     ",totalCredentials=%zu]",
+                     mEndpointId, userIndex, adjustedUserIndex, totalCredentials);
+        return false;
+    }
+
+    chip::Platform::CopyString(userInStorage.userName, userName);
     userInStorage.userName[userName.size()] = 0;
     userInStorage.userUniqueId              = uniqueId;
     userInStorage.userStatus                = userStatus;
@@ -277,7 +286,7 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
-bool LockEndpoint::setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin)
+bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin)
 {
     if (mLockState == lockState)
     {

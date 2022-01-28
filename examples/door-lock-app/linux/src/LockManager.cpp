@@ -91,7 +91,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     return true;
 }
 
-bool LockManager::Lock(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pin)
+bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -102,7 +102,7 @@ bool LockManager::Lock(chip::EndpointId endpointId, chip::Optional<chip::ByteSpa
     return lockEndpoint->Lock(pin);
 }
 
-bool LockManager::Unlock(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pin)
+bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
