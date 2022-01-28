@@ -96,9 +96,11 @@ public:
     {
         Event(EventId id) : mId(id), mEndpoint(0) {}
         Event(EventId id, chip::EndpointId endpoint) : mId(id), mEndpoint(endpoint) {}
+        Event(EventId id, chip::EndpointId endpoint, chip::AttributeId attributeId) : mId(id), mEndpoint(endpoint), mAttributeId(attributeId) {}
 
         EventId mId;
         chip::EndpointId mEndpoint;
+        chip::AttributeId mAttributeId;
     };
 
     struct Cover
@@ -138,6 +140,7 @@ public:
     virtual CHIP_ERROR Run();
     virtual void Finish();
     virtual void PostEvent(const Event & event) = 0;
+    virtual void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) = 0;
 
 protected:
     struct StateFlags
