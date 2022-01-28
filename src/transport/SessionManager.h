@@ -207,7 +207,11 @@ public:
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
     {
-        NodeId ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
+        // Allocate ephemeralInitiatorNodeID in Operational Node ID range
+        NodeId ephemeralInitiatorNodeID;
+        do {
+            ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
+        } while (ephemeralInitiatorNodeID == kUndefinedNodeId);
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
@@ -281,8 +285,8 @@ private:
     void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle && msg);
+    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                        System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 

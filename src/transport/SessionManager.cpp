@@ -401,7 +401,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     }
     else
     {
-        MessageDispatch(packetHeader, peerAddress, std::move(msg));
+        UnauthenticatedMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
 }
 
@@ -437,13 +437,16 @@ void SessionManager::RefreshSessionOperationalData(const SessionHandle & session
     });
 }
 
-void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBufferHandle && msg)
+void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                    System::PacketBufferHandle && msg)
 {
     Optional<NodeId> source      = packetHeader.GetSourceNodeId();
     Optional<NodeId> destination = packetHeader.GetDestinationNodeId();
     if ((source.HasValue() && destination.HasValue()) || (!source.HasValue() && !destination.HasValue()))
     {
+        ChipLogProgress(Inet,
+                        "Received malformed unsecure packet with source 0x" ChipLogFormatX64 " destination 0x" ChipLogFormatX64,
+                        ChipLogValueX64(source.ValueOr(kUndefinedNodeId)), ChipLogValueX64(destination.ValueOr(kUndefinedNodeId)));
         return; // ephemeral node id is only assigned to the initiator, there should be one and only one node id exists.
     }
 
@@ -464,7 +467,8 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
         optionalSession = mUnauthenticatedSessions.FindInitiator(destination.Value());
         if (!optionalSession.HasValue())
         {
-            ChipLogProgress(Inet, "Received unknown unsecure packet for initiator 0x%" PRId64, destination.Value());
+            ChipLogProgress(Inet, "Received unknown unsecure packet for initiator 0x" ChipLogFormatX64,
+                            ChipLogValueX64(destination.Value()));
             return;
         }
     }
