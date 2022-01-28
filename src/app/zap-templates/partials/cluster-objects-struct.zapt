@@ -14,12 +14,11 @@ namespace {{asUpperCamelCase name}} {
 
         CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
         {{#unless struct_contains_array}}
-        {{#if struct_is_fabric_scoped}}
-        CHIP_ERROR Decode(TLV::TLVReader &reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
-        {{else}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
-        {{/if}}
         {{/unless}}
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
         {{#if struct_is_fabric_scoped}}
         auto GetFabricIndex() const {
             return {{ asLowerCamelCase struct_fabric_idx_field }};
@@ -38,18 +37,18 @@ namespace {{asUpperCamelCase name}} {
         {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
 
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
         {{#if struct_is_fabric_scoped}}
-        bool MatchesFabricIndex(FabricIndex fabricIndex_) const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }} == fabricIndex_;
+        auto GetFabricIndex() const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }};
         }
 
         void SetFabricIndex(chip::FabricIndex fabricIndex_) {
             {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
         }
-
-        CHIP_ERROR Decode(TLV::TLVReader &reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);
-        {{else}}
-        CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/if}}
     };
     {{else}}
@@ -69,11 +68,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     return CHIP_NO_ERROR;
 }
 
-{{#if struct_is_fabric_scoped}}
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader, const Optional<FabricIndex> & overwriteFabricIndex) {
-{{else}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-{{/if}}
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
     VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
@@ -95,12 +90,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-{{#if struct_is_fabric_scoped}}
-    if (overwriteFabricIndex.HasValue()) {
-        {{ asLowerCamelCase struct_fabric_idx_field }} = overwriteFabricIndex.Value();
-    }
-{{/if}}
 
     return CHIP_NO_ERROR;
 }

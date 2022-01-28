@@ -4530,7 +4530,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -4565,11 +4565,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
 
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -4585,7 +4580,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -4610,11 +4605,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -6223,7 +6213,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -6251,11 +6241,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -9934,7 +9919,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -9972,11 +9957,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
 
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -9993,7 +9973,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -10021,11 +10001,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -10624,7 +10599,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -10652,11 +10627,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -22198,7 +22168,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -22220,11 +22190,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, const Optional<FabricI
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    if (overwriteFabricIndex.HasValue())
-    {
-        fabricIndex = overwriteFabricIndex.Value();
-    }
 
     return CHIP_NO_ERROR;
 }

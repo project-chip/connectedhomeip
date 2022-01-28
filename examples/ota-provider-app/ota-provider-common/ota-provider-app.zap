@@ -1319,7 +1319,7 @@
               "reportableChange": 0
             },
             {
-              "name": "CalendarType",
+              "name": "ActiveCalendarType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
