@@ -159,10 +159,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
     strcpy(buf, CHIP_DEVICE_CONFIG_UNIQUE_ID);
     return CHIP_NO_ERROR;
 #else
+    ReturnErrorCodeIf(bufSize != 32, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     char temp[32];
     int i = 0, j = 0;
 
-    wifi_get_mac_address(temp);
+    memset(&temp[0], 0, 32);
+    ReturnErrorCodeIf(wifi_get_mac_address(temp) != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     for (i = 0; i < bufSize; i++)
     {
