@@ -113,10 +113,19 @@ class IdlBitmapType:
     def bits(self):
         return base_type.bits()
 
+class IdlItemType(enum.Enum):
+    UNKNOWN = enum.auto()
+    STRUCT  = enum.auto()
+
 
 @dataclass
 class IdlType:
     idl_name: str
+    item_type: IdlItemType
+
+    @property
+    def is_struct(self) -> bool:
+        return self.item_type == IdlItemType.STRUCT
 
 
 # Data types, held by ZAP in chip-types.xml
@@ -275,7 +284,10 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         # Valid enum found. it MUST be based on a valid data type
         return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
 
+    result=IdlType(idl_name=data_type.name, item_type = IdlItemType.UNKNOWN)
     if lookup.find_struct(data_type.name):
+        result.item_type = IdlItemType.STRUCT
+    else:
         logging.warn("Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
-    return IdlType(idl_name=data_type.name)
+    return result
