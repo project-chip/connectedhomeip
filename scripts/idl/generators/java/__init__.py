@@ -229,7 +229,9 @@ class EncodableValue:
             else:
                 return "String"
         elif type(t) == IdlEnumType:
-            return "Integer;"
+            return "Integer"
+        elif type(t) == IdlBitmapType:
+            return "Integer"
         else:
             return "Object"
 
