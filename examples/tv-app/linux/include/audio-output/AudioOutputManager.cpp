@@ -19,6 +19,7 @@
 #include "AudioOutputManager.h"
 
 using namespace std;
+using namespace chip::app;
 using namespace chip::app::Clusters::AudioOutput;
 
 uint8_t AudioOutputManager::HandleGetCurrentOutput()
@@ -26,21 +27,21 @@ uint8_t AudioOutputManager::HandleGetCurrentOutput()
     return 0;
 }
 
-std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList()
+CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
-    std::list<Structs::OutputInfo::Type> list;
     // TODO: Insert code here
-    int maximumVectorSize = 3;
-
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
-        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-        outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
-        outputInfo.index      = static_cast<uint8_t>(1 + i);
-        list.push_back(outputInfo);
-    }
-    return list;
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        int maximumVectorSize = 3;
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
+            outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
+            outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
+            outputInfo.index      = static_cast<uint8_t>(1 + i);
+            ReturnErrorOnFailure(encoder.Encode(outputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)

@@ -506,7 +506,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _noc = [NSData data];
 
-        _icac = [NSData data];
+        _icac = nil;
     }
     return self;
 }

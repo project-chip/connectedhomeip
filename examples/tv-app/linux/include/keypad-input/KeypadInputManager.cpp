@@ -21,10 +21,10 @@
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
 
-Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keycCode)
+void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCode & keycCode)
 {
     // TODO: Insert code here
     Commands::SendKeyResponse::Type response;
     response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }
