@@ -100,9 +100,6 @@ class DLL_EXPORT BasicCluster : public ClusterBase
 public:
     BasicCluster() : ClusterBase(app::Clusters::Basic::Id) {}
     ~BasicCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
@@ -213,7 +210,7 @@ public:
     CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
     CHIP_ERROR SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                              uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex, chip::ByteSpan credentialData,
-                             uint16_t userIndex, uint8_t userStatus);
+                             uint16_t userIndex, uint8_t userStatus, uint8_t userType);
     CHIP_ERROR SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t operationType,
                        uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
                        uint8_t credentialRule);

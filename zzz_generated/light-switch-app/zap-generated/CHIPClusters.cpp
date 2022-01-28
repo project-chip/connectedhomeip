@@ -2967,8 +2967,14 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+=======
+// Groups Cluster Commands
+CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint16_t groupId, chip::CharSpan groupName)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -2991,8 +2997,15 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // deltaPositionMilliseconds: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), deltaPositionMilliseconds));
+=======
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // groupName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3008,8 +3021,13 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
+=======
+CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t groupId, chip::CharSpan groupName)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3031,7 +3049,15 @@ CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSucce
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
+=======
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // groupName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3047,7 +3073,12 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+=======
+CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t groupList)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3069,7 +3100,13 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     // Command takes no arguments.
+=======
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupList: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupList));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3111,6 +3148,7 @@ CHIP_ERROR NetworkCommissioningCluster::ConnectNetworkResponse(Callback::Cancela
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // networkingStatus: networkCommissioningStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkingStatus));
@@ -3118,6 +3156,9 @@ CHIP_ERROR NetworkCommissioningCluster::ConnectNetworkResponse(Callback::Cancela
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
     // errorValue: int32s
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), errorValue));
+=======
+    // Command takes no arguments.
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3133,9 +3174,14 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR NetworkCommissioningCluster::NetworkConfigResponse(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint8_t networkingStatus,
                                                               chip::CharSpan debugText)
+=======
+CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint16_t groupId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3159,10 +3205,15 @@ CHIP_ERROR NetworkCommissioningCluster::NetworkConfigResponse(Callback::Cancelab
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // networkingStatus: networkCommissioningStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkingStatus));
     // debugText: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
+=======
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3178,9 +3229,14 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR NetworkCommissioningCluster::ScanNetworksResponse(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint8_t networkingStatus,
                                                              chip::CharSpan debugText)
+=======
+CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint16_t groupId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3204,10 +3260,15 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworksResponse(Callback::Cancelabl
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // networkingStatus: networkCommissioningStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkingStatus));
     // debugText: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
+=======
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3400,9 +3461,13 @@ CHIP_ERROR OperationalCredentialsCluster::CertificateChainResponse(Callback::Can
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // certificate: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), certificate));
+=======
+    // Command takes no arguments.
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3442,6 +3507,7 @@ CHIP_ERROR OperationalCredentialsCluster::NOCResponse(Callback::Cancelable * onS
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // statusCode: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), statusCode));
@@ -3449,6 +3515,9 @@ CHIP_ERROR OperationalCredentialsCluster::NOCResponse(Callback::Cancelable * onS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), fabricIndex));
     // debugText: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), debugText));
+=======
+    // Command takes no arguments.
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3489,11 +3558,15 @@ CHIP_ERROR OperationalCredentialsCluster::OpCSRResponse(Callback::Cancelable * o
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
+<<<<<<< HEAD
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // NOCSRElements: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), NOCSRElements));
     // attestationSignature: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), attestationSignature));
+=======
+    // Command takes no arguments.
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3510,8 +3583,14 @@ exit:
 }
 
 // Scenes Cluster Commands
+<<<<<<< HEAD
 CHIP_ERROR ScenesCluster::AddSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint8_t status, uint16_t groupId, uint8_t sceneId)
+=======
+CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName,
+                                   chip::ClusterId clusterId, uint8_t length, uint8_t value)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3534,12 +3613,28 @@ CHIP_ERROR ScenesCluster::AddSceneResponse(Callback::Cancelable * onSuccessCallb
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // status: enum8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
+=======
+>>>>>>> Cleaning up the typo in helper.js
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
+<<<<<<< HEAD
+=======
+    // transitionTime: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // sceneName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), sceneName));
+    // clusterId: clusterId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
+    // length: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), length));
+    // value: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), value));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3555,10 +3650,15 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR ScenesCluster::GetSceneMembershipResponse(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint8_t status, uint8_t capacity,
                                                      uint16_t groupId, uint8_t sceneCount,
                                                      /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
+=======
+CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t groupId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3581,6 +3681,7 @@ CHIP_ERROR ScenesCluster::GetSceneMembershipResponse(Callback::Cancelable * onSu
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // status: enum8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
     // capacity: int8u
@@ -3591,6 +3692,10 @@ CHIP_ERROR ScenesCluster::GetSceneMembershipResponse(Callback::Cancelable * onSu
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneCount));
     // sceneList: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneList));
+=======
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3606,8 +3711,13 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR ScenesCluster::RemoveAllScenesResponse(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint8_t status, uint16_t groupId)
+=======
+CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3630,10 +3740,19 @@ CHIP_ERROR ScenesCluster::RemoveAllScenesResponse(Callback::Cancelable * onSucce
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // status: enum8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+=======
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // sceneId: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    // transitionTime: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3649,8 +3768,13 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR ScenesCluster::RemoveSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint8_t status, uint16_t groupId, uint8_t sceneId)
+=======
+CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t groupId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3673,12 +3797,17 @@ CHIP_ERROR ScenesCluster::RemoveSceneResponse(Callback::Cancelable * onSuccessCa
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // status: enum8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
+=======
+    // groupId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3694,8 +3823,13 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR ScenesCluster::StoreSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint8_t status, uint16_t groupId, uint8_t sceneId)
+=======
+CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint16_t groupId, uint8_t sceneId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3718,8 +3852,11 @@ CHIP_ERROR ScenesCluster::StoreSceneResponse(Callback::Cancelable * onSuccessCal
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // status: enum8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
+=======
+>>>>>>> Cleaning up the typo in helper.js
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
@@ -3739,9 +3876,14 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR ScenesCluster::ViewSceneResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                             chip::CharSpan sceneName)
+=======
+CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint16_t groupId, uint8_t sceneId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3764,13 +3906,17 @@ CHIP_ERROR ScenesCluster::ViewSceneResponse(Callback::Cancelable * onSuccessCall
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+<<<<<<< HEAD
     // status: enum8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+>>>>>>> Cleaning up the typo in helper.js
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 =======
     // transitionTime: int16u
@@ -3778,6 +3924,8 @@ CHIP_ERROR ScenesCluster::ViewSceneResponse(Callback::Cancelable * onSuccessCall
     // sceneName: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), sceneName));
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+>>>>>>> Cleaning up the typo in helper.js
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3793,6 +3941,7 @@ exit:
     return err;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zzz_generated/light-switch-app/zap-generated/CHIPClusters.cpp
 CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                     uint16_t groupId, uint8_t sceneId)
@@ -3802,6 +3951,10 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
                                                          Callback::Cancelable * onFailureCallback, uint8_t target,
                                                          chip::CharSpan data)
 >>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates:zzz_generated/tv-casting-app/zap-generated/CHIPClusters.cpp
+=======
+CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint16_t groupId, uint8_t sceneId)
+>>>>>>> Cleaning up the typo in helper.js
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3838,8 +3991,11 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * 
     // sceneId: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
 
+<<<<<<< HEAD
 =======
 >>>>>>> Regening light switch app with the right content after rebasing from upstream master
+=======
+>>>>>>> Cleaning up the typo in helper.js
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
