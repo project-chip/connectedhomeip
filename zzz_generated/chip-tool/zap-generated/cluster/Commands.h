@@ -1309,13 +1309,9 @@ class ColorControlColorLoopSet : public ClusterCommand
 public:
     ColorControlColorLoopSet() : ClusterCommand("color-loop-set")
     {
-        AddArgument("UpdateFlags", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags> *>(
-                        &mRequest.updateFlags));
-        AddArgument("Action", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.action)> *>(&mRequest.action));
-        AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
+        AddArgument("UpdateFlags", 0, UINT8_MAX, &mRequest.updateFlags);
+        AddArgument("Action", 0, UINT8_MAX, &mRequest.action);
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
         AddArgument("Time", 0, UINT16_MAX, &mRequest.time);
         AddArgument("StartHue", 0, UINT16_MAX, &mRequest.startHue);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -1342,8 +1338,7 @@ class ColorControlEnhancedMoveHue : public ClusterCommand
 public:
     ColorControlEnhancedMoveHue() : ClusterCommand("enhanced-move-hue")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1370,8 +1365,7 @@ public:
     ColorControlEnhancedMoveToHue() : ClusterCommand("enhanced-move-to-hue")
     {
         AddArgument("EnhancedHue", 0, UINT16_MAX, &mRequest.enhancedHue);
-        AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1424,8 +1418,7 @@ class ColorControlEnhancedStepHue : public ClusterCommand
 public:
     ColorControlEnhancedStepHue() : ClusterCommand("enhanced-step-hue")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -1478,8 +1471,7 @@ class ColorControlMoveColorTemperature : public ClusterCommand
 public:
     ColorControlMoveColorTemperature() : ClusterCommand("move-color-temperature")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
         AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
         AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
@@ -1507,8 +1499,7 @@ class ColorControlMoveHue : public ClusterCommand
 public:
     ColorControlMoveHue() : ClusterCommand("move-hue")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1534,8 +1525,7 @@ class ColorControlMoveSaturation : public ClusterCommand
 public:
     ColorControlMoveSaturation() : ClusterCommand("move-saturation")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1615,8 +1605,7 @@ public:
     ColorControlMoveToHue() : ClusterCommand("move-to-hue")
     {
         AddArgument("Hue", 0, UINT8_MAX, &mRequest.hue);
-        AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
@@ -1722,8 +1711,7 @@ class ColorControlStepColorTemperature : public ClusterCommand
 public:
     ColorControlStepColorTemperature() : ClusterCommand("step-color-temperature")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
@@ -1752,8 +1740,7 @@ class ColorControlStepHue : public ClusterCommand
 public:
     ColorControlStepHue() : ClusterCommand("step-hue")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -1780,8 +1767,7 @@ class ColorControlStepSaturation : public ClusterCommand
 public:
     ColorControlStepSaturation() : ClusterCommand("step-saturation")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
@@ -2224,10 +2210,8 @@ class DiagnosticLogsRetrieveLogsRequest : public ClusterCommand
 public:
     DiagnosticLogsRetrieveLogsRequest() : ClusterCommand("retrieve-logs-request")
     {
-        AddArgument("Intent", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.intent)> *>(&mRequest.intent));
-        AddArgument("RequestedProtocol", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.requestedProtocol)> *>(&mRequest.requestedProtocol));
+        AddArgument("Intent", 0, UINT8_MAX, &mRequest.intent);
+        AddArgument("RequestedProtocol", 0, UINT8_MAX, &mRequest.requestedProtocol);
         AddArgument("TransferFileDesignator", &mRequest.transferFileDesignator);
         ClusterCommand::AddArguments();
     }
@@ -2413,8 +2397,7 @@ class DoorLockSetCredential : public ClusterCommand
 public:
     DoorLockSetCredential() : ClusterCommand("set-credential"), mComplex_Credential(&mRequest.credential)
     {
-        AddArgument("OperationType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        AddArgument("OperationType", 0, UINT8_MAX, &mRequest.operationType);
         AddArgument("Credential", &mComplex_Credential);
         AddArgument("CredentialData", &mRequest.credentialData);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
@@ -2443,8 +2426,7 @@ class DoorLockSetUser : public ClusterCommand
 public:
     DoorLockSetUser() : ClusterCommand("set-user")
     {
-        AddArgument("OperationType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        AddArgument("OperationType", 0, UINT8_MAX, &mRequest.operationType);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserName", &mRequest.userName);
         AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
@@ -2800,8 +2782,7 @@ class GeneralCommissioningSetRegulatoryConfig : public ClusterCommand
 public:
     GeneralCommissioningSetRegulatoryConfig() : ClusterCommand("set-regulatory-config")
     {
-        AddArgument("Location", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.location)> *>(&mRequest.location));
+        AddArgument("Location", 0, UINT8_MAX, &mRequest.location);
         AddArgument("CountryCode", &mRequest.countryCode);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
         AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
@@ -3202,10 +3183,8 @@ class IdentifyTriggerEffect : public ClusterCommand
 public:
     IdentifyTriggerEffect() : ClusterCommand("trigger-effect")
     {
-        AddArgument("EffectIdentifier", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectIdentifier)> *>(&mRequest.effectIdentifier));
-        AddArgument("EffectVariant", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant));
+        AddArgument("EffectIdentifier", 0, UINT8_MAX, &mRequest.effectIdentifier);
+        AddArgument("EffectVariant", 0, UINT8_MAX, &mRequest.effectVariant);
         ClusterCommand::AddArguments();
     }
 
@@ -3279,8 +3258,7 @@ class KeypadInputSendKeyRequest : public ClusterCommand
 public:
     KeypadInputSendKeyRequest() : ClusterCommand("send-key-request")
     {
-        AddArgument("KeyCode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.keyCode)> *>(&mRequest.keyCode));
+        AddArgument("KeyCode", 0, UINT8_MAX, &mRequest.keyCode);
         ClusterCommand::AddArguments();
     }
 
@@ -3338,8 +3316,7 @@ class LevelControlMove : public ClusterCommand
 public:
     LevelControlMove() : ClusterCommand("move")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
         AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
@@ -3415,8 +3392,7 @@ class LevelControlMoveWithOnOff : public ClusterCommand
 public:
     LevelControlMoveWithOnOff() : ClusterCommand("move-with-on-off")
     {
-        AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
+        AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
         ClusterCommand::AddArguments();
     }
@@ -3440,8 +3416,7 @@ class LevelControlStep : public ClusterCommand
 public:
     LevelControlStep() : ClusterCommand("step")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
@@ -3468,8 +3443,7 @@ class LevelControlStepWithOnOff : public ClusterCommand
 public:
     LevelControlStepWithOnOff() : ClusterCommand("step-with-on-off")
     {
-        AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
+        AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         ClusterCommand::AddArguments();
@@ -4475,9 +4449,7 @@ public:
     {
         AddArgument("ProviderNodeId", 0, UINT64_MAX, &mRequest.providerNodeId);
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument(
-            "AnnouncementReason", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<decltype(mRequest.announcementReason)> *>(&mRequest.announcementReason));
+        AddArgument("AnnouncementReason", 0, UINT8_MAX, &mRequest.announcementReason);
         AddArgument("MetadataForNode", &mRequest.metadataForNode);
         AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
         ClusterCommand::AddArguments();
@@ -4584,10 +4556,8 @@ class OnOffOffWithEffect : public ClusterCommand
 public:
     OnOffOffWithEffect() : ClusterCommand("off-with-effect")
     {
-        AddArgument("EffectId", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectId)> *>(&mRequest.effectId));
-        AddArgument("EffectVariant", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant));
+        AddArgument("EffectId", 0, UINT8_MAX, &mRequest.effectId);
+        AddArgument("EffectVariant", 0, UINT8_MAX, &mRequest.effectVariant);
         ClusterCommand::AddArguments();
     }
 
@@ -4648,8 +4618,7 @@ class OnOffOnWithTimedOff : public ClusterCommand
 public:
     OnOffOnWithTimedOff() : ClusterCommand("on-with-timed-off")
     {
-        AddArgument("OnOffControl", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::OnOff::OnOffControl> *>(&mRequest.onOffControl));
+        AddArgument("OnOffControl", 0, UINT8_MAX, &mRequest.onOffControl);
         AddArgument("OnTime", 0, UINT16_MAX, &mRequest.onTime);
         AddArgument("OffWaitTime", 0, UINT16_MAX, &mRequest.offWaitTime);
         ClusterCommand::AddArguments();
@@ -5726,7 +5695,7 @@ public:
     TestClusterTestEmitTestEventRequest() : ClusterCommand("test-emit-test-event-request")
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
         AddArgument("Arg3", 0, 1, &mRequest.arg3);
         ClusterCommand::AddArguments();
     }
@@ -5751,7 +5720,7 @@ public:
     TestClusterTestEnumsRequest() : ClusterCommand("test-enums-request")
     {
         AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
         ClusterCommand::AddArguments();
     }
 
@@ -7766,11 +7735,8 @@ class ThermostatGetWeeklySchedule : public ClusterCommand
 public:
     ThermostatGetWeeklySchedule() : ClusterCommand("get-weekly-schedule")
     {
-        AddArgument("DaysToReturn", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.daysToReturn));
-        AddArgument(
-            "ModeToReturn", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(&mRequest.modeToReturn));
+        AddArgument("DaysToReturn", 0, UINT8_MAX, &mRequest.daysToReturn);
+        AddArgument("ModeToReturn", 0, UINT8_MAX, &mRequest.modeToReturn);
         ClusterCommand::AddArguments();
     }
 
@@ -7794,12 +7760,8 @@ public:
     ThermostatSetWeeklySchedule() : ClusterCommand("set-weekly-schedule"), mComplex_Payload(&mRequest.payload)
     {
         AddArgument("NumberOfTransitionsForSequence", 0, UINT8_MAX, &mRequest.numberOfTransitionsForSequence);
-        AddArgument(
-            "DayOfWeekForSequence", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.dayOfWeekForSequence));
-        AddArgument("ModeForSequence", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(
-                        &mRequest.modeForSequence));
+        AddArgument("DayOfWeekForSequence", 0, UINT8_MAX, &mRequest.dayOfWeekForSequence);
+        AddArgument("ModeForSequence", 0, UINT8_MAX, &mRequest.modeForSequence);
         AddArgument("Payload", &mComplex_Payload);
         ClusterCommand::AddArguments();
     }
@@ -7824,7 +7786,7 @@ class ThermostatSetpointRaiseLower : public ClusterCommand
 public:
     ThermostatSetpointRaiseLower() : ClusterCommand("setpoint-raise-lower")
     {
-        AddArgument("Mode", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.mode)> *>(&mRequest.mode));
+        AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
         AddArgument("Amount", INT8_MIN, INT8_MAX, &mRequest.amount);
         ClusterCommand::AddArguments();
     }
