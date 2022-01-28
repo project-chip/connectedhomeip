@@ -59,7 +59,6 @@ private:
     NVS_Handle mNvsHandle;
     uint16_t mMetaPage;
     MutableByteSpan mBlock;
-    // can't this be gotten through the requestor?
     OTADownloader * mDownloader;
 };
 
