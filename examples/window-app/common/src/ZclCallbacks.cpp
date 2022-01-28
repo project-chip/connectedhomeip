@@ -66,14 +66,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         app.PostEvent(WindowApp::Event(WindowApp::EventId::CoverTypeChange, endpoint));
         break;
 
-    case Attributes::CurrentPositionLiftPercent100ths::Id:
-        app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftChanged, endpoint));
-        break;
-
-    case Attributes::CurrentPositionTiltPercent100ths::Id:
-        app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltChanged, endpoint));
-        break;
-
     case Attributes::TargetPositionLiftPercent100ths::Id:
         Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
         Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
