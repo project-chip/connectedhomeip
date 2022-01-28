@@ -127,13 +127,6 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
     return candidateFound;
 }
 
-void OTAProviderExample::SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate)
-{
-    VerifyOrReturn(delegate != nullptr, ChipLogError(SoftwareUpdate, "User consent delegate is null"));
-    mUserConsentDelegate                      = delegate;
-    mUserConsentDelegate->userConsentCallback = OnUserConsent;
-}
-
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
@@ -232,11 +225,11 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
         // Only doing BDX transport for now
         MutableCharSpan uri(uriBuf, kUriMaxLen);
-        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
+        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(otaFilePath), uri);
         ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
 
         // Initialize the transfer session in prepartion for a BDX transfer
-        mBdxOtaSender.SetFilepath(mOTAFilePath);
+        mBdxOtaSender.SetFilepath(otaFilePath);
         BitFlags<TransferControlFlags> bdxFlags;
         bdxFlags.Set(TransferControlFlags::kReceiverDrive);
         CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
@@ -247,9 +240,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             return EMBER_ZCL_STATUS_FAILURE;
         }
 
-        response.imageURI.Emplace(chip::CharSpan(uriBuf, strlen(uriBuf)));
+        response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
         response.softwareVersion.Emplace(newSoftwareVersion);
-        response.softwareVersionString.Emplace(chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString)));
+        response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(newSoftwareVersionString));
         response.updateToken.Emplace(chip::ByteSpan(updateToken));
     }
 
