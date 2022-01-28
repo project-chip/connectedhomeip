@@ -50,7 +50,7 @@ struct __attribute__((packed)) EventPath
     chip::EventId eventId;
 };
 
-using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::DataVersion version, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                              chip::AttributeId attributeId,
                                              std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
                                              uint32_t dataLen);
@@ -78,7 +78,7 @@ public:
 
     app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         //
         // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
@@ -88,6 +88,7 @@ public:
         size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
         uint32_t size                     = 0;
+        DataVersion version               = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
@@ -104,9 +105,13 @@ public:
                 return;
             }
             size = writer.GetLengthWritten();
+            if (aVersion.HasValue())
+            {
+                version = aVersion.Value();
+            }
         }
 
-        gOnReadAttributeDataCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+        gOnReadAttributeDataCallback(mAppContext, version, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 

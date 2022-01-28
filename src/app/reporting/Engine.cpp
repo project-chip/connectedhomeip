@@ -138,12 +138,14 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
 
-                    // Try to encode our error as a status response.
-                    err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
-                    if (err != CHIP_NO_ERROR)
+                    if (err != CHIP_ERROR_NO_MEMORY)
                     {
-                        // OK, just roll back again and give up.
-                        attributeReportIBs.Rollback(attributeBackup);
+                        // Try to encode our error as a status response.
+                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        if (err != CHIP_NO_ERROR) {
+                            // OK, just roll back again and give up.
+                            attributeReportIBs.Rollback(attributeBackup);
+                        }
                     }
                 }
             }

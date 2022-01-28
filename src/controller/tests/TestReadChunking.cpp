@@ -78,6 +78,7 @@ DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
+chip::DataVersion gtestEndpointDataVersions[ArraySize(testEndpointClusters)];
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint3)
 DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(kTestBadAttribute, ARRAY, 1, 0),
@@ -87,7 +88,7 @@ DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
-
+chip::DataVersion gtestEndpoint3DataVersions[ArraySize(testEndpoint3Clusters)];
 //clang-format on
 
 uint8_t sAnStringThatCanNeverFitIntoTheMTU[4096] = { 0 };
@@ -96,7 +97,7 @@ class TestReadCallback : public app::ReadClient::Callback
 {
 public:
     TestReadCallback() : mBufferedCallback(*this) {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
     void OnDone() override;
@@ -108,7 +109,7 @@ public:
     app::BufferedReadCallback mBufferedCallback;
 };
 
-void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
                                        const app::StatusIB & aStatus)
 {
     if (aPath.mAttributeId != kTestListAttribute)
@@ -202,7 +203,7 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, nullptr);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, gtestEndpointDataVersions);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -275,7 +276,7 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, nullptr);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, gtestEndpoint3DataVersions);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -349,7 +350,7 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, nullptr);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, gtestEndpoint3DataVersions);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
