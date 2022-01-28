@@ -91,8 +91,8 @@
  *
  * @return Returns pointer to the attribute metadata location.
  */
-EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                          chip::AttributeId attributeId, uint8_t mask);
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                chip::AttributeId attributeId, uint8_t mask);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.

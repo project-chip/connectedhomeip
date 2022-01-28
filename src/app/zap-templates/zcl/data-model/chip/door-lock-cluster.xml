@@ -95,11 +95,11 @@ limitations under the License.
         <!-- Conformance feature RFID - for now optional -->
         <attribute side="server" code="19" define="NUM_RFID_USERS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfRFIDUsersSupported</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT16U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
+        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT16U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
+        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
+        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT8U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
         <!-- Conformance feature PIN - for now optional -->
         <attribute side="server" code="23" define="MAX_PIN_LENGTH" type="INT8U" writable="false" optional="true">MaxPINCodeLength</attribute>
         <!-- Conformance feature PIN - for now optional -->
@@ -365,11 +365,11 @@ limitations under the License.
             <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
             <arg name="status" type="DlStatus" />
-            <arg name="daysMask" type="DlDaysMaskMap" presentIf="status == 0" />
-            <arg name="startHour" type="INT8U" presentIf="status == 0" />
-            <arg name="startMinute" type="INT8U" presentIf="status == 0" />
-            <arg name="endHour" type="INT8U" presentIf="status == 0" />
-            <arg name="endMinute" type="INT8U" presentIf="status == 0" />
+            <arg name="daysMask" type="DlDaysMaskMap" optional="true" />
+            <arg name="startHour" type="INT8U" optional="true" />
+            <arg name="startMinute" type="INT8U" optional="true" />
+            <arg name="endHour" type="INT8U" optional="true" />
+            <arg name="endMinute" type="INT8U" optional="true" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="client" code="13" name="ClearWeekDaySchedule" optional="true">
@@ -401,8 +401,8 @@ limitations under the License.
             <arg name="yearDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
             <arg name="status" type="DlStatus" />
-            <arg name="localStartTime" type="epoch_s" presentIf="status == 0" />
-            <arg name="localEndTime" type="epoch_s" presentIf="status == 0" />
+            <arg name="localStartTime" type="epoch_s" optional="true" />
+            <arg name="localEndTime" type="epoch_s" optional="true" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="client" code="16" name="ClearYearDaySchedule" optional="true">
@@ -432,9 +432,9 @@ limitations under the License.
             <access op="invoke" role="administer" />
             <arg name="holidayIndex" type="INT8U" />
             <arg name="status" type="DlStatus" />
-            <arg name="localStartTime" type="epoch_s" presentIf="status == 0" />
-            <arg name="localEndTime" type="epoch_s" presentIf="status == 0" />
-            <arg name="operatingMode" type="DlOperatingMode" presentIf="status == 0" />
+            <arg name="localStartTime" type="epoch_s" optional="true" />
+            <arg name="localEndTime" type="epoch_s" optional="true" />
+            <arg name="operatingMode" type="DlOperatingMode" optional="true" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="client" code="19" name="ClearHolidaySchedule" optional="true">
@@ -952,15 +952,15 @@ limitations under the License.
 
     <bitmap name="DoorLockFeature" type="BITMAP32">
         <cluster code="0x0101" />
-        <field name="PINCredentials" mask="0x01"/>
-        <field name="RFIDCredentials" mask="0x02"/>
-        <field name="FingerCredentials" mask="0x04"/>
-        <field name="Logging" mask="0x08"/>
-        <field name="AccessSchedules" mask="0x10"/>
-        <field name="DoorPositionSensor" mask="0x20"/>
-        <field name="FaceCredentials" mask="0x40"/>
-        <field name="CredentialsOTA" mask="0x80"/>
-        <field name="UsersManagement" mask="0x100"/>
-        <field name="Notifications" mask="0x200"/>
+        <field name="PINCredentials" mask="0x01" />
+        <field name="RFIDCredentials" mask="0x02" />
+        <field name="FingerCredentials" mask="0x04" />
+        <field name="Logging" mask="0x08" />
+        <field name="AccessSchedules" mask="0x10" />
+        <field name="DoorPositionSensor" mask="0x20" />
+        <field name="FaceCredentials" mask="0x40" />
+        <field name="CredentialsOTA" mask="0x80" />
+        <field name="UsersManagement" mask="0x100" />
+        <field name="Notifications" mask="0x200" />
     </bitmap>
 </configurator>

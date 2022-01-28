@@ -2030,15 +2030,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _daysMask = @(0);
+        _daysMask = nil;
 
-        _startHour = @(0);
+        _startHour = nil;
 
-        _startMinute = @(0);
+        _startMinute = nil;
 
-        _endHour = @(0);
+        _endHour = nil;
 
-        _endMinute = @(0);
+        _endMinute = nil;
     }
     return self;
 }
@@ -2098,9 +2098,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _localStartTime = @(0);
+        _localStartTime = nil;
 
-        _localEndTime = @(0);
+        _localEndTime = nil;
     }
     return self;
 }
@@ -2156,11 +2156,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _localStartTime = @(0);
+        _localStartTime = nil;
 
-        _localEndTime = @(0);
+        _localEndTime = nil;
 
-        _operatingMode = @(0);
+        _operatingMode = nil;
     }
     return self;
 }

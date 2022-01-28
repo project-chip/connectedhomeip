@@ -17,6 +17,14 @@
   }
 
   {{/zcl_enums}}
+  {{#zcl_bitmaps}}
+  bitmap {{name}} : {{type}} {
+    {{#zcl_bitmap_items}}
+    k{{asUpperCamelCase label}} = {{asHex mask}};
+    {{/zcl_bitmap_items}}
+  }
+
+  {{/zcl_bitmaps}}
   {{#chip_cluster_specific_structs}}
 {{>idl_structure_definition extraIndent=1}}
 
