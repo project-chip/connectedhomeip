@@ -618,6 +618,7 @@ client cluster Groups = 4 {
   readonly attribute bitmap8 nameSupport = 0;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
+<<<<<<< HEAD
 
   request struct AddGroupRequest {
     INT16U groupId = 0;
@@ -640,6 +641,8 @@ client cluster Groups = 4 {
   request struct ViewGroupRequest {
     INT16U groupId = 0;
   }
+=======
+>>>>>>> Restore the previous asBlocks behavior
 }
 
 client cluster Identify = 3 {
@@ -1138,6 +1141,7 @@ client cluster Scenes = 5 {
   readonly attribute bitmap8 nameSupport = 4;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
+<<<<<<< HEAD
 
   request struct AddSceneRequest {
     INT16U groupId = 0;
@@ -1215,6 +1219,8 @@ client cluster Scenes = 5 {
     CHAR_STRING sceneName = 4;
     SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
+=======
+>>>>>>> Restore the previous asBlocks behavior
 }
 
 server cluster SoftwareDiagnostics = 52 {
