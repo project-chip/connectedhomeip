@@ -644,12 +644,12 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mAttestationResponseCallback(OnAttestationResponse, this),
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this),
     mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
     mNOCResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnAttestationFailureCallback(OnAttestationFailureResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
-    mOnCertFailureCallback(OnAddNOCFailureResponse, this), mOnRootCertFailureCallback(OnRootCertFailureResponse, this),
-    mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddNOCFailureResponse, this),
+    mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this), mAutoCommissioner(this)
 {
@@ -1080,37 +1080,31 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * devic
 {
     ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mAttestationResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnAttestationFailureCallback.Cancel();
+    OperationalCredentials::Commands::AttestationRequest::Type request;
+    request.attestationNonce = attestationNonce;
 
-    ReturnErrorOnFailure(cluster.AttestationRequest(successCallback, failureCallback, attestationNonce));
+    ReturnErrorOnFailure(
+        SendCommand<OperationalCredentialsCluster>(device, request, OnAttestationResponse, OnAttestationFailureResponse));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnAttestationFailureResponse(void * context, uint8_t status)
+void DeviceCommissioner::OnAttestationFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Device failed to receive the Attestation Information Response: 0x%02x", status);
+    ChipLogProgress(Controller, "Device failed to receive the Attestation Information Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-    commissioner->mAttestationResponseCallback.Cancel();
-    commissioner->mOnAttestationFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+    commissioner->CommissioningStageComplete(error);
 }
 
-void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan attestationElements, chip::ByteSpan signature)
+void DeviceCommissioner::OnAttestationResponse(void * context,
+                                               const OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
 {
     ChipLogProgress(Controller, "Received Attestation Information from the device");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
-    commissioner->mAttestationResponseCallback.Cancel();
-    commissioner->mOnAttestationFailureCallback.Cancel();
-
     CommissioningDelegate::CommissioningReport report;
-    report.Set<AttestationResponse>(AttestationResponse(attestationElements, signature));
+    report.Set<AttestationResponse>(AttestationResponse(data.attestationElements, data.signature));
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 

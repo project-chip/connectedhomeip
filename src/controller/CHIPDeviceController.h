@@ -752,8 +752,10 @@ private:
     static void OnCertificateChainResponse(
         void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
 
-    static void OnAttestationFailureResponse(void * context, uint8_t status);
-    static void OnAttestationResponse(void * context, chip::ByteSpan attestationElements, chip::ByteSpan signature);
+    static void OnAttestationFailureResponse(void * context, CHIP_ERROR error);
+    static void
+    OnAttestationResponse(void * context,
+                          const app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
 
     /**
      * @brief
@@ -828,11 +830,9 @@ private:
 
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
-    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
