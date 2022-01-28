@@ -37465,7 +37465,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 17);
+            XCTAssertEqual([actualValue count], 18);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -37483,6 +37483,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
             XCTAssertEqual([actualValue[14] unsignedIntValue], 18UL);
             XCTAssertEqual([actualValue[15] unsignedIntValue], 19UL);
             XCTAssertEqual([actualValue[16] unsignedIntValue], 20UL);
+            XCTAssertEqual([actualValue[17] unsignedIntValue], 21UL);
         }
 
         [expectation fulfill];
@@ -37506,7 +37507,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 7);
+            XCTAssertEqual([actualValue count], 8);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 4UL);
@@ -37514,6 +37515,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
             XCTAssertEqual([actualValue[4] unsignedIntValue], 6UL);
             XCTAssertEqual([actualValue[5] unsignedIntValue], 9UL);
             XCTAssertEqual([actualValue[6] unsignedIntValue], 10UL);
+            XCTAssertEqual([actualValue[7] unsignedIntValue], 11UL);
         }
 
         [expectation fulfill];
