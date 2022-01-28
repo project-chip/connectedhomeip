@@ -78,7 +78,13 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
+    // Open and erase secondary flash area to prepare
     if (flash_area_open(FLASH_AREA_IMAGE_SECONDARY(0), &(imageProcessor->mFlashArea)) != 0)
+    {
+        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
+        return;
+    }
+    if (flash_area_erase(imageProcessor->mFlashArea, 0, imageProcessor->mFlashArea->fa_size) != 0)
     {
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
         return;
@@ -95,11 +101,13 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    int ret = boot_set_pending(0, 1); // Will close flash area
+    flash_area_close(imageProcessor->mFlashArea);
+    ChipLogProgress(SoftwareUpdate, "Setting boot pending");
+    int ret = boot_set_pending(0, 1);
 
     if (ret != 0)
     {
-        // TODO: Handle error
+        ChipLogError(SoftwareUpdate, "Failed to set boot pending");
         return;
     }
 
@@ -145,14 +153,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    //auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    int16_t ret = boot_set_confirmed();
+    ChipLogProgress(SoftwareUpdate, "Rebooting after 2 seconds...");
 
-    if (ret != 0)
-    {
-        // TODO: Handle error
-        return;
-    }
+    cy_rtos_delay_milliseconds(2000);
+
+    NVIC_SystemReset();
 
     return;
 }
