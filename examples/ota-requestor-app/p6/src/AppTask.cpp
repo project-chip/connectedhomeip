@@ -44,6 +44,11 @@
 #include "platform/GenericOTARequestorDriver.h"
 #include "platform/P6/OTAImageProcessorImpl.h"
 
+extern "C"
+{
+#include "cy_smif_psoc6.h"
+}
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -110,6 +115,13 @@ CHIP_ERROR AppTask::StartAppTask()
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    int rc = psoc6_qspi_init();
+    if (rc != 0)
+    {
+        P6_LOG("psoc6_qspi_init failed");
+        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+    }
 
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
