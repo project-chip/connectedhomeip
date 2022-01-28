@@ -131,6 +131,7 @@ public:
     FabricInfo * GetFabricInfo(void) { return mFabricInfo; }
     NodeId GetNodeId(void) { return mNodeId; }
     bool GetOnConnecting(void) { return mOnConnecting; }
+
 private:
     CASECommands() {}
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
