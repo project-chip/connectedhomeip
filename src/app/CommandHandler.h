@@ -196,15 +196,7 @@ public:
 
     NodeId SourceNodeId() const
     {
-        if (mpExchangeCtx->IsGroupExchangeContext() == false)
-        {
-            return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
-        }
-        else
-        {
-            // TODO: Return the source node id in case of group exchange context.
-            return kUndefinedNodeId;
-        }
+        return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor().subject;
     }
 
 private:
