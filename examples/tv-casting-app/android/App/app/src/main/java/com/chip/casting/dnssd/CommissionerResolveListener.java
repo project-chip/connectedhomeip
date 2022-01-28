@@ -8,9 +8,7 @@ import android.util.Log;
 import android.widget.Button;
 import androidx.annotation.VisibleForTesting;
 import com.chip.casting.app.CastingContext;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 public class CommissionerResolveListener implements NsdManager.ResolveListener {
 
@@ -62,10 +60,7 @@ public class CommissionerResolveListener implements NsdManager.ResolveListener {
   public String getCommissionerButtonText(DiscoveredNodeData commissioner) {
     String main = commissioner.getDeviceName() != null ? commissioner.getDeviceName() : "";
     String aux =
-        ""
-            + (commissioner.getProductId() > 0
-                ? "Product ID: " + commissioner.getProductId()
-                : "");
+        "" + (commissioner.getProductId() > 0 ? "Product ID: " + commissioner.getProductId() : "");
     aux +=
         commissioner.getDeviceType() > 0
             ? (aux.isEmpty() ? "" : " ") + "Device Type: " + commissioner.getDeviceType()

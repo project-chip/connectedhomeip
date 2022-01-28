@@ -1,7 +1,6 @@
 package com.chip.casting.dnssd;
 
 import android.net.nsd.NsdServiceInfo;
-
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -13,7 +12,6 @@ public class DiscoveredNodeData {
   private static final int MAX_ROTATING_ID_LEN = 50;
   private static final String KEY_DEVICE_NAME = "DN";
   private static final String KEY_DEVICE_TYPE = "DT";
-
 
   private String hostName;
   private String instanceName;
@@ -31,7 +29,7 @@ public class DiscoveredNodeData {
   private int numIPs;
   private List<InetAddress> ipAddresses;
 
-  public DiscoveredNodeData() { }
+  public DiscoveredNodeData() {}
 
   public DiscoveredNodeData(NsdServiceInfo serviceInfo) {
     Map<String, byte[]> attributes = serviceInfo.getAttributes();
