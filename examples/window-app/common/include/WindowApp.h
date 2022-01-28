@@ -81,7 +81,6 @@ public:
         LiftDown,
         TiltUp,
         TiltDown,
-        StopMotion,
 
         // Cover Attribute update events
         AttributeChange,
@@ -115,7 +114,7 @@ public:
         void TiltUp();
         void TiltDown();
         void GotoTilt(EventId action = EventId::None);
-        void StopMotion();
+
         EmberAfWcType CycleType();
 
         static void OnLiftTimeout(Timer & timer);
