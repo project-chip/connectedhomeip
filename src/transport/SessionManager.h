@@ -211,7 +211,7 @@ public:
         NodeId ephemeralInitiatorNodeID;
         do {
             ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
-        } while (ephemeralInitiatorNodeID == kUndefinedNodeId);
+        } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
