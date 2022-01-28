@@ -78,10 +78,11 @@ def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) 
         capitalcase(attr.definition.name)
     )
 
+
 def CommandCallbackName(command: Command, cluster: Cluster):
-  if command.output_param.lower() == 'defaultsuccess':
-    return 'DefaultSuccess'
-  return '{}Cluster{}'.format(cluster.name, command.output_param)
+    if command.output_param.lower() == 'defaultsuccess':
+        return 'DefaultSuccess'
+    return '{}Cluster{}'.format(cluster.name, command.output_param)
 
 
 def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
@@ -95,10 +96,12 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
 
         yield attr
 
+
 def ClientClustersOnly(clusters: List[Cluster]):
     for cluster in clusters:
         if cluster.side == ClusterSide.CLIENT:
             yield cluster
+
 
 def NamedFilter(choices: List, name: str):
     for choice in choices:
@@ -106,15 +109,17 @@ def NamedFilter(choices: List, name: str):
             return choice
     raise Exception("No item named %s in %r" % (name, choices))
 
+
 def ToBoxedJavaType(field: Field):
-  if field.is_optional:
-    return 'jobject'
-  elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
-    return 'jbyteArray'
-  elif field.data_type.name.lower() in ['char_string', 'long_char_string']:
-    return 'jstring'
-  else:
-    return 'jobject'
+    if field.is_optional:
+        return 'jobject'
+    elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
+        return 'jbyteArray'
+    elif field.data_type.name.lower() in ['char_string', 'long_char_string']:
+        return 'jstring'
+    else:
+        return 'jobject'
+
 
 def LowercaseFirst(name: str):
     if len(name) > 1 and name[1].lower() != name[1]:
@@ -122,10 +127,12 @@ def LowercaseFirst(name: str):
         return name
     return name[0].lower() + name[1:]
 
+
 class EncodableValueAttr(enum.Enum):
-    LIST     = enum.auto()
+    LIST = enum.auto()
     NULLABLE = enum.auto()
     OPTIONAL = enum.auto()
+
 
 class EncodableValue:
     """
@@ -133,6 +140,7 @@ class EncodableValue:
     for optionality, lists and recursive data type lookups within
     the IDL and cluster
     """
+
     def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
         self.context = context
         self.data_type = data_type
@@ -145,7 +153,7 @@ class EncodableValue:
     @property
     def is_optional(self):
         return EncodableValueAttr.OPTIONAL in self.attrs
-    
+
     @property
     def is_list(self):
         return EncodableValueAttr.LIST in self.attrs
@@ -215,9 +223,9 @@ class EncodableValue:
                 raise Error("Unknown fundamental type")
         elif type(t) == BasicInteger:
             if t.byte_count >= 4:
-               return "Long"
+                return "Long"
             else:
-               return "Integer"
+                return "Integer"
         elif type(t) == BasicString:
             if t.is_binary:
                 return "byte[]"
@@ -233,10 +241,10 @@ class EncodableValue:
     @property
     def boxed_java_signature(self):
         if self.is_list:
-           return "Ljava/util/ArrayList;"
+            return "Ljava/util/ArrayList;"
 
         if self.is_optional:
-           return "Ljava/util/Optional;"
+            return "Ljava/util/Optional;"
 
         t = ParseDataType(self.data_type, self.context)
 
@@ -251,9 +259,9 @@ class EncodableValue:
                 raise Error("Unknown fundamental type")
         elif type(t) == BasicInteger:
             if t.byte_count >= 4:
-               return "Ljava/lang/Long;"
+                return "Ljava/lang/Long;"
             else:
-               return "Ljava/lang/Integer;"
+                return "Ljava/lang/Integer;"
         elif type(t) == BasicString:
             if t.is_binary:
                 return "[B"
@@ -265,7 +273,6 @@ class EncodableValue:
             return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
-
 
 
 def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableValue:
@@ -285,6 +292,7 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
 
 def CreateLookupContext(idl: Idl, cluster: Cluster):
     return TypeLookupContext(idl, cluster)
+
 
 def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext):
     # For backwards compatibility, we do not subscribe to structs
@@ -313,7 +321,6 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
-
 
     def internal_render_all(self):
         # Single generation for compatibility check

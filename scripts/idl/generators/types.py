@@ -100,6 +100,7 @@ class IdlEnumType:
     def bits(self):
         return base_type.bits()
 
+
 @dataclass
 class IdlBitmapType:
     idl_name: str
@@ -113,9 +114,10 @@ class IdlBitmapType:
     def bits(self):
         return base_type.bits()
 
+
 class IdlItemType(enum.Enum):
     UNKNOWN = enum.auto()
-    STRUCT  = enum.auto()
+    STRUCT = enum.auto()
 
 
 @dataclass
@@ -182,6 +184,7 @@ __CHIP_SIZED_TYPES__ = {
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=True),
 }
 
+
 class TypeLookupContext:
     """
     Handles type lookups within a scope.
@@ -210,14 +213,14 @@ class TypeLookupContext:
         for s in self.all_structs:
             if s.name == name:
                 return s
-                    
+
         return None
 
     def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
         for s in self.all_bitmaps:
             if s.name == name:
-               return s
-                    
+                return s
+
         return None
 
     @property
@@ -297,10 +300,11 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         # Valid enum found. it MUST be based on a valid data type
         return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[b.base_type.lower()])
 
-    result=IdlType(idl_name=data_type.name, item_type = IdlItemType.UNKNOWN)
+    result = IdlType(idl_name=data_type.name, item_type=IdlItemType.UNKNOWN)
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        logging.warn("Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
+        logging.warn(
+            "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result
