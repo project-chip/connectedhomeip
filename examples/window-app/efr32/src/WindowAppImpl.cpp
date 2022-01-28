@@ -384,7 +384,7 @@ void WindowAppImpl::UpdateLEDs()
             liftLimit             = CheckLimitState(current.Value(), limits);
         }
 
-        if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
+        if (OperationalState::Stall != cover.mLiftOpState)
         {
             mActionLED.Blink(100);
         }
