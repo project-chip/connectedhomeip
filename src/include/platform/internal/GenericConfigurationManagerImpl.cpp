@@ -316,9 +316,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = ReadConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
 
-    err = ReadConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -330,12 +329,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pIterationCoun
 
 exit:
     return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSpake2pIterationCount(uint32_t iterationCount)
-{
-    return WriteConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
 }
 
 template <class ConfigClass>
@@ -361,16 +354,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t 
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSpake2pSalt(const uint8_t * salt, size_t saltLen)
-{
-    return WriteConfigValueBin(ConfigClass::kConfigKey_Spake2pSalt, salt, saltLen);
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
 {
-    CHIP_ERROR err;
-    err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pVerifier, buf, bufSize, verifierLen);
+    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pVerifier, buf, bufSize, verifierLen);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -387,12 +373,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint
     ReturnErrorCodeIf(verifierLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSpake2pVerifier(const uint8_t * verifier, size_t verifierLen)
-{
-    return WriteConfigValueBin(ConfigClass::kConfigKey_Spake2pVerifier, verifier, verifierLen);
 }
 
 template <class ConfigClass>

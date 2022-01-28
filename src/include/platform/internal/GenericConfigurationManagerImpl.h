@@ -71,16 +71,15 @@ public:
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
+    // TODO: Remove SetupPinCode Get/Set APIs
+    // Device shouldn't store and access PIN Code - only Spake2p parameters and verifier
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) override;
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
-    CHIP_ERROR StoreSpake2pIterationCount(uint32_t iterationCount) override;
     CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen) override;
-    CHIP_ERROR StoreSpake2pSalt(const uint8_t * salt, size_t saltLen) override;
     CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen) override;
-    CHIP_ERROR StoreSpake2pVerifier(const uint8_t * verifier, size_t verifierLen) override;
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
