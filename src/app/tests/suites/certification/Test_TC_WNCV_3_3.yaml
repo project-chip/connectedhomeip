@@ -103,10 +103,13 @@ tests:
     ### Step 3x -> Verify StopMotion longer period effects on Lift
     ### Mandatory/Optionality Depends on (PA & LF) for all 4x Steps
 
+    # TODO Remove disabled once issue 14502 is fixed
+
     ### Read Current Position -> Store this value for step 4c
     - label:
           "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       PICS: WNCV_LF && WNCV_PA_LF
@@ -121,6 +124,7 @@ tests:
     - label:
           "3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
            3c: it Must be equal with CurrentPositionLiftPercent100ths from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
       PICS: WNCV_LF && WNCV_PA_LF
@@ -135,6 +139,7 @@ tests:
     - label:
           "4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
           from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: WNCV_TL && WNCV_PA_TL
@@ -149,6 +154,7 @@ tests:
     - label:
           "4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
            4c: it Must be equal with CurrentPositionTiltPercent100ths from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       PICS: WNCV_TL && WNCV_PA_TL
