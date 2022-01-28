@@ -34,6 +34,7 @@
 #include "esp_log.h"
 #include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -49,6 +50,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app;
 
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
@@ -120,10 +122,10 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
         {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
+            // MDNS server restart on any ip assignment: if link local ipv6 is
+            // configured, that will not trigger a 'internet connectivity change' as
+            // there is no internet connectivity. MDNS still wants to refresh its
+            // listening interfaces to include the newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
         if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
@@ -139,23 +141,28 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                                   uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
+    ESP_LOGI(TAG,
+             "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: "
+             "'0x%02x', Attribute ID: '0x%04x'",
+             clusterId, endpointId, attributeId);
 
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
-    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+    case Clusters::LevelControl::Id:
         OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-    case ZCL_COLOR_CONTROL_CLUSTER_ID:
+    case Clusters::ColorControl::Id:
         OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
 #endif
+    case Clusters::Identify::Id:
+        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, size, value);
+        break;
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
         break;
@@ -224,7 +231,8 @@ exit:
     return;
 }
 
-// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has an on-board RGB-LED
+// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has
+// an on-board RGB-LED
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
@@ -253,6 +261,28 @@ exit:
     return;
 }
 #endif
+
+void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size,
+                                                            uint8_t * value)
+{
+    if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id && size == 2)
+    {
+        uint16_t identifyTime;
+        memcpy(&identifyTime, value, size);
+        if (identifyTime)
+        {
+            // Currently we have no separate indicator LEDs on each endpoints.
+            // We are using LED1 for endpoint 0,1 and LED2 for endpoint 2
+            endpointId == 2 ? statusLED2.Blink(kIdentifyTimerDelayMS * 2) : statusLED1.Blink(kIdentifyTimerDelayMS * 2);
+        }
+        else
+        {
+            bool onOffState;
+            endpointId == 0 ? onOffState = mEndpointOnOffState[0] : onOffState = mEndpointOnOffState[endpointId - 1];
+            endpointId == 2 ? statusLED2.Set(onOffState) : statusLED1.Set(onOffState);
+        }
+    }
+}
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {

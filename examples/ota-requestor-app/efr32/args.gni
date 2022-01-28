@@ -25,5 +25,4 @@ chip_openthread_ftd = false
 
 declare_args() {
   chip_enable_ota_requestor = true
-  chip_build_libshell = true
 }

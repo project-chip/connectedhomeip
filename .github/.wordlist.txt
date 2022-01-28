@@ -938,6 +938,7 @@ SoftwareVersion
 SoftwareVersionString
 softwareVersionValid
 SPI
+spiflash
 spinel
 src
 SRP
