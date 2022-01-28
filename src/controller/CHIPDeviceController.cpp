@@ -644,10 +644,8 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this),
-    mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
-    mNOCResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddNOCFailureResponse, this),
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mNOCResponseCallback(OnOperationalCertificateAddResponse, this),
+    mRootCertResponseCallback(OnRootCertSuccessResponse, this), mOnCertFailureCallback(OnAddNOCFailureResponse, this),
     mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
@@ -1164,38 +1162,31 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
 {
     ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, 0);
 
-    Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, csrNonce));
+    OperationalCredentials::Commands::OpCSRRequest::Type request;
+    request.CSRNonce = csrNonce;
 
+    ReturnErrorOnFailure(
+        SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateSigningRequest, OnCSRFailureResponse));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnCSRFailureResponse(void * context, uint8_t status)
+void DeviceCommissioner::OnCSRFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Device failed to receive the CSR request Response: 0x%02x", status);
+    ChipLogProgress(Controller, "Device failed to receive the CSR request Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->mOpCSRResponseCallback.Cancel();
-    commissioner->mOnCSRFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+    commissioner->CommissioningStageComplete(error);
 }
 
-void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, ByteSpan NOCSRElements,
-                                                                ByteSpan AttestationSignature)
+void DeviceCommissioner::OnOperationalCertificateSigningRequest(
+    void * context, const OperationalCredentials::Commands::OpCSRResponse::DecodableType & data)
 {
     ChipLogProgress(Controller, "Received certificate signing request from the device");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    commissioner->mOpCSRResponseCallback.Cancel();
-    commissioner->mOnCSRFailureCallback.Cancel();
-
     CommissioningDelegate::CommissioningReport report;
-    report.Set<AttestationResponse>(AttestationResponse(NOCSRElements, AttestationSignature));
+    report.Set<AttestationResponse>(AttestationResponse(data.NOCSRElements, data.attestationSignature));
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
@@ -1307,7 +1298,6 @@ void DeviceCommissioner::OnAddNOCFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: 0x%02x", status);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCertFailureCallback.Cancel();
     // TODO: Map error status to correct error code
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
@@ -1324,7 +1314,6 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCertFailureCallback.Cancel();
 
     VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

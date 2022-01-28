@@ -746,7 +746,7 @@ private:
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 
     /* Callback when the previously sent CSR request results in failure */
-    static void OnCSRFailureResponse(void * context, uint8_t status);
+    static void OnCSRFailureResponse(void * context, CHIP_ERROR error);
 
     static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
     static void OnCertificateChainResponse(
@@ -763,10 +763,13 @@ private:
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
      * @param[in] context               The context provided while registering the callback.
-     * @param[in] NOCSRElements         CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
-     * @param[in] AttestationSignature  Cryptographic signature generated for the fields in the response message.
+     * @param[in] data                  The response struct containing the following fields:
+     *                                    NOCSRElements: CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     *                                    AttestationSignature: Cryptographic signature generated for the fields in the response
+     * message.
      */
-    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan NOCSRElements, ByteSpan AttestationSignature);
+    static void OnOperationalCertificateSigningRequest(
+        void * context, const app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
 
     /* Callback when adding operational certs to device results in failure */
     static void OnAddNOCFailureResponse(void * context, uint8_t status);
@@ -830,10 +833,8 @@ private:
 
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
-    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
