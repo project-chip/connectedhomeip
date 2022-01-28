@@ -127,7 +127,7 @@ public:
     void DeleteEntry(GroupSession * entry) { mEntries.ReleaseObject(entry); }
 
 private:
-    ObjectPool<GroupSession, kMaxSessionCount> mEntries;
+    BitMapObjectPool<GroupSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport
