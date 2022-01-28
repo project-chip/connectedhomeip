@@ -261,7 +261,12 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
@@ -381,11 +386,17 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         {
             Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
             Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
-            Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+            Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            err                                = CHIP_NO_ERROR; // TODO: remove override
             if (err != CHIP_NO_ERROR)
             {
+                // Grace period until ACLs are in place
+                ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+                err = CHIP_NO_ERROR;
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                // TODO: handle errors that aren't CHIP_ERROR_ACCESS_DENIED, etc.
                 continue;
             }
         }

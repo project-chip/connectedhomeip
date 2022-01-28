@@ -389,7 +389,12 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
@@ -821,7 +826,12 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);

@@ -61,6 +61,77 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
     return false;
 }
 
+char GetAuthModeStringForLogging(AuthMode authMode)
+{
+    switch (authMode)
+    {
+    case AuthMode::kNone:
+        return 'n';
+    case AuthMode::kPase:
+        return 'p';
+    case AuthMode::kCase:
+        return 'c';
+    case AuthMode::kGroup:
+        return 'g';
+    }
+    return 'u';
+}
+
+char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
+{
+    VerifyOrDie(size >= 16);
+    char * p         = buf;
+    char * const end = buf + size;
+    *p               = '\0';
+    // Format string chars needed:
+    //   1 for comma (optional)
+    //   2 for 0x prefix
+    //   8 for 32-bit hex value
+    constexpr char fmtWithoutComma[] = "0x%08" PRIx32;
+    constexpr char fmtWithComma[]    = ",0x%08" PRIx32;
+    constexpr int countWithoutComma  = 10;
+    constexpr int countWithComma     = countWithoutComma + 1;
+    bool withComma                   = false;
+    for (auto cat : cats.values)
+    {
+        if (cat == chip::kUndefinedCAT)
+        {
+            break;
+        }
+        snprintf(p, end - p, withComma ? fmtWithComma : fmtWithoutComma, cat);
+        p += withComma ? countWithComma : countWithoutComma;
+        if (p >= end)
+        {
+            // Indicate output was truncated
+            p    = end - 2;
+            *p-- = '.';
+            *p-- = '.';
+            *p-- = '.';
+            break;
+        }
+        withComma = true;
+    }
+    return buf;
+}
+
+char GetPrivilegeStringForLogging(Privilege privilege)
+{
+    switch (privilege)
+    {
+    case Privilege::kView:
+        return 'v';
+    case Privilege::kProxyView:
+        return 'p';
+    case Privilege::kOperate:
+        return 'o';
+    case Privilege::kManage:
+        return 'm';
+    case Privilege::kAdminister:
+        return 'a';
+    }
+    return 'u';
+}
+
 } // namespace
 
 namespace chip {
@@ -72,13 +143,13 @@ AccessControl::Delegate AccessControl::mDefaultDelegate;
 
 CHIP_ERROR AccessControl::Init()
 {
-    ChipLogDetail(DataManagement, "AccessControl::Init");
+    ChipLogDetail(DataManagement, "AccessControl: initializing");
     return mDelegate.Init();
 }
 
 CHIP_ERROR AccessControl::Finish()
 {
-    ChipLogDetail(DataManagement, "AccessControl::Finish");
+    ChipLogDetail(DataManagement, "AccessControl: finishing");
     return mDelegate.Finish();
 }
 
@@ -87,6 +158,15 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 {
     // Don't check if using default delegate (e.g. test code that isn't testing access control)
     ReturnErrorCodeIf(&mDelegate == &mDefaultDelegate, CHIP_NO_ERROR);
+
+    {
+        char buf[64]; // fits 5 cats
+        ChipLogDetail(DataManagement,
+                      "AccessControl: checking f=%" PRIu8 " a=%c s=0x%" PRIx64 " t=%s c=0x%" PRIx32 " e=%" PRIu16 " p=%c",
+                      subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
+                      subjectDescriptor.subject, GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats),
+                      requestPath.cluster, requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+    }
 
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
