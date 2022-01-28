@@ -644,8 +644,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this), mAutoCommissioner(this)
@@ -1337,38 +1336,28 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, 0);
-
-    Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
-
-    ReturnErrorOnFailure(cluster.AddTrustedRootCertificate(successCallback, failureCallback, rcac));
+    OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
+    request.rootCertificate = rcac;
+    ReturnErrorOnFailure(
+        SendCommand<OperationalCredentialsCluster>(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse));
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
+void DeviceCommissioner::OnRootCertSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
 {
     ChipLogProgress(Controller, "Device confirmed that it has received the root certificate");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-
-    commissioner->mRootCertResponseCallback.Cancel();
-    commissioner->mOnRootCertFailureCallback.Cancel();
-
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
-void DeviceCommissioner::OnRootCertFailureResponse(void * context, uint8_t status)
+void DeviceCommissioner::OnRootCertFailureResponse(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Device failed to receive the root certificate Response: 0x%02x", status);
+    ChipLogProgress(Controller, "Device failed to receive the root certificate Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->mRootCertResponseCallback.Cancel();
-    commissioner->mOnRootCertFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+    commissioner->CommissioningStageComplete(error);
 }
 
 CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device)
