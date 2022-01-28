@@ -16655,8 +16655,8 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Interaction Model Version\n");
-            err = TestQueryInteractionModelVersion_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Data Model Revision\n");
+            err = TestQueryDataModelRevision_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Query Vendor Name\n");
@@ -16761,9 +16761,9 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, uint16_t interactionModelVersion)
+    static void OnSuccessCallback_1(void * context, uint16_t dataModelRevision)
     {
-        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(interactionModelVersion);
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(dataModelRevision);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -16956,13 +16956,13 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestQueryInteractionModelVersion_1()
+    CHIP_ERROR TestQueryDataModelRevision_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -16973,9 +16973,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint16_t interactionModelVersion)
+    void OnSuccessResponse_1(uint16_t dataModelRevision)
     {
-        VerifyOrReturn(CheckConstraintType("interactionModelVersion", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("dataModelRevision", "", "uint16"));
         NextTest();
     }
 

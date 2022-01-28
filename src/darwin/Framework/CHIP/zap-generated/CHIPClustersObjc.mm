@@ -1471,28 +1471,27 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)readAttributeInteractionModelVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+- (void)readAttributeDataModelRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = Basic::Attributes::InteractionModelVersion::TypeInfo;
+        using TypeInfo = Basic::Attributes::DataModelRevision::TypeInfo;
         auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)subscribeAttributeInteractionModelVersionWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                     NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeDataModelRevisionWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIPInt16uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = Basic::Attributes::InteractionModelVersion::TypeInfo;
+            using TypeInfo = Basic::Attributes::DataModelRevision::TypeInfo;
             auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,

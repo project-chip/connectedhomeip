@@ -398,7 +398,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "InteractionModelVersion",
+                    "attributeName": "DataModelRevision",
                     "attributeId": 0x00000000,
                     "type": "int",
                     "reportable": True,

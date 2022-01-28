@@ -4035,10 +4035,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Basic::Id: {
         switch (path.mAttributeId)
         {
-        case Basic::Attributes::InteractionModelVersion::Id: {
+        case Basic::Attributes::DataModelRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InteractionModelVersion", 1, value);
+            return DataModelLogger::LogValue("DataModelRevision", 1, value);
         }
         case Basic::Attributes::VendorName::Id: {
             chip::CharSpan value;

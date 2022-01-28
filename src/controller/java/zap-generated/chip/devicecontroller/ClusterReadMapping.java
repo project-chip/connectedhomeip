@@ -504,20 +504,18 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute", readBarrierControlClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("barrierControl", readBarrierControlInteractionInfo);
     Map<String, InteractionInfo> readBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readBasicInteractionModelVersionCommandParams =
+    Map<String, CommandParameterInfo> readBasicDataModelRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBasicInteractionModelVersionAttributeInteractionInfo =
+    InteractionInfo readBasicDataModelRevisionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicCluster) cluster)
-                  .readInteractionModelVersionAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                  .readDataModelRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readBasicInteractionModelVersionCommandParams);
+            readBasicDataModelRevisionCommandParams);
     readBasicInteractionInfo.put(
-        "readInteractionModelVersionAttribute",
-        readBasicInteractionModelVersionAttributeInteractionInfo);
+        "readDataModelRevisionAttribute", readBasicDataModelRevisionAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBasicVendorNameCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBasicVendorNameAttributeInteractionInfo =

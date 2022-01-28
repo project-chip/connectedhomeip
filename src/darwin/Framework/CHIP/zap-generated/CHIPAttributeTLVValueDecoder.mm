@@ -723,8 +723,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::Basic::Id: {
         using namespace Clusters::Basic;
         switch (aPath.mAttributeId) {
-        case Attributes::InteractionModelVersion::Id: {
-            using TypeInfo = Attributes::InteractionModelVersion::TypeInfo;
+        case Attributes::DataModelRevision::Id: {
+            using TypeInfo = Attributes::DataModelRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

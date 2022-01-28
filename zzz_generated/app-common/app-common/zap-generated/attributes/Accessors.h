@@ -1010,10 +1010,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace Basic {
 namespace Attributes {
 
-namespace InteractionModelVersion {
+namespace DataModelRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace InteractionModelVersion
+} // namespace DataModelRevision
 
 namespace VendorName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string

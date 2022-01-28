@@ -66,8 +66,8 @@ public:
             err = TestLogOnOffTestStartup_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Interaction Model Version\n");
-            err = TestQueryInteractionModelVersion_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Data Model Revision\n");
+            err = TestQueryDataModelRevision_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Query Vendor Name\n");
@@ -173,16 +173,15 @@ private:
         return Log("*** Basic Cluster Tests Ready");
     }
 
-    CHIP_ERROR TestQueryInteractionModelVersion_2()
+    CHIP_ERROR TestQueryDataModelRevision_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        ChipLogError(chipTool,
-                     "[Endpoint: 0x%08x Cluster: Basic Attribute: InteractionModelVersion] Query Interaction Model Version",
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: DataModelRevision] Query Data Model Revision",
                      endpoint);
 
         ClearAttributeAndCommandPaths();
         mAttributePath = chip::app::ConcreteAttributePath(endpoint, chip::app::Clusters::Basic::Id,
-                                                          chip::app::Clusters::Basic::Attributes::InteractionModelVersion::Id);
+                                                          chip::app::Clusters::Basic::Attributes::DataModelRevision::Id);
         return CHIP_NO_ERROR;
     }
 

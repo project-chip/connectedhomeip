@@ -1152,13 +1152,13 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readInteractionModelVersionAttribute(IntegerAttributeCallback callback) {
-      readInteractionModelVersionAttribute(chipClusterPtr, callback);
+    public void readDataModelRevisionAttribute(IntegerAttributeCallback callback) {
+      readDataModelRevisionAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeInteractionModelVersionAttribute(
+    public void subscribeDataModelRevisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeInteractionModelVersionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeDataModelRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readVendorNameAttribute(CharStringAttributeCallback callback) {
@@ -1368,10 +1368,10 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readInteractionModelVersionAttribute(
+    private native void readDataModelRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void subscribeInteractionModelVersionAttribute(
+    private native void subscribeDataModelRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readVendorNameAttribute(

@@ -102,8 +102,8 @@ typedef void (*CHIPBarrierControlClusterAttributeListAttributeCallbackType)(
 typedef void (*CHIPBarrierControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BarrierControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPBasicClusterInteractionModelVersionAttributeCallbackType)(
-    void *, chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPBasicClusterDataModelRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPBasicClusterVendorNameAttributeCallbackType)(
     void *, chip::app::Clusters::Basic::Attributes::VendorName::TypeInfo::DecodableArgType);
 typedef void (*CHIPBasicClusterVendorIDAttributeCallbackType)(

@@ -952,7 +952,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "InteractionModelVersion",
+              "name": "DataModelRevision",
               "code": 0,
               "mfgCode": null,
               "side": "server",

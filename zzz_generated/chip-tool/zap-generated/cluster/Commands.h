@@ -569,7 +569,7 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * InteractionModelVersion                                           | 0x0000 |
+| * DataModelRevision                                                 | 0x0000 |
 | * VendorName                                                        | 0x0001 |
 | * VendorID                                                          | 0x0002 |
 | * ProductName                                                       | 0x0003 |
@@ -8886,54 +8886,54 @@ void registerClusterBasic(Commands & commands)
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id),                                                                            //
-        make_unique<ReadAttribute>(Id, "interaction-model-version", Attributes::InteractionModelVersion::Id),      //
-        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id),                                 //
-        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id),                                     //
-        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id),                               //
-        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id),                                   //
-        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id),                                   //
-        make_unique<ReadAttribute>(Id, "location", Attributes::Location::Id),                                      //
-        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id),                       //
-        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id),          //
-        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id),                       //
-        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id),          //
-        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id),                   //
-        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id),                                 //
-        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id),                                 //
-        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id),                             //
-        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id),                             //
-        make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id),              //
-        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id),                                    //
-        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id),                                     //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                       //
-        make_unique<WriteAttribute>(Id),                                                                           //
-        make_unique<WriteBasicNodeLabel>(),                                                                        //
-        make_unique<WriteBasicLocation>(),                                                                         //
-        make_unique<WriteBasicLocalConfigDisabled>(),                                                              //
-        make_unique<SubscribeAttribute>(Id),                                                                       //
-        make_unique<SubscribeAttribute>(Id, "interaction-model-version", Attributes::InteractionModelVersion::Id), //
-        make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id),                            //
-        make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorID::Id),                                //
-        make_unique<SubscribeAttribute>(Id, "product-name", Attributes::ProductName::Id),                          //
-        make_unique<SubscribeAttribute>(Id, "product-id", Attributes::ProductID::Id),                              //
-        make_unique<SubscribeAttribute>(Id, "node-label", Attributes::NodeLabel::Id),                              //
-        make_unique<SubscribeAttribute>(Id, "location", Attributes::Location::Id),                                 //
-        make_unique<SubscribeAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id),                  //
-        make_unique<SubscribeAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id),     //
-        make_unique<SubscribeAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id),                  //
-        make_unique<SubscribeAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id),     //
-        make_unique<SubscribeAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id),              //
-        make_unique<SubscribeAttribute>(Id, "part-number", Attributes::PartNumber::Id),                            //
-        make_unique<SubscribeAttribute>(Id, "product-url", Attributes::ProductURL::Id),                            //
-        make_unique<SubscribeAttribute>(Id, "product-label", Attributes::ProductLabel::Id),                        //
-        make_unique<SubscribeAttribute>(Id, "serial-number", Attributes::SerialNumber::Id),                        //
-        make_unique<SubscribeAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id),         //
-        make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id),                               //
-        make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id),                                //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                  //
+        make_unique<ReadAttribute>(Id),                                                                        //
+        make_unique<ReadAttribute>(Id, "data-model-revision", Attributes::DataModelRevision::Id),              //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id),                             //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id),                                 //
+        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id),                           //
+        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id),                               //
+        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id),                               //
+        make_unique<ReadAttribute>(Id, "location", Attributes::Location::Id),                                  //
+        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id),                   //
+        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id),      //
+        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id),                   //
+        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id),      //
+        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id),               //
+        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id),                             //
+        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id),                             //
+        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id),                         //
+        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id),                         //
+        make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id),          //
+        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id),                                //
+        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id),                                 //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                       //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                   //
+        make_unique<WriteAttribute>(Id),                                                                       //
+        make_unique<WriteBasicNodeLabel>(),                                                                    //
+        make_unique<WriteBasicLocation>(),                                                                     //
+        make_unique<WriteBasicLocalConfigDisabled>(),                                                          //
+        make_unique<SubscribeAttribute>(Id),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "data-model-revision", Attributes::DataModelRevision::Id),         //
+        make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id),                        //
+        make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorID::Id),                            //
+        make_unique<SubscribeAttribute>(Id, "product-name", Attributes::ProductName::Id),                      //
+        make_unique<SubscribeAttribute>(Id, "product-id", Attributes::ProductID::Id),                          //
+        make_unique<SubscribeAttribute>(Id, "node-label", Attributes::NodeLabel::Id),                          //
+        make_unique<SubscribeAttribute>(Id, "location", Attributes::Location::Id),                             //
+        make_unique<SubscribeAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id),              //
+        make_unique<SubscribeAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id), //
+        make_unique<SubscribeAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id),              //
+        make_unique<SubscribeAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id), //
+        make_unique<SubscribeAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id),          //
+        make_unique<SubscribeAttribute>(Id, "part-number", Attributes::PartNumber::Id),                        //
+        make_unique<SubscribeAttribute>(Id, "product-url", Attributes::ProductURL::Id),                        //
+        make_unique<SubscribeAttribute>(Id, "product-label", Attributes::ProductLabel::Id),                    //
+        make_unique<SubscribeAttribute>(Id, "serial-number", Attributes::SerialNumber::Id),                    //
+        make_unique<SubscribeAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id),     //
+        make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id),                           //
+        make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id),                            //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                  //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),              //
         //
         // Events
         //
