@@ -435,7 +435,7 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
 {
-    FabricIndex accessingFabricIndex = aDecoder.GetAccessingFabricIndex();
+    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
     DataModel::DecodableList<AccessControlEntryCodec> list;
     ReturnErrorOnFailure(aDecoder.Decode(list));
@@ -446,8 +446,9 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     size_t maxCount;
 
     AccessControl::EntryIterator it;
-    ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessFabricIndex));
-    for (it.Next() == CHIP_NO_ERROR)
+    AccessControl::Entry entry;
+    ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
+    if (it.Next(entry) == CHIP_NO_ERROR)
     {
         oldCount++;
     }

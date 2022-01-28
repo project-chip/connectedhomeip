@@ -22,7 +22,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/data-model/Decode.h>
-#include <app/data-model/DecodeWithoutFabricIndex.h>
 #include <functional>
 
 namespace chip {
@@ -83,7 +82,7 @@ private:
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        SuccessOrExit(app::DataModel::DecodeWithoutFabricIndex(*apData, value));
+        SuccessOrExit(app::DataModel::Decode(*apData, value));
 
         mOnSuccess(aPath, value);
 

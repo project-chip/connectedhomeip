@@ -24,6 +24,10 @@ namespace {{asUpperCamelCase name}} {
         auto GetFabricIndex() const {
             return {{ asLowerCamelCase struct_fabric_idx_field }};
         }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+        }
         {{/if}}
     };
 
@@ -37,6 +41,10 @@ namespace {{asUpperCamelCase name}} {
         {{#if struct_is_fabric_scoped}}
         bool MatchesFabricIndex(FabricIndex fabricIndex_) const {
             return {{ asLowerCamelCase struct_fabric_idx_field }} == fabricIndex_;
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
         }
 
         CHIP_ERROR Decode(TLV::TLVReader &reader, const chip::Optional<FabricIndex> & overwriteFabricIndex);

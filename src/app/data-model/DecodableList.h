@@ -40,6 +40,8 @@ class DecodableList
 public:
     DecodableList() { ClearReader(); }
 
+    static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
+
     /*
      * @brief
      *
@@ -57,14 +59,11 @@ public:
      */
     void ClearReader() { mReader.Init(nullptr, 0); }
 
-    /**
-     * Make it fabric scoped when the internal field is fabric scoped.
-     *
-     * This function should not be implemented, since DecodableList won't be used for encode (so using it will cause link time
-     * failure).
-     */
     template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-    bool MatchesFabricIndex(FabricIndex);
+    void SetFabricIndex(FabricIndex fabricIndex)
+    {
+        mFabricIndex.SetValue(fabricIndex);
+    }
 
     class Iterator
     {
@@ -98,11 +97,7 @@ public:
          * this shall return false as well. The caller is expected to invoke GetStatus()
          * to retrieve the status of the operation.
          */
-        template <
-            typename X = T,
-            typename std::enable_if_t<
-                std::is_same<decltype(DataModel::Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>())), CHIP_ERROR>::value,
-                X> * = nullptr>
+        template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
         bool Next()
         {
             if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
@@ -123,13 +118,7 @@ public:
             return (mStatus == CHIP_NO_ERROR);
         }
 
-        template <typename X = T,
-                  typename std::enable_if_t<
-                      std::is_class<X>::value &&
-                          std::is_same<decltype(DataModel::Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>(),
-                                                                  std::declval<Optional<FabricIndex> &>())),
-                                       CHIP_ERROR>::value,
-                      X> * = nullptr>
+        template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
         bool Next()
         {
             if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
@@ -144,7 +133,12 @@ public:
 
             if (mStatus == CHIP_NO_ERROR)
             {
-                mStatus = DataModel::Decode(mReader, mValue, mFabricIndex);
+                mStatus = DataModel::Decode(mReader, mValue);
+            }
+
+            if (mStatus == CHIP_NO_ERROR && mFabricIndex.HasValue())
+            {
+                mValue.SetFabricIndex(mFabricIndex.Value());
             }
 
             return (mStatus == CHIP_NO_ERROR);
@@ -203,25 +197,12 @@ public:
         }
     }
 
-    template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
     CHIP_ERROR Decode(TLV::TLVReader & reader)
     {
         VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
         TLV::TLVType type;
         ReturnErrorOnFailure(reader.EnterContainer(type));
         SetReader(reader);
-        ReturnErrorOnFailure(reader.ExitContainer(type));
-        return CHIP_NO_ERROR;
-    }
-
-    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-    CHIP_ERROR Decode(TLV::TLVReader & reader, const Optional<FabricIndex> & overwriteFabricIndex)
-    {
-        VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
-        TLV::TLVType type;
-        ReturnErrorOnFailure(reader.EnterContainer(type));
-        SetReader(reader);
-        mFabricIndex = overwriteFabricIndex;
         ReturnErrorOnFailure(reader.ExitContainer(type));
         return CHIP_NO_ERROR;
     }
