@@ -2503,6 +2503,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kNotConnected = 1;
   }
 
+  bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+    kMLECounts = 0x4;
+    kMACCounts = 0x8;
+  }
+
   struct NeighborTable {
     INT64U extAddress = 0;
     INT32U age = 1;
