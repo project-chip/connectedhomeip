@@ -197,7 +197,8 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
 
     CommissionerInitParams commissionerParams;
     PopulateInitParams(commissionerParams, params);
-    commissionerParams.pairingDelegate = params.pairingDelegate;
+    commissionerParams.pairingDelegate     = params.pairingDelegate;
+    commissionerParams.defaultCommissioner = params.defaultCommissioner;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
     return err;

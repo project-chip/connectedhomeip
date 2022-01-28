@@ -101,9 +101,9 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int):
+    def __init__(self, nodeid: int, testCommissioner: bool=False):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
-            controllerNodeId=nodeid)
+            controllerNodeId=nodeid, useTestCommissioner=testCommissioner)
         self.logger = logger
         self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
 
@@ -139,6 +139,9 @@ class BaseTestHelper:
             return False
         self.logger.info("Device finished key exchange.")
         return True
+
+    def TestUsedTestCommssioner(self):
+        return self.devCtrl.GetTestCommissionerUsed()
 
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")

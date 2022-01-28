@@ -50,6 +50,7 @@
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningDelegate.h>
@@ -92,6 +93,22 @@ chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
 chip::Controller::CommissioningParameters sCommissioningParameters;
+
+bool sTestCommissionerUsed = false;
+class TestCommissioner : public chip::Controller::AutoCommissioner
+{
+public:
+    TestCommissioner() : AutoCommissioner() {}
+    ~TestCommissioner() {}
+    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err,
+                                         chip::Controller::CommissioningDelegate::CommissioningReport report) override
+    {
+        sTestCommissionerUsed = true;
+        return chip::Controller::AutoCommissioner::CommissioningStepFinished(err, report);
+    }
+};
+TestCommissioner sTestCommissioner;
+
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -102,7 +119,7 @@ chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                                   chip::NodeId localDeviceId);
+                                                                   chip::NodeId localDeviceId, bool useTestCommissioner);
 ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl);
 ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl,
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
@@ -181,10 +198,11 @@ uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 
 chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64_t subscriptionId);
+bool pychip_TestCommissionerUsed();
 }
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                                   chip::NodeId localDeviceId)
+                                                                   chip::NodeId localDeviceId, bool useTestCommissioner)
 {
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
     VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -238,6 +256,10 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
+    if (useTestCommissioner)
+    {
+        initParams.defaultCommissioner = &sTestCommissioner;
+    }
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
     err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
@@ -656,4 +678,9 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
     }
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return CHIP_NO_ERROR.AsInteger();
+}
+
+bool pychip_TestCommissionerUsed()
+{
+    return sTestCommissionerUsed;
 }

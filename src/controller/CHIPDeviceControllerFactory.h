@@ -61,6 +61,7 @@ struct SetupParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
+    CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
 // TODO everything other than the fabric storage here should be removed.

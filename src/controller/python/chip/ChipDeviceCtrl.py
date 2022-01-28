@@ -82,7 +82,7 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None, useTestCommissioner=False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         if bluetoothAdapter is None:
@@ -94,7 +94,7 @@ class ChipDeviceController(object):
 
         devCtrl = c_void_p(None)
         res = self._dmLib.pychip_DeviceController_NewDeviceController(
-            pointer(devCtrl), controllerNodeId)
+            pointer(devCtrl), controllerNodeId, useTestCommissioner)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -225,6 +225,11 @@ class ChipDeviceController(object):
             # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes == 0
+
+    def GetTestCommissionerUsed(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_TestCommissionerUsed()
+        )
 
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
         # IP connection will run through full commissioning, so we need to wait
@@ -681,7 +686,7 @@ class ChipDeviceController(object):
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
             self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [
-                POINTER(c_void_p), c_uint64]
+                POINTER(c_void_p), c_uint64, c_bool]
             self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
@@ -794,3 +799,5 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
                 c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
+            self._dmLib.pychip_TestCommissionerUsed.argtypes = []
+            self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
