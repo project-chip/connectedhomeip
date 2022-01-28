@@ -63,6 +63,8 @@ config("p6_ota_config") {
     "APP_VERSION_MAJOR=1",
     "APP_VERSION_MINOR=0",
     "APP_VERSION_BUILD=0",
+    "MCUBOOT_OVERWRITE_ONLY",
+    "CY_ENABLE_XIP_PROGRAM",
   ]
 
 }
