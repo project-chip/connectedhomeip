@@ -77,7 +77,7 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "${chip_root}/src/platform/P6",
     "${p6_project_dir}/include",
     "${examples_plat_dir}",
-    "${p6_project_dir}/bootloader_cm0p/config",
+    "${p6_project_dir}/config",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/",
