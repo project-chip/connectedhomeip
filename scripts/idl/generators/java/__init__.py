@@ -37,6 +37,8 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     actual = ParseDataType(field.data_type, context)
     if type(actual) == IdlEnumType:
         actual = actual.base_type
+    elif type(actual) == IdlBitmapType:
+        actual = actual.base_type
 
     if type(actual) == BasicString:
         if actual.is_binary:
@@ -166,13 +168,7 @@ class EncodableValue:
 
     @property
     def is_bitmap(self):
-        return self.data_type.name in [
-           "bitmap8",
-           "bitmap16",
-           "bitmap24",
-           "bitmap32",
-           "bitmap64",
-        ] or self.context.is_bitmap_type(self.data_type.name)
+        self.context.is_bitmap_type(self.data_type.name)
 
     def clone(self):
         return EncodableValue(self.context, self.data_type, self.attrs)
@@ -272,7 +268,7 @@ class EncodableValue:
 
 
 
-def EncodableValueFrom(field: Field, context: TypeLookupContext):
+def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableValue:
     attrs = set()
 
     if field.is_optional:

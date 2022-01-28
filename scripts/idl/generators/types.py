@@ -136,6 +136,7 @@ __CHIP_SIZED_TYPES__ = {
     "bitmap64": BasicInteger(idl_name="bitmap64", byte_count=8, is_signed=False),
     "bitmap8": BasicInteger(idl_name="bitmap8", byte_count=1, is_signed=False),
     "enum16": BasicInteger(idl_name="enum16", byte_count=2, is_signed=False),
+    "enum32": BasicInteger(idl_name="enum32", byte_count=4, is_signed=False),
     "enum8": BasicInteger(idl_name="enum8", byte_count=1, is_signed=False),
     "int16s": BasicInteger(idl_name="int16s", byte_count=2, is_signed=True),
     "int16u": BasicInteger(idl_name="int16u", byte_count=2, is_signed=False),
@@ -206,19 +207,20 @@ class TypeLookupContext:
         return None
 
     def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
-        for s in self.all_structs():
+        for s in self.all_structs:
             if s.name == name:
                 return s
                     
         return None
 
     def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
-        for s in self.all_bitmaps():
+        for s in self.all_bitmaps:
             if s.name == name:
                return s
                     
         return None
 
+    @property
     def all_enums(self):
         """All enumerations, ordered by lookup prioroty."""
         if self.cluster:
@@ -227,12 +229,14 @@ class TypeLookupContext:
         for e in self.idl.enums:
             yield e
 
+    @property
     def all_bitmaps(self):
         """All structs, ordered by lookup prioroty."""
         if self.cluster:
             for b in self.cluster.bitmaps:
                 yield b
 
+    @property
     def all_structs(self):
         """All structs, ordered by lookup prioroty."""
         if self.cluster:
@@ -242,13 +246,18 @@ class TypeLookupContext:
             yield e
 
     def is_enum_type(self, name: str):
-        return any(map(lambda e: e.name == name, self.all_enums()))
+        if name.lower() in ["enum8", "enum16", "enum32"]:
+            return True
+        return any(map(lambda e: e.name == name, self.all_enums))
 
     def is_struct_type(self, name: str):
-        return any(map(lambda s: s.name == name, self.all_structs()))
+        return any(map(lambda s: s.name == name, self.all_structs))
 
     def is_bitmap_type(self, name: str):
-        return any(map(lambda s: s.name == name, self.idl.bitmaps))
+        if name.lower() in ["bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"]:
+            return True
+
+        return any(map(lambda s: s.name == name, self.all_bitmaps))
 
 
 def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType]:
@@ -268,6 +277,10 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         return BasicString(idl_name=lowercase_name, is_binary=False, max_length=data_type.max_length)
     elif lowercase_name in ['octet_string', 'long_octet_string']:
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
+    elif lowercase_name in ['enum8', 'enum16', 'enum32']:
+        return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
+    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32']:
+        return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
     if int_type is not None:
@@ -282,7 +295,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     b = lookup.find_bitmap(data_type.name)
     if b:
         # Valid enum found. it MUST be based on a valid data type
-        return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
+        return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[b.base_type.lower()])
 
     result=IdlType(idl_name=data_type.name, item_type = IdlItemType.UNKNOWN)
     if lookup.find_struct(data_type.name):
