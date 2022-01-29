@@ -68,6 +68,42 @@ server cluster AccessControl = 31 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+server cluster AdministratorCommissioning = 60 {
+  enum CommissioningWindowStatus : ENUM8 {
+    kWindowNotOpen = 0;
+    kEnhancedWindowOpen = 1;
+    kBasicWindowOpen = 2;
+  }
+
+  enum StatusCode : ENUM8 {
+    kBusy = 1;
+    kPAKEParameterError = 2;
+    kWindowNotOpen = 3;
+  }
+
+  readonly attribute int8u windowStatus = 0;
+  readonly attribute fabric_idx adminFabricIndex = 1;
+  readonly attribute int16u adminVendorId = 2;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct OpenBasicCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+  }
+
+  request struct OpenCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+    OCTET_STRING PAKEVerifier = 1;
+    INT16U discriminator = 2;
+    INT32U iterations = 3;
+    OCTET_STRING salt = 4;
+    INT16U passcodeID = 5;
+  }
+
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
+}
+
 server cluster Basic = 40 {
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
@@ -577,6 +613,7 @@ server cluster UserLabel = 65 {
 
 endpoint 0 {
   server  cluster AccessControl;
+  server  cluster AdministratorCommissioning;
   server  cluster Basic;
   server  cluster FixedLabel;
   server  cluster GeneralCommissioning;
