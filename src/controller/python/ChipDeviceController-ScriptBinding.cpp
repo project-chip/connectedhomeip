@@ -223,7 +223,6 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     FactoryInitParams factoryParams;
     factoryParams.fabricStorage = &sFabricStorage;
-    factoryParams.imDelegate    = nullptr;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 

@@ -27,7 +27,6 @@
 #pragma once
 
 #include <app/CommandSender.h>
-#include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <lib/core/CHIPCallback.h>
@@ -60,8 +59,6 @@ public:
                                       Callback::Cancelable * onFailureCallback, app::TLVDataFilter tlvDataFilter = nullptr);
 
     virtual void CancelIMResponseHandler(void * commandObj);
-
-    virtual Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() = 0;
 
     virtual Messaging::ExchangeManager * GetExchangeManager() const = 0;
 

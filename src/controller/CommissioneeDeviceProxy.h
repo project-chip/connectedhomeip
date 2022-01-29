@@ -75,8 +75,6 @@ struct ControllerDeviceInitParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
     FabricTable * fabricsTable = nullptr;
-
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
@@ -124,7 +122,6 @@ public:
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
         mIDAllocator        = params.idAllocator;
-        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -232,8 +229,6 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
-
 private:
     enum class ConnectionState
     {
@@ -271,8 +266,6 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     SessionHolderWithDelegate mSecureSession;
-
-    Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
     uint8_t mSequenceNumber = 0;
 

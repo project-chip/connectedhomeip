@@ -144,7 +144,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .idAllocator    = &mIDAllocator,
         .fabricTable    = params.systemState->Fabrics(),
         .clientPool     = &mCASEClientPool,
-        .imDelegate     = params.systemState->IMDelegate(),
         .mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Value(mMRPConfig),
     };
 
@@ -639,7 +638,6 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .storageDelegate    = mStorageDelegate,
         .idAllocator        = &mIDAllocator,
         .fabricsTable       = mSystemState->Fabrics(),
-        .imDelegate         = mSystemState->IMDelegate(),
     };
 }
 
