@@ -40,7 +40,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
-#include <protocols/temp_zcl/TempZCL.h>
 #include <pthread.h>
 
 #include <platform/android/AndroidChipPlatform-JNI.h>

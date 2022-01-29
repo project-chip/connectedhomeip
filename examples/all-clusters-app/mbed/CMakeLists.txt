@@ -71,12 +71,10 @@ target_sources(${APP_TARGET} PRIVATE
 
                ${APP_UTIL}/DataModelHandler.cpp
                ${APP_UTIL}/af-event.cpp
-               ${APP_UTIL}/af-main-common.cpp
                ${APP_UTIL}/attribute-storage.cpp
                ${APP_UTIL}/attribute-table.cpp
                ${APP_UTIL}/attribute-size-util.cpp
                ${APP_UTIL}/binding-table.cpp
-               ${APP_UTIL}/chip-message-send.cpp
                ${APP_UTIL}/client-api.cpp
                ${APP_UTIL}/ember-print.cpp
                ${APP_UTIL}/ember-compatibility-functions.cpp

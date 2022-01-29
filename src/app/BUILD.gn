@@ -145,7 +145,6 @@ static_library("app") {
     "TimedRequest.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
-    "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
