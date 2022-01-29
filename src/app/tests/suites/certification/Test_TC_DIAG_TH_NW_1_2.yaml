@@ -757,7 +757,7 @@ tests:
       attribute: "SecurityPolicy"
       response:
           value: 0
-    
+
     #disabled due to type error
     - label: "read ChannelPage0Mask attribute value"
       disabled: true
@@ -765,7 +765,7 @@ tests:
       attribute: "ChannelMask"
       response:
           value: 0
-    
+
     - label: "Validate constraints of attribute: ChannelPage0Mask"
       disabled: true
       command: "readAttribute"
