@@ -34,6 +34,142 @@ namespace Controller {
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
 
+// GeneralCommissioning Cluster Commands
+CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint16_t expiryLengthSeconds,
+                                                    uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GeneralCommissioning::Commands::ArmFailSafe::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // expiryLengthSeconds: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), expiryLengthSeconds));
+    // breadcrumb: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         GeneralCommissioning::Commands::CommissioningComplete::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback, uint8_t location,
+                                                            chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         GeneralCommissioning::Commands::SetRegulatoryConfig::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // location: regulatoryLocationType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    // countryCode: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), countryCode));
+    // breadcrumb: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue,
