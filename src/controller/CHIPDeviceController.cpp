@@ -90,14 +90,6 @@ using namespace chip::Transport;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
 
-// For some applications those does not implement IMDelegate, the DeviceControllerInteractionModelDelegate will dispatch the
-// response to IMDefaultResponseCallback CHIPClientCallbacks, for the applications those implemented IMDelegate, this function will
-// not be used.
-bool __attribute__((weak)) IMDefaultResponseCallback(const chip::app::CommandSender * commandObj, EmberAfStatus status)
-{
-    return false;
-}
-
 namespace chip {
 namespace Controller {
 

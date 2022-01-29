@@ -68,11 +68,6 @@
             "output": "CHIPClientCallbacks.h"
         },
         {
-            "path": "templates/app/CHIPClientCallbacks-src.zapt",
-            "name": "CHIP Client Callbacks",
-            "output": "CHIPClientCallbacks.cpp"
-        },
-        {
             "path": "templates/app/im-cluster-command-handler.zapt",
             "name": "CHIP Client Callbacks for Interaction Model",
             "output": "IMClusterCommandHandler.cpp"

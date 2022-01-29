@@ -59,7 +59,6 @@ function(chip_configure_data_model APP_TARGET)
     if (ARG_INCLUDE_CLIENT_CALLBACKS)
         target_sources(${APP_TARGET} PRIVATE
             ${CHIP_APP_BASE_DIR}/util/im-client-callbacks.cpp
-            ${ARG_GEN_DIR}/CHIPClientCallbacks.cpp
         )
     endif()
 

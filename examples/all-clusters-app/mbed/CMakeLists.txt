@@ -54,7 +54,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${MBED_COMMON}/util/LEDWidget.cpp
 
                ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${GEN_DIR}/app-common/app-common/zap-generated/attributes/Accessors.cpp
                ${GEN_DIR}/app-common/app-common/zap-generated/cluster-objects.cpp

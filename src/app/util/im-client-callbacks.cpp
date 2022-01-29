@@ -297,51 +297,6 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
 // Singleton instance of the callbacks manager
 static app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool IMDefaultResponseCallback(const app::CommandSender * commandObj, EmberAfStatus status)
-{
-    ChipLogProgress(Zcl, "DefaultResponse:");
-    ChipLogProgress(Zcl, "  Transaction: %p", commandObj);
-    LogStatus(status);
-
-    Callback::Cancelable * onSuccessCallback = nullptr;
-    Callback::Cancelable * onFailureCallback = nullptr;
-    NodeId sourceIdentifier =
-        reinterpret_cast<NodeId>(commandObj); /* #6559: Currently, we only have one commands for the IMInvokeCommands and to a
-                                                 device, so the seqNum is always set to 0. */
-
-    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceIdentifier, 0, &onSuccessCallback, &onFailureCallback);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        if (onSuccessCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
-        }
-
-        if (onFailureCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
-        }
-
-        return true;
-    }
-
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        Callback::Callback<DefaultSuccessCallback> * cb =
-            Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-        cb->mCall(cb->mContext);
-    }
-    else
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
-    }
-
-    return true;
-}
-
 bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status)
 {
     ChipLogProgress(Zcl, "WriteResponse:");

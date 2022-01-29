@@ -36,7 +36,7 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #    Deprecated, specify zap_file instead.
 #
 #  use_default_client_callbacks
-#    Include CHIPClientCallbacks.cpp.
+#    Include im-client-callbacks.cpp.
 #
 # Forwards all the remaining variables to the source_set.
 #
@@ -170,10 +170,7 @@ template("chip_data_model") {
       }
 
       if (_use_default_client_callbacks) {
-        sources += [
-          "${_app_root}/util/im-client-callbacks.cpp",
-          "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp",
-        ]
+        sources += [ "${_app_root}/util/im-client-callbacks.cpp" ]
       }
 
       if (_use_default_im_dispatch) {

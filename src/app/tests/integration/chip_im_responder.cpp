@@ -97,15 +97,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     statusCodeFlipper = !statusCodeFlipper;
 }
 
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
-{
-    // Nothing todo.
-    (void) aCommandPath;
-    (void) aReader;
-    (void) apCommandObj;
-}
-
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
