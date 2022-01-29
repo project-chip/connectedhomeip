@@ -41,4 +41,3 @@ typedef struct
     uint8_t sequence;
     uint8_t radius;
 } EmberApsFrame;
-
