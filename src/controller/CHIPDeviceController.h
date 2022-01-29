@@ -831,30 +831,21 @@ private:
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
     template <typename ClusterObjectT, typename RequestObjectT>
-    CHIP_ERROR SendCommand(DeviceProxy * device, RequestObjectT request,
+    CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb)
     {
-        ClusterObjectT cluster;
-        cluster.Associate(device, 0);
-
-        return cluster.InvokeCommand(request, this, successCb, failureCb);
+        return SendCommand<ClusterObjectT>(device, request, successCb, failureCb, 0, NullOptional);
     }
 
     template <typename ClusterObjectT, typename RequestObjectT>
-    CHIP_ERROR SendCommand(DeviceProxy * device, RequestObjectT request,
+    CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
-                           CommandResponseFailureCallback failureCb, chip::Optional<chip::System::Clock::Timeout> timeout)
+                           CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
     {
         ClusterObjectT cluster;
-        cluster.Associate(device, 0);
-
-        if (timeout.HasValue())
-        {
-            VerifyOrReturnError(chip::CanCastTo<uint16_t>(timeout.Value().count()), CHIP_ERROR_INVALID_ARGUMENT);
-            chip::Optional<uint16_t> timedInvokeRequestTimeoutInMs(static_cast<uint16_t>(timeout.Value().count()));
-            return cluster.InvokeCommand(request, this, successCb, failureCb, timedInvokeRequestTimeoutInMs);
-        }
+        cluster.Associate(device, endpoint);
+        cluster.SetCommandTimeout(timeout);
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
