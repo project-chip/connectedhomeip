@@ -304,15 +304,8 @@ JNI_METHOD(void, AccountLoginCluster, loginRequest)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -479,15 +472,8 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -540,15 +526,8 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -588,15 +567,8 @@ JNI_METHOD(void, AdministratorCommissioningCluster, revokeCommissioning)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -8718,15 +8690,8 @@ JNI_METHOD(void, DoorLockCluster, clearCredential)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -8768,15 +8733,8 @@ JNI_METHOD(void, DoorLockCluster, clearUser)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9154,15 +9112,8 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9249,15 +9200,8 @@ JNI_METHOD(void, DoorLockCluster, setCredential)
         chip::Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9352,15 +9296,8 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9528,15 +9465,8 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9586,15 +9516,8 @@ JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));

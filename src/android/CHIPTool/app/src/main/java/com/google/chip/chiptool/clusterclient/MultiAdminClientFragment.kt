@@ -99,6 +99,7 @@ class MultiAdminClientFragment : Fragment() {
   }
 
   private suspend fun sendRevokeCommandClick() {
+    val timedInvokeTimeout = 10000
     getAdministratorCommissioningClusterForDevice().revokeCommissioning(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("Revoke Commissioning success")
@@ -108,7 +109,7 @@ class MultiAdminClientFragment : Fragment() {
         showMessage("Revoke Commissioning  failure $ex")
         Log.e(TAG, "Revoke Commissioning  failure", ex)
       }
-    })
+    }, timedInvokeTimeout)
   }
 
   private suspend fun getAdministratorCommissioningClusterForDevice(): ChipClusters.AdministratorCommissioningCluster {

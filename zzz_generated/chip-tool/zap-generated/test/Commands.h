@@ -74434,7 +74434,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_5(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74539,7 +74540,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_7(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74575,7 +74577,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_8(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74681,7 +74684,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_10(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74788,7 +74792,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_12(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74895,7 +74900,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_14(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75002,7 +75008,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_16(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75113,7 +75120,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_18(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75224,7 +75232,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_20(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75331,7 +75340,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_22(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75435,7 +75445,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_24(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75470,7 +75481,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_25(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75499,7 +75511,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_26(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75598,7 +75611,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_28(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75697,7 +75711,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_30(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75726,7 +75741,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_31(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75755,7 +75771,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_32(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76060,7 +76077,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_39(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76231,7 +76249,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_42(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76280,7 +76299,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_43(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76469,7 +76489,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_48(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76643,7 +76664,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_51(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76693,7 +76715,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_52(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76742,7 +76765,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_53(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76792,7 +76816,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_54(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76842,7 +76867,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_55(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76892,7 +76918,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_56(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76942,7 +76969,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_57(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76992,7 +77020,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_58(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77043,7 +77072,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_59(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77094,7 +77124,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_60(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77143,7 +77174,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_61(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77193,7 +77225,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_62(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77243,7 +77276,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_63(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77292,7 +77326,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_64(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77342,7 +77377,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_65(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77385,7 +77421,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_66(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77536,7 +77573,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_69(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77681,7 +77719,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_72(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77725,7 +77764,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_73(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77976,7 +78016,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_78(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78027,7 +78068,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_79(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78078,7 +78120,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_80(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78119,7 +78162,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_81(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78477,7 +78521,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_88(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78525,7 +78570,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_89(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78694,7 +78740,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_92(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78736,7 +78783,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_93(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78768,7 +78816,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_94(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78800,7 +78849,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_95(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78832,7 +78882,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_96(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78864,7 +78915,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_97(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78896,7 +78948,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_98(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78925,7 +78978,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_99(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79218,7 +79272,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_1(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79260,7 +79315,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_2(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79315,7 +79371,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_4(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79369,7 +79426,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_6(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79424,7 +79482,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_8(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79480,7 +79539,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_10(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79952,7 +80012,8 @@ private:
 
         auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_1(error); };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -82486,7 +82547,8 @@ private:
             (static_cast<DL_Schedules *>(context))->OnFailureResponse_70(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -82852,7 +82914,8 @@ private:
             (static_cast<DL_Schedules *>(context))->OnFailureResponse_79(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 

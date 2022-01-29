@@ -265,11 +265,6 @@ public class ChipClusters {
     }
 
     public void loginRequest(
-        DefaultClusterCallback callback, String tempAccountIdentifier, String setupPIN) {
-      loginRequest(chipClusterPtr, callback, tempAccountIdentifier, setupPIN, null);
-    }
-
-    public void loginRequest(
         DefaultClusterCallback callback,
         String tempAccountIdentifier,
         String setupPIN,
@@ -359,34 +354,9 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void openBasicCommissioningWindow(
-        DefaultClusterCallback callback, Integer commissioningTimeout) {
-      openBasicCommissioningWindow(chipClusterPtr, callback, commissioningTimeout, null);
-    }
-
-    public void openBasicCommissioningWindow(
         DefaultClusterCallback callback, Integer commissioningTimeout, int timedInvokeTimeoutMs) {
       openBasicCommissioningWindow(
           chipClusterPtr, callback, commissioningTimeout, timedInvokeTimeoutMs);
-    }
-
-    public void openCommissioningWindow(
-        DefaultClusterCallback callback,
-        Integer commissioningTimeout,
-        byte[] PAKEVerifier,
-        Integer discriminator,
-        Long iterations,
-        byte[] salt,
-        Integer passcodeID) {
-      openCommissioningWindow(
-          chipClusterPtr,
-          callback,
-          commissioningTimeout,
-          PAKEVerifier,
-          discriminator,
-          iterations,
-          salt,
-          passcodeID,
-          null);
     }
 
     public void openCommissioningWindow(
@@ -408,10 +378,6 @@ public class ChipClusters {
           salt,
           passcodeID,
           timedInvokeTimeoutMs);
-    }
-
-    public void revokeCommissioning(DefaultClusterCallback callback) {
-      revokeCommissioning(chipClusterPtr, callback, null);
     }
 
     public void revokeCommissioning(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
@@ -4700,19 +4666,9 @@ public class ChipClusters {
 
     public void clearCredential(
         DefaultClusterCallback callback,
-        @Nullable ChipStructs.DoorLockClusterDlCredential credential) {
-      clearCredential(chipClusterPtr, callback, credential, null);
-    }
-
-    public void clearCredential(
-        DefaultClusterCallback callback,
         @Nullable ChipStructs.DoorLockClusterDlCredential credential,
         int timedInvokeTimeoutMs) {
       clearCredential(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
-    }
-
-    public void clearUser(DefaultClusterCallback callback, Integer userIndex) {
-      clearUser(chipClusterPtr, callback, userIndex, null);
     }
 
     public void clearUser(
@@ -4794,33 +4750,9 @@ public class ChipClusters {
       getYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex, timedInvokeTimeoutMs);
     }
 
-    public void lockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
-      lockDoor(chipClusterPtr, callback, pinCode, null);
-    }
-
     public void lockDoor(
         DefaultClusterCallback callback, Optional<byte[]> pinCode, int timedInvokeTimeoutMs) {
       lockDoor(chipClusterPtr, callback, pinCode, timedInvokeTimeoutMs);
-    }
-
-    public void setCredential(
-        SetCredentialResponseCallback callback,
-        Integer operationType,
-        ChipStructs.DoorLockClusterDlCredential credential,
-        byte[] credentialData,
-        @Nullable Integer userIndex,
-        @Nullable Integer userStatus,
-        @Nullable Integer userType) {
-      setCredential(
-          chipClusterPtr,
-          callback,
-          operationType,
-          credential,
-          credentialData,
-          userIndex,
-          userStatus,
-          userType,
-          null);
     }
 
     public void setCredential(
@@ -4842,28 +4774,6 @@ public class ChipClusters {
           userStatus,
           userType,
           timedInvokeTimeoutMs);
-    }
-
-    public void setUser(
-        DefaultClusterCallback callback,
-        Integer operationType,
-        Integer userIndex,
-        @Nullable String userName,
-        @Nullable Long userUniqueId,
-        @Nullable Integer userStatus,
-        @Nullable Integer userType,
-        @Nullable Integer credentialRule) {
-      setUser(
-          chipClusterPtr,
-          callback,
-          operationType,
-          userIndex,
-          userName,
-          userUniqueId,
-          userStatus,
-          userType,
-          credentialRule,
-          null);
     }
 
     public void setUser(
@@ -4961,18 +4871,9 @@ public class ChipClusters {
           timedInvokeTimeoutMs);
     }
 
-    public void unlockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
-      unlockDoor(chipClusterPtr, callback, pinCode, null);
-    }
-
     public void unlockDoor(
         DefaultClusterCallback callback, Optional<byte[]> pinCode, int timedInvokeTimeoutMs) {
       unlockDoor(chipClusterPtr, callback, pinCode, timedInvokeTimeoutMs);
-    }
-
-    public void unlockWithTimeout(
-        DefaultClusterCallback callback, Integer timeout, Optional<byte[]> pinCode) {
-      unlockWithTimeout(chipClusterPtr, callback, timeout, pinCode, null);
     }
 
     public void unlockWithTimeout(
