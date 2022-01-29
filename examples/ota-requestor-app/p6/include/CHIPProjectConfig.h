@@ -113,7 +113,7 @@
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
-/** 
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
  * The hardware version number assigned to device or product by the device vendor.  This
