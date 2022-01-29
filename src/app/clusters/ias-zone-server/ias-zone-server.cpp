@@ -184,10 +184,15 @@ static EmberStatus sendToClient(EndpointId endpoint)
     // emberAfSendCommandUnicastToBindings()
     emberAfSetCommandEndpoints(endpoint, 0);
 
+    // TODO: Figure out how this sending should actually work in Matter.
+#if 0
     // A binding table entry is created on Zone Enrollment for each endpoint, so
     // a simple call to SendCommandUnicastToBinding will handle determining the
     // destination endpoint, address, etc for us.
     status = emberAfSendCommandUnicastToBindings();
+#else
+    status = EMBER_ERR_FATAL;
+#endif
 
     if (EMBER_SUCCESS != status)
     {

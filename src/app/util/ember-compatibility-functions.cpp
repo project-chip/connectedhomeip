@@ -204,7 +204,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 {
     if (currentCommandObject == nullptr)
     {
-        // If this command is not handled by IM, then let ember send response.
+        // We have no idea what we're supposed to respond to.
         return false;
     }
 
