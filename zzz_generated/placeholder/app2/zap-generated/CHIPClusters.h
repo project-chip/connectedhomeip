@@ -35,13 +35,6 @@ class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 public:
     GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
     ~GeneralCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t location, chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
@@ -49,26 +42,6 @@ class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan NOCValue,
-                      chip::ByteSpan ICACValue, chip::ByteSpan IPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
-    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan rootCertificate);
-    CHIP_ERROR AttestationRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::ByteSpan attestationNonce);
-    CHIP_ERROR CertificateChainRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t certificateType);
-    CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            chip::ByteSpan CSRNonce);
-    CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            uint8_t fabricIndex);
-    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::ByteSpan trustedRootIdentifier);
-    CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 chip::CharSpan label);
-    CHIP_ERROR UpdateNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan NOCValue, chip::ByteSpan ICACValue);
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase

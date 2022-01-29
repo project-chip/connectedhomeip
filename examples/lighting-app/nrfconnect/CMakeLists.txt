@@ -88,7 +88,6 @@ target_sources(app PRIVATE
                main/main.cpp
                main/ZclCallbacks.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp

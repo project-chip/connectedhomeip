@@ -15,7 +15,6 @@ list(
 
     ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
-    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
     ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/CHIPClientCallbacks.cpp
 
     ${chip_dir}/examples/ota-requestor-app/ameba/main/chipinterface.cpp

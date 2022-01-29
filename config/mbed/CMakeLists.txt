@@ -463,7 +463,6 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
 
     target_sources(${APP_TARGET} PRIVATE
         ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
-        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
         ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
 
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
