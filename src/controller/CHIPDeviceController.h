@@ -453,7 +453,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
-                                      public SessionEstablishmentDelegate, public app::AttributeCache::Callback
+                                      public SessionEstablishmentDelegate,
+                                      public app::AttributeCache::Callback
 {
 public:
     DeviceCommissioner();

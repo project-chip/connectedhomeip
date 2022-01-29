@@ -257,18 +257,17 @@ struct BasicSoftware
 
 struct NetworkClusters
 {
-    EndpointId wifi = kInvalidEndpointId;
+    EndpointId wifi   = kInvalidEndpointId;
     EndpointId thread = kInvalidEndpointId;
-    EndpointId eth = kInvalidEndpointId;
+    EndpointId eth    = kInvalidEndpointId;
 };
 
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport
-        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
-                  BasicVendor, BasicProduct, BasicSoftware, NetworkClusters>
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, BasicVendor,
+                                         BasicProduct, BasicSoftware, NetworkClusters>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

@@ -112,7 +112,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kReadProductId:
         return CommissioningStage::kReadSoftwareVersion;
     case CommissioningStage::kReadSoftwareVersion:
-        if(mNeedsNetworkSetup) {
+        if (mNeedsNetworkSetup)
+        {
             return CommissioningStage::kGetNetworkTechnology;
         }
         else
@@ -220,18 +221,20 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     return CommissioningStage::kError;
 }
 
-EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) {
-    switch(stage) {
-        case CommissioningStage::kWiFiNetworkSetup:
-        case CommissioningStage::kWiFiNetworkEnable:
-            return mNetworkEndpoints.wifi;
-        case CommissioningStage::kThreadNetworkSetup:
-        case CommissioningStage::kThreadNetworkEnable:
-            return mNetworkEndpoints.thread;
-        case CommissioningStage::kGetNetworkTechnology:
-            return kInvalidEndpointId;
-        default:
-            return 0;
+EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
+{
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkSetup:
+    case CommissioningStage::kWiFiNetworkEnable:
+        return mNetworkEndpoints.wifi;
+    case CommissioningStage::kThreadNetworkSetup:
+    case CommissioningStage::kThreadNetworkEnable:
+        return mNetworkEndpoints.thread;
+    case CommissioningStage::kGetNetworkTechnology:
+        return kInvalidEndpointId;
+    default:
+        return 0;
     }
 }
 
@@ -250,7 +253,8 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
         Transport::Type::kBle;
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
-    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
+                                            GetCommandTimeout(nextStage));
 }
 
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
