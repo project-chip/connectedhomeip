@@ -3671,6 +3671,7 @@ client cluster UnitLocalization = 45 {
   }
 
   attribute TempUnit temperatureUnit = 0;
+  readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }

@@ -8413,6 +8413,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TemperatureUnit                                                   | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -11845,12 +11846,14 @@ void registerClusterUnitLocalization(Commands & commands)
         //
         make_unique<ReadAttribute>(Id),                                                           //
         make_unique<ReadAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id),      //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),          //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),      //
         make_unique<WriteAttribute>(Id),                                                          //
         make_unique<WriteUnitLocalizationTemperatureUnit>(),                                      //
         make_unique<SubscribeAttribute>(Id),                                                      //
         make_unique<SubscribeAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id), //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id),           //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id), //
         //

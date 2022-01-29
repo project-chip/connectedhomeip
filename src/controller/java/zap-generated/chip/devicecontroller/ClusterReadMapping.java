@@ -7881,6 +7881,22 @@ public class ClusterReadMapping {
     readUnitLocalizationInteractionInfo.put(
         "readTemperatureUnitAttribute",
         readUnitLocalizationTemperatureUnitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUnitLocalizationAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUnitLocalizationAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitLocalizationCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.UnitLocalizationCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedUnitLocalizationClusterAttributeListAttributeCallback(),
+            readUnitLocalizationAttributeListCommandParams);
+    readUnitLocalizationInteractionInfo.put(
+        "readAttributeListAttribute", readUnitLocalizationAttributeListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readUnitLocalizationFeatureMapCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readUnitLocalizationFeatureMapAttributeInteractionInfo =
