@@ -106,7 +106,7 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun readBasicClusters(itemIndex: Int) {
     when(ATTRIBUTES[itemIndex]) {
-      getString(R.string.basic_cluster_interaction_mode_version_text) -> sendReadDataModelRevisionAttribute()
+      getString(R.string.basic_cluster_data_model_revision_text) -> sendReadDataModelRevisionAttribute()
       getString(R.string.basic_cluster_vendor_name_text) -> sendReadVendorNameAttribute()
       getString(R.string.basic_cluster_vendor_id_text) -> sendReadVendorIDAttribute()
       getString(R.string.basic_cluster_product_name_text) -> sendReadProductNameAttribute()
@@ -129,7 +129,7 @@ class BasicClientFragment : Fragment() {
   }
 
   private fun makeAttributeList() {
-    ATTRIBUTES.add(getString(R.string.basic_cluster_interaction_mode_version_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_data_model_revision_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_name_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_id_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_product_name_text))
