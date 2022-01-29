@@ -312,7 +312,6 @@ void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apC
     VerifyOrDie(apReadClient != nullptr);
     VerifyOrDie(apCallback != nullptr);
 
-    delete apReadClient;
     delete apCallback;
 }
 
