@@ -142,9 +142,10 @@
  * "assert" is used. */
 //#define MCUBOOT_HAVE_ASSERT_H
 
-#define MCUBOOT_WATCHDOG_FEED()         \
-    do {                                \
-        /* TODO: to be implemented */   \
+#define MCUBOOT_WATCHDOG_FEED()                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        /* TODO: to be implemented */                                                                                              \
     } while (0)
 
 #endif /* MCUBOOT_CONFIG_H */

@@ -141,8 +141,9 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    int rc = flash_area_write(imageProcessor->mFlashArea, imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
-    if(rc != 0)
+    int rc = flash_area_write(imageProcessor->mFlashArea, imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(),
+                              imageProcessor->mBlock.size());
+    if (rc != 0)
     {
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
