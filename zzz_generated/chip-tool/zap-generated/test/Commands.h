@@ -42870,7 +42870,7 @@ private:
         (static_cast<Test_TC_DIAG_TH_NW_1_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, chip::ByteSpan networkName)
+    static void OnSuccessCallback_2(void * context, chip::CharSpan networkName)
     {
         (static_cast<Test_TC_DIAG_TH_NW_1_2 *>(context))->OnSuccessResponse_2(networkName);
     }
@@ -43916,7 +43916,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(chip::ByteSpan networkName)
+    void OnSuccessResponse_2(chip::CharSpan networkName)
     {
         VerifyOrReturn(CheckConstraintType("networkName", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("networkName", networkName.size(), 16));
@@ -78437,16 +78437,24 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Write location\n");
-            err = TestWriteLocation_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read location\n");
+            err = TestReadLocation_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Write location\n");
+            err = TestWriteLocation_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read AttributeList value\n");
-            err = TestReadAttributeListValue_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read back location\n");
+            err = TestReadBackLocation_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read AttributeList value\n");
+            err = TestReadAttributeListValue_5();
             break;
         }
 
@@ -78459,7 +78467,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -78469,7 +78477,10 @@ private:
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1(location);
+    }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
@@ -78483,9 +78494,26 @@ private:
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    static void OnSuccessCallback_3(void * context, chip::CharSpan location)
     {
-        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_3(attributeList);
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_3(location);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_5(attributeList);
     }
 
     //
@@ -78498,17 +78526,14 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteLocation_1()
+    CHIP_ERROR TestReadLocation_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("USgarbage: not in length on purpose", 2);
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
 
@@ -78518,16 +78543,21 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1() { NextTest(); }
+    void OnSuccessResponse_1(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("XX", 2)));
 
-    CHIP_ERROR TestRestoreInitialLocationValue_2()
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteLocation_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
+        locationArgument = chip::Span<const char>("USgarbage: not in length on purpose", 2);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -78542,13 +78572,13 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeListValue_3()
+    CHIP_ERROR TestReadBackLocation_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
@@ -78559,7 +78589,53 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    void OnSuccessResponse_3(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("US", 2)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreInitialLocationValue_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeListValue_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
     {
         {
             auto iter_0 = attributeList.begin();
@@ -78978,7 +79054,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -89382,17 +89458,25 @@ public:
             err = TestGroupWriteAttribute_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
+            err = TestReadBackAttribute_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_5();
             break;
         case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read back Attribute\n");
+            err = TestReadBackAttribute_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_7();
+            break;
+        case 8:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 6 : Check on/off attribute value is true after on command for endpoint 1\n");
-            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_6();
+                            " ***** Test Step 8 : Check on/off attribute value is true after on command for endpoint 1\n");
+            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8();
             break;
         }
 
@@ -89419,23 +89503,43 @@ private:
 
     static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(); }
 
-    static void OnDoneCallback_4(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_4(); }
-
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(); }
+    static void OnSuccessCallback_4(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
+
+    static void OnDoneCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5(); }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, bool onOff)
+    static void OnSuccessCallback_6(void * context, chip::CharSpan location)
     {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(onOff);
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(location);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, bool onOff)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_8(onOff);
     }
 
     //
@@ -89544,17 +89648,14 @@ private:
 
     void OnDoneResponse_3() { NextTest(); }
 
-    CHIP_ERROR TestRestoreInitialLocationValue_4()
+    CHIP_ERROR TestReadBackAttribute_4()
     {
-        const chip::GroupId groupId = 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_4, OnFailureCallback_4, OnDoneCallback_4));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
@@ -89564,29 +89665,24 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4() { NextTest(); }
-
-    void OnDoneResponse_4() { NextTest(); }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    void OnSuccessResponse_4(chip::CharSpan location)
     {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("US", 2)));
 
-        RequestType request;
+        NextTest();
+    }
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5();
-        };
+    CHIP_ERROR TestRestoreInitialLocationValue_5()
+    {
+        const chip::GroupId groupId = 1;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(error);
-        };
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
 
-        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_5, OnFailureCallback_5, OnDoneCallback_5));
         return CHIP_NO_ERROR;
     }
 
@@ -89600,13 +89696,13 @@ private:
 
     void OnDoneResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_6()
+    CHIP_ERROR TestReadBackAttribute_6()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
@@ -89617,7 +89713,63 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(bool onOff)
+    void OnSuccessResponse_6(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("XX", 2)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_7()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_7(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_7(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    void OnDoneResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 1));
 
