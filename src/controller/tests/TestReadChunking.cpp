@@ -96,7 +96,7 @@ class TestReadCallback : public app::ReadClient::Callback
 {
 public:
     TestReadCallback() : mBufferedCallback(*this) {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
     void OnDone() override;
@@ -108,8 +108,8 @@ public:
     app::BufferedReadCallback mBufferedCallback;
 };
 
-void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                                       const app::StatusIB & aStatus)
+void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
+                                       TLV::TLVReader * apData, const app::StatusIB & aStatus)
 {
     if (aPath.mAttributeId != kTestListAttribute)
     {
@@ -209,6 +209,9 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
     app::ReadPrepareParams readParams(sessionHandle);
 
@@ -280,6 +283,9 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -353,6 +359,9 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);

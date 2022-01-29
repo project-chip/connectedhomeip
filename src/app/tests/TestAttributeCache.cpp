@@ -126,7 +126,7 @@ void DataSeriesGenerator::Generate()
     System::PacketBufferTLVReader reader;
     ReadClient::Callback * callback = mReadCallback;
     StatusIB status;
-
+    Optional<DataVersion> version;
     callback->OnReportBegin();
 
     uint8_t index = 0;
@@ -198,13 +198,13 @@ void DataSeriesGenerator::Generate()
             writer.Finalize(&handle);
             reader.Init(std::move(handle));
             NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-            callback->OnAttributeData(path, &reader, status);
+            callback->OnAttributeData(path, version, &reader, status);
         }
         else
         {
             ChipLogProgress(DataManagement, "\t -- Generating Status");
             status.mStatus = Protocols::InteractionModel::Status::Failure;
-            callback->OnAttributeData(path, nullptr, status);
+            callback->OnAttributeData(path, version, nullptr, status);
         }
 
         index++;
