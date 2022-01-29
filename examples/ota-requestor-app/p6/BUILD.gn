@@ -38,9 +38,11 @@ declare_args() {
 
 config("p6_ota_config") {
   #ldflags =  ["-T/" + rebase_path("src/cy8c6xxa_cm4.ld", "/", "${p6_project_dir}")]
-  ldflags =  ["-T/" + rebase_path("src/cy8c6xxa_cm4_dual_ota_int.ld", "/", "${p6_project_dir}")]
+  ldflags = [ "-T/" + rebase_path("src/cy8c6xxa_cm4_dual_ota_int.ld",
+                                  "/",
+                                  "${p6_project_dir}") ]
 
-  ldflags +=["-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000"]
+  ldflags += [ "-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000" ]
 
   defines = [
     "CY_OTA",
@@ -66,7 +68,7 @@ config("p6_ota_config") {
     "APP_VERSION_BUILD=0",
     "MCUBOOT_OVERWRITE_ONLY",
     "CY_ENABLE_XIP_PROGRAM",
-    ]
+  ]
 }
 
 # Warning: Don't change the name of this target without also modifying
@@ -85,7 +87,7 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/sysflash/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/include",
-    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/"
+    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/",
   ]
 
   defines = [
@@ -94,16 +96,21 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setup_pin_code}",
   ]
 
-  sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h",
-              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
-              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
-              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
-              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_map.c",
-              "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/src/bootutil_misc.c",
-              "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_prog.c",
-              "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_qspi.c"]
+  sources = [
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/src/bootutil_misc.c",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_map.c",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
+    "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
+    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_prog.c",
+    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_qspi.c",
+    "${p6_project_dir}/include/CHIPProjectConfig.h",
+  ]
 
-  public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config", ":p6_ota_config" ]
+  public_configs = [
+    "${chip_root}/third_party/p6:p6_sdk_config",
+    ":p6_ota_config",
+  ]
 }
 
 p6_executable("ota_requestor_app") {
@@ -122,10 +129,10 @@ p6_executable("ota_requestor_app") {
 
   deps = [
     ":ota_requestor_app_sdk_sources",
-    "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/src/lib",
+    "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
 

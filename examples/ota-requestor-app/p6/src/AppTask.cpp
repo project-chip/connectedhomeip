@@ -23,6 +23,10 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
+#include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/GenericOTARequestorDriver.h"
+#include "platform/P6/OTAImageProcessorImpl.h"
 #include "qrcodegen.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -39,13 +43,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/P6/OTAImageProcessorImpl.h"
 
-extern "C"
-{
+extern "C" {
 #include "cy_smif_psoc6.h"
 }
 
@@ -383,7 +382,6 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != NULL)
@@ -431,9 +429,9 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::UpdateClusterState(void)
 {
     // TODO: Write ota cluster attributes as necessary
-    //EmberAfStatus status = emberAfWriteAttribute(
-    //if (status != EMBER_ZCL_STATUS_SUCCESS)
+    // EmberAfStatus status = emberAfWriteAttribute(
+    // if (status != EMBER_ZCL_STATUS_SUCCESS)
     //{
-        //P6_LOG("ERR: updating on/off %x", status);
+    // P6_LOG("ERR: updating on/off %x", status);
     //}
 }

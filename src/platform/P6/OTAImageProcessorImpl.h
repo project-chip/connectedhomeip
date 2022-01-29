@@ -25,12 +25,11 @@
 #include <fstream>
 
 #ifdef CY_OTA
-extern "C"
-{
-#include "cy_smif_psoc6.h"
-#include "cy_flash_psoc6.h"
-#include "sysflash/sysflash.h"
+extern "C" {
 #include "bootutil/bootutil.h"
+#include "cy_flash_psoc6.h"
+#include "cy_smif_psoc6.h"
+#include "sysflash/sysflash.h"
 }
 
 namespace chip {
@@ -68,7 +67,7 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
 
-    const struct flash_area *mFlashArea;
+    const struct flash_area * mFlashArea;
 };
 
 } // namespace chip

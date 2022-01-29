@@ -34,8 +34,8 @@
 
 #include <AppTask.h>
 
-#include "cyhal_wdt.h"
 #include "AppConfig.h"
+#include "cyhal_wdt.h"
 #include "init_p6Platform.h"
 #include <app/server/Server.h>
 
