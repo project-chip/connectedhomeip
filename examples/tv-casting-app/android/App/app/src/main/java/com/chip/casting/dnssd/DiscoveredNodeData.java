@@ -12,6 +12,7 @@ public class DiscoveredNodeData {
   private static final int MAX_ROTATING_ID_LEN = 50;
   private static final String KEY_DEVICE_NAME = "DN";
   private static final String KEY_DEVICE_TYPE = "DT";
+  private static final String KEY_VENDOR_PRODUCT = "VP";
 
   private String hostName;
   private String instanceName;
@@ -29,14 +30,13 @@ public class DiscoveredNodeData {
   private int numIPs;
   private List<InetAddress> ipAddresses;
 
-  public DiscoveredNodeData() {}
-
   public DiscoveredNodeData(NsdServiceInfo serviceInfo) {
     Map<String, byte[]> attributes = serviceInfo.getAttributes();
-    this.deviceName = new String(attributes.get("DN"), StandardCharsets.UTF_8);
-    this.deviceType = Long.parseLong(new String(attributes.get("DT"), StandardCharsets.UTF_8));
+    this.deviceName = new String(attributes.get(KEY_DEVICE_NAME), StandardCharsets.UTF_8);
+    this.deviceType =
+        Long.parseLong(new String(attributes.get(KEY_DEVICE_TYPE), StandardCharsets.UTF_8));
 
-    String vp = new String(attributes.get("VP"), StandardCharsets.UTF_8);
+    String vp = new String(attributes.get(KEY_VENDOR_PRODUCT), StandardCharsets.UTF_8);
     if (vp != null) {
       String[] vpArray = vp.split("\\+");
       if (vpArray.length > 0) {
