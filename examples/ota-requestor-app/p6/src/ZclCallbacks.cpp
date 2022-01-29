@@ -47,13 +47,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     switch (clusterId)
     {
-    // TODO: Handle ota-requester cluster
-        case Identify::Id:
-            ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
-                            ChipLogValueMEI(attributeId), type, *value, size);
-            break;
-        default:
-            P6_LOG("Unhandled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-            break;
+        // TODO: Handle ota-requester cluster
+    case Identify::Id:
+        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(attributeId), type, *value, size);
+        break;
+    default:
+        P6_LOG("Unhandled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+        break;
     }
 }
