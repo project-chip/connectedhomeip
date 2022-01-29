@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2022 Project CHIP Authors
 #    Copyright (c) 2018 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -166,125 +166,6 @@ menu "CHIP Core"
             help
                 The maximum number of simultaneously active session keys.
 
-        config DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT
-            int "Default Security Session Establishment Timeout (ms)"
-            range 0 65535
-            default 30000
-            help
-                The default amount of time, in milliseconds, after which an in-progess
-                session establishment will fail due to a timeout.
-
-                This value can be overridden by the application at runtime.
-
-        config DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT
-            int "Default Security Session Idle Timeout (ms)"
-            range 0 65535
-            default 15000
-            help
-                The default minimum amount of time, in milliseconds, that an unreserved
-                and idle security session will be allowed to exist before being destroyed.
-                In practice, unreserved idle sessions can exist for up to twice this value.
-
-                This value can be overridden by the application at runtime.
-
-        menu "Protocols"
-
-            config ENABLE_PASE_INITIATOR
-                bool "Enable PASE Initiator"
-                default n
-                help
-                    Enable support for initiating PASE security sessions with a remote node.
-
-                    This feature is rarely needed in device applications of CHIP.
-
-                    (PASE = Password Authenticated Session Establishment).
-
-            config ENABLE_PASE_RESPONDER
-                bool "Enable PASE Responder"
-                default y
-                help
-                    Enable support for responding to a request from a remote node to initiate
-                    a PASE security session.
-
-                    This feature is necessary to support standard CHIP pairing.
-
-                    (PASE = Password Authenticated Session Establishment).
-
-            config ENABLE_CASE_INITIATOR
-                bool "Enable CASE Initiator"
-                default y
-                help
-                    Enable support for initiating CASE security sessions with a remote node.
-
-                    This feature is necessary to support interacting with CHIP cloud services.
-
-                    (CASE = Certificate Authenticated Session Establishment).
-
-            config ENABLE_CASE_RESPONDER
-                bool "Enable CASE Responder"
-                default y
-                help
-                    Enable support for responding to a request from a remote note to initiate
-                    a CASE security session.
-
-                    This feature is necessary to support standard CHIP pairing.
-
-                    (CASE = Certificate Authenticated Session Establishment).
-
-        endmenu # "Protocols"
-
-        menu "Group Keys"
-
-            config USE_APP_GROUP_KEYS_FOR_MSG_ENC
-                bool "Enable Group Keys for CHIP Message Encryption"
-                default y
-                help
-                    Enable the use of application group keys for CHIP message encryption.
-
-            config MAX_CACHED_MSG_ENC_APP_KEYS
-                int "Group Key Cache Size"
-                range 0 255
-                default 5
-                depends on USE_APP_GROUP_KEYS_FOR_MSG_ENC
-                help
-                    The size of the cache (in number of keys) used to store derived application
-                    group encryption keys.
-
-                    This value is only meaningful when group keys are enabled for CHIP message
-                    encryption.
-
-            config MAX_APPLICATION_EPOCH_KEYS
-                int "Max Application Epoch Keys"
-                range 0 8
-                default 4
-                help
-                    The maximum number of simultaneously supported application epoch keys.
-
-                    (Epoch keys are a kind of symmetric key that gets mixed together with
-                    other key material to form a group encryption key which can be used
-                    for private communication amongst a set of related CHIP nodes).
-
-                    This value should be set to the maximum number of epoch keys that
-                    can be simultaneously provisioned on the local CHIP node.  The
-                    maximum supported value is 8, however, in most cases only two such
-                    keys will exist at any given point in time.
-
-            config MAX_APPLICATION_GROUPS
-                int "Max Application Master Keys"
-                range 0 255
-                default 4
-                help
-                    The maximum number of simultaneously supported application group master keys.
-
-                    (Application group master keys are a kind of symmetric key that gets mixed
-                    together with other key material to form a group encryption key which can
-                    be used for private communication amongst a set of related CHIP nodes).
-
-                    This value should be set to the number of CHIP application groups
-                    in which the local CHIP device will be a member.
-
-        endmenu # "Group Keys"
-
         menu "Debugging"
 
             config SECURITY_TEST_MODE
@@ -306,12 +187,6 @@ menu "CHIP Core"
 
                     WARNING: This option makes it possible to circumvent basic CHIP security functionality.
                     Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
-
-            config DEBUG_CERT_VALIDATION
-                bool "Enable Certificate Validation Debugging"
-                default n
-                help
-                    Enable support for debugging output from certificate validation.
 
         endmenu # "Debugging"
 
