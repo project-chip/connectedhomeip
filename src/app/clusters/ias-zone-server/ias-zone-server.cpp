@@ -191,7 +191,7 @@ static EmberStatus sendToClient(EndpointId endpoint)
     // destination endpoint, address, etc for us.
     status = emberAfSendCommandUnicastToBindings();
 #else
-    status = EMBER_ERR_FATAL;
+    status     = EMBER_ERR_FATAL;
 #endif
 
     if (EMBER_SUCCESS != status)
