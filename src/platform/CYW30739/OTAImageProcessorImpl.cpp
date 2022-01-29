@@ -158,13 +158,16 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    const uint32_t written = wiced_firmware_upgrade_process_block(imageProcessor->mParams.downloadedBytes,
-                                                                  imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
-    if (written != imageProcessor->mBlock.size())
+    if (IsSpanUsable(imageProcessor->mBlock))
     {
-        ChipLogError(SoftwareUpdate, "wiced_firmware_upgrade_process_block 0x%08lx", written);
-        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-        return;
+        const uint32_t written = wiced_firmware_upgrade_process_block(imageProcessor->mParams.downloadedBytes,
+                                                                      imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+        if (written != imageProcessor->mBlock.size())
+        {
+            ChipLogError(SoftwareUpdate, "wiced_firmware_upgrade_process_block 0x%08lx", written);
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+            return;
+        }
     }
 
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
