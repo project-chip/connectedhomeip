@@ -25,7 +25,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-    ${chip_dir}/src/app/util/im-client-callbacks.cpp
 )
 
 add_library(

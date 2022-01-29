@@ -35,9 +35,6 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #    Names of the clusters directories to compile.
 #    Deprecated, specify zap_file instead.
 #
-#  use_default_client_callbacks
-#    Include im-client-callbacks.cpp.
-#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
@@ -56,10 +53,6 @@ template("chip_data_model") {
 
   _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
 
-  _use_default_client_callbacks =
-      defined(invoker.use_default_client_callbacks) &&
-      invoker.use_default_client_callbacks
-
   source_set(_data_model_name) {
     forward_variables_from(invoker,
                            "*",
@@ -67,7 +60,6 @@ template("chip_data_model") {
                              "zap_pregenerated_dir",
                              "cluster_sources",
                              "zap_file",
-                             "use_default_client_callbacks",
                              "is_server",
                            ])
 
@@ -167,10 +159,6 @@ template("chip_data_model") {
 
       if (chip_controller) {
         sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
-      }
-
-      if (_use_default_client_callbacks) {
-        sources += [ "${_app_root}/util/im-client-callbacks.cpp" ]
       }
 
       if (_use_default_im_dispatch) {

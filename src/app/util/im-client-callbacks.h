@@ -26,9 +26,6 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
-bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status);
-void LogStatus(uint8_t status);
-
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
 typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
