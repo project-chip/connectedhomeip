@@ -329,6 +329,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
 
+    // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
+    // context tag, 1 byte for value
+    const uint32_t kReservedSizeForIMRevision = 1 + 1 + 1;
+
     // Reserved size for the end of report message, which is an end-of-container (i.e 1 byte for the control tag).
     const uint32_t kReservedSizeForEndOfReportMessage = 1;
 
@@ -362,7 +366,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
 
-    SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
+    SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForIMRevision +
+                                                       kReservedSizeForEndOfReportMessage));
 
     {
         bool hasMoreChunksForAttributes = false;
@@ -388,7 +393,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     }
 
     SuccessOrExit(reportDataBuilder.GetError());
-    SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
+    SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForIMRevision +
+                                                         kReservedSizeForEndOfReportMessage));
     if (hasMoreChunks)
     {
         reportDataBuilder.MoreChunkedMessages(true);
