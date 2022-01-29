@@ -158,11 +158,11 @@ public:
         virtual void OnDone() = 0;
 
         /**
-         * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe and the ReadPrepareParams was
-         * moved into this client for management. This will have to be free'ed appropriately by the application.
-         * If SendAutoResubscribeRequest fails, this function will be called before it returns the failure.
-         * If SendAutoResubscribeRequest succeeds, this function will be called immediately before calling OnDone.
-         * If SendAutoResubscribeRequest is not called, this function will not be called.
+         * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe
+         * and the ReadPrepareParams was moved into this client for management. This will have to be free'ed appropriately by the
+         * application. If SendAutoResubscribeRequest fails, this function will be called before it returns the failure. If
+         * SendAutoResubscribeRequest succeeds, this function will be called immediately before calling OnDone. If
+         * SendAutoResubscribeRequest is not called, this function will not be called.
          */
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
     };
@@ -243,7 +243,8 @@ public:
 
     // Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
     // we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
-    // by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be used.
+    // by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
+    // used.
     //
     // The application has to know to
     // a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList with
@@ -251,7 +252,8 @@ public:
     // time in the system, you can either have a single subscription with re-sub enabled that that has mKeepSubscriptions = false,
     // OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not have a mix of both simultaneously.
     // If SendAutoResubscribeRequest is called at all, it guarantees that it will call OnDeallocatePaths when OnDone is called.
-    // SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since that's the only case when the consumer moved a ReadParams into the client.
+    // SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since that's the only case when the consumer moved
+    // a ReadParams into the client.
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
 
 private:
@@ -340,7 +342,7 @@ private:
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
     ReadPrepareParams mReadPrepareParams;
-    uint32_t mNumRetries   = 0;
+    uint32_t mNumRetries = 0;
 };
 
 }; // namespace app

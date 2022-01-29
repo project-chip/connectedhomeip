@@ -817,7 +817,7 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 bool ReadClient::ResubscribeIfNeeded()
 {
     bool shouldResubscribe = true;
-    uint32_t intervalMsec = 0;
+    uint32_t intervalMsec  = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {
         ChipLogProgress(DataManagement, "mResubscribePolicy is null");
@@ -839,7 +839,7 @@ bool ReadClient::ResubscribeIfNeeded()
     else
     {
         ChipLogProgress(DataManagement, "Will try to Resubscribe at retry index %" PRIu32 " after %" PRIu32 "ms", mNumRetries,
-                intervalMsec);
+                        intervalMsec);
     }
     return true;
 }

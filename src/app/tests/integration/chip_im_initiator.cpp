@@ -220,6 +220,7 @@ public:
             delete[] aReadPrepareParams.mpEventPathParamsList;
         }
     }
+
 private:
     chip::Platform::UniquePtr<chip::app::ReadClient> mReadClient;
 };

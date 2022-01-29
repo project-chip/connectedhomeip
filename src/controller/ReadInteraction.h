@@ -50,7 +50,7 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
 
     auto readPaths = Platform::MakeUnique<app::AttributePathParams>(endpointId, clusterId, attributeId);
     VerifyOrReturnError(readPaths != nullptr, CHIP_ERROR_NO_MEMORY);
-    readParams.mpAttributePathParamsList  = readPaths.get();
+    readParams.mpAttributePathParamsList    = readPaths.get();
     readParams.mAttributePathParamsListSize = 1;
 
     auto onDone = [](TypedReadAttributeCallback<DecodableAttributeType> * callback) { chip::Platform::Delete(callback); };
@@ -196,7 +196,7 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     auto readPaths = Platform::MakeUnique<app::EventPathParams>(endpointId, clusterId, eventId);
     VerifyOrReturnError(readPaths != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    readParams.mpEventPathParamsList  = readPaths.get();
+    readParams.mpEventPathParamsList = readPaths.get();
 
     readParams.mEventPathParamsListSize = 1;
 

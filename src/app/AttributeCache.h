@@ -349,7 +349,6 @@ private:
         return mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
-
     void OnDone() override { return mCallback.OnDone(); }
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
 

@@ -375,7 +375,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
             readPaths.release();
-            err                               = readClient->SendAutoResubscribeRequest(std::move(params));
+            err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);
         }
         else
@@ -443,7 +443,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Rea
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
             readPaths.release();
-            err                               = readClient->SendAutoResubscribeRequest(std::move(params));
+            err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);
         }
         else
