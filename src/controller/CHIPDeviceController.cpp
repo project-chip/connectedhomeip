@@ -716,6 +716,8 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
+    mSystemState->SessionMgr()->UnregisterRecoveryDelegate(*this);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     if (mUdcTransportMgr != nullptr)
     {
@@ -934,6 +936,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Invalid device for commissioning " ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
     if (mCommissioningStage != CommissioningStage::kSecurePairing)
     {
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
@@ -1452,6 +1455,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 {
     static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
