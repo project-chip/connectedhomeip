@@ -48,7 +48,6 @@
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
 #include <app-common/zap-generated/callback.h>
-#include <app/util/af-main.h>
 #include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 
