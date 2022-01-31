@@ -25,7 +25,7 @@
                 "WHD_PRINT_DISABLE"
             ],
             "target.components_add": ["capsense"],
-            "ble-button": "USER_BUTTON",
+            "function-button2": "USER_BUTTON",
             "mcuboot.primary-slot-address": "0x10022000",
             "mcuboot.slot-size": "0x180000",
             "mcuboot.scratch-address": "0x101A2000",
@@ -43,21 +43,29 @@
             "help": "System status LED.",
             "value": "LED1"
         },
-        "function-button": {
-            "help": "Function button pin.",
+        "function-button1": {
+            "help": "Function button 1 pin.",
             "value": "BUTTON1"
         },
-        "ble-button": {
-            "help": "BLE button pin.",
+        "function-button2": {
+            "help": "Function button 2 pin.",
             "value": "BUTTON2"
         },
         "factory-reset-trigger-timeout": {
-            "help": "'function-button' press timeout to trigger a factory reset (in milliseconds).",
+            "help": "'function-button1' press timeout to trigger a factory reset (in milliseconds).",
             "value": 3000
         },
-        "factory-reset-cancel-window-timeout": {
-            "help": "'function-button' press timeout to cancel a factory reset (in milliseconds). The total 'function-button' press time to have the factory reset actually initiated is equal to 'factory-reset-trigger-timeout' + 'factory-reset-cancel-window-timeout'.",
+        "commissioning-reset-trigger-timeout": {
+            "help": "'function-button2' press timeout to trigger a commissioning reset (in milliseconds).",
             "value": 3000
+        },
+        "reset-cancel-window-timeout": {
+            "help": "'function-buttonX' press timeout to cancel a reset task (in milliseconds). The total 'function-buttonX' press time to have the specific reset actually initiated is equal to '<type>-reset-trigger-timeout' + 'reset-cancel-window-timeout'.",
+            "value": 3000
+        },
+        "user-response-timeout": {
+            "help": "Amount of time (in milliseconds) to wait for a response from the user. Value equal 0 means waiting forever",
+            "value": 0
         },
         "ble-device-name": {
             "help": "Name used for BLE advertising.",
