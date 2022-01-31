@@ -124,7 +124,7 @@ tests:
       attribute: "TargetPositionLiftPercent100ths"
       PICS: WNCV_LF && WNCV_PA_LF
       response:
-            value: 0
+            value: 10000
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -135,7 +135,7 @@ tests:
       attribute: "TargetPositionTiltPercent100ths"
       PICS: WNCV_TL && WNCV_PA_TL
       response:
-            value: 0
+            value: 10000
 
     - label: "2e: TH leave the device moving for 2 seconds"
       cluster: "DelayCommands"
