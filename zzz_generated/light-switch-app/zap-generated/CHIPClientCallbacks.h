@@ -30,6 +30,7 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
+<<<<<<< HEAD
 // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
 // instead of IM status code.
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
@@ -51,6 +52,8 @@ typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint8_t s
                                                        uint16_t transitionTime, chip::CharSpan sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
+=======
+>>>>>>> master
 // List specific responses
 void GroupsClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                    chip::Callback::Cancelable * onFailureCallback);

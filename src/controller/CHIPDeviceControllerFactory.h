@@ -71,7 +71,6 @@ struct FactoryInitParams
     System::Layer * systemLayer                                   = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-    DeviceControllerInteractionModelDelegate * imDelegate         = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
