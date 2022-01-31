@@ -24,10 +24,10 @@
 #include <WindowApp.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/callback.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -37,19 +37,20 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters::WindowCovering;
 
-void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     switch (attributePath.mClusterId)
     {
-        case Id:
-            MatterWindowCoveringClusterServerAttributeChangedCallback(attributePath);
-            break;
-        case app::Clusters::Identify::Id:
-            ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
-            ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-            break;
-        default:
-            break;
+    case Id:
+        MatterWindowCoveringClusterServerAttributeChangedCallback(attributePath);
+        break;
+    case app::Clusters::Identify::Id:
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+    default:
+        break;
     }
 }
 
