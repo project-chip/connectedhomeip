@@ -61,6 +61,8 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
     return false;
 }
 
+#if CHIP_DETAIL_LOGGING
+
 char GetAuthModeStringForLogging(AuthMode authMode)
 {
     switch (authMode)
@@ -139,6 +141,8 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     }
     return 'u';
 }
+
+#endif // CHIP_DETAIL_LOGGING
 
 } // namespace
 
